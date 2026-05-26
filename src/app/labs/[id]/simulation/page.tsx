@@ -66,6 +66,7 @@ export default function SimulationRoomPage() {
         const deltaSeconds = 0.1 * simulationSpeed;
         const nextSeconds = elapsedSecondsRef.current + deltaSeconds;
         setElapsedSeconds(nextSeconds);
+        elapsedSecondsRef.current = nextSeconds;
 
         // Calculate Temperature based on decay equation
         // T(t) = Ts + (T0 - Ts) * e^(-kt)
@@ -73,6 +74,7 @@ export default function SimulationRoomPage() {
         const mins = nextSeconds / 60;
         const nextTemp = ambientTemp + (initialTemp - ambientTemp) * Math.exp(-coolingConstant * mins);
         setCurrentTemp(nextTemp);
+        currentTempRef.current = nextTemp;
 
         // Check if log interval threshold is crossed to auto log a data point
         if (nextSeconds - lastLoggedTimeRef.current >= logInterval) {
@@ -81,6 +83,7 @@ export default function SimulationRoomPage() {
             { time: mins, temp: nextTemp, ambient: ambientTemp },
           ]);
           setLastLoggedTime(nextSeconds);
+          lastLoggedTimeRef.current = nextSeconds;
         }
       }, 100);
     }
@@ -92,24 +95,35 @@ export default function SimulationRoomPage() {
 
   // Start / Pause toggle
   const handleStartStop = () => {
-    setIsRunning(!isRunning);
+    const nextIsRunning = !isRunning;
+    setIsRunning(nextIsRunning);
+    isRunningRef.current = nextIsRunning;
 
     // If starting from absolute zero, add initial log point
-    if (!isRunning && elapsedSeconds === 0) {
+    if (nextIsRunning && elapsedSeconds === 0) {
       setDataPoints([
         { time: 0, temp: initialTemp, ambient: ambientTemp }
       ]);
       setLastLoggedTime(0);
+      lastLoggedTimeRef.current = 0;
     }
   };
 
   // Reset simulator
   const handleReset = () => {
     setIsRunning(false);
+    isRunningRef.current = false;
+    
     setElapsedSeconds(0);
+    elapsedSecondsRef.current = 0;
+    
     setCurrentTemp(initialTemp);
+    currentTempRef.current = initialTemp;
+    
     setDataPoints([]);
+    
     setLastLoggedTime(0);
+    lastLoggedTimeRef.current = 0;
   };
 
   // Add Manual log point
@@ -151,8 +165,40 @@ export default function SimulationRoomPage() {
     const content = dataPoints
       .map(p => `เวลา: ${p.time.toFixed(1)} นาที | อุณหภูมิ: ${p.temp.toFixed(1)}°C | อุณหภูมิแวดล้อม: ${p.ambient.toFixed(1)}°C`)
       .join("\n");
-    navigator.clipboard.writeText(content);
-    alert("คัดลอกตารางข้อมูลลงคลิปบอร์ดแล้ว!");
+    
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(content)
+          .then(() => alert("คัดลอกตารางข้อมูลลงคลิปบอร์ดแล้ว!"))
+          .catch(() => {
+            fallbackCopy(content);
+          });
+      } else {
+        fallbackCopy(content);
+      }
+    } catch (err) {
+      fallbackCopy(content);
+    }
+  };
+
+  // Fallback Copy method for legacy browsers / non-secure contexts
+  const fallbackCopy = (text: string) => {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    // Prevent scrolling to bottom in legacy browsers
+    textArea.style.top = "0";
+    textArea.style.left = "0";
+    textArea.style.position = "fixed";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    try {
+      document.execCommand("copy");
+      alert("คัดลอกตารางข้อมูลลงคลิปบอร์ดแล้ว!");
+    } catch (err) {
+      alert("ไม่สามารถคัดลอกข้อมูลโดยอัตโนมัติได้ กรุณาคัดลอกด้วยตนเอง");
+    }
+    document.body.removeChild(textArea);
   };
 
   // Save results and redirect
