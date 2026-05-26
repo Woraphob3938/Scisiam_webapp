@@ -13,7 +13,7 @@ import LabSidebar from "@/components/labs/LabSidebar";
 import DecorativeBackground from "@/components/labs/DecorativeBackground";
 import BottomCallout from "@/components/BottomCallout";
 
-import { ClipboardList, Target, X, CheckCircle, Sliders, Thermometer, Sun, Zap, RefreshCw } from "lucide-react";
+import { ClipboardList, Target, X, CheckCircle, Sliders, Thermometer, Sun, Zap, RefreshCw, Play } from "lucide-react";
 
 // Types
 import { LabData } from "@/components/LabCard";
@@ -176,7 +176,25 @@ export default function LabDetailPage() {
       </main>
 
       {/* 5. Bottom callout banner */}
-      <BottomCallout />
+      <div className="w-full max-w-4xl mx-auto px-6 py-6 select-none relative z-10">
+        <div className="relative overflow-hidden rounded-full bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-600 p-[1.5px] shadow-lg shadow-indigo-500/10 group hover:shadow-xl hover:shadow-indigo-500/15 transition-all duration-300">
+          <div className="bg-white/95 rounded-full px-8 py-3.5 flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
+            <div className="flex items-center gap-2">
+              <span className="w-5 h-5 flex items-center justify-center shrink-0">🚀</span>
+              <p className="text-xs sm:text-sm font-bold bg-gradient-to-r from-slate-700 via-slate-800 to-slate-900 bg-clip-text text-transparent leading-relaxed tracking-wide">
+                พร้อมเริ่มเรียนรู้แล้วหรือยัง? กดเริ่มทดลองและค้นพบการเปลี่ยนแปลงของอุณหภูมิไปพร้อมกัน!
+              </p>
+            </div>
+            
+            <button
+              onClick={handleStartExperiment}
+              className="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-full text-xs font-bold transition-all duration-300 flex items-center gap-1.5 cursor-pointer active:scale-95 shadow-md shadow-indigo-500/10 shrink-0"
+            >
+              <span>เริ่มทดลอง</span>
+            </button>
+          </div>
+        </div>
+      </div>
 
       {/* 6. Simulator Loading & Interactive Console Modal */}
       {showSimModal && (
@@ -363,20 +381,16 @@ export default function LabDetailPage() {
                   กำลังดาวน์โหลดแบบจำลอง...
                 </button>
               ) : (
-                <>
-                  <button 
-                    onClick={closeModal}
-                    className="px-5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs sm:text-sm font-bold text-slate-600 hover:bg-slate-100 transition-all cursor-pointer"
-                  >
-                    ออกจากการจำลอง
-                  </button>
-                  <button 
-                    onClick={() => alert("ระบบบันทึกความคืบหน้าการทดลองแล้ว! (Mock Save)")}
-                    className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-all shadow-md shadow-indigo-600/10 cursor-pointer"
-                  >
-                    ส่งรายงานและบันทึก
-                  </button>
-                </>
+                <button 
+                  onClick={() => {
+                    router.push(`/labs/${labId}/simulation`);
+                    closeModal();
+                  }}
+                  className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 transition-all shadow-md shadow-indigo-600/10 cursor-pointer"
+                >
+                  <Play className="w-4 h-4 fill-white" />
+                  <span>เข้าสู่ห้องทดลองจำลอง 🔬</span>
+                </button>
               )}
             </div>
 
