@@ -25,6 +25,12 @@ export default function ExperimentViewport({
     return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")} นาที`;
   };
 
+  const formatTimeOnly = (totalSeconds: number) => {
+    const mins = Math.floor(totalSeconds / 60);
+    const secs = Math.floor(totalSeconds % 60);
+    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  };
+
   // Calculate instant cooling rate: dT/dt = -k(T - Ts)
   const coolingRate = -coolingConstant * (currentTemp - ambientTemp);
 
@@ -186,83 +192,77 @@ export default function ExperimentViewport({
         <div className="md:col-span-4 flex flex-col justify-between gap-3">
           
           {/* STAT 1: อุณหภูมิของวัตถุ (T) */}
-          <div className="bg-rose-50/50 border border-rose-100 rounded-xl p-3.5 flex items-center justify-between shadow-xs">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
-                <Thermometer className="w-4.5 h-4.5" />
+          <div className="bg-rose-50/50 border border-rose-100/80 rounded-2xl p-4 flex items-center justify-between gap-4 shadow-sm hover:shadow-md transition-all duration-300">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-rose-100 text-rose-500 flex items-center justify-center shrink-0 shadow-sm">
+                <Thermometer className="w-5.5 h-5.5" />
               </div>
-              <div className="text-left">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide block leading-none">
-                  อุณหภูมิวัตถุ (T)
-                </span>
-                <span className="text-sm font-bold text-slate-700 mt-1 block leading-none">
-                  Object Temp
-                </span>
+              <div className="flex flex-col text-left">
+                <span className="text-xs font-bold text-slate-700">อุณหภูมิวัตถุ (T)</span>
+                <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Object Temp</span>
               </div>
             </div>
-            <span className="text-base sm:text-lg font-extrabold text-rose-600">
-              {currentTemp.toFixed(1)}°C
-            </span>
+            <div className="text-right">
+              <span className="text-lg sm:text-xl font-black text-rose-600 tracking-tight leading-none">
+                {currentTemp.toFixed(1)}°C
+              </span>
+            </div>
           </div>
 
           {/* STAT 2: อุณหภูมิสิ่งแวดล้อม (Ts) */}
-          <div className="bg-blue-50/50 border border-blue-100 rounded-xl p-3.5 flex items-center justify-between shadow-xs">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
-                <Sun className="w-4.5 h-4.5" />
+          <div className="bg-blue-50/50 border border-blue-100/80 rounded-2xl p-4 flex items-center justify-between gap-4 shadow-sm hover:shadow-md transition-all duration-300">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-500 flex items-center justify-center shrink-0 shadow-sm">
+                <Sun className="w-5.5 h-5.5" />
               </div>
-              <div className="text-left">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide block leading-none">
-                  อุณหภูมิสิ่งแวดล้อม (Ts)
-                </span>
-                <span className="text-sm font-bold text-slate-700 mt-1 block leading-none">
-                  Ambient Temp
-                </span>
+              <div className="flex flex-col text-left">
+                <span className="text-xs font-bold text-slate-700">อุณหภูมิสิ่งแวดล้อม (Tₛ)</span>
+                <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Ambient Temp</span>
               </div>
             </div>
-            <span className="text-base sm:text-lg font-extrabold text-blue-600">
-              {ambientTemp.toFixed(1)}°C
-            </span>
+            <div className="text-right">
+              <span className="text-lg sm:text-xl font-black text-blue-600 tracking-tight leading-none">
+                {ambientTemp.toFixed(1)}°C
+              </span>
+            </div>
           </div>
 
-          {/* STAT 3: เวลาจับเวลา */}
-          <div className="bg-slate-50/80 border border-slate-200/60 rounded-xl p-3.5 flex items-center justify-between shadow-xs">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center shrink-0">
-                <Timer className="w-4.5 h-4.5" />
+          {/* STAT 3: เวลาการทดลอง */}
+          <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4 flex items-center justify-between gap-4 shadow-sm hover:shadow-md transition-all duration-300">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-slate-100 text-slate-500 flex items-center justify-center shrink-0 shadow-sm">
+                <Timer className="w-5.5 h-5.5" />
               </div>
-              <div className="text-left">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide block leading-none">
-                  เวลาการทดลอง
-                </span>
-                <span className="text-sm font-bold text-slate-700 mt-1 block leading-none">
-                  Elapsed Time
-                </span>
+              <div className="flex flex-col text-left">
+                <span className="text-xs font-bold text-slate-700">เวลาการทดลอง</span>
+                <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Elapsed Time</span>
               </div>
             </div>
-            <span className="text-base sm:text-lg font-extrabold text-slate-700">
-              {formatTime(elapsedSeconds)}
-            </span>
+            <div className="text-right flex flex-col items-end shrink-0">
+              <span className="text-lg sm:text-xl font-black text-slate-700 tracking-tight leading-none">
+                {formatTimeOnly(elapsedSeconds)}
+              </span>
+              <span className="text-[10px] font-bold text-slate-400 mt-1">นาที</span>
+            </div>
           </div>
 
           {/* STAT 4: อัตราการเปลี่ยนแปลง dT/dt */}
-          <div className="bg-emerald-50/50 border border-emerald-100 rounded-xl p-3.5 flex items-center justify-between shadow-xs">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
-                <TrendingDown className="w-4.5 h-4.5" />
+          <div className="bg-emerald-50/50 border border-emerald-100/80 rounded-2xl p-4 flex items-center justify-between gap-4 shadow-sm hover:shadow-md transition-all duration-300">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 shadow-sm">
+                <TrendingDown className="w-5.5 h-5.5" />
               </div>
-              <div className="text-left">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide block leading-none">
-                  อัตราเปลี่ยนอุณหภูมิ
-                </span>
-                <span className="text-sm font-bold text-slate-700 mt-1 block leading-none">
-                  Rate (dT/dt)
-                </span>
+              <div className="flex flex-col text-left">
+                <span className="text-xs font-bold text-slate-700">อัตราเปลี่ยนอุณหภูมิ</span>
+                <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Rate (dT/dt)</span>
               </div>
             </div>
-            <span className="text-base sm:text-lg font-extrabold text-emerald-600">
-              {coolingRate.toFixed(2)} °C/นาที
-            </span>
+            <div className="text-right flex flex-col items-end shrink-0">
+              <span className="text-lg sm:text-xl font-black text-emerald-600 tracking-tight leading-none">
+                {coolingRate.toFixed(2)}
+              </span>
+              <span className="text-[10px] font-bold text-emerald-500 mt-1">°C/นาที</span>
+            </div>
           </div>
 
         </div>

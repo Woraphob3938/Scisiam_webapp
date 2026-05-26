@@ -217,11 +217,11 @@ export default function SimulationRoomPage() {
             </div>
 
             {/* Row 2: Live Graph & Log Data Table & Formula */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6.5">
-              <div className="h-full">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6.5">
+              <div className="lg:col-span-5 md:col-span-6 col-span-1 h-full">
                 <LiveGraph dataPoints={dataPoints} />
               </div>
-              <div className="h-full">
+              <div className="lg:col-span-4 md:col-span-6 col-span-1 h-full">
                 <DataTable
                   dataPoints={dataPoints}
                   onAddPoint={handleAddPoint}
@@ -229,7 +229,7 @@ export default function SimulationRoomPage() {
                   onCopyData={handleCopyData}
                 />
               </div>
-              <div className="h-full">
+              <div className="lg:col-span-3 md:col-span-12 col-span-1 h-full">
                 <FormulaCard />
               </div>
             </div>

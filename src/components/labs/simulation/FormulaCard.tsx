@@ -5,7 +5,7 @@ import { Info, HelpCircle } from "lucide-react";
 
 export default function FormulaCard() {
   return (
-    <div className="bg-white rounded-3xl border border-slate-100 p-6 shadow-md shadow-slate-100/50 hover:shadow-lg transition-all duration-300 flex flex-col justify-between h-full select-none">
+    <div className="bg-white rounded-3xl border border-slate-100 p-6 shadow-md shadow-slate-100/50 hover:shadow-lg transition-all duration-300 flex flex-col h-full select-none">
       
       {/* Header */}
       <h3 className="text-base sm:text-lg font-bold text-slate-800 tracking-tight mb-4 border-b border-slate-50 pb-2.5 flex items-center gap-2">
@@ -13,7 +13,7 @@ export default function FormulaCard() {
         สมการของกฎการเย็นตัวของนิวตัน
       </h3>
 
-      <div className="space-y-4 text-left">
+      <div className="flex-grow flex flex-col justify-between gap-4">
         
         {/* Large Equation box */}
         <div className="bg-gradient-to-tr from-blue-50 to-indigo-50/50 rounded-2xl border border-blue-100/50 p-5 flex items-center justify-center">
@@ -28,18 +28,18 @@ export default function FormulaCard() {
         </div>
 
         {/* Variables definitions */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 text-xs sm:text-sm border-b border-slate-100 pb-3">
-          <div className="flex items-center gap-2 bg-slate-50/50 border border-slate-100 p-2.5 rounded-xl">
+        <div className="flex flex-col gap-2 border-b border-slate-100 pb-3">
+          <div className="flex items-center gap-2.5 bg-slate-50/50 border border-slate-100 p-2.5 rounded-xl">
             <span className="w-6 h-6 rounded-lg bg-rose-50 border border-rose-100 text-rose-500 font-extrabold flex items-center justify-center shrink-0">T</span>
-            <span className="text-slate-500 font-bold">อุณหภูมิวัตถุ (°C)</span>
+            <span className="text-slate-600 font-semibold text-xs">อุณหภูมิวัตถุ (°C)</span>
           </div>
-          <div className="flex items-center gap-2 bg-slate-50/50 border border-slate-100 p-2.5 rounded-xl">
+          <div className="flex items-center gap-2.5 bg-slate-50/50 border border-slate-100 p-2.5 rounded-xl">
             <span className="w-6 h-6 rounded-lg bg-blue-50 border border-blue-100 text-blue-500 font-extrabold flex items-center justify-center shrink-0">T<sub>s</sub></span>
-            <span className="text-slate-500 font-bold">อุณหภูมิสิ่งแวดล้อม (°C)</span>
+            <span className="text-slate-600 font-semibold text-xs">อุณหภูมิสิ่งแวดล้อม (°C)</span>
           </div>
-          <div className="flex items-center gap-2 bg-slate-50/50 border border-slate-100 p-2.5 rounded-xl">
+          <div className="flex items-center gap-2.5 bg-slate-50/50 border border-slate-100 p-2.5 rounded-xl">
             <span className="w-6 h-6 rounded-lg bg-purple-50 border border-purple-100 text-purple-600 font-extrabold flex items-center justify-center shrink-0">k</span>
-            <span className="text-slate-500 font-bold">ค่าคงที่การเย็นตัว (/นาที)</span>
+            <span className="text-slate-600 font-semibold text-xs">ค่าคงที่การเย็นตัว (/นาที)</span>
           </div>
         </div>
 

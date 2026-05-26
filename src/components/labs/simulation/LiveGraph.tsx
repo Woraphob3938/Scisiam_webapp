@@ -37,7 +37,7 @@ export default function LiveGraph({ dataPoints }: LiveGraphProps) {
   };
 
   return (
-    <div className="bg-white rounded-3xl border border-slate-100 p-6 shadow-md shadow-slate-100/50 hover:shadow-lg transition-all duration-300 flex flex-col justify-between h-full select-none">
+    <div className="bg-white rounded-3xl border border-slate-100 p-6 shadow-md shadow-slate-100/50 hover:shadow-lg transition-all duration-300 flex flex-col h-full select-none">
       
       {/* Header */}
       <div className="flex items-center justify-between mb-4 pb-2 border-b border-slate-50">
@@ -66,14 +66,14 @@ export default function LiveGraph({ dataPoints }: LiveGraphProps) {
       </div>
 
       {/* SVG Canvas Container */}
-      <div className="w-full bg-slate-50/50 border border-slate-100 rounded-2xl p-4 flex items-center justify-center relative">
+      <div className="w-full bg-slate-50/50 border border-slate-100 rounded-2xl p-4 flex-1 flex flex-col items-center justify-center relative min-h-[220px]">
         {dataPoints.length === 0 ? (
-          <div className="h-44 flex flex-col items-center justify-center text-slate-400 gap-1.5">
+          <div className="flex-1 flex flex-col items-center justify-center text-slate-400 gap-1.5 py-8">
             <HelpCircle className="w-8 h-8 text-slate-300 animate-pulse" />
             <p className="text-xs font-semibold">กดปุ่ม "เริ่ม" เพื่อพล็อตกราฟเรียลไทม์</p>
           </div>
         ) : (
-          <svg className="w-full h-44 sm:h-52" viewBox="0 0 320 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <svg className="w-full h-full min-h-[176px]" viewBox="0 0 320 160" fill="none" xmlns="http://www.w3.org/2000/svg">
             {/* Grid subdivisions lines (horizontal) */}
             <line x1="30" y1="135" x2="290" y2="135" stroke="#cbd5e1" strokeWidth="1.5" />
             <line x1="30" y1="108" x2="290" y2="108" stroke="#f1f5f9" strokeWidth="1" />
