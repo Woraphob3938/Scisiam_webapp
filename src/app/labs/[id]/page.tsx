@@ -102,6 +102,90 @@ const labsData: Record<string, LabData> = {
     category: "Physics",
     status: "",
     description: "ศึกษาอัตราการแผ่รังสีความร้อนของวัตถุดำและอัตราการสูญเสียพลังงานที่แปรผันตามอุณหภูมิสัมบูรณ์ยกกำลังสี่"
+  },
+  "acid-base-titration": {
+    id: "acid-base-titration",
+    title: "Acid-Base Titration Lab",
+    category: "Chemistry",
+    status: "",
+    description: "ทดลองวัดและหาค่าความเข้มข้นของกรดหรือเบสผ่านกระบวนการไทเทรตทางเคมี ติดตามระดับ pH และการเปลี่ยนสีของอินดิเคเตอร์แบบเรียลไทม์"
+  },
+  "boyles-law": {
+    id: "boyles-law",
+    title: "Boyle's Gas Law Lab",
+    category: "Chemistry",
+    status: "",
+    description: "ทดลองวัดความสัมพันธ์ระหว่างความดันและปริมาตรของแก๊สที่อุณหภูมิคงที่เพื่อตรวจสอบกฎของบอยล์"
+  },
+  "charross-law": {
+    id: "charles-law",
+    title: "Charles's Temperature-Volume Lab",
+    category: "Chemistry",
+    status: "",
+    description: "วิเคราะห์ความสัมพันธ์เชิงปริมาณระหว่างอุณหภูมิและปริมาตรของแก๊สภายใต้ความดันคงตัวตามกฎของชาร์ล"
+  },
+  "le-chateliers-principle": {
+    id: "le-chateliers-principle",
+    title: "Chemical Equilibrium Shift",
+    category: "Chemistry",
+    status: "",
+    description: "ศึกษาการเปลี่ยนแปลงสมดุลเคมีเมื่อรบกวนระบบด้วยความดัน อุณหภูมิ และความเข้มข้นสารตามหลักของเลอชาเตอลิเย"
+  },
+  "beer-lambert-law": {
+    id: "beer-lambert-law",
+    title: "Spectrophotometry & Concentration",
+    category: "Chemistry",
+    status: "",
+    description: "วัดการดูดกลืนแสงของสารละลายที่มีความเข้มข้นต่างกันเพื่อสร้างกราฟมาตรฐานตามกฎของเบียร์-ลัมแบร์ต"
+  },
+  "hesss-law": {
+    id: "hesss-law",
+    title: "Hess's Law & Calorimetry",
+    category: "Chemistry",
+    status: "",
+    description: "ทดลองวัดความร้อนของปฏิกิริยาเคมีหลายขั้นตอนเพื่อพิสูจน์ความไม่ขึ้นกับเส้นทางของเอนทัลปีรวมตามกฎของเฮสส์"
+  },
+  "galvanic-cell": {
+    id: "galvanic-cell",
+    title: "Galvanic Cells & Voltage",
+    category: "Chemistry",
+    status: "",
+    description: "ศึกษาปฏิกิริยารีดอกซ์และการไหลของกระแสไฟฟ้าในเซลล์เคมีไฟฟ้าเพื่อคำนวณหาค่าแรงเคลื่อนไฟฟ้ามาตรฐาน"
+  },
+  "chemical-kinetics": {
+    id: "chemical-kinetics",
+    title: "Chemical Reaction Rates",
+    category: "Chemistry",
+    status: "",
+    description: "วิเคราะห์ปัจจัยที่มีผลต่ออัตราการเกิดปฏิกิริยาเคมี เช่น ความเข้มข้น อุณหภูมิ และตัวเร่งปฏิกิริยาตามทฤษฎีการชน"
+  },
+  "solubility-product": {
+    id: "solubility-product",
+    title: "Solubility Product Constant",
+    category: "Chemistry",
+    status: "",
+    description: "ศึกษาปฏิกิริยาการเกิดตะกอนและการละลายของเกลือละลายยากเพื่อคำนวณหาค่าคงตัวผลคูณการละลาย"
+  },
+  "avogadros-law": {
+    id: "avogadros-law",
+    title: "Avogadro's Molar Volume",
+    category: "Chemistry",
+    status: "",
+    description: "ทดลองหาปริมาตรของแก๊ส 1 โมลที่สภาวะมาตรฐาน (STP) และศึกษาความสัมพันธ์กับจำนวนอนุภาคของแก๊ส"
+  },
+  "electrolysis-lab": {
+    id: "electrolysis-lab",
+    title: "Electrolysis & Metal Plating",
+    category: "Chemistry",
+    status: "",
+    description: "ทดลองแยกสารเคมีด้วยไฟฟ้าและชุบโลหะเพื่อวิเคราะห์ความสัมพันธ์ของปริมาณสารตามกฎการแยกสารด้วยไฟฟ้า"
+  },
+  "colligative-properties": {
+    id: "colligative-properties",
+    title: "Colligative Properties Lab",
+    category: "Chemistry",
+    status: "",
+    description: "ศึกษาการลดลงของจุดเยือกแข็งและการเพิ่มขึ้นของจุดเดือดของตัวทำละลายเมื่อเติมตัวละลายที่ระเหยยาก"
   }
 };
 

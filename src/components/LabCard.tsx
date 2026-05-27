@@ -108,8 +108,251 @@ const TitrationSVG = () => (
   </svg>
 );
 
-// 3. SVG Illustration for Biology (Photosynthesis Rate Chamber)
-// Plant in glass dome under the sun
+// 4. Boyle's Law SVG
+const BoylesLawSVG = () => (
+  <svg className="w-full h-32" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="100" cy="60" r="45" fill="#fee2e2" opacity="0.4" />
+    <rect x="50" y="45" width="80" height="30" rx="2" fill="rgba(255,255,255,0.8)" stroke="#94a3b8" strokeWidth="2" />
+    <rect x="110" y="46" width="6" height="28" fill="#ef4444" />
+    <rect x="116" y="57" width="40" height="6" fill="#cbd5e1" stroke="#94a3b8" strokeWidth="1" />
+    <rect x="156" y="50" width="4" height="20" fill="#475569" />
+
+    <circle cx="60" cy="55" r="2.5" fill="#ef4444" />
+    <circle cx="70" cy="50" r="2.5" fill="#ef4444" className="animate-pulse" />
+    <circle cx="65" cy="65" r="2.5" fill="#ef4444" />
+    <circle cx="78" cy="60" r="2.5" fill="#ef4444" />
+    <circle cx="85" cy="52" r="2.5" fill="#ef4444" />
+    <circle cx="95" cy="58" r="2.5" fill="#ef4444" className="animate-pulse" />
+    <circle cx="90" cy="68" r="2.5" fill="#ef4444" />
+    <circle cx="75" cy="70" r="2.5" fill="#ef4444" />
+
+    <g transform="translate(15, 45)">
+      <circle cx="15" cy="15" r="12" fill="#ffffff" stroke="#94a3b8" strokeWidth="1.5" />
+      <path d="M15,15 L23,20" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" className="animate-pulse" />
+      <text x="15" y="24" fill="#94a3b8" fontSize="6" textAnchor="middle" fontWeight="bold">P</text>
+    </g>
+  </svg>
+);
+
+// 5. Charles's Law SVG
+const CharlessLawSVG = () => (
+  <svg className="w-full h-32" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="100" cy="60" r="45" fill="#fee2e2" opacity="0.4" />
+    <path d="M90,105 L110,105 L104,85 L96,85 Z" fill="#64748b" stroke="#475569" strokeWidth="1.5" />
+    <path d="M100,85 L100,80" stroke="#94a3b8" strokeWidth="2" />
+    <path d="M100,70 Q95,78 100,83 Q105,78 100,70" fill="#f59e0b" className="animate-bounce" />
+    <path d="M100,74 Q97,79 100,82 Q103,79 100,74" fill="#ef4444" />
+
+    <rect x="70" y="20" width="60" height="50" rx="3" fill="rgba(255,255,255,0.85)" stroke="#94a3b8" strokeWidth="2" />
+    <rect x="72" y="25" width="56" height="6" fill="#ef4444" />
+
+    <circle cx="85" cy="40" r="2.5" fill="#ef4444" />
+    <circle cx="115" cy="38" r="2.5" fill="#ef4444" className="animate-pulse" />
+    <circle cx="100" cy="45" r="2.5" fill="#ef4444" />
+    <circle cx="90" cy="55" r="2.5" fill="#ef4444" />
+    <circle cx="110" cy="58" r="2.5" fill="#ef4444" className="animate-pulse" />
+    <circle cx="120" cy="48" r="2.5" fill="#ef4444" />
+  </svg>
+);
+
+// 6. Le Chatelier's Principle SVG
+const LeChateliersPrincipleSVG = () => (
+  <svg className="w-full h-32" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="100" cy="60" r="45" fill="#fee2e2" opacity="0.4" />
+    <line x1="100" y1="30" x2="100" y2="90" stroke="#475569" strokeWidth="3" />
+    <rect x="80" y="90" width="40" height="5" fill="#475569" rx="1" />
+    
+    <line x1="50" y1="40" x2="150" y2="40" stroke="#475569" strokeWidth="2" />
+    <circle cx="100" cy="40" r="3" fill="#94a3b8" />
+
+    <path d="M40,40 L45,65 H75 L80,40" stroke="#475569" strokeWidth="1.5" fill="none" />
+    <path d="M46,63 H74 L78,45 H42 Z" fill="#ef4444" opacity="0.75" />
+
+    <path d="M120,40 L125,65 H155 L160,40" stroke="#475569" strokeWidth="1.5" fill="none" />
+    <path d="M126,63 H154 L158,45 H122 Z" fill="#f87171" opacity="0.4" />
+
+    <path d="M92,20 L108,20 M104,17 L108,20 L104,23" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M108,26 L92,26 M96,23 L92,26 L96,29" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+// 7. Beer-Lambert Law SVG
+const BeerLambertLawSVG = () => (
+  <svg className="w-full h-32" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="100" cy="60" r="45" fill="#fee2e2" opacity="0.4" />
+    <rect x="85" y="25" width="30" height="70" rx="1" fill="rgba(255,255,255,0.7)" stroke="#94a3b8" strokeWidth="2" />
+    <rect x="87" y="35" width="26" height="58" fill="#ef4444" opacity="0.75" />
+
+    <path d="M20,60 L85,60" stroke="#f59e0b" strokeWidth="6" opacity="0.9" strokeLinecap="round" />
+    <path d="M115,60 L180,60" stroke="#f59e0b" strokeWidth="2.5" opacity="0.5" strokeLinecap="round" />
+
+    <text x="50" y="50" fill="#f59e0b" fontSize="8" fontWeight="bold" textAnchor="middle">Light I₀</text>
+    <text x="150" y="50" fill="#d97706" fontSize="8" fontWeight="bold" textAnchor="middle">Light I</text>
+  </svg>
+);
+
+// 8. Hess's Law SVG
+const HesssLawSVG = () => (
+  <svg className="w-full h-32" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="100" cy="60" r="45" fill="#fee2e2" opacity="0.4" />
+    <path d="M75,35 L80,85 A8,8 0 0,0 88,93 H112 A8,8 0 0,0 120,85 L125,35 Z" fill="rgba(255,255,255,0.9)" stroke="#94a3b8" strokeWidth="2" />
+    <line x1="72" y1="35" x2="128" y2="35" stroke="#475569" strokeWidth="3" strokeLinecap="round" />
+
+    <path d="M81,80 A6,6 0 0,0 87,86 H113 A6,6 0 0,0 119,80 L122,50 H78 Z" fill="#ef4444" opacity="0.5" />
+
+    <rect x="98" y="15" width="4" height="60" rx="1.5" fill="#ffffff" stroke="#475569" strokeWidth="1" />
+    <circle cx="100" cy="74" r="5" fill="#ef4444" stroke="#475569" strokeWidth="1" />
+    <rect x="99.5" y="45" width="1" height="30" fill="#ef4444" />
+
+    <path d="M68,50 Q64,55 68,60" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round" className="animate-pulse" />
+    <path d="M132,50 Q136,55 132,60" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round" className="animate-pulse" />
+  </svg>
+);
+
+// 9. Galvanic Cell SVG
+const GalvanicCellSVG = () => (
+  <svg className="w-full h-32" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="100" cy="60" r="45" fill="#fee2e2" opacity="0.4" />
+    <path d="M35,50 L38,85 A5,5 0 0,0 43,90 H67 A5,5 0 0,0 72,85 L75,50" stroke="#64748b" strokeWidth="1.5" fill="none" />
+    <path d="M38,82 H72 L74,60 H36 Z" fill="#fee2e2" />
+    <rect x="42" y="40" width="8" height="42" fill="#ef4444" stroke="#b91c1c" strokeWidth="1" />
+
+    <path d="M125,50 L128,85 A5,5 0 0,0 133,90 H157 A5,5 0 0,0 162,85 L165,50" stroke="#64748b" strokeWidth="1.5" fill="none" />
+    <path d="M128,82 H162 L164,60 H126 Z" fill="#93c5fd" opacity="0.4" />
+    <rect x="150" y="40" width="8" height="42" fill="#94a3b8" stroke="#475569" strokeWidth="1" />
+
+    <path d="M60,65 L60,45 A10,10 0 0,1 80,35 H120 A10,10 0 0,1 140,45 L140,65" stroke="#e2e8f0" strokeWidth="5" fill="none" strokeLinecap="round" />
+    <path d="M60,65 L60,45 A10,10 0 0,1 80,35 H120 A10,10 0 0,1 140,45 L140,65" stroke="#cbd5e1" strokeWidth="3" fill="none" strokeLinecap="round" />
+
+    <path d="M46,40 L46,25 L90,25" stroke="#475569" strokeWidth="1.5" fill="none" />
+    <path d="M154,40 L154,25 L110,25" stroke="#475569" strokeWidth="1.5" fill="none" />
+    <circle cx="100" cy="25" r="9" fill="#ffffff" stroke="#475569" strokeWidth="1.5" />
+    <text x="100" y="29" fill="#ef4444" fontSize="7" fontWeight="bold" textAnchor="middle" className="animate-pulse">V</text>
+  </svg>
+);
+
+// 10. Chemical Kinetics SVG
+const ChemicalKineticsSVG = () => (
+  <svg className="w-full h-32" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="100" cy="60" r="45" fill="#fee2e2" opacity="0.4" />
+    
+    <g transform="translate(60, 45)">
+      <circle cx="0" cy="0" r="8" fill="#ef4444" />
+      <circle cx="14" cy="0" r="6" fill="#f87171" />
+      <path d="M7,-10 L7,10 M-3,0 L17,0" stroke="#f59e0b" strokeWidth="1.5" strokeLinecap="round" className="animate-ping" />
+    </g>
+
+    <g transform="translate(130, 70)">
+      <circle cx="0" cy="0" r="7" fill="#ef4444" />
+      <circle cx="12" cy="0" r="7" fill="#94a3b8" />
+      <path d="M6,-8 L6,8 M-2,0 L14,0" stroke="#f59e0b" strokeWidth="1" strokeLinecap="round" />
+    </g>
+
+    <path d="M30,95 Q70,95 90,40 T150,95" stroke="#ef4444" strokeWidth="2" strokeDasharray="3 3" fill="none" opacity="0.6" />
+    <text x="90" y="32" fill="#ef4444" fontSize="7" fontWeight="bold" textAnchor="middle">Ea</text>
+  </svg>
+);
+
+// 11. Solubility Product SVG
+const SolubilityProductSVG = () => (
+  <svg className="w-full h-32" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="100" cy="60" r="45" fill="#fee2e2" opacity="0.4" />
+    <path d="M65,30 L68,90 A6,6 0 0,0 74,96 H126 A6,6 0 0,0 132,90 L135,30" stroke="#64748b" strokeWidth="2" fill="none" />
+    <path d="M68,88 H132 L133,48 H67 Z" fill="#fee2e2" opacity="0.5" />
+
+    <g className="animate-pulse">
+      <circle cx="80" cy="60" r="3" fill="#ef4444" />
+      <text x="80" y="62" fill="#ffffff" fontSize="5" textAnchor="middle">+</text>
+      
+      <circle cx="115" cy="55" r="3" fill="#f87171" />
+      <text x="115" y="57" fill="#ffffff" fontSize="5" textAnchor="middle">-</text>
+
+      <circle cx="95" cy="72" r="3" fill="#ef4444" />
+      <text x="95" y="74" fill="#ffffff" fontSize="5" textAnchor="middle">+</text>
+
+      <circle cx="110" cy="78" r="3" fill="#f87171" />
+      <text x="110" y="80" fill="#ffffff" fontSize="5" textAnchor="middle">-</text>
+    </g>
+
+    <path d="M80,95 Q100,85 120,95 Z" fill="#ef4444" stroke="#b91c1c" strokeWidth="1.5" />
+    <circle cx="90" cy="91" r="2.5" fill="#b91c1c" />
+    <circle cx="105" cy="90" r="2" fill="#ef4444" />
+    <circle cx="98" cy="92" r="2.5" fill="#f87171" />
+  </svg>
+);
+
+// 12. Avogadro's Law SVG
+const AvogadrosLawSVG = () => (
+  <svg className="w-full h-32" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="100" cy="60" r="45" fill="#fee2e2" opacity="0.4" />
+    <rect x="35" y="35" width="50" height="50" rx="4" fill="rgba(255,255,255,0.8)" stroke="#94a3b8" strokeWidth="2" />
+    <circle cx="45" cy="45" r="3" fill="#ef4444" />
+    <circle cx="75" cy="48" r="3" fill="#ef4444" className="animate-pulse" />
+    <circle cx="60" cy="60" r="3" fill="#ef4444" />
+    <circle cx="48" cy="72" r="3" fill="#ef4444" />
+    <circle cx="70" cy="70" r="3" fill="#ef4444" className="animate-pulse" />
+    <text x="60" y="100" fill="#ef4444" fontSize="8" fontWeight="bold" textAnchor="middle">1 Mole O₂</text>
+
+    <rect x="115" y="35" width="50" height="50" rx="4" fill="rgba(255,255,255,0.8)" stroke="#94a3b8" strokeWidth="2" />
+    <g className="animate-pulse">
+      <circle cx="125" cy="45" r="2.5" fill="#f87171" /><circle cx="130" cy="45" r="2" fill="#ef4444" />
+      <circle cx="150" cy="50" r="2.5" fill="#f87171" /><circle cx="155" cy="50" r="2" fill="#ef4444" />
+      <circle cx="135" cy="65" r="2.5" fill="#f87171" /><circle cx="140" cy="65" r="2" fill="#ef4444" />
+      <circle cx="128" cy="75" r="2.5" fill="#f87171" /><circle cx="133" cy="75" r="2" fill="#ef4444" />
+      <circle cx="152" cy="72" r="2.5" fill="#f87171" /><circle cx="157" cy="72" r="2" fill="#ef4444" />
+    </g>
+    <text x="140" y="100" fill="#ef4444" fontSize="8" fontWeight="bold" textAnchor="middle">1 Mole CO₂</text>
+  </svg>
+);
+
+// 13. Electrolysis SVG
+const ElectrolysisSVG = () => (
+  <svg className="w-full h-32" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="100" cy="60" r="45" fill="#fee2e2" opacity="0.4" />
+    <path d="M60,40 L63,90 A5,5 0 0,0 68,95 H132 A5,5 0 0,0 137,90 L140,40" stroke="#64748b" strokeWidth="2" fill="none" />
+    <path d="M63,88 H137 L139,52 H61 Z" fill="#fee2e2" opacity="0.5" />
+
+    <rect x="75" y="30" width="8" height="50" fill="#475569" />
+    <rect x="117" y="30" width="8" height="50" fill="#ef4444" />
+
+    <circle cx="80" cy="45" r="1.5" fill="#ffffff" opacity="0.8" className="animate-bounce" />
+    <circle cx="78" cy="60" r="2" fill="#ffffff" opacity="0.8" />
+    <circle cx="81" cy="70" r="1.5" fill="#ffffff" opacity="0.8" className="animate-bounce" />
+
+    <circle cx="119" cy="50" r="2" fill="#ffffff" opacity="0.8" className="animate-bounce" />
+    <circle cx="122" cy="62" r="1.5" fill="#ffffff" opacity="0.8" />
+    <circle cx="120" cy="72" r="2" fill="#ffffff" opacity="0.8" className="animate-bounce" />
+
+    <rect x="93" y="10" width="14" height="18" fill="#475569" rx="1" />
+    <path d="M79,30 L79,18 L93,18" stroke="#475569" strokeWidth="1.5" fill="none" />
+    <path d="M121,30 L121,18 L107,18" stroke="#475569" strokeWidth="1.5" fill="none" />
+  </svg>
+);
+
+// 14. Colligative Properties SVG
+const ColligativePropertiesSVG = () => (
+  <svg className="w-full h-32" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="100" cy="60" r="45" fill="#fee2e2" opacity="0.4" />
+    <path d="M60,35 L63,85 A5,5 0 0,0 68,90 H132 A5,5 0 0,0 137,85 L140,35" stroke="#64748b" strokeWidth="2" fill="none" />
+    <path d="M63,83 H137 L138,50 H62 Z" fill="#fee2e2" opacity="0.6" />
+
+    <circle cx="75" cy="65" r="3" fill="#ef4444" />
+    <circle cx="95" cy="72" r="3" fill="#ef4444" className="animate-pulse" />
+    <circle cx="115" cy="60" r="3" fill="#ef4444" />
+    <circle cx="125" cy="75" r="3" fill="#ef4444" className="animate-pulse" />
+    <circle cx="85" cy="78" r="3" fill="#ef4444" />
+    <circle cx="105" cy="80" r="3" fill="#ef4444" />
+
+    <circle cx="80" cy="55" r="1.5" fill="#ef4444" opacity="0.6" />
+    <circle cx="110" cy="54" r="2" fill="#ef4444" opacity="0.6" />
+
+    <path d="M85,25 Q82,18 85,12" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round" className="animate-bounce" />
+    <path d="M100,28 Q97,21 100,15" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M115,25 Q112,18 115,12" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round" className="animate-bounce" />
+  </svg>
+);
+
+// 15. Photosynthesis Rate Chamber SVG
 const PhotosynthesisSVG = () => (
   <svg className="w-full h-32" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
     <circle cx="100" cy="60" r="45" fill="#dcfce7" opacity="0.4" />
@@ -513,6 +756,30 @@ export default function LabCard({
         return <KeplersLawsSVG />;
       case "stefan-boltzmann":
         return <StefanBoltzmannSVG />;
+      case "acid-base-titration":
+        return <TitrationSVG />;
+      case "boyles-law":
+        return <BoylesLawSVG />;
+      case "charles-law":
+        return <CharlessLawSVG />;
+      case "le-chateliers-principle":
+        return <LeChateliersPrincipleSVG />;
+      case "beer-lambert-law":
+        return <BeerLambertLawSVG />;
+      case "hesss-law":
+        return <HesssLawSVG />;
+      case "galvanic-cell":
+        return <GalvanicCellSVG />;
+      case "chemical-kinetics":
+        return <ChemicalKineticsSVG />;
+      case "solubility-product":
+        return <SolubilityProductSVG />;
+      case "avogadros-law":
+        return <AvogadrosLawSVG />;
+      case "electrolysis-lab":
+        return <ElectrolysisSVG />;
+      case "colligative-properties":
+        return <ColligativePropertiesSVG />;
       default:
         switch (lab.category) {
           case "Physics":
