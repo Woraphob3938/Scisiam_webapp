@@ -5,7 +5,7 @@ import { Send, Pin, HelpCircle, Sparkles } from "lucide-react";
 
 export default function DecorativeBackground() {
   return (
-    <div className="absolute inset-0 pointer-events-none overflow-hidden z-20 select-none">
+    <div className="absolute inset-0 pointer-events-none overflow-hidden z-20 select-none" aria-hidden="true">
       
       {/* 1. Left Side: Floating Paper Plane (Middle Left) */}
       <div className="hidden xl:block absolute top-[180px] left-[2%] animate-float-slow text-indigo-500/80">

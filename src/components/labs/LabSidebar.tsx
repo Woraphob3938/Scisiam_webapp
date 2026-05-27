@@ -13,14 +13,14 @@ export default function LabSidebar() {
   ];
 
   return (
-    <aside className="w-full flex flex-col gap-6.5 select-none">
+    <aside className="w-full flex flex-col gap-6.5 select-none lg:sticky lg:top-24 self-start">
       
       {/* CARD 1: ข้อมูลห้องแล็บ */}
-      <div className="bg-white rounded-2xl border border-slate-100 p-5.5 shadow-md shadow-slate-100/50 hover:shadow-lg transition-all duration-300">
-        <h4 className="text-sm sm:text-base font-bold text-slate-800 tracking-tight mb-4 flex items-center gap-2 border-b border-slate-50 pb-2.5">
+      <div className="bg-white/85 backdrop-blur-md rounded-2xl border border-white/40 p-5.5 shadow-xl shadow-slate-100/30 hover:shadow-2xl hover:shadow-slate-200/40 hover:-translate-y-0.5 transition-all duration-300">
+        <h3 className="text-sm sm:text-base font-bold text-slate-800 mb-4 flex items-center gap-2 border-b border-slate-50 pb-2.5">
           <Info className="w-4.5 h-4.5 text-blue-500" />
           ข้อมูลห้องแล็บ
-        </h4>
+        </h3>
         <div className="divide-y divide-slate-100">
           {labInfoRows.map((row, idx) => {
             const Icon = row.icon;
@@ -38,12 +38,12 @@ export default function LabSidebar() {
       </div>
 
       {/* CARD 2: ความคืบหน้า */}
-      <div className="bg-white rounded-2xl border border-slate-100 p-5.5 shadow-md shadow-slate-100/50 hover:shadow-lg transition-all duration-300">
+      <div className="bg-white/85 backdrop-blur-md rounded-2xl border border-white/40 p-5.5 shadow-xl shadow-slate-100/30 hover:shadow-2xl hover:shadow-slate-200/40 hover:-translate-y-0.5 transition-all duration-300">
         <div className="flex items-center justify-between mb-3">
-          <h4 className="text-sm sm:text-base font-bold text-slate-800 tracking-tight flex items-center gap-2">
+          <h3 className="text-sm sm:text-base font-bold text-slate-800 flex items-center gap-2">
             <CheckSquare className="w-4.5 h-4.5 text-emerald-500" />
             ความคืบหน้า
-          </h4>
+          </h3>
           <span className="text-xs font-extrabold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">
             60%
           </span>
@@ -51,7 +51,7 @@ export default function LabSidebar() {
 
         {/* Progress Bar Container */}
         <div className="space-y-2">
-          <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
+          <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden" role="progressbar" aria-valuenow={60} aria-valuemin={0} aria-valuemax={100} aria-label="ความคืบหน้าการทำแล็บ">
             <div className="h-full bg-emerald-500 rounded-full transition-all duration-500" style={{ width: "60%" }} />
           </div>
           <p className="text-[11px] text-slate-400 font-semibold text-left">
@@ -61,11 +61,11 @@ export default function LabSidebar() {
       </div>
 
       {/* CARD 3: คำแนะนำก่อนเริ่ม */}
-      <div className="bg-white rounded-2xl border border-slate-100 p-5.5 shadow-md shadow-slate-100/50 hover:shadow-lg transition-all duration-300">
-        <h4 className="text-sm sm:text-base font-bold text-slate-800 tracking-tight mb-3.5 flex items-center gap-2">
+      <div className="bg-white/85 backdrop-blur-md rounded-2xl border border-white/40 p-5.5 shadow-xl shadow-slate-100/30 hover:shadow-2xl hover:shadow-slate-200/40 hover:-translate-y-0.5 transition-all duration-300">
+        <h3 className="text-sm sm:text-base font-bold text-slate-800 mb-3.5 flex items-center gap-2">
           <ShieldAlert className="w-4.5 h-4.5 text-amber-500" />
           คำแนะนำก่อนเริ่ม
-        </h4>
+        </h3>
         <ul className="space-y-2.5 text-left">
           {[
             "ตรวจสอบอุปกรณ์ให้พร้อมและปลอดภัยก่อนกดเริ่มทำการทดลอง",
@@ -83,7 +83,7 @@ export default function LabSidebar() {
       </div>
 
       {/* CARD 4: ภารกิจนักวิทย์ */}
-      <div className="bg-white rounded-2xl border border-slate-100 p-5.5 shadow-md shadow-slate-100/50 hover:shadow-lg transition-all duration-300 relative overflow-hidden group">
+      <div className="bg-white/85 backdrop-blur-md rounded-2xl border border-white/40 p-5.5 shadow-xl shadow-slate-100/30 hover:shadow-2xl hover:shadow-slate-200/40 hover:-translate-y-0.5 transition-all duration-300 relative overflow-hidden group">
         <div className="absolute top-0 right-0 w-12 h-12 bg-purple-500/5 rounded-bl-full" />
         
         <div className="flex items-center gap-2.5 mb-3 border-b border-slate-50 pb-2">
@@ -91,14 +91,14 @@ export default function LabSidebar() {
             <Award className="w-4 h-4" />
           </div>
           <div>
-            <h4 className="text-xs sm:text-sm font-bold text-slate-800">ภารกิจนักวิทย์</h4>
+            <h3 className="text-xs sm:text-sm font-bold text-slate-800">ภารกิจนักวิทย์</h3>
             <p className="text-[10px] text-slate-400 font-semibold">เก็บครบ 5 ห้อง</p>
           </div>
         </div>
 
         {/* Progress details */}
         <div className="space-y-2">
-          <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
+          <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden" role="progressbar" aria-valuenow={60} aria-valuemin={0} aria-valuemax={100} aria-label="ความคืบหน้าภารกิจนักวิทย์">
             <div className="h-full bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full transition-all duration-500 group-hover:scale-x-105 origin-left" style={{ width: "60%" }} />
           </div>
           

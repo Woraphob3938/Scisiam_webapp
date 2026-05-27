@@ -5,12 +5,12 @@ import { BookOpen } from "lucide-react";
 
 export default function TheoryCard() {
   return (
-    <div className="bg-white rounded-3xl border border-slate-100 p-6 sm:p-7.5 shadow-md shadow-slate-100/50 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
+    <div className="bg-white/80 backdrop-blur-md rounded-3xl border border-white/40 p-6 sm:p-7.5 shadow-xl shadow-slate-100/30 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
       {/* Card Header */}
-      <h3 className="text-base sm:text-lg font-bold text-slate-800 tracking-tight mb-5 border-b border-slate-50 pb-3 flex items-center gap-2">
+      <h2 className="text-base sm:text-lg font-bold text-slate-800 mb-5 border-b border-slate-50 pb-3 flex items-center gap-2">
         <BookOpen className="w-5.5 h-5.5 text-indigo-500" />
         ทฤษฎีที่เกี่ยวข้อง
-      </h3>
+      </h2>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
         
@@ -23,7 +23,7 @@ export default function TheoryCard() {
           {/* Mathematical Formula Box */}
           <div className="bg-slate-50 rounded-2xl border border-slate-100 p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="text-center sm:text-left">
-              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1">
+              <span className="text-[10px] text-slate-400 font-bold uppercase block mb-1">
                 สมการความสัมพันธ์
               </span>
               <div className="text-xl sm:text-2xl font-mono font-bold text-slate-800 inline-flex items-center gap-1.5">
@@ -56,12 +56,12 @@ export default function TheoryCard() {
 
         {/* Right Side: High-Fidelity Mini Graph Vector Drawing */}
         <div className="lg:col-span-5 flex flex-col items-center">
-          <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-2 self-start lg:self-center">
+          <span className="text-[10px] text-slate-400 font-bold uppercase mb-2 self-start lg:self-center">
             กราฟตัวอย่างการลดอุณหภูมิ
           </span>
 
           <div className="w-full bg-slate-50/50 rounded-2xl border border-slate-100/50 p-3 select-none flex items-center justify-center">
-            <svg className="w-full max-w-[240px] h-36" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg className="w-full max-w-[240px] h-36" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
               {/* Grid lines (horizontal) */}
               <line x1="20" y1="95" x2="190" y2="95" stroke="#cbd5e1" strokeWidth="1" />
               <line x1="20" y1="70" x2="190" y2="70" stroke="#f1f5f9" strokeWidth="1" />

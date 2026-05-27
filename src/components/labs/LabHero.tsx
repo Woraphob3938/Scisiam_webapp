@@ -23,7 +23,7 @@ export default function LabHero({
 
   return (
     <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-12 md:px-20 py-4 select-none">
-      <div className="relative overflow-hidden bg-white border border-slate-100 rounded-[32px] shadow-xl shadow-slate-200/40 p-6 sm:p-8 md:p-10 flex flex-col lg:flex-row items-center justify-between gap-8 md:gap-12">
+      <div className="relative overflow-hidden bg-white/90 backdrop-blur-md border border-white/60 rounded-[32px] shadow-2xl shadow-slate-200/30 p-6 sm:p-8 md:p-10 flex flex-col lg:flex-row items-center justify-between gap-8 md:gap-12">
         {/* Soft Decorative Accent Glow */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-blue-400/10 via-indigo-400/5 to-transparent rounded-bl-full pointer-events-none" />
 
@@ -54,7 +54,7 @@ export default function LabHero({
           </div>
 
           {/* Main Title */}
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-800 tracking-tight mb-3">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-800 mb-3 leading-tight">
             {title}
           </h1>
 
@@ -68,7 +68,8 @@ export default function LabHero({
             {/* Start Lab Button */}
             <button
               onClick={onStartExperiment}
-              className="flex items-center justify-center gap-2 py-3 px-7 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-2xl text-sm font-bold transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg hover:shadow-indigo-500/20 active:scale-95 cursor-pointer shadow-md shadow-indigo-600/10"
+              aria-label={`เริ่มทำการทดลองห้องแล็บ ${title}`}
+              className="flex items-center justify-center gap-2 py-3 px-7 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-2xl text-sm font-bold transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg hover:shadow-indigo-500/20 active:scale-95 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500 focus:outline-none cursor-pointer shadow-md shadow-indigo-600/10"
             >
               <Play className="w-4 h-4 fill-white" />
               <span>เริ่มทดลอง</span>
@@ -77,9 +78,10 @@ export default function LabHero({
             {/* Save for later button */}
             <button
               onClick={() => setIsSaved(!isSaved)}
+              aria-label={isSaved ? `ยกเลิกการบันทึกห้องแล็บ ${title}` : `บันทึกห้องแล็บ ${title} ไว้ศึกษาภายหลัง`}
               className={`
                 flex items-center justify-center gap-2 py-3 px-6 border-2 rounded-2xl text-sm font-bold
-                transition-all duration-300 transform hover:scale-[1.02] active:scale-95 cursor-pointer
+                transition-all duration-300 transform hover:scale-[1.02] active:scale-95 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500 focus:outline-none cursor-pointer
                 ${
                   isSaved
                     ? "bg-amber-50 border-amber-300 text-amber-600 hover:bg-amber-100/50"
@@ -94,7 +96,7 @@ export default function LabHero({
             {/* Back Button */}
             <Link
               href="/"
-              className="flex items-center justify-center gap-1.5 py-3.5 px-4 text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors duration-200"
+              className="flex items-center justify-center gap-1.5 py-3.5 px-4 text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-blue-500 rounded-xl focus:outline-none"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>กลับไปหน้ารายชื่อห้องแล็บ</span>
@@ -104,7 +106,7 @@ export default function LabHero({
 
         {/* Right Side: High-Fidelity SVG Cooling Experiment Illustration */}
         <div className="relative shrink-0 w-60 h-60 sm:w-72 sm:h-72 select-none animate-float-medium flex items-center justify-center">
-          <svg className="w-full h-full" viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <svg className="w-full h-full" viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             {/* Glowing aura */}
             <circle cx="120" cy="120" r="70" fill="#bfdbfe" opacity="0.3" filter="blur(30px)" />
             <circle cx="120" cy="120" r="45" fill="#e0f2fe" opacity="0.5" />

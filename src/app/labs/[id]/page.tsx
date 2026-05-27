@@ -425,7 +425,7 @@ export default function LabDetailPage() {
           </div>
 
           {/* Right Sidebar Column (30%) */}
-          <div className="lg:col-span-4">
+          <div className="lg:col-span-4 lg:sticky lg:top-24 self-start">
             <LabSidebar />
           </div>
 
