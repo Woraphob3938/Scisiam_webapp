@@ -68,7 +68,7 @@ const NewtonCooldownSVG = () => (
 // Flask and burette
 const TitrationSVG = () => (
   <svg className="w-full h-32" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="100" cy="60" r="45" fill="#d1fae5" opacity="0.4" />
+    <circle cx="100" cy="60" r="45" fill="#fee2e2" opacity="0.4" />
 
     {/* Burette Stand & Tube */}
     <g transform="translate(100, 10)">
@@ -82,13 +82,13 @@ const TitrationSVG = () => (
       {/* Burette Glass Column */}
       <rect x="4" y="5" width="8" height="65" rx="1.5" fill="rgba(255, 255, 255, 0.8)" stroke="#94a3b8" strokeWidth="1.5" />
       {/* Active liquid inside burette */}
-      <rect x="6" y="25" width="4" height="40" fill="#34d399" opacity="0.7" />
+      <rect x="6" y="25" width="4" height="40" fill="#f87171" opacity="0.7" />
       
       {/* Stopcock valve */}
       <circle cx="8" cy="72" r="3" fill="#ef4444" />
       
       {/* Drop falling */}
-      <circle cx="8" cy="85" r="2" fill="#34d399" className="animate-bounce" />
+      <circle cx="8" cy="85" r="2" fill="#f87171" className="animate-bounce" />
     </g>
 
     {/* Laboratory Flask */}
@@ -96,15 +96,15 @@ const TitrationSVG = () => (
       {/* Flask Body */}
       <path d="M26,8 L26,20 L12,42 A8,8 0 0,0 18,54 L44,54 A8,8 0 0,0 50,42 L36,20 L36,8 Z" fill="rgba(255, 255, 255, 0.9)" stroke="#94a3b8" strokeWidth="2" strokeLinejoin="round" />
       {/* Liquid inside flask */}
-      <path d="M16,40 L46,40 A8,8 0 0,1 50,42 L44,54 L18,54 A8,8 0 0,1 12,42 Z" fill="#10b981" opacity="0.75" />
+      <path d="M16,40 L46,40 A8,8 0 0,1 50,42 L44,54 L18,54 A8,8 0 0,1 12,42 Z" fill="#ef4444" opacity="0.75" />
       {/* Bubbles in flask */}
       <circle cx="25" cy="46" r="1.5" fill="#ffffff" opacity="0.8" />
       <circle cx="36" cy="48" r="2" fill="#ffffff" opacity="0.7" />
     </g>
 
     {/* Chemical Sparkles */}
-    <circle cx="60" cy="40" r="2" fill="#10b981" className="animate-pulse" />
-    <circle cx="148" cy="50" r="1.5" fill="#34d399" />
+    <circle cx="60" cy="40" r="2" fill="#ef4444" className="animate-pulse" />
+    <circle cx="148" cy="50" r="1.5" fill="#f87171" />
   </svg>
 );
 
@@ -456,14 +456,14 @@ export default function LabCard({
       iconColor: "text-blue-500",
     },
     Chemistry: {
-      border: "border-emerald-100 hover:border-emerald-300",
-      accentBg: "bg-emerald-50/50",
-      accentText: "text-emerald-600",
+      border: "border-red-100 hover:border-red-300",
+      accentBg: "bg-red-50/50",
+      accentText: "text-red-600",
       glow: "soft-glow-chemistry",
-      badgeColor: "bg-emerald-50 text-emerald-700 border-emerald-100",
-      btnPrimary: "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white shadow-md shadow-emerald-500/10",
-      btnOutline: "border-emerald-200 text-emerald-600 hover:bg-emerald-50/50",
-      iconColor: "text-emerald-500",
+      badgeColor: "bg-red-50 text-red-700 border-red-100",
+      btnPrimary: "bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white shadow-md shadow-red-500/10",
+      btnOutline: "border-red-200 text-red-600 hover:bg-red-50/50",
+      iconColor: "text-red-500",
     },
     Biology: {
       border: "border-green-100 hover:border-green-300",
@@ -540,7 +540,7 @@ export default function LabCard({
       `}
     >
       {/* Top Background Glow Effect */}
-      <div className={`absolute top-0 right-0 w-32 h-32 rounded-full -mr-16 -mt-16 opacity-10 filter blur-xl ${lab.category === "Physics" ? "bg-blue-600" : lab.category === "Chemistry" ? "bg-emerald-600" : "bg-green-600"}`} />
+      <div className={`absolute top-0 right-0 w-32 h-32 rounded-full -mr-16 -mt-16 opacity-10 filter blur-xl ${lab.category === "Physics" ? "bg-blue-600" : lab.category === "Chemistry" ? "bg-red-600" : "bg-green-600"}`} />
 
       <div>
         {/* SVG Illustration Container */}
