@@ -43,10 +43,22 @@ export default function SimulationRoomPage() {
   const currentTempRef = useRef(currentTemp);
   const lastLoggedTimeRef = useRef(lastLoggedTime);
 
+  const initialTempRef = useRef(initialTemp);
+  const ambientTempRef = useRef(ambientTemp);
+  const coolingConstantRef = useRef(coolingConstant);
+  const logIntervalRef = useRef(logInterval);
+  const simulationSpeedRef = useRef(simulationSpeed);
+
   useEffect(() => { isRunningRef.current = isRunning; }, [isRunning]);
   useEffect(() => { elapsedSecondsRef.current = elapsedSeconds; }, [elapsedSeconds]);
   useEffect(() => { currentTempRef.current = currentTemp; }, [currentTemp]);
   useEffect(() => { lastLoggedTimeRef.current = lastLoggedTime; }, [lastLoggedTime]);
+
+  useEffect(() => { initialTempRef.current = initialTemp; }, [initialTemp]);
+  useEffect(() => { ambientTempRef.current = ambientTemp; }, [ambientTemp]);
+  useEffect(() => { coolingConstantRef.current = coolingConstant; }, [coolingConstant]);
+  useEffect(() => { logIntervalRef.current = logInterval; }, [logInterval]);
+  useEffect(() => { simulationSpeedRef.current = simulationSpeed; }, [simulationSpeed]);
 
   // Handle setting active currentTemp base on initialTemp before start
   useEffect(() => {
@@ -63,7 +75,7 @@ export default function SimulationRoomPage() {
       // Tick every 100ms for smoothness
       timer = setInterval(() => {
         // Increment elapsed seconds based on speed multiplier
-        const deltaSeconds = 0.1 * simulationSpeed;
+        const deltaSeconds = 0.1 * simulationSpeedRef.current;
         const nextSeconds = elapsedSecondsRef.current + deltaSeconds;
         setElapsedSeconds(nextSeconds);
         elapsedSecondsRef.current = nextSeconds;
@@ -72,15 +84,15 @@ export default function SimulationRoomPage() {
         // T(t) = Ts + (T0 - Ts) * e^(-kt)
         // Convert seconds to minutes for the 'k' rate constant (which is per-minute)
         const mins = nextSeconds / 60;
-        const nextTemp = ambientTemp + (initialTemp - ambientTemp) * Math.exp(-coolingConstant * mins);
+        const nextTemp = ambientTempRef.current + (initialTempRef.current - ambientTempRef.current) * Math.exp(-coolingConstantRef.current * mins);
         setCurrentTemp(nextTemp);
         currentTempRef.current = nextTemp;
 
         // Check if log interval threshold is crossed to auto log a data point
-        if (nextSeconds - lastLoggedTimeRef.current >= logInterval) {
+        if (nextSeconds - lastLoggedTimeRef.current >= logIntervalRef.current) {
           setDataPoints((prev) => [
             ...prev,
-            { time: mins, temp: nextTemp, ambient: ambientTemp },
+            { time: mins, temp: nextTemp, ambient: ambientTempRef.current },
           ]);
           setLastLoggedTime(nextSeconds);
           lastLoggedTimeRef.current = nextSeconds;
@@ -91,7 +103,7 @@ export default function SimulationRoomPage() {
     return () => {
       if (timer) clearInterval(timer);
     };
-  }, [isRunning, simulationSpeed, initialTemp, ambientTemp, coolingConstant, logInterval]);
+  }, [isRunning]);
 
   // Start / Pause toggle
   const handleStartStop = () => {

@@ -17,24 +17,27 @@ export default function LiveGraph({ dataPoints }: LiveGraphProps) {
   // SVG Viewbox dimensions: 320 width x 160 height
   // Margin bounds: X-padding: 30 to 290. Y-padding: 20 to 130.
   // Math scales: time range 0 to 60. Temp range 0 to 100.
-  const timeToSvgX = (t: number) => 30 + (t / 60) * 260;
-  const tempToSvgY = (temp: number) => 135 - (temp / 100) * 110;
+  // SVG Viewbox dimensions: 320 width x 160 height
+  // Margin bounds: X-padding: 30 to 290. Y-padding: 20 to 130.
+  // Math scales: time range 0 to 60. Temp range 0 to 100.
+  const timeToSvgX = React.useCallback((t: number) => 30 + (t / 60) * 260, []);
+  const tempToSvgY = React.useCallback((temp: number) => 135 - (temp / 100) * 110, []);
 
   // Build the SVG path for the Object Temperature curve
-  const getTempPath = () => {
+  const tempPath = React.useMemo(() => {
     if (dataPoints.length === 0) return "";
     return dataPoints
       .map((p, i) => `${i === 0 ? "M" : "L"}${timeToSvgX(p.time)},${tempToSvgY(p.temp)}`)
       .join(" ");
-  };
+  }, [dataPoints, timeToSvgX, tempToSvgY]);
 
   // Build the SVG path for the Ambient Temperature baseline
-  const getAmbientPath = () => {
+  const ambientPath = React.useMemo(() => {
     if (dataPoints.length === 0) return "";
     return dataPoints
       .map((p, i) => `${i === 0 ? "M" : "L"}${timeToSvgX(p.time)},${tempToSvgY(p.ambient)}`)
       .join(" ");
-  };
+  }, [dataPoints, timeToSvgX, tempToSvgY]);
 
   return (
     <div className="bg-white rounded-3xl border border-slate-100 p-6 shadow-md shadow-slate-100/50 hover:shadow-lg transition-all duration-300 flex flex-col h-full select-none">
@@ -86,7 +89,7 @@ export default function LiveGraph({ dataPoints }: LiveGraphProps) {
             <line x1="95" y1="25" x2="95" y2="135" stroke="#f1f5f9" strokeWidth="1" />
             <line x1="160" y1="25" x2="160" y2="135" stroke="#f1f5f9" strokeWidth="1" />
             <line x1="225" y1="25" x2="225" y2="135" stroke="#f1f5f9" strokeWidth="1" />
-            <line x1="290" y1="25" x2="290" y2="135" stroke="#cbd5e1" strokeWidth="1" />
+            <line x1="290" y1="25" x2="290" y2="135" stroke="#cbd5e1" strokeWidth="1.5" />
 
             {/* Y-Axis Label metrics (Temperature) */}
             <text x="25" y="28" fill="#94a3b8" fontSize="7" fontWeight="bold" textAnchor="end">100</text>
@@ -107,10 +110,10 @@ export default function LiveGraph({ dataPoints }: LiveGraphProps) {
             <text x="302" y="148" fill="#94a3b8" fontSize="6.5" fontWeight="extrabold" textAnchor="start">เวลา (นาที)</text>
 
             {/* Baseline Ambient Temp (Ts) (Dashed green line) */}
-            <path d={getAmbientPath()} stroke="#10b981" strokeWidth="1.5" strokeDasharray="3 3" fill="none" className="transition-all duration-300" />
+            <path d={ambientPath} stroke="#10b981" strokeWidth="1.5" strokeDasharray="3 3" fill="none" className="transition-all duration-300" />
 
             {/* Decay Temperature Curve (T) (Solid blue line) */}
-            <path d={getTempPath()} stroke="#3b82f6" strokeWidth="2.5" strokeLinecap="round" fill="none" className="transition-all duration-300" />
+            <path d={tempPath} stroke="#3b82f6" strokeWidth="2.5" strokeLinecap="round" fill="none" className="transition-all duration-300" />
 
             {/* SVG Data points circles overlay */}
             {dataPoints.map((p, idx) => (
