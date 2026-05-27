@@ -16,21 +16,98 @@ const labsData: LabData[] = [
     id: "newtons-cooling",
     title: "Newton's law of cooling",
     category: "Physics",
-    status: "ว่าง",
+    status: "",
     description: "เรียนรู้เกี่ยวกับการระบายความร้อนของวัตถุตามกฎการเย็นตัวของนิวตัน วิเคราะห์อัตราการสูญเสียความร้อนสอดคล้องกับอุณหภูมิแวดล้อมจำลอง"
+  },
+  {
+    id: "ohms-law",
+    title: "Ohm's Law & DC Circuits",
+    category: "Physics",
+    status: "",
+    description: "ศึกษาความสัมพันธ์ระหว่างความต่างศักย์ กระแสไฟฟ้า และความต้านทานในวงจรไฟฟ้ากระแสตรงตามกฎของโอห์ม"
+  },
+  {
+    id: "hookes-law",
+    title: "Hooke's Law of Elasticity",
+    category: "Physics",
+    status: "",
+    description: "ศึกษาความยืดหยุ่นของสปริงและแรงดึงกลับตามระยะยืด วิเคราะห์ค่าคงตัวของสปริงตามกฎของฮุค"
+  },
+  {
+    id: "snells-law",
+    title: "Snell's Law of Refraction",
+    category: "Physics",
+    status: "",
+    description: "ศึกษาดัชนีหักเหของแสงและการเดินทางผ่านตัวกลางต่างชนิดกัน วิเคราะห์ความสัมพันธ์ของมุมตามกฎของสเนลล์"
+  },
+  {
+    id: "ideal-gas-law",
+    title: "Ideal Gas Law Simulation",
+    category: "Physics",
+    status: "",
+    description: "วิเคราะห์การเปลี่ยนแปลงสถานะของแก๊สอุดมคติผ่านการเปลี่ยนตัวแปรความดัน ปริมาตร และอุณหภูมิ"
+  },
+  {
+    id: "newtons-second-law",
+    title: "Newton's Second Law of Motion",
+    category: "Physics",
+    status: "",
+    description: "ศึกษาผลของแรงลัพธ์และมวลที่มีต่อความเร่งของวัตถุจำลองตามกฎการเคลื่อนที่ข้อที่สองของนิวตัน"
+  },
+  {
+    id: "momentum-conservation",
+    title: "Conservation of Linear Momentum",
+    category: "Physics",
+    status: "",
+    description: "จำลองการชนของวัตถุบนแนวเส้นตรงเพื่อวิเคราะห์การอนุรักษ์โมเมนตัมและพลังงานจลน์ในการชน"
+  },
+  {
+    id: "faradays-law",
+    title: "Faraday's Electromagnetic Induction",
+    category: "Physics",
+    status: "",
+    description: "ศึกษาการเกิดกระแสไฟฟ้าเหนี่ยวนำและแรงเคลื่อนไฟฟ้าเหนี่ยวนำจากการเปลี่ยนแปลงของฟลักซ์แม่เหล็ก"
+  },
+  {
+    id: "bernoullis-principle",
+    title: "Bernoulli's Principle & Fluid Dynamics",
+    category: "Physics",
+    status: "",
+    description: "ศึกษาความสัมพันธ์ระหว่างความเร็วและความดันของของไหลในท่อที่มีหน้าตัดต่างกันตามหลักการแบร์นูลลี"
+  },
+  {
+    id: "photoelectric-effect",
+    title: "Einstein's Photoelectric Effect",
+    category: "Physics",
+    status: "",
+    description: "วิเคราะห์พลังงานจลน์สูงสุดของโฟโตอิเล็กตรอนที่หลุดจากผิวโลหะตามฟังก์ชันงานและความถี่ของแสง"
+  },
+  {
+    id: "keplers-laws",
+    title: "Kepler's Third Law of Planetary Motion",
+    category: "Physics",
+    status: "",
+    description: "วิเคราะห์คาบการโคจรและระยะห่างเฉลี่ยจากดวงอาทิตย์ของดาวเคราะห์จำลองตามกฎข้อที่สามของเคปเลอร์"
+  },
+  {
+    id: "stefan-boltzmann",
+    title: "Stefan-Boltzmann Law of Blackbody Radiation",
+    category: "Physics",
+    status: "",
+    description: "ศึกษาอัตราการแผ่รังสีความร้อนของวัตถุดำและอัตราการสูญเสียพลังงานที่แปรผันตามอุณหภูมิสัมบูรณ์ยกกำลังสี่"
   },
   {
     id: "acid-base-titration",
     title: "Acid-Base Titration Lab",
     category: "Chemistry",
-    status: "ว่าง",
+    status: "",
     description: "ทดลองวัดและหาค่าความเข้มข้นของกรดหรือเบสผ่านกระบวนการไทเทรตทางเคมี ติดตามระดับ pH และการเปลี่ยนสีของอินดิเคเตอร์แบบเรียลไทม์"
   },
   {
     id: "photosynthesis-rate",
     title: "Photosynthesis Rate Chamber",
     category: "Biology",
-    status: "ว่าง",
+    status: "",
     description: "ศึกษาระดับกระบวนการสังเคราะห์แสงของพืชสีเขียวในห้องทดลองปิด วิเคราะห์ผลกระทบของแสง ระดับคาร์บอนไดออกไซด์ และอุณหภูมิ"
   }
 ];

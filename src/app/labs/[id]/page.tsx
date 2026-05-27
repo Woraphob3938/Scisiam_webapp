@@ -23,8 +23,85 @@ const labsData: Record<string, LabData> = {
     id: "newtons-cooling",
     title: "Newton's law of cooling",
     category: "Physics",
-    status: "ว่าง",
+    status: "",
     description: "ศึกษาการเปลี่ยนแปลงอุณหภูมิของวัตถุตามเวลา และเข้าใจความสัมพันธ์ตามกฎการเย็นตัวของนิวตัน วิเคราะห์สมการและสัมประสิทธิ์การแลกเปลี่ยนความร้อน"
+  },
+  "ohms-law": {
+    id: "ohms-law",
+    title: "Ohm's Law & DC Circuits",
+    category: "Physics",
+    status: "",
+    description: "ศึกษาความสัมพันธ์ระหว่างความต่างศักย์ กระแสไฟฟ้า และความต้านทานในวงจรไฟฟ้ากระแสตรงตามกฎของโอห์ม"
+  },
+  "hookes-law": {
+    id: "hookes-law",
+    title: "Hooke's Law of Elasticity",
+    category: "Physics",
+    status: "",
+    description: "ศึกษาความยืดหยุ่นของสปริงและแรงดึงกลับตามระยะยืด วิเคราะห์ค่าคงตัวของสปริงตามกฎของฮุค"
+  },
+  "snells-law": {
+    id: "snells-law",
+    title: "Snell's Law of Refraction",
+    category: "Physics",
+    status: "",
+    description: "ศึกษาดัชนีหักเหของแสงและการเดินทางผ่านตัวกลางต่างชนิดกัน วิเคราะห์ความสัมพันธ์ของมุมตามกฎของสเนลล์"
+  },
+  "ideal-gas-law": {
+    id: "ideal-gas-law",
+    title: "Ideal Gas Law Simulation",
+    category: "Physics",
+    status: "",
+    description: "วิเคราะห์การเปลี่ยนแปลงสถานะของแก๊สอุดมคติผ่านการเปลี่ยนตัวแปรความดัน ปริมาตร และอุณหภูมิ"
+  },
+  "newtons-second-law": {
+    id: "newtons-second-law",
+    title: "Newton's Second Law of Motion",
+    category: "Physics",
+    status: "",
+    description: "ศึกษาผลของแรงลัพธ์และมวลที่มีต่อความเร่งของวัตถุจำลองตามกฎการเคลื่อนที่ข้อที่สองของนิวตัน"
+  },
+  "momentum-conservation": {
+    id: "momentum-conservation",
+    title: "Conservation of Linear Momentum",
+    category: "Physics",
+    status: "",
+    description: "จำลองการชนของวัตถุบนแนวเส้นตรงเพื่อวิเคราะห์การอนุรักษ์โมเมนตัมและพลังงานจลน์ในการชน"
+  },
+  "faradays-law": {
+    id: "faradays-law",
+    title: "Faraday's Electromagnetic Induction",
+    category: "Physics",
+    status: "",
+    description: "ศึกษาการเกิดกระแสไฟฟ้าเหนี่ยวนำและแรงเคลื่อนไฟฟ้าเหนี่ยวนำจากการเปลี่ยนแปลงของฟลักซ์แม่เหล็ก"
+  },
+  "bernoullis-principle": {
+    id: "bernoullis-principle",
+    title: "Bernoulli's Principle & Fluid Dynamics",
+    category: "Physics",
+    status: "",
+    description: "ศึกษาความสัมพันธ์ระหว่างความเร็วและความดันของของไหลในท่อที่มีหน้าตัดต่างกันตามหลักการแบร์นูลลี"
+  },
+  "photoelectric-effect": {
+    id: "photoelectric-effect",
+    title: "Einstein's Photoelectric Effect",
+    category: "Physics",
+    status: "",
+    description: "วิเคราะห์พลังงานจลน์สูงสุดของโฟโตอิเล็กตรอนที่หลุดจากผิวโลหะตามฟังก์ชันงานและความถี่ของแสง"
+  },
+  "keplers-laws": {
+    id: "keplers-laws",
+    title: "Kepler's Third Law of Planetary Motion",
+    category: "Physics",
+    status: "",
+    description: "วิเคราะห์คาบการโคจรและระยะห่างเฉลี่ยจากดวงอาทิตย์ของดาวเคราะห์จำลองตามกฎข้อที่สามของเคปเลอร์"
+  },
+  "stefan-boltzmann": {
+    id: "stefan-boltzmann",
+    title: "Stefan-Boltzmann Law of Blackbody Radiation",
+    category: "Physics",
+    status: "",
+    description: "ศึกษาอัตราการแผ่รังสีความร้อนของวัตถุดำและอัตราการสูญเสียพลังงานที่แปรผันตามอุณหภูมิสัมบูรณ์ยกกำลังสี่"
   }
 };
 
