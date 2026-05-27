@@ -6,9 +6,10 @@ import { Home, FlaskConical, ClipboardCheck, Award, History, User } from "lucide
 
 interface SidebarProps {
   activeMenu: "หน้าหลัก" | "ห้องแล็บของฉัน" | "ภารกิจนักวิทย์" | "คะแนนและรางวัล" | "ประวัติการเรียนรู้" | "โปรไฟล์" | string;
+  flushLeft?: boolean;
 }
 
-export default function Sidebar({ activeMenu }: SidebarProps) {
+export default function Sidebar({ activeMenu, flushLeft = false }: SidebarProps) {
   const sidebarMenu = [
     { name: "หน้าหลัก", icon: Home, href: "/" },
     { name: "ห้องแล็บของฉัน", icon: FlaskConical, href: "#" },
@@ -19,7 +20,11 @@ export default function Sidebar({ activeMenu }: SidebarProps) {
   ];
 
   return (
-    <aside className="w-full flex flex-col bg-white/90 backdrop-blur-md border border-slate-200/50 rounded-[32px] p-6 shadow-sm min-h-[580px] justify-between lg:sticky lg:top-24 self-start select-none">
+    <aside className={`w-full flex flex-col bg-white/90 backdrop-blur-md border border-slate-200/50 p-6 shadow-sm min-h-[580px] justify-between lg:sticky lg:top-24 self-start select-none ${
+      flushLeft 
+        ? "rounded-r-[32px] rounded-l-none border-l-0 shadow-lg shadow-slate-200/10" 
+        : "rounded-[32px]"
+    }`}>
       <div className="space-y-6">
         {/* Sidebar Header Brand (styled like the logo) */}
         <div className="flex items-center gap-3 pb-4 border-b border-slate-100">

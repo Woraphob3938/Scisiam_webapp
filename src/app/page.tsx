@@ -326,16 +326,16 @@ export default function Home() {
       />
 
       {/* 4. Responsive Grid Layout */}
-      <div className="max-w-[1440px] w-full mx-auto px-4 sm:px-6 md:px-8 py-4">
+      <div className="w-full px-0 py-4">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
           {/* Left Column: Reusable Sidebar Navigation */}
-          <div className="lg:col-span-3 hidden lg:flex">
-            <Sidebar activeMenu="หน้าหลัก" />
+          <div className="lg:col-span-3 hidden lg:flex pl-0">
+            <Sidebar activeMenu="หน้าหลัก" flushLeft={true} />
           </div>
 
           {/* Right Column: Lab Card Grid */}
-          <div className="lg:col-span-9 col-span-12">
+          <div className="lg:col-span-9 col-span-12 px-4 lg:pl-0 lg:pr-8">
             {filteredLabs.length === 0 ? (
               <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm flex flex-col items-center gap-3">
                 <HelpCircle className="w-12 h-12 text-slate-300" />
