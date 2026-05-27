@@ -186,6 +186,90 @@ const labsData: Record<string, LabData> = {
     category: "Chemistry",
     status: "",
     description: "ศึกษาการลดลงของจุดเยือกแข็งและการเพิ่มขึ้นของจุดเดือดของตัวทำละลายเมื่อเติมตัวละลายที่ระเหยยาก"
+  },
+  "photosynthesis-rate": {
+    id: "photosynthesis-rate",
+    title: "Photosynthesis Rate Chamber",
+    category: "Biology",
+    status: "",
+    description: "ศึกษาระดับกระบวนการสังเคราะห์แสงของพืชสีเขียวในห้องทดลองปิด วิเคราะห์ผลกระทบของแสง ระดับคาร์บอนไดออกไซด์ และอุณหภูมิ"
+  },
+  "mendels-inheritance": {
+    id: "mendels-inheritance",
+    title: "Mendelian Genetics Lab",
+    category: "Biology",
+    status: "",
+    description: "ศึกษาการถ่ายทอดลักษณะทางพันธุกรรมของถั่วลันเตาและการจับคู่ยีนในตารางพุนเนตต์ตามกฎของเมนเดล"
+  },
+  "mitosis-division": {
+    id: "mitosis-division",
+    title: "Mitosis & Cell Cycle",
+    category: "Biology",
+    status: "",
+    description: "ศึกษาขั้นตอนการจำลองตัวเองและการแบ่งนิวเคลียสแบบไมโทซิสในระยะต่างๆ ผ่านกล้องจุลทรรศน์เสมือน"
+  },
+  "cell-osmosis": {
+    id: "cell-osmosis",
+    title: "Osmosis & Plasmolysis",
+    category: "Biology",
+    status: "",
+    description: "ทดลองศึกษาการแพร่และการออสโมซิสของน้ำผ่านเยื่อเลือกผ่านในสภาวะความเข้มข้นสารละลายต่างกัน"
+  },
+  "enzyme-kinetics": {
+    id: "enzyme-kinetics",
+    title: "Enzyme Catalysis Lab",
+    category: "Biology",
+    status: "",
+    description: "วิเคราะห์อัตราการทำงานของเอนไซม์ตามการเปลี่ยนแปลงความเข้มข้นสาร อุณหภูมิ และค่า pH ตามสมการ Michaelis-Menten"
+  },
+  "dna-extraction": {
+    id: "dna-extraction",
+    title: "DNA Extraction Chamber",
+    category: "Biology",
+    status: "",
+    description: "เรียนรู้ขั้นตอนการทำลายผนังเซลล์และตกตะกอนเพื่อแยกสายใยโมเลกุลดีเอ็นเอออกจากตัวอย่างพืชและผลไม้"
+  },
+  "cellular-respiration": {
+    id: "cellular-respiration",
+    title: "Cellular Respiration Lab",
+    category: "Biology",
+    status: "",
+    description: "ศึกษาการสลายโมเลกุลสารอาหารเพื่อผลิตพลังงาน ATP ทั้งในภาวะที่มีและไม่มีแก๊สออกซิเจน"
+  },
+  "plant-transpiration": {
+    id: "plant-transpiration",
+    title: "Plant Transpiration Potometer",
+    category: "Biology",
+    status: "",
+    description: "วัดอัตราการคายน้ำของยอดพืชภายใต้สภาวะควบคุม เช่น ความชื้น อุณหภูมิ ลม และความเข้มแสงด้วยโพโทมิเตอร์"
+  },
+  "natural-selection": {
+    id: "natural-selection",
+    title: "Natural Selection Simulator",
+    category: "Biology",
+    status: "",
+    description: "จำลองการเปลี่ยนแปลงสัดส่วนลักษณะประชากรสิ่งมีชีวิตตามปัจจัยกดดันของสภาพแวดล้อมตามทฤษฎีวิวัฒนาการ"
+  },
+  "blood-typing": {
+    id: "blood-typing",
+    title: "Blood Typing & Agglutination",
+    category: "Biology",
+    status: "",
+    description: "ทดลองหาหมู่เลือดระบบ ABO และ Rh ผ่านการตกตะกอนของเม็ดเลือดแดงเมื่อทำปฏิกิริยากับแอนติบอดีจำลอง"
+  },
+  "food-chain": {
+    id: "food-chain",
+    title: "Food Chain & Ecology",
+    category: "Biology",
+    status: "",
+    description: "วิเคราะห์การถ่ายทอดพลังงานและสารอาหารผ่านผู้ผลิต ผู้บริโภค และผู้ย่อยสลายในพีระมิดพลังงานระบบนิเวศ"
+  },
+  "heart-rate": {
+    id: "heart-rate",
+    title: "Cardiovascular System Lab",
+    category: "Biology",
+    status: "",
+    description: "วิเคราะห์อัตราการเต้นของหัวใจและความดันเลือดภายใต้การตอบสนองต่อการทำกิจกรรมและระดับสารกระตุ้นจำลอง"
   }
 };
 

@@ -392,6 +392,290 @@ const PhotosynthesisSVG = () => (
   </svg>
 );
 
+// 16. Mendelian Genetics Lab SVG
+const MendelsInheritanceSVG = () => (
+  <svg className="w-full h-32" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="100" cy="60" r="45" fill="#dcfce7" opacity="0.4" />
+    
+    {/* Punnett Square Grid */}
+    <g transform="translate(65, 25)">
+      {/* Outer borders and lines */}
+      <rect x="15" y="15" width="60" height="60" rx="4" fill="rgba(255, 255, 255, 0.85)" stroke="#16a34a" strokeWidth="2" />
+      <line x1="45" y1="15" x2="45" y2="75" stroke="#16a34a" strokeWidth="1.5" />
+      <line x1="15" y1="45" x2="75" y2="45" stroke="#16a34a" strokeWidth="1.5" />
+      
+      {/* Gametes labels */}
+      <text x="30" y="8" fill="#15803d" fontSize="9.5" fontWeight="bold" textAnchor="middle">Y</text>
+      <text x="60" y="8" fill="#15803d" fontSize="9.5" fontWeight="bold" textAnchor="middle">y</text>
+      <text x="6" y="33" fill="#15803d" fontSize="9.5" fontWeight="bold" textAnchor="middle">Y</text>
+      <text x="6" y="63" fill="#15803d" fontSize="9.5" fontWeight="bold" textAnchor="middle">y</text>
+      
+      {/* Genotypes inside grid */}
+      <text x="30" y="34" fill="#16a34a" fontSize="8" fontWeight="bold" textAnchor="middle">YY</text>
+      <circle cx="30" cy="40" r="3" fill="#22c55e" />
+      
+      <text x="60" y="34" fill="#16a34a" fontSize="8" fontWeight="bold" textAnchor="middle">Yy</text>
+      <circle cx="60" cy="40" r="3" fill="#22c55e" />
+      
+      <text x="30" y="64" fill="#16a34a" fontSize="8" fontWeight="bold" textAnchor="middle">Yy</text>
+      <circle cx="30" cy="70" r="3" fill="#22c55e" />
+      
+      <text x="60" y="64" fill="#ca8a04" fontSize="8" fontWeight="bold" textAnchor="middle">yy</text>
+      <circle cx="60" cy="70" r="3" fill="#eab308" />
+    </g>
+  </svg>
+);
+
+// 17. Mitosis & Cell Cycle SVG
+const MitosisDivisionSVG = () => (
+  <svg className="w-full h-32" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="100" cy="60" r="45" fill="#dcfce7" opacity="0.4" />
+    
+    <path d="M60,60 C60,40 80,35 100,45 C120,35 140,40 140,60 C140,80 120,85 100,75 C80,85 60,80 60,60 Z" fill="rgba(255, 255, 255, 0.85)" stroke="#16a34a" strokeWidth="2" />
+    
+    <circle cx="68" cy="60" r="2.5" fill="#15803d" />
+    <circle cx="132" cy="60" r="2.5" fill="#15803d" />
+    
+    <path d="M68,60 L92,48 M68,60 L95,54 M68,60 L95,66 M68,60 L92,72" stroke="#4ade80" strokeWidth="1" opacity="0.75" />
+    <path d="M132,60 L108,48 M132,60 L105,54 M132,60 L105,66 M132,60 L108,72" stroke="#4ade80" strokeWidth="1" opacity="0.75" />
+    
+    <path d="M92,46 L86,48 L92,50" stroke="#15803d" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M95,52 L89,54 L95,56" stroke="#22c55e" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M95,64 L89,66 L95,68" stroke="#15803d" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M92,70 L86,72 L92,74" stroke="#22c55e" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+    
+    <path d="M108,46 L114,48 L108,50" stroke="#15803d" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M105,52 L111,54 L105,56" stroke="#22c55e" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M105,64 L111,66 L105,68" stroke="#15803d" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M108,70 L114,72 L108,74" stroke="#22c55e" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+// 18. Osmosis & Plasmolysis SVG
+const CellOsmosisSVG = () => (
+  <svg className="w-full h-32" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="100" cy="60" r="45" fill="#dcfce7" opacity="0.4" />
+    
+    <path d="M60,35 L64,90 A6,6 0 0,0 70,96 H130 A6,6 0 0,0 136,90 L140,35" stroke="#64748b" strokeWidth="2" fill="none" />
+    <path d="M64,88 H136 L138,55 H62 Z" fill="#dbeafe" opacity="0.5" />
+    
+    <line x1="100" y1="55" x2="100" y2="95" stroke="#16a34a" strokeWidth="2.2" strokeDasharray="3 3.5" />
+    
+    <circle cx="70" cy="65" r="2.2" fill="#3b82f6" />
+    <circle cx="75" cy="78" r="2.2" fill="#3b82f6" />
+    <circle cx="85" cy="60" r="2.2" fill="#3b82f6" />
+    <circle cx="90" cy="85" r="2.2" fill="#3b82f6" />
+    <circle cx="68" cy="88" r="2.2" fill="#3b82f6" />
+    
+    <circle cx="125" cy="88" r="2.2" fill="#3b82f6" />
+    <circle cx="110" cy="60" r="2.2" fill="#3b82f6" />
+    
+    <circle cx="112" cy="74" r="5" fill="#15803d" />
+    <circle cx="128" cy="66" r="5" fill="#15803d" />
+    <circle cx="124" cy="80" r="5" fill="#15803d" />
+    
+    <path d="M86,72 L110,72 M104,69 L110,72 L104,75" stroke="#2563eb" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse" />
+  </svg>
+);
+
+// 19. Enzyme Catalysis Lab SVG
+const EnzymeKineticsSVG = () => (
+  <svg className="w-full h-32" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="100" cy="60" r="45" fill="#dcfce7" opacity="0.4" />
+    
+    <path d="M50,75 C50,45 75,45 85,55 C90,60 95,60 100,55 C110,45 135,45 135,75 C135,95 110,95 100,90 C90,95 50,95 50,75 Z" fill="#22c55e" stroke="#15803d" strokeWidth="2" />
+    <text x="92.5" y="80" fill="#ffffff" fontSize="7" fontWeight="bold">ENZYME</text>
+    
+    <path d="M84,32 C84,32 90,44 92.5,47.5 C95,51 100,51 102.5,47.5 C105,44 111,32 111,32 Z" fill="#f97316" stroke="#ea580c" strokeWidth="1.5" />
+    <text x="97.5" y="27" fill="#ea580c" fontSize="7" fontWeight="bold" textAnchor="middle">SUBSTRATE</text>
+    
+    <path d="M97.5,33 L97.5,44 M94.5,41 L97.5,44 L100.5,41" stroke="#ea580c" strokeWidth="1.2" strokeLinecap="round" />
+  </svg>
+);
+
+// 20. DNA Extraction Chamber SVG
+const DnaExtractionSVG = () => (
+  <svg className="w-full h-32" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="100" cy="60" r="45" fill="#dcfce7" opacity="0.4" />
+    
+    <g transform="translate(68, 20) rotate(15)">
+      <rect x="12" y="10" width="26" height="70" rx="13" fill="rgba(255, 255, 255, 0.9)" stroke="#64748b" strokeWidth="2" />
+      <path d="M13,50 L37,50 A12.5,12.5 0 0,1 25,79 A12.5,12.5 0 0,1 13,76 Z" fill="#14532d" opacity="0.85" />
+      <rect x="13" y="30" width="24" height="20" fill="#a7f3d0" opacity="0.6" />
+      
+      <path d="M25,20 Q21,27 25,34 T25,48 T25,62" stroke="#22c55e" strokeWidth="2" fill="none" strokeLinecap="round" />
+      <path d="M21,20 Q25,27 21,34 T21,48 T21,62" stroke="#4ade80" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+      
+      <line x1="21" y1="24" x2="25" y2="24" stroke="#ffffff" strokeWidth="1" />
+      <line x1="21" y1="31" x2="25" y2="31" stroke="#ffffff" strokeWidth="1" />
+      <line x1="21" y1="38" x2="25" y2="38" stroke="#ffffff" strokeWidth="1" />
+      <line x1="21" y1="45" x2="25" y2="45" stroke="#ffffff" strokeWidth="1" />
+      <line x1="21" y1="52" x2="25" y2="52" stroke="#ffffff" strokeWidth="1" />
+      
+      <rect x="23" y="-5" width="4" height="45" rx="2" fill="rgba(255,255,255,0.7)" stroke="#94a3b8" strokeWidth="1" />
+    </g>
+  </svg>
+);
+
+// 21. Cellular Respiration Lab SVG
+const CellularRespirationSVG = () => (
+  <svg className="w-full h-32" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="100" cy="60" r="45" fill="#dcfce7" opacity="0.4" />
+    
+    <ellipse cx="100" cy="60" rx="42" ry="24" fill="rgba(255, 255, 255, 0.85)" stroke="#15803d" strokeWidth="2.2" />
+    <path d="M64,60 C64,52 68,46 72,46 C76,46 78,54 82,54 C86,54 88,44 92,44 C96,44 98,56 102,56 C106,56 108,46 112,46 C116,46 118,54 122,54 C126,54 128,48 132,48 C136,48 136,54 136,60 C136,66 132,72 128,72 C124,72 122,66 118,66 C114,66 112,74 108,74 C104,74 102,64 98,64 C94,64 92,72 88,72 C84,72 82,64 78,64 C74,64 72,70 68,70 C64,70 64,66 64,60 Z" stroke="#22c55e" strokeWidth="1.8" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+    
+    <text x="35" y="44" fill="#15803d" fontSize="7" fontWeight="bold">Glucose</text>
+    <path d="M40,48 L56,54" stroke="#15803d" strokeWidth="1.2" strokeLinecap="round" />
+    
+    <text x="38" y="78" fill="#2563eb" fontSize="7" fontWeight="bold">O₂</text>
+    <path d="M42,72 L58,66" stroke="#2563eb" strokeWidth="1.2" strokeLinecap="round" />
+    
+    <g transform="translate(142, 44)" className="animate-pulse">
+      <path d="M12,0 L14,8 L22,8 L16,13 L18,21 L12,16 L6,21 L8,13 L2,8 L10,8 Z" fill="#eab308" stroke="#ca8a04" strokeWidth="1" />
+      <text x="12" y="13" fill="#854d0e" fontSize="6.5" fontWeight="bold" textAnchor="middle">ATP</text>
+    </g>
+    
+    <text x="146" y="80" fill="#475569" fontSize="6.5" fontWeight="bold">CO₂ + H₂O</text>
+  </svg>
+);
+
+// 22. Plant Transpiration Potometer SVG
+const PlantTranspirationSVG = () => (
+  <svg className="w-full h-32" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="100" cy="60" r="45" fill="#dcfce7" opacity="0.4" />
+    
+    <g transform="translate(50, 20)">
+      <path d="M15,15 Q15,40 15,55" stroke="#16a34a" strokeWidth="2.5" strokeLinecap="round" />
+      <path d="M15,20 Q5,14 8,8 Q17,11 15,20" fill="#22c55e" />
+      <path d="M15,28 Q26,22 23,16 Q16,19 15,28" fill="#4ade80" />
+      <path d="M15,38 Q4,35 6,28 Q14,31 15,38" fill="#15803d" />
+      
+      <path d="M3,6 Q6,2 9,6" stroke="#f59e0b" strokeWidth="1" strokeLinecap="round" className="animate-bounce" />
+      <path d="M26,12 Q29,8 32,12" stroke="#f59e0b" strokeWidth="1" strokeLinecap="round" />
+    </g>
+    
+    <g transform="translate(62, 70)">
+      <rect x="0" y="0" width="10" height="15" fill="#dbeafe" stroke="#64748b" strokeWidth="1.5" />
+      <path d="M5,10 L70,10 L70,-10 L85,-10" fill="none" stroke="#64748b" strokeWidth="2.5" />
+      <path d="M5,10 L70,10 L70,-10 L85,-10" fill="none" stroke="#dbeafe" strokeWidth="1.2" />
+      
+      <circle cx="45" cy="10" r="1.5" fill="#22d3ee" className="animate-pulse" />
+      <line x1="20" y1="13" x2="20" y2="7" stroke="#64748b" strokeWidth="1" />
+      <line x1="30" y1="13" x2="30" y2="7" stroke="#64748b" strokeWidth="1" />
+      <line x1="40" y1="13" x2="40" y2="7" stroke="#64748b" strokeWidth="1" />
+      <line x1="50" y1="13" x2="50" y2="7" stroke="#64748b" strokeWidth="1" />
+      <line x1="60" y1="13" x2="60" y2="7" stroke="#64748b" strokeWidth="1" />
+    </g>
+  </svg>
+);
+
+// 23. Natural Selection Simulator SVG
+const NaturalSelectionSVG = () => (
+  <svg className="w-full h-32" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="100" cy="60" r="45" fill="#dcfce7" opacity="0.4" />
+    
+    <path d="M35,90 Q70,70 140,85 C140,85 155,50 115,35 Q60,40 35,90 Z" fill="#22c55e" stroke="#15803d" strokeWidth="1.5" opacity="0.85" />
+    <path d="M35,90 Q75,65 125,50" stroke="#15803d" strokeWidth="1.2" strokeLinecap="round" opacity="0.6" />
+    
+    <g transform="translate(68, 62) rotate(-15)">
+      <ellipse cx="6" cy="10" rx="4.5" ry="6" fill="#15803d" />
+      <circle cx="6" cy="3" r="2.5" fill="#14532d" />
+      <line x1="6" y1="10" x2="6" y2="17" stroke="#14532d" strokeWidth="1" />
+      <circle cx="4" cy="8" r="0.8" fill="#4ade80" />
+      <circle cx="8" cy="11" r="0.8" fill="#4ade80" />
+    </g>
+    
+    <g transform="translate(105, 52) rotate(15)">
+      <ellipse cx="6" cy="10" rx="4.5" ry="6" fill="#b45309" />
+      <circle cx="6" cy="3" r="2.5" fill="#78350f" />
+      <line x1="6" y1="10" x2="6" y2="17" stroke="#78350f" strokeWidth="1" />
+      <circle cx="4" cy="8" r="0.8" fill="#f97316" />
+      <circle cx="8" cy="11" r="0.8" fill="#f97316" />
+    </g>
+    
+    <g transform="translate(130, 20)">
+      <path d="M0,35 L40,10 L30,48 Z" fill="#64748b" stroke="#475569" strokeWidth="1.5" />
+      <line x1="16" y1="25" x2="35" y2="30" stroke="#475569" strokeWidth="1.5" />
+      <circle cx="34" cy="18" r="2" fill="#000000" />
+    </g>
+  </svg>
+);
+
+// 24. Blood Typing & Agglutination SVG
+const BloodTypingSVG = () => (
+  <svg className="w-full h-32" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="100" cy="60" r="45" fill="#dcfce7" opacity="0.4" />
+    
+    <rect x="42" y="32" width="116" height="56" rx="8" fill="rgba(255, 255, 255, 0.9)" stroke="#94a3b8" strokeWidth="2" />
+    
+    <g transform="translate(62, 60)">
+      <circle cx="0" cy="0" r="13" fill="none" stroke="#cbd5e1" strokeWidth="1.5" />
+      <circle cx="0" cy="0" r="9.5" fill="#f43f5e" opacity="0.8" />
+      <text x="0" y="3" fill="#ffffff" fontSize="8" fontWeight="bold" textAnchor="middle">A</text>
+    </g>
+    
+    <g transform="translate(100, 60)">
+      <circle cx="0" cy="0" r="13" fill="none" stroke="#cbd5e1" strokeWidth="1.5" />
+      <circle cx="-5" cy="-4" r="2.5" fill="#be123c" />
+      <circle cx="4" cy="-5" r="2" fill="#be123c" />
+      <circle cx="-3" cy="4" r="3" fill="#be123c" />
+      <circle cx="5" cy="3" r="2.5" fill="#be123c" />
+      <circle cx="0" cy="0" r="2" fill="#be123c" />
+      <text x="0" y="3" fill="#ffffff" fontSize="8" fontWeight="bold" textAnchor="middle">B</text>
+    </g>
+    
+    <g transform="translate(138, 60)">
+      <circle cx="0" cy="0" r="13" fill="none" stroke="#cbd5e1" strokeWidth="1.5" />
+      <circle cx="-4" cy="-4" r="2" fill="#be123c" />
+      <circle cx="5" cy="-3" r="2.5" fill="#be123c" />
+      <circle cx="-4" cy="4" r="2.5" fill="#be123c" />
+      <circle cx="4" cy="4" r="3" fill="#be123c" />
+      <circle cx="0" cy="-1" r="2" fill="#be123c" />
+      <text x="0" y="3" fill="#ffffff" fontSize="8" fontWeight="bold" textAnchor="middle">Rh</text>
+    </g>
+  </svg>
+);
+
+// 25. Food Chain & Ecology SVG
+const FoodChainSVG = () => (
+  <svg className="w-full h-32" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="100" cy="60" r="45" fill="#dcfce7" opacity="0.4" />
+    
+    <g transform="translate(60, 20)">
+      <path d="M0,80 L80,80 L70,60 L10,60 Z" fill="#15803d" stroke="#14532d" strokeWidth="1.5" />
+      <text x="40" y="73" fill="#ffffff" fontSize="6.5" fontWeight="bold" textAnchor="middle">PRODUCERS</text>
+      
+      <path d="M10,60 L70,60 L60,40 L20,40 Z" fill="#22c55e" stroke="#15803d" strokeWidth="1.5" />
+      <text x="40" y="52" fill="#ffffff" fontSize="6.5" fontWeight="bold" textAnchor="middle">HERBIVORES</text>
+      
+      <path d="M20,40 L60,40 L50,20 L30,20 Z" fill="#4ade80" stroke="#22c55e" strokeWidth="1.5" />
+      <text x="40" y="32" fill="#14532d" fontSize="6" fontWeight="bold" textAnchor="middle">CARNIVORES</text>
+      
+      <path d="M30,20 L50,20 L40,0 Z" fill="#eab308" stroke="#ca8a04" strokeWidth="1.5" />
+      <text x="40" y="14" fill="#854d0e" fontSize="5.5" fontWeight="bold" textAnchor="middle">APEX</text>
+      
+      <path d="M-12,75 L-12,15 M-16,25 L-12,15 L-8,25" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse" />
+      <text x="-20" y="48" fill="#ea580c" fontSize="6.5" fontWeight="bold" transform="rotate(-90 -20 48)" textAnchor="middle">ENERGY FLOW</text>
+    </g>
+  </svg>
+);
+
+// 26. Cardiovascular System Lab SVG
+const HeartRateSVG = () => (
+  <svg className="w-full h-32" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="100" cy="60" r="45" fill="#dcfce7" opacity="0.4" />
+    
+    <g transform="translate(68, 25)" className="animate-pulse">
+      <path d="M16,28 C16,28 0,16 0,8 C0,1 6,-5 16,3 C26,-5 32,1 32,8 C32,16 16,28 16,28 Z" fill="#10b981" opacity="0.75" />
+      <path d="M16,25 C16,25 3,14 3,7 C3,2.5 7.5,-2 16,5 C24.5,-2 29,2.5 29,7 C29,14 16,25 16,25 Z" fill="#34d399" opacity="0.9" />
+    </g>
+    
+    <path d="M25,60 L75,60 L80,52 L85,68 L92,30 L98,90 L104,60 L108,54 L112,60 L120,60 L125,54 L130,60 L175,60" stroke="#16a34a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M25,60 L75,60 L80,52 L85,68 L92,30 L98,90 L104,60 L108,54 L112,60 L120,60 L125,54 L130,60 L175,60" stroke="#4ade80" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" opacity="0.8" />
+  </svg>
+);
+
 // 4. Ohm's Law SVG
 const OhmsLawSVG = () => (
   <svg className="w-full h-32" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -780,6 +1064,30 @@ export default function LabCard({
         return <ElectrolysisSVG />;
       case "colligative-properties":
         return <ColligativePropertiesSVG />;
+      case "photosynthesis-rate":
+        return <PhotosynthesisSVG />;
+      case "mendels-inheritance":
+        return <MendelsInheritanceSVG />;
+      case "mitosis-division":
+        return <MitosisDivisionSVG />;
+      case "cell-osmosis":
+        return <CellOsmosisSVG />;
+      case "enzyme-kinetics":
+        return <EnzymeKineticsSVG />;
+      case "dna-extraction":
+        return <DnaExtractionSVG />;
+      case "cellular-respiration":
+        return <CellularRespirationSVG />;
+      case "plant-transpiration":
+        return <PlantTranspirationSVG />;
+      case "natural-selection":
+        return <NaturalSelectionSVG />;
+      case "blood-typing":
+        return <BloodTypingSVG />;
+      case "food-chain":
+        return <FoodChainSVG />;
+      case "heart-rate":
+        return <HeartRateSVG />;
       default:
         switch (lab.category) {
           case "Physics":
