@@ -108,8 +108,8 @@ export default function ExperimentViewport({
       {/* Main Grid Viewport (Scene vs Stats) */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-stretch">
         
-        {/* Left Side: 2D Beaker Science Scene (8 Columns) */}
-        <div className="md:col-span-8 bg-slate-50 border border-slate-200/40 rounded-2xl relative h-60 md:h-72 overflow-hidden flex items-center justify-center">
+        {/* Left Side: 2D Beaker Science Scene (6/7 Columns) */}
+        <div className="md:col-span-6 xl:col-span-7 bg-slate-50 border border-slate-200/40 rounded-2xl relative h-60 md:h-72 overflow-hidden flex items-center justify-center">
           
           {/* Subtle Grid Pattern Overlay */}
           <div className="absolute inset-0 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:16px_16px] opacity-50" />
@@ -202,80 +202,80 @@ export default function ExperimentViewport({
           </svg>
         </div>
 
-        {/* Right Side: Active Stat Readings HUD (4 Columns) */}
-        <div className="md:col-span-4 flex flex-col justify-between gap-3">
+        {/* Right Side: Active Stat Readings HUD (6/5 Columns) */}
+        <div className="md:col-span-6 xl:col-span-5 flex flex-col justify-between gap-3">
           
           {/* STAT 1: อุณหภูมิของวัตถุ (T) */}
-          <div className="bg-rose-50/50 border border-rose-100/80 rounded-2xl p-4 flex items-center justify-between gap-4 shadow-sm hover:shadow-md transition-all duration-300">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-rose-100 text-rose-500 flex items-center justify-center shrink-0 shadow-sm">
-                <Thermometer className="w-5.5 h-5.5" />
+          <div className="bg-rose-50/50 border border-rose-100/80 rounded-2xl p-3 sm:p-4 flex items-center justify-between gap-2.5 sm:gap-3 shadow-sm hover:shadow-md transition-all duration-300">
+            <div className="flex items-center gap-2 sm:gap-2.5 flex-1 min-w-0">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-rose-100 text-rose-500 flex items-center justify-center shrink-0 shadow-sm">
+                <Thermometer className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
-              <div className="flex flex-col text-left">
-                <span className="text-xs font-bold text-slate-700">อุณหภูมิวัตถุ (T)</span>
-                <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Object Temp</span>
+              <div className="flex flex-col text-left min-w-0 flex-1">
+                <span className="text-xs font-bold text-slate-700 truncate block">อุณหภูมิวัตถุ (T)</span>
+                <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider truncate block">Object Temp</span>
               </div>
             </div>
-            <div className="text-right">
-              <span className="text-lg sm:text-xl font-black text-rose-600 tracking-tight leading-none">
+            <div className="text-right shrink-0 ml-1.5">
+              <span className="text-sm sm:text-base md:text-sm lg:text-sm xl:text-base font-black text-rose-600 tracking-tight leading-none">
                 {currentTemp.toFixed(1)}°C
               </span>
             </div>
           </div>
 
           {/* STAT 2: อุณหภูมิสิ่งแวดล้อม (Ts) */}
-          <div className="bg-blue-50/50 border border-blue-100/80 rounded-2xl p-4 flex items-center justify-between gap-4 shadow-sm hover:shadow-md transition-all duration-300">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-500 flex items-center justify-center shrink-0 shadow-sm">
-                <Sun className="w-5.5 h-5.5" />
+          <div className="bg-blue-50/50 border border-blue-100/80 rounded-2xl p-3 sm:p-4 flex items-center justify-between gap-2.5 sm:gap-3 shadow-sm hover:shadow-md transition-all duration-300">
+            <div className="flex items-center gap-2 sm:gap-2.5 flex-1 min-w-0">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-blue-100 text-blue-500 flex items-center justify-center shrink-0 shadow-sm">
+                <Sun className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
-              <div className="flex flex-col text-left">
-                <span className="text-xs font-bold text-slate-700">อุณหภูมิสิ่งแวดล้อม (Tₛ)</span>
-                <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Ambient Temp</span>
+              <div className="flex flex-col text-left min-w-0 flex-1">
+                <span className="text-xs font-bold text-slate-700 truncate block">อุณหภูมิสิ่งแวดล้อม (Tₛ)</span>
+                <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider truncate block">Ambient Temp</span>
               </div>
             </div>
-            <div className="text-right">
-              <span className="text-lg sm:text-xl font-black text-blue-600 tracking-tight leading-none">
+            <div className="text-right shrink-0 ml-1.5">
+              <span className="text-sm sm:text-base md:text-sm lg:text-sm xl:text-base font-black text-blue-600 tracking-tight leading-none">
                 {ambientTemp.toFixed(1)}°C
               </span>
             </div>
           </div>
 
           {/* STAT 3: เวลาการทดลอง */}
-          <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4 flex items-center justify-between gap-4 shadow-sm hover:shadow-md transition-all duration-300">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-slate-100 text-slate-500 flex items-center justify-center shrink-0 shadow-sm">
-                <Timer className="w-5.5 h-5.5" />
+          <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-3 sm:p-4 flex items-center justify-between gap-2.5 sm:gap-3 shadow-sm hover:shadow-md transition-all duration-300">
+            <div className="flex items-center gap-2 sm:gap-2.5 flex-1 min-w-0">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-slate-100 text-slate-500 flex items-center justify-center shrink-0 shadow-sm">
+                <Timer className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
-              <div className="flex flex-col text-left">
-                <span className="text-xs font-bold text-slate-700">เวลาการทดลอง</span>
-                <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Elapsed Time</span>
+              <div className="flex flex-col text-left min-w-0 flex-1">
+                <span className="text-xs font-bold text-slate-700 truncate block">เวลาการทดลอง</span>
+                <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider truncate block">Elapsed Time</span>
               </div>
             </div>
-            <div className="text-right flex flex-col items-end shrink-0">
-              <span className="text-lg sm:text-xl font-black text-slate-700 tracking-tight leading-none">
+            <div className="text-right flex flex-col items-end shrink-0 ml-1.5">
+              <span className="text-sm sm:text-base md:text-sm lg:text-sm xl:text-base font-black text-slate-700 tracking-tight leading-none">
                 {formatTimeOnly(elapsedSeconds)}
               </span>
-              <span className="text-[10px] font-bold text-slate-400 mt-1">นาที</span>
+              <span className="text-[9px] sm:text-[10px] font-bold text-slate-400 mt-0.5 sm:mt-1">นาที</span>
             </div>
           </div>
 
           {/* STAT 4: อัตราการเปลี่ยนแปลง dT/dt */}
-          <div className="bg-emerald-50/50 border border-emerald-100/80 rounded-2xl p-4 flex items-center justify-between gap-4 shadow-sm hover:shadow-md transition-all duration-300">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 shadow-sm">
-                <TrendingDown className="w-5.5 h-5.5" />
+          <div className="bg-emerald-50/50 border border-emerald-100/80 rounded-2xl p-3 sm:p-4 flex items-center justify-between gap-2.5 sm:gap-3 shadow-sm hover:shadow-md transition-all duration-300">
+            <div className="flex items-center gap-2 sm:gap-2.5 flex-1 min-w-0">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 shadow-sm">
+                <TrendingDown className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
-              <div className="flex flex-col text-left">
-                <span className="text-xs font-bold text-slate-700">อัตราเปลี่ยนอุณหภูมิ</span>
-                <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Rate (dT/dt)</span>
+              <div className="flex flex-col text-left min-w-0 flex-1">
+                <span className="text-xs font-bold text-slate-700 truncate block">อัตราเปลี่ยนอุณหภูมิ</span>
+                <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider truncate block">Rate (dT/dt)</span>
               </div>
             </div>
-            <div className="text-right flex flex-col items-end shrink-0">
-              <span className="text-lg sm:text-xl font-black text-emerald-600 tracking-tight leading-none">
+            <div className="text-right flex flex-col items-end shrink-0 ml-1.5">
+              <span className="text-sm sm:text-base md:text-sm lg:text-sm xl:text-base font-black text-emerald-600 tracking-tight leading-none">
                 {coolingRate.toFixed(2)}
               </span>
-              <span className="text-[10px] font-bold text-emerald-500 mt-1">°C/นาที</span>
+              <span className="text-[9px] sm:text-[10px] font-bold text-emerald-500 mt-0.5 sm:mt-1">°C/นาที</span>
             </div>
           </div>
 
