@@ -187,8 +187,8 @@ export default function ProfilePage() {
             <div className="space-y-6">
               {/* Sidebar Header Brand (styled like the logo) */}
               <div className="flex items-center gap-3 pb-4 border-b border-slate-100 select-none">
-                <div className="w-9 h-9 rounded-xl bg-blue-100 flex items-center justify-center overflow-hidden">
-                  <img src="/icon.png" alt="SciSiam Logo" className="w-full h-full object-cover" />
+                <div className="w-9 h-9 rounded-xl bg-blue-50/80 border border-blue-100/30 flex items-center justify-center overflow-hidden relative">
+                  <img src="/penguin_expressions.png" alt="SciSiam Logo" className="absolute w-[300%] max-w-none left-0 top-[-5%] object-contain" />
                 </div>
                 <div className="flex flex-col text-left">
                   <span className="text-base font-extrabold text-slate-800 leading-none">ไออุ่น</span>
@@ -230,8 +230,8 @@ export default function ProfilePage() {
               </div>
 
               {/* Penguin image */}
-              <div className="w-28 h-28 select-none pointer-events-none mt-2">
-                <img src="/icon.png" alt="Mascot Penguin" className="w-full h-full object-contain" />
+              <div className="w-28 h-28 select-none pointer-events-none mt-2 relative overflow-hidden">
+                <img src="/penguin_expressions.png" alt="Mascot Penguin" className="absolute w-[300%] max-w-none left-0 top-[-5%] object-contain" />
               </div>
             </div>
           </aside>
@@ -530,8 +530,8 @@ export default function ProfilePage() {
                 <div className="bg-white/95 rounded-[23px] px-6 py-4.5 flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left relative overflow-hidden min-h-[96px]">
                   
                   {/* Peeking Mascot Penguin */}
-                  <div className="absolute -left-2 -bottom-5 w-24 h-24 select-none pointer-events-none z-10">
-                    <img src="/android-icon-foreground.png" alt="Penguin mascot" className="w-full h-full object-contain" />
+                  <div className="absolute -left-2 -bottom-5 w-24 h-24 select-none pointer-events-none z-10 overflow-hidden">
+                    <img src="/penguin_expressions.png" alt="Penguin mascot" className="absolute w-[300%] max-w-none left-0 top-[-5%] object-contain" />
                   </div>
                   
                   <div className="flex items-center gap-4 pl-20">
