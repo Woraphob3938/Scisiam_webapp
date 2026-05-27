@@ -17,7 +17,7 @@ export default function CategoryFilter({
   const categoriesList = [
     { id: "All" as Category, name: "ทั้งหมด", icon: LayoutGrid, color: "blue" },
     { id: "Physics" as Category, name: "Physics", icon: Atom, color: "indigo" },
-    { id: "Chemistry" as Category, name: "Chemistry", icon: Beaker, color: "red" },
+    { id: "Chemistry" as Category, name: "Chemistry", icon: Beaker, color: "purple" },
     { id: "Biology" as Category, name: "Biology", icon: Leaf, color: "green" },
   ];
 
@@ -31,7 +31,7 @@ export default function CategoryFilter({
           const activeColorClasses: Record<string, string> = {
             blue: "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/20 scale-[1.02]",
             indigo: "bg-gradient-to-r from-indigo-600 to-blue-600 text-white shadow-md shadow-indigo-500/20 scale-[1.02]",
-            red: "bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-md shadow-red-500/20 scale-[1.02]",
+            purple: "bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white shadow-md shadow-purple-500/20 scale-[1.02]",
             green: "bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-md shadow-green-500/20 scale-[1.02]",
           };
 
