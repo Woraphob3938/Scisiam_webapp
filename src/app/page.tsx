@@ -251,7 +251,7 @@ export default function Home() {
                 <button 
                   onClick={() => {
                     if (activeModal) {
-                      router.push(`/labs/${activeModal.lab.id}`);
+                      router.push(`/labs/${activeModal.lab.id}/simulation`);
                       closeModal();
                     }
                   }}
