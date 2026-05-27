@@ -188,7 +188,7 @@ export default function ProfilePage() {
               {/* Sidebar Header Brand (styled like the logo) */}
               <div className="flex items-center gap-3 pb-4 border-b border-slate-100 select-none">
                 <div className="w-9 h-9 rounded-xl bg-blue-100 flex items-center justify-center overflow-hidden">
-                  <img src="/logo.png" alt="SciSiam Logo" className="w-full h-full object-cover" />
+                  <img src="/icon.png" alt="SciSiam Logo" className="w-full h-full object-cover" />
                 </div>
                 <div className="flex flex-col text-left">
                   <span className="text-base font-extrabold text-slate-800 leading-none">ไออุ่น</span>
@@ -231,7 +231,7 @@ export default function ProfilePage() {
 
               {/* Penguin image */}
               <div className="w-28 h-28 select-none pointer-events-none mt-2">
-                <img src="/logo.png" alt="Mascot Penguin" className="w-full h-full object-contain" />
+                <img src="/icon.png" alt="Mascot Penguin" className="w-full h-full object-contain" />
               </div>
             </div>
           </aside>
@@ -531,7 +531,7 @@ export default function ProfilePage() {
                   
                   {/* Peeking Mascot Penguin */}
                   <div className="absolute -left-2 -bottom-5 w-24 h-24 select-none pointer-events-none z-10">
-                    <img src="/logo.png" alt="Penguin mascot" className="w-full h-full object-contain" />
+                    <img src="/android-icon-foreground.png" alt="Penguin mascot" className="w-full h-full object-contain" />
                   </div>
                   
                   <div className="flex items-center gap-4 pl-20">
