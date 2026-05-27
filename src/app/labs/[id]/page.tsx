@@ -117,7 +117,7 @@ const labsData: Record<string, LabData> = {
     status: "",
     description: "ทดลองวัดความสัมพันธ์ระหว่างความดันและปริมาตรของแก๊สที่อุณหภูมิคงที่เพื่อตรวจสอบกฎของบอยล์"
   },
-  "charross-law": {
+  "charles-law": {
     id: "charles-law",
     title: "Charles's Temperature-Volume Lab",
     category: "Chemistry",
