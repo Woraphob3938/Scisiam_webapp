@@ -51,14 +51,18 @@ export default function LabDetailPage() {
 
   // Calculate cooling curve data points when sliders change
   // Formula: T(t) = Ts + (T0 - Ts) * e^(-kt)
+  // Calculate cooling curve data points when sliders change
+  // Formula: T(t) = Ts + (T0 - Ts) * e^(-kt)
   useEffect(() => {
     const points = [];
     const totalTime = 60; // 60 minutes
     const step = 2.5; // step interval
     
     for (let t = 0; t <= totalTime; t += step) {
-      const temp = ambientTemp + (initialTemp - ambientTemp) * Math.exp(-coolingConstant * t);
-      points.push({ x: t, y: temp });
+      // Add subtle experimental sensor noise as per science-expert guideline
+      const noise = t > 0 ? (Math.random() - 0.5) * 0.4 : 0;
+      const temp = ambientTemp + (initialTemp - ambientTemp) * Math.exp(-coolingConstant * t) + noise;
+      points.push({ x: t, y: Math.max(0, temp) });
     }
     setChartPoints(points);
   }, [initialTemp, ambientTemp, coolingConstant]);
@@ -89,20 +93,26 @@ export default function LabDetailPage() {
   };
 
   // Convert mathematical coordinates to SVG viewbox coordinates (200w x 120h)
+  const timeToSvgX = (t: number) => 20 + (t / 60) * 160;
+  const tempToSvgY = (temp: number) => 100 - (temp / 100) * 90;
+
   const getSvgPath = () => {
     if (chartPoints.length === 0) return "";
-    
-    // SVG Dimensions: W=180 (starts at X=20), H=90 (starts at Y=10)
-    // Math bounds: Time: 0 to 60. Temp: 0 to 100.
-    const timeToSvgX = (t: number) => 20 + (t / 60) * 160;
-    const tempToSvgY = (temp: number) => 100 - (temp / 100) * 90;
-
     return chartPoints
       .map((p, i) => `${i === 0 ? "M" : "L"}${timeToSvgX(p.x)},${tempToSvgY(p.y)}`)
       .join(" ");
   };
 
-  const ambientY = 100 - (ambientTemp / 100) * 90;
+  const getSvgAreaPath = () => {
+    if (chartPoints.length === 0) return "";
+    const linePath = getSvgPath();
+    const startX = timeToSvgX(chartPoints[0].x);
+    const endX = timeToSvgX(chartPoints[chartPoints.length - 1].x);
+    const baseY = 100; // maps to temp=0
+    return `${linePath} L${endX},${baseY} L${startX},${baseY} Z`;
+  };
+
+  const ambientY = tempToSvgY(ambientTemp);
 
   return (
     <div className="flex flex-col min-h-screen bg-slate-50 relative pb-16 overflow-hidden">
@@ -114,7 +124,9 @@ export default function LabDetailPage() {
       <Navbar />
 
       {/* 2. Breadcrumb Navigation */}
-      <Breadcrumb category={lab.category} title={lab.title} />
+      <div className="w-full max-w-[1440px] mx-auto px-6 sm:px-12 md:px-20 pt-6 pb-2 select-none">
+        <Breadcrumb category={lab.category} title={lab.title} />
+      </div>
 
       {/* 3. Hero Section Details */}
       <LabHero
@@ -198,24 +210,24 @@ export default function LabDetailPage() {
 
       {/* 6. Simulator Loading & Interactive Console Modal */}
       {showSimModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/40 backdrop-blur-md animate-in fade-in duration-200">
           <div 
-            className="bg-white w-full max-w-2xl rounded-[32px] shadow-2xl border border-slate-100 overflow-hidden flex flex-col animate-in zoom-in-95 duration-300"
+            className="bg-white/95 backdrop-blur-xl w-full max-w-2xl rounded-[32px] shadow-2xl border border-slate-200/50 overflow-hidden flex flex-col animate-in zoom-in-95 duration-300"
             role="dialog"
             aria-modal="true"
           >
             {/* Modal Header */}
-            <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex justify-between items-center select-none">
+            <div className="px-6 py-4 bg-slate-50/80 border-b border-slate-100 flex justify-between items-center select-none backdrop-blur-md">
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-blue-600 animate-pulse" />
-                <span className="text-xs sm:text-sm font-bold text-slate-700">เครื่องทดลองเย็นตัวจำลองเสมือนจริง</span>
+                <span className="text-xs sm:text-sm font-bold text-slate-700 leading-relaxed">เครื่องทดลองเย็นตัวจำลองเสมือนจริง</span>
               </div>
               <button 
                 onClick={closeModal}
-                className="p-1 rounded-full hover:bg-slate-200/80 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                className="p-1.5 rounded-full hover:bg-slate-200/80 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
                 aria-label="ปิดเครื่องมือ"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4.5 h-4.5" />
               </button>
             </div>
 
@@ -223,15 +235,23 @@ export default function LabDetailPage() {
             <div className="p-6 overflow-y-auto max-h-[75vh]">
               {simProgress < 100 ? (
                 /* Loading Phase */
-                <div className="flex flex-col items-center justify-center text-center py-10 space-y-6 select-none">
-                  <div className="w-18 h-18 rounded-full border-4 border-slate-100 border-t-blue-600 animate-spin" />
-                  <div className="space-y-2.5 w-full max-w-xs">
-                    <p className="text-sm font-bold text-slate-700">{simStage}</p>
-                    <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                <div className="flex flex-col items-center justify-center text-center py-12 space-y-6 select-none">
+                  {/* Glowing Double Ring Science Spinner */}
+                  <div className="relative w-20 h-20 flex items-center justify-center">
+                    <div className="absolute inset-0 rounded-full border-4 border-slate-100 border-t-indigo-600 animate-spin" />
+                    <div className="absolute w-14 h-14 rounded-full border-4 border-slate-100/50 border-b-rose-500 animate-spin [animation-direction:reverse]" />
+                    <Thermometer className="w-6 h-6 text-indigo-500 animate-pulse" />
+                  </div>
+                  <div className="space-y-3 w-full max-w-sm">
+                    <p className="text-sm font-bold text-slate-700 leading-relaxed break-words">{simStage}</p>
+                    <div className="w-full bg-slate-100/80 h-2.5 rounded-full overflow-hidden relative border border-slate-200/20">
                       <div 
-                        className="h-full bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full transition-all duration-300"
+                        className="h-full bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-600 rounded-full transition-all duration-300 relative"
                         style={{ width: `${simProgress}%` }}
-                      />
+                      >
+                        {/* Glow indicator at progress tip */}
+                        <div className="absolute right-0 top-0 h-full w-2 bg-white/50 blur-[2px]" />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -239,82 +259,89 @@ export default function LabDetailPage() {
                 /* Interactive Lab Simulation Interface */
                 <div className="space-y-6">
                   {/* Banner Info */}
-                  <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-4 text-emerald-800 flex items-start gap-3 select-none">
-                    <CheckCircle className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
-                    <div>
-                      <h4 className="text-sm font-bold">จำลองระบบทำงานเรียบร้อย!</h4>
-                      <p className="text-xs text-emerald-700/95 font-medium mt-0.5">
+                  <div className="bg-emerald-50/80 border border-emerald-100/80 rounded-2xl p-4 text-emerald-800 flex items-start gap-3 select-none backdrop-blur-md">
+                    <div className="p-1 rounded-lg bg-emerald-100 text-emerald-600 shrink-0">
+                      <CheckCircle className="w-4.5 h-4.5" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-sm font-bold leading-normal">จำลองระบบทำงานเรียบร้อย!</h4>
+                      <p className="text-xs text-emerald-700/90 font-medium mt-0.5 leading-relaxed break-words">
                         ลองปรับตั้งค่าตัวแปรจำลองด้านล่าง เพื่อดูการฟิตติ้งเส้นโค้งอุณหภูมิตามกฎนิวตันในทันที
                       </p>
                     </div>
                   </div>
 
                   {/* Two Column Layout for controls vs output */}
-                  <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                  <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
                     
                     {/* Simulator Sliders (Left 5 Columns) */}
-                    <div className="md:col-span-5 bg-slate-50 border border-slate-100 p-4.5 rounded-2xl space-y-4">
-                      <h5 className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5 mb-2 select-none">
-                        <Sliders className="w-4 h-4 text-indigo-500" />
-                        ตัวแปรทดลองควบคุม
-                      </h5>
+                    <div className="md:col-span-5 bg-slate-50/50 border border-slate-100 p-5 rounded-2xl flex flex-col justify-between gap-4">
+                      <div>
+                        <h5 className="text-[10px] sm:text-xs font-extrabold text-slate-400 uppercase leading-relaxed flex items-center gap-1.5 mb-4 select-none">
+                          <Sliders className="w-4 h-4 text-indigo-500" />
+                          ตัวแปรทดลองควบคุม
+                        </h5>
 
-                      {/* Slider 1: Initial Temp T0 */}
-                      <div className="space-y-1">
-                        <div className="flex justify-between items-center text-xs font-bold select-none">
-                          <span className="text-slate-600 flex items-center gap-1">
-                            <Thermometer className="w-3.5 h-3.5 text-rose-500" />
-                            อุณหภูมิเริ่มต้น (T₀)
-                          </span>
-                          <span className="text-rose-600 font-extrabold">{initialTemp} °C</span>
-                        </div>
-                        <input
-                          type="range"
-                          min="60"
-                          max="100"
-                          value={initialTemp}
-                          onChange={(e) => setInitialTemp(Number(e.target.value))}
-                          className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-rose-500"
-                        />
-                      </div>
+                        {/* Sliders Stack */}
+                        <div className="space-y-4">
+                          {/* Slider 1: Initial Temp T0 */}
+                          <div className="group bg-white p-3 rounded-xl border border-slate-100 hover:border-slate-200/60 hover:shadow-xs transition-all duration-200 select-none">
+                            <div className="flex justify-between items-center text-xs font-bold mb-1.5">
+                              <span className="text-slate-600 flex items-center gap-1.5 leading-normal">
+                                <Thermometer className="w-4 h-4 text-rose-500 group-hover:animate-bounce" />
+                                อุณหภูมิเริ่มต้น (T₀)
+                              </span>
+                              <span className="text-rose-600 font-extrabold text-xs bg-rose-50 px-2 py-0.5 rounded border border-rose-100">{initialTemp} °C</span>
+                            </div>
+                            <input
+                              type="range"
+                              min="60"
+                              max="100"
+                              value={initialTemp}
+                              onChange={(e) => setInitialTemp(Number(e.target.value))}
+                              className="w-full h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-rose-500"
+                            />
+                          </div>
 
-                      {/* Slider 2: Ambient Temp Ts */}
-                      <div className="space-y-1">
-                        <div className="flex justify-between items-center text-xs font-bold select-none">
-                          <span className="text-slate-600 flex items-center gap-1">
-                            <Sun className="w-3.5 h-3.5 text-emerald-500" />
-                            อุณหภูมิแวดล้อม (T<sub>s</sub>)
-                          </span>
-                          <span className="text-emerald-600 font-extrabold">{ambientTemp} °C</span>
-                        </div>
-                        <input
-                          type="range"
-                          min="10"
-                          max="40"
-                          value={ambientTemp}
-                          onChange={(e) => setAmbientTemp(Number(e.target.value))}
-                          className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-emerald-500"
-                        />
-                      </div>
+                          {/* Slider 2: Ambient Temp Ts */}
+                          <div className="group bg-white p-3 rounded-xl border border-slate-100 hover:border-slate-200/60 hover:shadow-xs transition-all duration-200 select-none">
+                            <div className="flex justify-between items-center text-xs font-bold mb-1.5">
+                              <span className="text-slate-600 flex items-center gap-1.5 leading-normal">
+                                <Sun className="w-4 h-4 text-amber-500 group-hover:animate-spin-slow" />
+                                อุณหภูมิแวดล้อม (Tₛ)
+                              </span>
+                              <span className="text-emerald-600 font-extrabold text-xs bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">{ambientTemp} °C</span>
+                            </div>
+                            <input
+                              type="range"
+                              min="10"
+                              max="40"
+                              value={ambientTemp}
+                              onChange={(e) => setAmbientTemp(Number(e.target.value))}
+                              className="w-full h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                            />
+                          </div>
 
-                      {/* Slider 3: Cooling Rate Constant k */}
-                      <div className="space-y-1">
-                        <div className="flex justify-between items-center text-xs font-bold select-none">
-                          <span className="text-slate-600 flex items-center gap-1">
-                            <Zap className="w-3.5 h-3.5 text-blue-500" />
-                            อัตราการเย็นตัว (k)
-                          </span>
-                          <span className="text-blue-600 font-extrabold">{coolingConstant.toFixed(3)}</span>
+                          {/* Slider 3: Cooling Rate Constant k */}
+                          <div className="group bg-white p-3 rounded-xl border border-slate-100 hover:border-slate-200/60 hover:shadow-xs transition-all duration-200 select-none">
+                            <div className="flex justify-between items-center text-xs font-bold mb-1.5">
+                              <span className="text-slate-600 flex items-center gap-1.5 leading-normal">
+                                <Zap className="w-4 h-4 text-blue-500 group-hover:scale-110 transition-transform" />
+                                อัตราการเย็นตัว (k)
+                              </span>
+                              <span className="text-blue-600 font-extrabold text-xs bg-blue-50 px-2 py-0.5 rounded border border-blue-100">{coolingConstant.toFixed(3)}</span>
+                            </div>
+                            <input
+                              type="range"
+                              min="0.01"
+                              max="0.1"
+                              step="0.005"
+                              value={coolingConstant}
+                              onChange={(e) => setCoolingConstant(Number(e.target.value))}
+                              className="w-full h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                            />
+                          </div>
                         </div>
-                        <input
-                          type="range"
-                          min="0.01"
-                          max="0.1"
-                          step="0.005"
-                          value={coolingConstant}
-                          onChange={(e) => setCoolingConstant(Number(e.target.value))}
-                          className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-500"
-                        />
                       </div>
 
                       {/* Reset button */}
@@ -324,7 +351,7 @@ export default function LabDetailPage() {
                           setAmbientTemp(25);
                           setCoolingConstant(0.04);
                         }}
-                        className="w-full py-2 bg-white hover:bg-slate-100 border border-slate-200 text-slate-600 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer mt-1"
+                        className="w-full py-2.5 bg-white hover:bg-slate-50 border border-slate-200 text-slate-600 rounded-xl text-xs font-bold transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 shadow-xs"
                       >
                         <RefreshCw className="w-3.5 h-3.5" />
                         <span>คืนค่าเริ่มต้น</span>
@@ -332,36 +359,62 @@ export default function LabDetailPage() {
                     </div>
 
                     {/* Output Real-time Graph (Right 7 Columns) */}
-                    <div className="md:col-span-7 flex flex-col items-center">
-                      <div className="w-full bg-slate-50 border border-slate-100 p-3 rounded-2xl flex items-center justify-center">
+                    <div className="md:col-span-7 flex flex-col justify-between">
+                      <div className="w-full h-full bg-slate-950/95 border border-slate-800 p-4 rounded-2xl flex flex-col justify-between shadow-inner relative overflow-hidden">
+                        {/* Title block inside graph */}
+                        <div className="flex items-center justify-between text-[9px] text-slate-500 font-bold select-none border-b border-slate-900 pb-1.5 mb-2">
+                          <span>TELEMETRY GRAPH (REAL-TIME)</span>
+                          <span className="text-indigo-400">MODEL: T(t) = Tₛ + (T₀ - Tₛ)e⁻ᵏᵗ</span>
+                        </div>
                         <svg className="w-full h-44" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <defs>
+                            {/* Glow Filter */}
+                            <filter id="glow-line" x="-20%" y="-20%" width="140%" height="140%">
+                              <feGaussianBlur stdDeviation="2.5" result="blur" />
+                              <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                            </filter>
+                            {/* Area Gradient */}
+                            <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.25" />
+                              <stop offset="100%" stopColor="#3b82f6" stopOpacity="0" />
+                            </linearGradient>
+                          </defs>
+
                           {/* Grid Lines */}
-                          <line x1="20" y1="95" x2="190" y2="95" stroke="#cbd5e1" strokeWidth="1" />
-                          <line x1="20" y1="70" x2="190" y2="70" stroke="#f1f5f9" strokeWidth="1" />
-                          <line x1="20" y1="45" x2="190" y2="45" stroke="#f1f5f9" strokeWidth="1" />
-                          <line x1="20" y1="20" x2="190" y2="20" stroke="#f1f5f9" strokeWidth="1" />
+                          <line x1="20" y1="10" x2="180" y2="10" stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
+                          <line x1="20" y1="32.5" x2="180" y2="32.5" stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
+                          <line x1="20" y1="55" x2="180" y2="55" stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
+                          <line x1="20" y1="77.5" x2="180" y2="77.5" stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
+                          <line x1="20" y1="100" x2="180" y2="100" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
 
                           {/* Axes labels */}
-                          <text x="18" y="23" fill="#94a3b8" fontSize="7" fontWeight="bold" textAnchor="end">100</text>
-                          <text x="18" y="48" fill="#94a3b8" fontSize="7" fontWeight="bold" textAnchor="end">75</text>
-                          <text x="18" y="73" fill="#94a3b8" fontSize="7" fontWeight="bold" textAnchor="end">50</text>
-                          <text x="18" y="98" fill="#94a3b8" fontSize="7" fontWeight="bold" textAnchor="end">25</text>
+                          <text x="17" y="12.5" fill="#475569" fontSize="6.5" fontWeight="bold" textAnchor="end">100°C</text>
+                          <text x="17" y="35" fill="#475569" fontSize="6.5" fontWeight="bold" textAnchor="end">75°C</text>
+                          <text x="17" y="57.5" fill="#475569" fontSize="6.5" fontWeight="bold" textAnchor="end">50°C</text>
+                          <text x="17" y="80" fill="#475569" fontSize="6.5" fontWeight="bold" textAnchor="end">25°C</text>
 
                           {/* Ambient Temp Ts line */}
-                          <line x1="20" y1={ambientY} x2="180" y2={ambientY} stroke="#10b981" strokeWidth="1.5" strokeDasharray="3 3" />
+                          <line x1="20" y1={ambientY} x2="180" y2={ambientY} stroke="#10b981" strokeWidth="1.25" strokeDasharray="3 2" opacity="0.8" />
                           <text x="183" y={ambientY + 2} fill="#10b981" fontSize="7" fontWeight="extrabold">Tₛ</text>
 
+                          {/* Area under the path */}
+                          <path d={getSvgAreaPath()} fill="url(#chartGrad)" />
+
+                          {/* Glowing line shadow */}
+                          <path d={getSvgPath()} stroke="#60a5fa" strokeWidth="4.5" strokeLinecap="round" fill="none" opacity="0.3" filter="url(#glow-line)" />
+                          
                           {/* Interactive Cooling Curve path */}
-                          <path d={getSvgPath()} stroke="#3b82f6" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+                          <path d={getSvgPath()} stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" fill="none" />
+
+                          {/* Hot Initial Point Indicator */}
+                          {chartPoints.length > 0 && (
+                            <circle cx="20" cy={tempToSvgY(initialTemp)} r="3" fill="#f43f5e" />
+                          )}
 
                           {/* Horizontal axis time line */}
-                          <line x1="20" y1="110" x2="190" y2="110" stroke="#cbd5e1" strokeWidth="1" />
+                          <line x1="20" y1="110" x2="180" y2="110" stroke="rgba(255,255,255,0.15)" strokeWidth="1" />
                           
                           {/* Time tick labels */}
-                          <text x="20" y="118" fill="#94a3b8" fontSize="6" fontWeight="bold" textAnchor="middle">0</text>
-                          <text x="60" y="118" fill="#94a3b8" fontSize="6" fontWeight="bold" textAnchor="middle">15</text>
-                          <text x="100" y="118" fill="#94a3b8" fontSize="6" fontWeight="bold" textAnchor="middle">30</text>
-                          <text x="140" y="118" fill="#94a3b8" fontSize="6" fontWeight="bold" textAnchor="middle">45</text>
                           <text x="180" y="118" fill="#94a3b8" fontSize="6" fontWeight="bold" textAnchor="middle">60</text>
                           
                           <text x="195" y="118" fill="#94a3b8" fontSize="6" fontWeight="bold">นาที</text>
