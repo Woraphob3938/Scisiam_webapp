@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import { Bell, Sparkles, ChevronDown, Compass, Award } from "lucide-react";
 
 export default function Navbar() {
@@ -30,7 +31,7 @@ export default function Navbar() {
   return (
     <nav className="sticky top-0 z-50 w-full bg-white/85 backdrop-blur-md border-b border-slate-100 shadow-xs px-4 sm:px-8 py-3.5 flex items-center justify-between transition-all duration-300">
       {/* Logo Section */}
-      <div className="flex items-center gap-2.5 group cursor-pointer">
+      <Link href="/" className="flex items-center gap-2.5 group cursor-pointer select-none">
         <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-blue-500/20 group-hover:scale-105 transition-all duration-300">
           <Compass className="w-5.5 h-5.5 animate-spin-slow" />
         </div>
@@ -42,7 +43,7 @@ export default function Navbar() {
             Virtual Lab
           </span>
         </div>
-      </div>
+      </Link>
 
       {/* Right Navigation Controls */}
       <div className="flex items-center gap-3 sm:gap-5">
@@ -93,10 +94,10 @@ export default function Navbar() {
         <div className="relative">
           <button
             onClick={() => setShowProfileMenu(!showProfileMenu)}
-            className="flex items-center gap-2 hover:bg-slate-50 p-1.5 pr-2.5 rounded-xl transition-all duration-200"
+            className="flex items-center gap-2 hover:bg-slate-50 p-1.5 pr-2.5 rounded-xl transition-all duration-200 select-none cursor-pointer"
           >
-            <div className="w-8.5 h-8.5 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-600 text-white flex items-center justify-center font-bold text-sm shadow-sm ring-2 ring-indigo-50 border border-white">
-              ST
+            <div className="w-9 h-9 rounded-full bg-blue-50 flex items-center justify-center overflow-hidden ring-2 ring-indigo-50/50 border border-white shrink-0">
+              <img src="/student_avatar_3d.png" alt="รูปโปรไฟล์" className="w-full h-full object-cover" />
             </div>
             <div className="hidden sm:flex flex-col text-left">
               <span className="text-xs text-slate-400 font-medium">ยินดีต้อนรับ</span>
@@ -110,14 +111,16 @@ export default function Navbar() {
           {/* Simple Dropdown for profile menu */}
           {showProfileMenu && (
             <div className="absolute right-0 mt-2.5 w-48 bg-white rounded-2xl shadow-xl border border-slate-100 py-1.5 text-left z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-              <a
-                href="#profile"
+              <Link
+                href="/profile"
+                onClick={() => setShowProfileMenu(false)}
                 className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-indigo-600 transition-colors"
               >
                 โปรไฟล์ของฉัน
-              </a>
+              </Link>
               <a
                 href="#settings"
+                onClick={() => setShowProfileMenu(false)}
                 className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-indigo-600 transition-colors"
               >
                 ตั้งค่าบัญชี
@@ -125,6 +128,7 @@ export default function Navbar() {
               <hr className="my-1 border-slate-50" />
               <a
                 href="#logout"
+                onClick={() => setShowProfileMenu(false)}
                 className="block px-4 py-2 text-sm text-rose-600 hover:bg-rose-50 transition-colors"
               >
                 ออกจากระบบ
