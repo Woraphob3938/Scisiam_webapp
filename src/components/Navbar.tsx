@@ -2,9 +2,11 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Bell, Sparkles, ChevronDown, Compass, Award } from "lucide-react";
+import { Bell, Sparkles, ChevronDown, Compass, Award, Menu } from "lucide-react";
+import { useSidebar } from "@/context/SidebarContext";
 
 export default function Navbar() {
+  const { toggleSidebar } = useSidebar();
   const [showNotification, setShowNotification] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [points, setPoints] = useState(120);
@@ -31,19 +33,29 @@ export default function Navbar() {
   return (
     <nav className="sticky top-0 z-50 w-full bg-white/85 backdrop-blur-md border-b border-slate-100 shadow-xs px-4 sm:px-8 py-3.5 flex items-center justify-between transition-all duration-300">
       {/* Logo Section */}
-      <Link href="/" className="flex items-center gap-2.5 group cursor-pointer select-none">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-blue-500/20 group-hover:scale-105 transition-all duration-300">
-          <Compass className="w-5.5 h-5.5 animate-spin-slow" />
-        </div>
-        <div className="flex flex-col">
-          <span className="text-xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 bg-clip-text text-transparent tracking-tight">
-            SciSiam
-          </span>
-          <span className="text-[10px] text-slate-400 font-medium tracking-wider -mt-1 uppercase">
-            Virtual Lab
-          </span>
-        </div>
-      </Link>
+      <div className="flex items-center gap-3 select-none">
+        <button
+          onClick={toggleSidebar}
+          className="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-all duration-200 hidden lg:block cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
+          aria-label="เปิด/ปิด เมนูด้านข้าง"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
+
+        <Link href="/" className="flex items-center gap-2.5 group cursor-pointer select-none">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-blue-500/20 group-hover:scale-105 transition-all duration-300">
+            <Compass className="w-5.5 h-5.5 animate-spin-slow" />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 bg-clip-text text-transparent tracking-tight">
+              SciSiam
+            </span>
+            <span className="text-[10px] text-slate-400 font-medium tracking-wider -mt-1 uppercase">
+              Virtual Lab
+            </span>
+          </div>
+        </Link>
+      </div>
 
       {/* Right Navigation Controls */}
       <div className="flex items-center gap-3 sm:gap-5">

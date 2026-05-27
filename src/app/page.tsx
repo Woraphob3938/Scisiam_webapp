@@ -9,6 +9,7 @@ import LabCard, { LabData } from "@/components/LabCard";
 import Sidebar from "@/components/Sidebar";
 import BottomCallout from "@/components/BottomCallout";
 import { Play, BookOpen, X, CheckCircle, HelpCircle } from "lucide-react";
+import { useSidebar } from "@/context/SidebarContext";
 
 // Mock lab data based on system requirements
 const labsData: LabData[] = [
@@ -268,6 +269,7 @@ const labsData: LabData[] = [
 
 export default function Home() {
   const router = useRouter();
+  const { isCollapsed } = useSidebar();
   const [selectedCategory, setSelectedCategory] = useState<Category>("All");
   const [activeModal, setActiveModal] = useState<{ type: "details" | "enter"; lab: LabData } | null>(null);
   const [enterProgress, setEnterProgress] = useState(0);
@@ -325,17 +327,17 @@ export default function Home() {
         onCategoryChange={setSelectedCategory}
       />
 
-      {/* 4. Responsive Grid Layout */}
-      <div className="w-full px-0 py-4">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      {/* 4. Responsive Layout */}
+      <div className="w-full px-0">
+        <div className="flex gap-8 items-start relative">
           
           {/* Left Column: Reusable Sidebar Navigation */}
-          <div className="lg:col-span-3 hidden lg:flex pl-0">
-            <Sidebar activeMenu="หน้าหลัก" flushLeft={true} />
+          <div className="hidden lg:flex shrink-0 pl-0">
+            <Sidebar activeMenu="หน้าหลัก" />
           </div>
-
+ 
           {/* Right Column: Lab Card Grid */}
-          <div className="lg:col-span-9 col-span-12 px-4 lg:pl-0 lg:pr-8">
+          <div className="flex-1 min-w-0 px-4 lg:pl-0 lg:pr-8 py-4">
             {filteredLabs.length === 0 ? (
               <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm flex flex-col items-center gap-3">
                 <HelpCircle className="w-12 h-12 text-slate-300" />
@@ -356,7 +358,7 @@ export default function Home() {
               </div>
             )}
           </div>
-
+ 
         </div>
       </div>
 

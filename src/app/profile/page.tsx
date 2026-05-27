@@ -6,6 +6,7 @@ import Navbar from "@/components/Navbar";
 import Breadcrumb from "@/components/labs/Breadcrumb";
 import DecorativeBackground from "@/components/labs/DecorativeBackground";
 import Sidebar from "@/components/Sidebar";
+import { useSidebar } from "@/context/SidebarContext";
 import { 
   Home,
   FlaskConical,
@@ -26,6 +27,7 @@ import {
 } from "lucide-react";
 
 export default function ProfilePage() {
+  const { isCollapsed } = useSidebar();
   const [username, setUsername] = useState("นักเรียน");
   const [isEditingName, setIsEditingName] = useState(false);
   const [tempName, setTempName] = useState("นักเรียน");
@@ -171,15 +173,15 @@ export default function ProfilePage() {
 
       {/* 3. Main Split Container */}
       <main className="w-full px-0 py-2 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <div className="flex gap-8 items-start relative">
           
           {/* LEFT COLUMN: SIDEBAR MENU (col-span-3, hidden on mobile) */}
-          <div className="hidden lg:flex lg:col-span-3 pl-0">
-            <Sidebar activeMenu="โปรไฟล์" flushLeft={true} />
+          <div className="hidden lg:flex shrink-0 pl-0">
+            <Sidebar activeMenu="โปรไฟล์" />
           </div>
-
+ 
           {/* RIGHT COLUMN: MAIN PROFILE CONTENTS (col-span-9) */}
-          <div className="lg:col-span-9 col-span-12 px-4 lg:pl-0 lg:pr-8 space-y-8">
+          <div className="flex-1 min-w-0 px-4 lg:pl-0 lg:pr-8 space-y-8">
             
             {/* PROFILE HEADER CARD */}
             <section className="bg-gradient-to-br from-[#f0f7ff]/95 via-[#f8fbff]/90 to-[#e0f2fe]/40 backdrop-blur-xl border border-blue-100/40 rounded-[32px] p-6 sm:p-8 flex flex-col md:flex-row justify-between items-center gap-6 relative shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden">
