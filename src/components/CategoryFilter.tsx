@@ -28,6 +28,13 @@ export default function CategoryFilter({
           const Icon = category.icon;
           const isActive = activeCategory === category.id;
 
+          const activeColorClasses: Record<string, string> = {
+            blue: "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/20 scale-[1.02]",
+            indigo: "bg-gradient-to-r from-indigo-600 to-blue-600 text-white shadow-md shadow-indigo-500/20 scale-[1.02]",
+            red: "bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-md shadow-red-500/20 scale-[1.02]",
+            green: "bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-md shadow-green-500/20 scale-[1.02]",
+          };
+
           return (
             <button
               key={category.id}
@@ -38,7 +45,7 @@ export default function CategoryFilter({
                 hover:scale-[1.03] active:scale-95
                 ${
                   isActive
-                    ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/20 scale-[1.02]"
+                    ? activeColorClasses[category.color] || activeColorClasses.blue
                     : "bg-white text-slate-600 hover:text-slate-900 border border-slate-200/60 shadow-xs hover:bg-slate-50"
                 }
               `}
