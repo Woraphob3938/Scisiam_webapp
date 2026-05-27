@@ -9,6 +9,7 @@ interface ExperimentViewportProps {
   ambientTemp: number;
   elapsedSeconds: number;
   coolingConstant: number;
+  isHeaterOn: boolean;
 }
 
 export default function ExperimentViewport({
@@ -17,6 +18,7 @@ export default function ExperimentViewport({
   ambientTemp,
   elapsedSeconds,
   coolingConstant,
+  isHeaterOn,
 }: ExperimentViewportProps) {
   // Format elapsed time (Seconds -> MM:SS)
   const formatTime = (totalSeconds: number) => {
@@ -146,7 +148,19 @@ export default function ExperimentViewport({
           <svg className="w-full h-full max-w-[200px]" viewBox="0 0 160 200" fill="none" xmlns="http://www.w3.org/2000/svg">
             {/* Heating plate / stand Base */}
             <rect x="25" y="160" width="110" height="15" rx="3" fill="#334155" />
-            <rect x="35" y="155" width="90" height="5" rx="1" fill="#475569" />
+            <rect x="35" y="155" width="90" height="5" rx="1" fill={isHeaterOn ? "#f43f5e" : "#475569"} className="transition-all duration-300" />
+            
+            {/* Flames when heater is active */}
+            {isHeaterOn && (
+              <g className="animate-pulse">
+                <path d="M50,155 C48,150 52,142 55,145 C58,142 62,150 60,155 Z" fill="#f97316" />
+                <path d="M70,155 C67,148 72,138 75,142 C78,138 83,148 80,155 Z" fill="#ef4444" />
+                <path d="M90,155 C88,150 92,142 95,145 C98,142 102,150 100,155 Z" fill="#f97316" />
+                <path d="M110,155 C108,151 112,144 114,147 C116,144 120,151 118,155 Z" fill="#ef4444" />
+                {/* Inner hot yellow flame */}
+                <path d="M72,155 C70,150 73,143 75,145 C77,143 80,150 78,155 Z" fill="#facc15" />
+              </g>
+            )}
             
             {/* Beaker Container */}
             <path d="M40,55 L40,145 C40,149 43,152 47,152 L113,152 C117,152 120,149 120,145 L120,55" fill="none" stroke="#cbd5e1" strokeWidth="2.5" strokeLinecap="round" />

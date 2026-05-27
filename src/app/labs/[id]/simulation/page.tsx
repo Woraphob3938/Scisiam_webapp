@@ -37,6 +37,11 @@ export default function SimulationRoomPage() {
   const [dataPoints, setDataPoints] = useState<DataPoint[]>([]);
   const [lastLoggedTime, setLastLoggedTime] = useState(0);
 
+  // Heater & Quest States
+  const [isHeaterOn, setIsHeaterOn] = useState(false);
+  const [questProgress, setQuestProgress] = useState(0);
+  const [questSuccess, setQuestSuccess] = useState(false);
+
   // References for keeping track of fast state changes inside the interval
   const isRunningRef = useRef(isRunning);
   const elapsedSecondsRef = useRef(elapsedSeconds);
@@ -49,6 +54,10 @@ export default function SimulationRoomPage() {
   const logIntervalRef = useRef(logInterval);
   const simulationSpeedRef = useRef(simulationSpeed);
 
+  const isHeaterOnRef = useRef(isHeaterOn);
+  const questProgressRef = useRef(questProgress);
+  const questSuccessRef = useRef(questSuccess);
+
   useEffect(() => { isRunningRef.current = isRunning; }, [isRunning]);
   useEffect(() => { elapsedSecondsRef.current = elapsedSeconds; }, [elapsedSeconds]);
   useEffect(() => { currentTempRef.current = currentTemp; }, [currentTemp]);
@@ -59,6 +68,10 @@ export default function SimulationRoomPage() {
   useEffect(() => { coolingConstantRef.current = coolingConstant; }, [coolingConstant]);
   useEffect(() => { logIntervalRef.current = logInterval; }, [logInterval]);
   useEffect(() => { simulationSpeedRef.current = simulationSpeed; }, [simulationSpeed]);
+
+  useEffect(() => { isHeaterOnRef.current = isHeaterOn; }, [isHeaterOn]);
+  useEffect(() => { questProgressRef.current = questProgress; }, [questProgress]);
+  useEffect(() => { questSuccessRef.current = questSuccess; }, [questSuccess]);
 
   // Handle setting active currentTemp base on initialTemp before start
   useEffect(() => {
@@ -80,15 +93,46 @@ export default function SimulationRoomPage() {
         setElapsedSeconds(nextSeconds);
         elapsedSecondsRef.current = nextSeconds;
 
-        // Calculate Temperature based on decay equation
-        // T(t) = Ts + (T0 - Ts) * e^(-kt)
-        // Convert seconds to minutes for the 'k' rate constant (which is per-minute)
-        const mins = nextSeconds / 60;
-        const nextTemp = ambientTempRef.current + (initialTempRef.current - ambientTempRef.current) * Math.exp(-coolingConstantRef.current * mins);
+        // Calculate Temperature based on decay or heating equation (differential step method)
+        let nextTemp = currentTempRef.current;
+        if (isHeaterOnRef.current) {
+          // Heat up rate: 18°C per minute, which is 0.3°C per second
+          const heatingRate = 18;
+          nextTemp = Math.min(100, currentTempRef.current + (heatingRate * deltaSeconds) / 60);
+        } else {
+          // Cool down rate based on Newton's Law of Cooling: dT = -k(T - Ts)*dt
+          // k is per minute, so we multiply by deltaSeconds / 60
+          const coolingAmount = coolingConstantRef.current * (currentTempRef.current - ambientTempRef.current) * (deltaSeconds / 60);
+          nextTemp = Math.max(ambientTempRef.current, currentTempRef.current - coolingAmount);
+        }
+        
         setCurrentTemp(nextTemp);
         currentTempRef.current = nextTemp;
 
+        // Quest tracking: Maintain 50-60°C for 20 seconds continuously
+        if (nextTemp >= 50 && nextTemp <= 60) {
+          const nextQuestProg = Math.min(20, questProgressRef.current + deltaSeconds);
+          setQuestProgress(nextQuestProg);
+          questProgressRef.current = nextQuestProg;
+          
+          if (nextQuestProg >= 20 && !questSuccessRef.current) {
+            setQuestSuccess(true);
+            questSuccessRef.current = true;
+            
+            // Reward 25 points!
+            const currentPoints = Number(localStorage.getItem("scisiam_points") || "120");
+            const newPoints = currentPoints + 25;
+            localStorage.setItem("scisiam_points", String(newPoints));
+            window.dispatchEvent(new Event("points-updated"));
+            alert("🎉 ยินดีด้วย! คุณผ่านภารกิจควบคุมอุณหภูมิน้ำให้อยู่ในช่วง 50°C - 60°C ต่อเนื่องเป็นเวลา 20 วินาทีสำเร็จ! รับ +25 แต้ม 💎");
+          }
+        } else {
+          setQuestProgress(0);
+          questProgressRef.current = 0;
+        }
+
         // Check if log interval threshold is crossed to auto log a data point
+        const mins = nextSeconds / 60;
         if (nextSeconds - lastLoggedTimeRef.current >= logIntervalRef.current) {
           setDataPoints((prev) => [
             ...prev,
@@ -121,10 +165,24 @@ export default function SimulationRoomPage() {
     }
   };
 
+  // Toggle Heater power
+  const handleToggleHeater = () => {
+    if (!isRunning) return;
+    const nextHeater = !isHeaterOn;
+    setIsHeaterOn(nextHeater);
+    isHeaterOnRef.current = nextHeater;
+  };
+
   // Reset simulator
   const handleReset = () => {
     setIsRunning(false);
     isRunningRef.current = false;
+    
+    setIsHeaterOn(false);
+    isHeaterOnRef.current = false;
+    
+    setQuestProgress(0);
+    questProgressRef.current = 0;
     
     setElapsedSeconds(0);
     elapsedSecondsRef.current = 0;
@@ -252,6 +310,7 @@ export default function SimulationRoomPage() {
                   ambientTemp={ambientTemp}
                   elapsedSeconds={elapsedSeconds}
                   coolingConstant={coolingConstant}
+                  isHeaterOn={isHeaterOn}
                 />
               </div>
               <div className="h-full">
@@ -270,6 +329,8 @@ export default function SimulationRoomPage() {
                   onStartStop={handleStartStop}
                   onReset={handleReset}
                   onSave={handleSaveResults}
+                  isHeaterOn={isHeaterOn}
+                  onToggleHeater={handleToggleHeater}
                 />
               </div>
             </div>
@@ -299,7 +360,7 @@ export default function SimulationRoomPage() {
 
           {/* Right Column Sidebar (25% / 3 columns) */}
           <div className="lg:col-span-3">
-            <LearningSidebar />
+            <LearningSidebar questProgress={questProgress} questSuccess={questSuccess} />
           </div>
 
         </div>

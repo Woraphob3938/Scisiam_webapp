@@ -1,11 +1,31 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Bell, Sparkles, ChevronDown, Compass, Award } from "lucide-react";
 
 export default function Navbar() {
   const [showNotification, setShowNotification] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [points, setPoints] = useState(120);
+
+  useEffect(() => {
+    const loadPoints = () => {
+      const stored = localStorage.getItem("scisiam_points");
+      if (stored) {
+        setPoints(Number(stored));
+      } else {
+        localStorage.setItem("scisiam_points", "120");
+      }
+    };
+    loadPoints();
+
+    window.addEventListener("points-updated", loadPoints);
+    window.addEventListener("storage", loadPoints);
+    return () => {
+      window.removeEventListener("points-updated", loadPoints);
+      window.removeEventListener("storage", loadPoints);
+    };
+  }, []);
 
   return (
     <nav className="sticky top-0 z-50 w-full bg-white/85 backdrop-blur-md border-b border-slate-100 shadow-xs px-4 sm:px-8 py-3.5 flex items-center justify-between transition-all duration-300">
@@ -29,7 +49,7 @@ export default function Navbar() {
         {/* Points/Stars Counter */}
         <div className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 hover:bg-amber-100/70 border border-amber-200/50 text-amber-700 rounded-full shadow-xs cursor-pointer select-none transition-all duration-300 hover:scale-105 active:scale-95">
           <Sparkles className="w-4 h-4 text-amber-500 fill-amber-400 animate-pulse" />
-          <span className="text-xs sm:text-sm font-bold">120 แต้ม</span>
+          <span className="text-xs sm:text-sm font-bold">{points} แต้ม</span>
         </div>
 
         {/* Notification Bell */}

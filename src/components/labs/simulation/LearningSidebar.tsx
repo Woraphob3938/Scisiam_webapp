@@ -3,7 +3,15 @@
 import React from "react";
 import { Target, CheckCircle2, TrendingUp, Award, HelpCircle, Check, Sparkles } from "lucide-react";
 
-export default function LearningSidebar() {
+interface LearningSidebarProps {
+  questProgress?: number;
+  questSuccess?: boolean;
+}
+
+export default function LearningSidebar({
+  questProgress = 0,
+  questSuccess = false,
+}: LearningSidebarProps) {
   return (
     <aside className="w-full flex flex-col gap-6 select-none">
       
@@ -59,15 +67,20 @@ export default function LearningSidebar() {
             ภารกิจนักวิทย์
           </h4>
           <span className="text-xs font-extrabold text-purple-600 bg-purple-50 px-2 py-0.5 rounded-md">
-            4 / 5
+            {questSuccess ? "5 / 5" : "4 / 5"}
           </span>
         </div>
         <div className="space-y-1.5">
           <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
-            <div className="h-full bg-purple-500 rounded-full" style={{ width: "80%" }} />
+            <div 
+              className="h-full bg-purple-500 rounded-full transition-all duration-300" 
+              style={{ width: questSuccess ? "100%" : `${80 + (questProgress / 20) * 20}%` }} 
+            />
           </div>
           <p className="text-[10px] text-slate-400 font-semibold text-left">
-            เก็บครบ 5 ภารกิจเพื่อรับรางวัลพิเศษ!
+            {questSuccess 
+              ? "ยินดีด้วย! คุณคุมความร้อนแล็บฟิสิกส์สำเร็จ (+25 แต้ม) 💎" 
+              : `คุมอุณหภูมิ 50-60°C: ${questProgress.toFixed(1)} / 20.0 วินาที`}
           </p>
         </div>
       </div>

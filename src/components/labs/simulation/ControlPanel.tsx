@@ -18,6 +18,8 @@ interface ControlPanelProps {
   onStartStop: () => void;
   onReset: () => void;
   onSave: () => void;
+  isHeaterOn: boolean;
+  onToggleHeater: () => void;
 }
 
 export default function ControlPanel({
@@ -35,6 +37,8 @@ export default function ControlPanel({
   onStartStop,
   onReset,
   onSave,
+  isHeaterOn,
+  onToggleHeater,
 }: ControlPanelProps) {
   return (
     <div className="bg-white rounded-3xl border border-slate-100 p-6 shadow-md shadow-slate-100/50 hover:shadow-lg transition-all duration-300 flex flex-col justify-between h-full select-none">
@@ -167,6 +171,31 @@ export default function ControlPanel({
             </div>
           </div>
 
+        </div>
+
+        {/* Heater Toggle Button */}
+        <div className="pt-2">
+          <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wide text-left block mb-1">
+            อุปกรณ์ทำความร้อน (Heater)
+          </label>
+          <button
+            onClick={onToggleHeater}
+            disabled={!isRunning}
+            className={`
+              w-full py-2.5 px-4 rounded-xl text-xs font-bold flex items-center justify-center gap-2 border
+              transition-all duration-300 active:scale-95 cursor-pointer
+              ${
+                !isRunning
+                  ? "bg-slate-50 border-slate-200 text-slate-400 cursor-not-allowed opacity-50"
+                  : isHeaterOn
+                  ? "bg-rose-500 border-rose-600 text-white shadow-md shadow-rose-500/20 hover:bg-rose-600"
+                  : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
+              }
+            `}
+          >
+            <div className={`w-2 h-2 rounded-full ${isHeaterOn ? "bg-white animate-ping" : "bg-slate-400"}`} />
+            <span>{isHeaterOn ? "🔥 เปิดฮีตเตอร์อยู่ (ทำความร้อน)" : "♨️ ปิดฮีตเตอร์ (เย็นตัวปกติ)"}</span>
+          </button>
         </div>
 
       </div>
