@@ -319,22 +319,23 @@ export default function Home() {
       {/* 2. Hero Section */}
       <HeroSection />
 
-      {/* 3. Responsive Grid Layout */}
-      <div className="max-w-[1440px] w-full mx-auto px-4 sm:px-6 md:px-8 py-6">
+      {/* 3. Filter Category Section */}
+      <CategoryFilter
+        activeCategory={selectedCategory}
+        onCategoryChange={setSelectedCategory}
+      />
+
+      {/* 4. Responsive Grid Layout */}
+      <div className="max-w-[1440px] w-full mx-auto px-4 sm:px-6 md:px-8 py-4">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
-          {/* Left Column: Vertical Category Filter & Left Decorations */}
-          <div className="lg:col-span-3 flex flex-col gap-6 items-center lg:items-start w-full">
-            <CategoryFilter
-              activeCategory={selectedCategory}
-              onCategoryChange={setSelectedCategory}
-              layout="vertical"
-            />
+          {/* Left Column Decorations (Pushes to bottom on mobile, side-aligned on desktop) */}
+          <div className="lg:col-span-2 order-2 lg:order-1 flex justify-center">
             <LeftDecorations />
           </div>
 
-          {/* Right Column: Lab Card Grid */}
-          <div className="lg:col-span-9 w-full">
+          {/* Center Column: Lab Card Grid */}
+          <div className="lg:col-span-8 order-1 lg:order-2">
             {filteredLabs.length === 0 ? (
               <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm flex flex-col items-center gap-3">
                 <HelpCircle className="w-12 h-12 text-slate-300" />
@@ -354,6 +355,11 @@ export default function Home() {
                 ))}
               </div>
             )}
+          </div>
+
+          {/* Right Column Decorations (Pushes to bottom on mobile, side-aligned on desktop) */}
+          <div className="lg:col-span-2 order-3 flex justify-center">
+            <RightDecorations />
           </div>
 
         </div>
