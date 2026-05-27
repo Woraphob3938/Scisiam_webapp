@@ -1,9 +1,72 @@
 "use client";
 
-import React from "react";
-import { CloudLightning, Cpu, Rocket } from "lucide-react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
+import { useRouter } from "next/navigation";
+import { CloudLightning, Cpu, Rocket, Search, X, Atom, Beaker, Leaf, ArrowRight } from "lucide-react";
+import { labsData } from "@/data/labs";
 
 export default function HeroSection() {
+  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isFocused, setIsFocused] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Filter labs based on search query (title or description)
+  const searchResults = useMemo(() => {
+    if (!searchQuery.trim()) return [];
+    const q = searchQuery.toLowerCase();
+    return labsData.filter(
+      (lab) =>
+        lab.title.toLowerCase().includes(q) ||
+        lab.description.toLowerCase().includes(q)
+    ).slice(0, 8); // limit to 8 results
+  }, [searchQuery]);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node) &&
+        inputRef.current &&
+        !inputRef.current.contains(e.target as Node)
+      ) {
+        setIsFocused(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const categoryIcon = (category: string) => {
+    switch (category) {
+      case "Physics":
+        return <Atom className="w-4 h-4 text-blue-500" />;
+      case "Chemistry":
+        return <Beaker className="w-4 h-4 text-purple-500" />;
+      case "Biology":
+        return <Leaf className="w-4 h-4 text-green-500" />;
+      default:
+        return <Atom className="w-4 h-4 text-slate-400" />;
+    }
+  };
+
+  const categoryBadge = (category: string) => {
+    switch (category) {
+      case "Physics":
+        return "bg-blue-50 text-blue-600 border-blue-100";
+      case "Chemistry":
+        return "bg-purple-50 text-purple-600 border-purple-100";
+      case "Biology":
+        return "bg-green-50 text-green-600 border-green-100";
+      default:
+        return "bg-slate-50 text-slate-600 border-slate-100";
+    }
+  };
+
+  const showDropdown = isFocused && searchQuery.trim().length > 0;
+
   return (
     <section className="relative w-full py-10 md:py-16 px-6 sm:px-12 md:px-20 overflow-hidden bg-gradient-to-b from-blue-50/70 via-indigo-50/30 to-transparent flex flex-col items-center text-center">
       {/* Decorative Wave Background Pattern */}
@@ -73,7 +136,7 @@ export default function HeroSection() {
           </p>
 
           {/* Status Badges */}
-          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
+          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mb-6">
             <div className="flex items-center gap-2 px-4 py-2 bg-emerald-50 border border-emerald-100 rounded-full text-emerald-700 shadow-sm transition-all duration-300 hover:bg-emerald-100/50 hover:shadow-md">
               <span className="relative flex h-2.5 w-2.5">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -91,6 +154,79 @@ export default function HeroSection() {
                 ระบบจำลองออนไลน์
               </span>
             </div>
+          </div>
+
+          {/* ===== SEARCH INPUT BAR ===== */}
+          <div className="relative w-full max-w-lg">
+            <div className={`flex items-center bg-white border rounded-2xl shadow-sm px-4 py-3 transition-all duration-300 ${
+              isFocused 
+                ? "border-blue-400 shadow-lg shadow-blue-500/10 ring-2 ring-blue-100" 
+                : "border-slate-200 hover:border-slate-300 hover:shadow-md"
+            }`}>
+              <Search className={`w-5 h-5 shrink-0 transition-colors duration-200 ${isFocused ? "text-blue-500" : "text-slate-400"}`} />
+              <input
+                ref={inputRef}
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onFocus={() => setIsFocused(true)}
+                placeholder="ค้นหาห้องแล็บ เช่น Newton, Osmosis, Titration..."
+                className="flex-1 bg-transparent outline-none text-sm font-medium text-slate-700 placeholder:text-slate-400 ml-3 leading-normal"
+                aria-label="ค้นหาห้องแล็บวิทยาศาสตร์"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => { setSearchQuery(""); inputRef.current?.focus(); }}
+                  className="p-1 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                  aria-label="ล้างการค้นหา"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+
+            {/* ===== AUTOCOMPLETE DROPDOWN ===== */}
+            {showDropdown && (
+              <div
+                ref={dropdownRef}
+                className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-200/80 rounded-2xl shadow-xl shadow-slate-200/40 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200"
+              >
+                {searchResults.length > 0 ? (
+                  <div className="max-h-80 overflow-y-auto py-2">
+                    {searchResults.map((lab) => (
+                      <button
+                        key={lab.id}
+                        onClick={() => {
+                          router.push(`/labs/${lab.id}`);
+                          setSearchQuery("");
+                          setIsFocused(false);
+                        }}
+                        className="flex items-center gap-3.5 w-full px-4 py-3 text-left hover:bg-slate-50 transition-colors duration-150 cursor-pointer group"
+                      >
+                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border ${categoryBadge(lab.category)}`}>
+                          {categoryIcon(lab.category)}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-bold text-slate-700 truncate group-hover:text-blue-600 transition-colors leading-normal">
+                            {lab.title}
+                          </p>
+                          <p className="text-[11px] text-slate-400 font-medium truncate mt-0.5 leading-normal">
+                            {lab.description}
+                          </p>
+                        </div>
+                        <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-blue-500 transition-colors shrink-0" />
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="px-4 py-8 text-center">
+                    <Search className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+                    <p className="text-sm font-bold text-slate-500 leading-normal">ไม่พบห้องแล็บที่ตรงกับคำค้นหา</p>
+                    <p className="text-xs text-slate-400 mt-1 leading-normal">ลองค้นหาด้วยคำอื่น เช่น "Ohm", "DNA", "กรด"</p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
