@@ -5,6 +5,7 @@ import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Breadcrumb from "@/components/labs/Breadcrumb";
 import DecorativeBackground from "@/components/labs/DecorativeBackground";
+import Sidebar from "@/components/Sidebar";
 import { 
   Home,
   FlaskConical,
@@ -155,16 +156,6 @@ export default function ProfilePage() {
     }
   ];
 
-  // Sidebar Menu Config
-  const sidebarMenu = [
-    { name: "หน้าหลัก", icon: Home, href: "/", active: false },
-    { name: "ห้องแล็บของฉัน", icon: FlaskConical, href: "#", active: false },
-    { name: "ภารกิจนักวิทย์", icon: ClipboardCheck, href: "#", active: false },
-    { name: "คะแนนและรางวัล", icon: Award, href: "#", active: false },
-    { name: "ประวัติการเรียนรู้", icon: History, href: "#", active: false },
-    { name: "โปรไฟล์", icon: User, href: "/profile", active: true },
-  ];
-
   return (
     <div className="flex flex-col min-h-screen bg-slate-50 relative pb-16 overflow-hidden">
       {/* Absolute Decorative Floating Elements */}
@@ -183,58 +174,9 @@ export default function ProfilePage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
           {/* LEFT COLUMN: SIDEBAR MENU (col-span-3, hidden on mobile) */}
-          <aside className="hidden lg:flex lg:col-span-3 flex-col bg-white/90 backdrop-blur-md border border-slate-200/50 rounded-[32px] p-6 shadow-sm min-h-[580px] justify-between">
-            <div className="space-y-6">
-              {/* Sidebar Header Brand (styled like the logo) */}
-              <div className="flex items-center gap-3 pb-4 border-b border-slate-100 select-none">
-                <div className="w-9 h-9 rounded-xl bg-blue-50/80 border border-blue-100/30 flex items-center justify-center overflow-hidden relative">
-                  <img src="/penguin_expressions.png" alt="SciSiam Logo" className="absolute w-[300%] max-w-none left-0 top-[-5%] object-contain" />
-                </div>
-                <div className="flex flex-col text-left">
-                  <span className="text-base font-extrabold text-slate-800 leading-none">ไออุ่น</span>
-                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">SciSiam Mascot</span>
-                </div>
-              </div>
-
-              {/* Navigation Menu */}
-              <nav className="space-y-1.5" aria-label="เมนูหลักโปรไฟล์">
-                {sidebarMenu.map((item, idx) => {
-                  const Icon = item.icon;
-                  return (
-                    <Link
-                      key={idx}
-                      href={item.href}
-                      className={`flex items-center gap-3.5 px-4.5 py-3 rounded-2xl text-sm font-bold transition-all duration-300 ${
-                        item.active
-                          ? "bg-blue-50/80 text-blue-600 border-l-4 border-blue-500"
-                          : "text-slate-500 hover:bg-slate-50 hover:text-slate-800"
-                      }`}
-                    >
-                      <Icon className="w-5 h-5 shrink-0" />
-                      <span>{item.name}</span>
-                    </Link>
-                  );
-                })}
-              </nav>
-            </div>
-
-            {/* Mascot Callout Card */}
-            <div className="mt-8 border-t border-slate-50 pt-5 flex flex-col items-center">
-              {/* Speech bubble */}
-              <div className="relative w-full bg-blue-50/70 border border-blue-100/50 rounded-2xl px-4 py-3 text-xs font-bold text-slate-600 text-center mb-1 leading-relaxed">
-                เรียนรู้ไปด้วยกัน
-                <br />
-                เก่งขึ้นทุกวันเลย! 🐧✨
-                {/* Bubble tail */}
-                <div className="absolute bottom-[-5px] left-1/2 -translate-x-1/2 w-2.5 h-2.5 bg-blue-50/70 border-r border-b border-blue-100/50 rotate-45" />
-              </div>
-
-              {/* Penguin image */}
-              <div className="w-28 h-28 select-none pointer-events-none mt-2 relative overflow-hidden">
-                <img src="/penguin_expressions.png" alt="Mascot Penguin" className="absolute w-[300%] max-w-none left-0 top-[-5%] object-contain" />
-              </div>
-            </div>
-          </aside>
+          <div className="hidden lg:flex lg:col-span-3">
+            <Sidebar activeMenu="โปรไฟล์" />
+          </div>
 
           {/* RIGHT COLUMN: MAIN PROFILE CONTENTS (col-span-9) */}
           <div className="lg:col-span-9 space-y-8">

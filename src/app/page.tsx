@@ -6,7 +6,7 @@ import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import CategoryFilter, { Category } from "@/components/CategoryFilter";
 import LabCard, { LabData } from "@/components/LabCard";
-import { LeftDecorations, RightDecorations } from "@/components/DecorativeElements";
+import Sidebar from "@/components/Sidebar";
 import BottomCallout from "@/components/BottomCallout";
 import { Play, BookOpen, X, CheckCircle, HelpCircle } from "lucide-react";
 
@@ -329,13 +329,13 @@ export default function Home() {
       <div className="max-w-[1440px] w-full mx-auto px-4 sm:px-6 md:px-8 py-4">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
-          {/* Left Column Decorations (Pushes to bottom on mobile, side-aligned on desktop) */}
-          <div className="lg:col-span-2 order-2 lg:order-1 flex justify-center">
-            <LeftDecorations />
+          {/* Left Column: Reusable Sidebar Navigation */}
+          <div className="lg:col-span-3 hidden lg:flex">
+            <Sidebar activeMenu="หน้าหลัก" />
           </div>
 
-          {/* Center Column: Lab Card Grid */}
-          <div className="lg:col-span-8 order-1 lg:order-2">
+          {/* Right Column: Lab Card Grid */}
+          <div className="lg:col-span-9 col-span-12">
             {filteredLabs.length === 0 ? (
               <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm flex flex-col items-center gap-3">
                 <HelpCircle className="w-12 h-12 text-slate-300" />
@@ -355,11 +355,6 @@ export default function Home() {
                 ))}
               </div>
             )}
-          </div>
-
-          {/* Right Column Decorations (Pushes to bottom on mobile, side-aligned on desktop) */}
-          <div className="lg:col-span-2 order-3 flex justify-center">
-            <RightDecorations />
           </div>
 
         </div>
