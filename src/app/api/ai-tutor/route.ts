@@ -8,7 +8,7 @@ type ChatMessage = {
   content: string;
 };
 
-const DEFAULT_MODEL = "gemini-pro";
+const DEFAULT_MODEL = "gemini-2.5-flash";
 const MAX_MESSAGES = 10;
 const MAX_MESSAGE_CHARS = 900;
 
