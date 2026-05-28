@@ -8,7 +8,7 @@ type ChatMessage = {
   content: string;
 };
 
-const DEFAULT_MODEL = "gemini-1.5-flash";
+const DEFAULT_MODEL = "gemini-pro";
 const MAX_MESSAGES = 10;
 const MAX_MESSAGE_CHARS = 900;
 
@@ -36,13 +36,13 @@ function extractGeminiText(payload: unknown): string {
   if (!payload || typeof payload !== "object") return "";
   const candidates = (payload as { candidates?: unknown }).candidates;
   if (!Array.isArray(candidates) || candidates.length === 0) return "";
-  
+
   const content = (candidates[0] as { content?: unknown }).content;
   if (!content || typeof content !== "object") return "";
-  
+
   const parts = (content as { parts?: unknown }).parts;
   if (!Array.isArray(parts) || parts.length === 0) return "";
-  
+
   const text = (parts[0] as { text?: unknown }).text;
   return typeof text === "string" ? text.trim() : "";
 }
