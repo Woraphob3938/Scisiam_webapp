@@ -30,28 +30,7 @@ export default function Home() {
   };
 
   const handleEnterRoom = (id: string) => {
-    const lab = labsData.find((l) => l.id === id);
-    if (lab) {
-      setActiveModal({ type: "enter", lab });
-      setEnterProgress(0);
-      setEnterStage("กำลังเชื่อมต่อเซิร์ฟเวอร์จำลอง...");
-
-      // Simulate step-by-step loading for the lab entry
-      const interval = setInterval(() => {
-        setEnterProgress((prev) => {
-          if (prev >= 100) {
-            clearInterval(interval);
-            return 100;
-          }
-          const next = prev + 25;
-          if (next === 25) setEnterStage("ดาวน์โหลดข้อมูลห้องปฏิบัติการเสมือน...");
-          if (next === 50) setEnterStage("จัดเตรียมเครื่องมือวัดและสารเคมี...");
-          if (next === 75) setEnterStage("ตรวจสอบความปลอดภัยห้องปฏิบัติการ...");
-          if (next === 100) setEnterStage("ห้องแล็บพร้อมใช้งานแล้ว! 🚀");
-          return next;
-        });
-      }, 500);
-    }
+    router.push(`/labs/${id}/simulation`);
   };
 
   const closeModal = () => {

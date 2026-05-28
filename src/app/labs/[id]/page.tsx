@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Breadcrumb from "@/components/labs/Breadcrumb";
@@ -10,276 +10,19 @@ import EquipmentList from "@/components/labs/EquipmentList";
 import ExperimentSteps from "@/components/labs/ExperimentSteps";
 import TheoryCard from "@/components/labs/TheoryCard";
 import LabSidebar from "@/components/labs/LabSidebar";
-import DecorativeBackground from "@/components/labs/DecorativeBackground";
-import BottomCallout from "@/components/BottomCallout";
-
 import { ClipboardList, Target, X, CheckCircle, Sliders, Thermometer, Sun, Zap, RefreshCw, Play } from "lucide-react";
 
-// Types
-import { LabData } from "@/components/LabCard";
+import { labsById } from "@/data/labs";
 
-const labsData: Record<string, LabData> = {
-  "newtons-cooling": {
-    id: "newtons-cooling",
-    title: "Newton's law of cooling",
-    category: "Physics",
-    status: "",
-    description: "ศึกษาการเปลี่ยนแปลงอุณหภูมิของวัตถุตามเวลา และเข้าใจความสัมพันธ์ตามกฎการเย็นตัวของนิวตัน วิเคราะห์สมการและสัมประสิทธิ์การแลกเปลี่ยนความร้อน"
-  },
-  "ohms-law": {
-    id: "ohms-law",
-    title: "Ohm's Law & DC Circuits",
-    category: "Physics",
-    status: "",
-    description: "ศึกษาความสัมพันธ์ระหว่างความต่างศักย์ กระแสไฟฟ้า และความต้านทานในวงจรไฟฟ้ากระแสตรงตามกฎของโอห์ม"
-  },
-  "hookes-law": {
-    id: "hookes-law",
-    title: "Hooke's Law of Elasticity",
-    category: "Physics",
-    status: "",
-    description: "ศึกษาความยืดหยุ่นของสปริงและแรงดึงกลับตามระยะยืด วิเคราะห์ค่าคงตัวของสปริงตามกฎของฮุค"
-  },
-  "snells-law": {
-    id: "snells-law",
-    title: "Snell's Law of Refraction",
-    category: "Physics",
-    status: "",
-    description: "ศึกษาดัชนีหักเหของแสงและการเดินทางผ่านตัวกลางต่างชนิดกัน วิเคราะห์ความสัมพันธ์ของมุมตามกฎของสเนลล์"
-  },
-  "ideal-gas-law": {
-    id: "ideal-gas-law",
-    title: "Ideal Gas Law Simulation",
-    category: "Physics",
-    status: "",
-    description: "วิเคราะห์การเปลี่ยนแปลงสถานะของแก๊สอุดมคติผ่านการเปลี่ยนตัวแปรความดัน ปริมาตร และอุณหภูมิ"
-  },
-  "newtons-second-law": {
-    id: "newtons-second-law",
-    title: "Newton's Second Law of Motion",
-    category: "Physics",
-    status: "",
-    description: "ศึกษาผลของแรงลัพธ์และมวลที่มีต่อความเร่งของวัตถุจำลองตามกฎการเคลื่อนที่ข้อที่สองของนิวตัน"
-  },
-  "momentum-conservation": {
-    id: "momentum-conservation",
-    title: "Conservation of Linear Momentum",
-    category: "Physics",
-    status: "",
-    description: "จำลองการชนของวัตถุบนแนวเส้นตรงเพื่อวิเคราะห์การอนุรักษ์โมเมนตัมและพลังงานจลน์ในการชน"
-  },
-  "faradays-law": {
-    id: "faradays-law",
-    title: "Faraday's Electromagnetic Induction",
-    category: "Physics",
-    status: "",
-    description: "ศึกษาการเกิดกระแสไฟฟ้าเหนี่ยวนำและแรงเคลื่อนไฟฟ้าเหนี่ยวนำจากการเปลี่ยนแปลงของฟลักซ์แม่เหล็ก"
-  },
-  "bernoullis-principle": {
-    id: "bernoullis-principle",
-    title: "Bernoulli's Principle & Fluid Dynamics",
-    category: "Physics",
-    status: "",
-    description: "ศึกษาความสัมพันธ์ระหว่างความเร็วและความดันของของไหลในท่อที่มีหน้าตัดต่างกันตามหลักการแบร์นูลลี"
-  },
-  "photoelectric-effect": {
-    id: "photoelectric-effect",
-    title: "Einstein's Photoelectric Effect",
-    category: "Physics",
-    status: "",
-    description: "วิเคราะห์พลังงานจลน์สูงสุดของโฟโตอิเล็กตรอนที่หลุดจากผิวโลหะตามฟังก์ชันงานและความถี่ของแสง"
-  },
-  "keplers-laws": {
-    id: "keplers-laws",
-    title: "Kepler's Third Law of Planetary Motion",
-    category: "Physics",
-    status: "",
-    description: "วิเคราะห์คาบการโคจรและระยะห่างเฉลี่ยจากดวงอาทิตย์ของดาวเคราะห์จำลองตามกฎข้อที่สามของเคปเลอร์"
-  },
-  "stefan-boltzmann": {
-    id: "stefan-boltzmann",
-    title: "Stefan-Boltzmann Law of Blackbody Radiation",
-    category: "Physics",
-    status: "",
-    description: "ศึกษาอัตราการแผ่รังสีความร้อนของวัตถุดำและอัตราการสูญเสียพลังงานที่แปรผันตามอุณหภูมิสัมบูรณ์ยกกำลังสี่"
-  },
-  "acid-base-titration": {
-    id: "acid-base-titration",
-    title: "Acid-Base Titration Lab",
-    category: "Chemistry",
-    status: "",
-    description: "ทดลองวัดและหาค่าความเข้มข้นของกรดหรือเบสผ่านกระบวนการไทเทรตทางเคมี ติดตามระดับ pH และการเปลี่ยนสีของอินดิเคเตอร์แบบเรียลไทม์"
-  },
-  "boyles-law": {
-    id: "boyles-law",
-    title: "Boyle's Gas Law Lab",
-    category: "Chemistry",
-    status: "",
-    description: "ทดลองวัดความสัมพันธ์ระหว่างความดันและปริมาตรของแก๊สที่อุณหภูมิคงที่เพื่อตรวจสอบกฎของบอยล์"
-  },
-  "charles-law": {
-    id: "charles-law",
-    title: "Charles's Temperature-Volume Lab",
-    category: "Chemistry",
-    status: "",
-    description: "วิเคราะห์ความสัมพันธ์เชิงปริมาณระหว่างอุณหภูมิและปริมาตรของแก๊สภายใต้ความดันคงตัวตามกฎของชาร์ล"
-  },
-  "le-chateliers-principle": {
-    id: "le-chateliers-principle",
-    title: "Chemical Equilibrium Shift",
-    category: "Chemistry",
-    status: "",
-    description: "ศึกษาการเปลี่ยนแปลงสมดุลเคมีเมื่อรบกวนระบบด้วยความดัน อุณหภูมิ และความเข้มข้นสารตามหลักของเลอชาเตอลิเย"
-  },
-  "beer-lambert-law": {
-    id: "beer-lambert-law",
-    title: "Spectrophotometry & Concentration",
-    category: "Chemistry",
-    status: "",
-    description: "วัดการดูดกลืนแสงของสารละลายที่มีความเข้มข้นต่างกันเพื่อสร้างกราฟมาตรฐานตามกฎของเบียร์-ลัมแบร์ต"
-  },
-  "hesss-law": {
-    id: "hesss-law",
-    title: "Hess's Law & Calorimetry",
-    category: "Chemistry",
-    status: "",
-    description: "ทดลองวัดความร้อนของปฏิกิริยาเคมีหลายขั้นตอนเพื่อพิสูจน์ความไม่ขึ้นกับเส้นทางของเอนทัลปีรวมตามกฎของเฮสส์"
-  },
-  "galvanic-cell": {
-    id: "galvanic-cell",
-    title: "Galvanic Cells & Voltage",
-    category: "Chemistry",
-    status: "",
-    description: "ศึกษาปฏิกิริยารีดอกซ์และการไหลของกระแสไฟฟ้าในเซลล์เคมีไฟฟ้าเพื่อคำนวณหาค่าแรงเคลื่อนไฟฟ้ามาตรฐาน"
-  },
-  "chemical-kinetics": {
-    id: "chemical-kinetics",
-    title: "Chemical Reaction Rates",
-    category: "Chemistry",
-    status: "",
-    description: "วิเคราะห์ปัจจัยที่มีผลต่ออัตราการเกิดปฏิกิริยาเคมี เช่น ความเข้มข้น อุณหภูมิ และตัวเร่งปฏิกิริยาตามทฤษฎีการชน"
-  },
-  "solubility-product": {
-    id: "solubility-product",
-    title: "Solubility Product Constant",
-    category: "Chemistry",
-    status: "",
-    description: "ศึกษาปฏิกิริยาการเกิดตะกอนและการละลายของเกลือละลายยากเพื่อคำนวณหาค่าคงตัวผลคูณการละลาย"
-  },
-  "avogadros-law": {
-    id: "avogadros-law",
-    title: "Avogadro's Molar Volume",
-    category: "Chemistry",
-    status: "",
-    description: "ทดลองหาปริมาตรของแก๊ส 1 โมลที่สภาวะมาตรฐาน (STP) และศึกษาความสัมพันธ์กับจำนวนอนุภาคของแก๊ส"
-  },
-  "electrolysis-lab": {
-    id: "electrolysis-lab",
-    title: "Electrolysis & Metal Plating",
-    category: "Chemistry",
-    status: "",
-    description: "ทดลองแยกสารเคมีด้วยไฟฟ้าและชุบโลหะเพื่อวิเคราะห์ความสัมพันธ์ของปริมาณสารตามกฎการแยกสารด้วยไฟฟ้า"
-  },
-  "colligative-properties": {
-    id: "colligative-properties",
-    title: "Colligative Properties Lab",
-    category: "Chemistry",
-    status: "",
-    description: "ศึกษาการลดลงของจุดเยือกแข็งและการเพิ่มขึ้นของจุดเดือดของตัวทำละลายเมื่อเติมตัวละลายที่ระเหยยาก"
-  },
-  "photosynthesis-rate": {
-    id: "photosynthesis-rate",
-    title: "Photosynthesis Rate Chamber",
-    category: "Biology",
-    status: "",
-    description: "ศึกษาระดับกระบวนการสังเคราะห์แสงของพืชสีเขียวในห้องทดลองปิด วิเคราะห์ผลกระทบของแสง ระดับคาร์บอนไดออกไซด์ และอุณหภูมิ"
-  },
-  "mendels-inheritance": {
-    id: "mendels-inheritance",
-    title: "Mendelian Genetics Lab",
-    category: "Biology",
-    status: "",
-    description: "ศึกษาการถ่ายทอดลักษณะทางพันธุกรรมของถั่วลันเตาและการจับคู่ยีนในตารางพุนเนตต์ตามกฎของเมนเดล"
-  },
-  "mitosis-division": {
-    id: "mitosis-division",
-    title: "Mitosis & Cell Cycle",
-    category: "Biology",
-    status: "",
-    description: "ศึกษาขั้นตอนการจำลองตัวเองและการแบ่งนิวเคลียสแบบไมโทซิสในระยะต่างๆ ผ่านกล้องจุลทรรศน์เสมือน"
-  },
-  "cell-osmosis": {
-    id: "cell-osmosis",
-    title: "Osmosis & Plasmolysis",
-    category: "Biology",
-    status: "",
-    description: "ทดลองศึกษาการแพร่และการออสโมซิสของน้ำผ่านเยื่อเลือกผ่านในสภาวะความเข้มข้นสารละลายต่างกัน"
-  },
-  "enzyme-kinetics": {
-    id: "enzyme-kinetics",
-    title: "Enzyme Catalysis Lab",
-    category: "Biology",
-    status: "",
-    description: "วิเคราะห์อัตราการทำงานของเอนไซม์ตามการเปลี่ยนแปลงความเข้มข้นสาร อุณหภูมิ และค่า pH ตามสมการ Michaelis-Menten"
-  },
-  "dna-extraction": {
-    id: "dna-extraction",
-    title: "DNA Extraction Chamber",
-    category: "Biology",
-    status: "",
-    description: "เรียนรู้ขั้นตอนการทำลายผนังเซลล์และตกตะกอนเพื่อแยกสายใยโมเลกุลดีเอ็นเอออกจากตัวอย่างพืชและผลไม้"
-  },
-  "cellular-respiration": {
-    id: "cellular-respiration",
-    title: "Cellular Respiration Lab",
-    category: "Biology",
-    status: "",
-    description: "ศึกษาการสลายโมเลกุลสารอาหารเพื่อผลิตพลังงาน ATP ทั้งในภาวะที่มีและไม่มีแก๊สออกซิเจน"
-  },
-  "plant-transpiration": {
-    id: "plant-transpiration",
-    title: "Plant Transpiration Potometer",
-    category: "Biology",
-    status: "",
-    description: "วัดอัตราการคายน้ำของยอดพืชภายใต้สภาวะควบคุม เช่น ความชื้น อุณหภูมิ ลม และความเข้มแสงด้วยโพโทมิเตอร์"
-  },
-  "natural-selection": {
-    id: "natural-selection",
-    title: "Natural Selection Simulator",
-    category: "Biology",
-    status: "",
-    description: "จำลองการเปลี่ยนแปลงสัดส่วนลักษณะประชากรสิ่งมีชีวิตตามปัจจัยกดดันของสภาพแวดล้อมตามทฤษฎีวิวัฒนาการ"
-  },
-  "blood-typing": {
-    id: "blood-typing",
-    title: "Blood Typing & Agglutination",
-    category: "Biology",
-    status: "",
-    description: "ทดลองหาหมู่เลือดระบบ ABO และ Rh ผ่านการตกตะกอนของเม็ดเลือดแดงเมื่อทำปฏิกิริยากับแอนติบอดีจำลอง"
-  },
-  "food-chain": {
-    id: "food-chain",
-    title: "Food Chain & Ecology",
-    category: "Biology",
-    status: "",
-    description: "วิเคราะห์การถ่ายทอดพลังงานและสารอาหารผ่านผู้ผลิต ผู้บริโภค และผู้ย่อยสลายในพีระมิดพลังงานระบบนิเวศ"
-  },
-  "heart-rate": {
-    id: "heart-rate",
-    title: "Cardiovascular System Lab",
-    category: "Biology",
-    status: "",
-    description: "วิเคราะห์อัตราการเต้นของหัวใจและความดันเลือดภายใต้การตอบสนองต่อการทำกิจกรรมและระดับสารกระตุ้นจำลอง"
-  }
-};
+const DEFAULT_LAB_ID = "newtons-cooling";
 
 export default function LabDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const labId = (params?.id as string) || "newtons-cooling";
+  const labId = (params?.id as string) || DEFAULT_LAB_ID;
 
   // Fallback to Newton's Law of Cooling as primary demo
-  const lab = labsData[labId] || labsData["newtons-cooling"];
+  const lab = labsById[labId] || labsById[DEFAULT_LAB_ID];
 
   // Simulation states
   const [showSimModal, setShowSimModal] = useState(false);
@@ -291,46 +34,21 @@ export default function LabDetailPage() {
   const [ambientTemp, setAmbientTemp] = useState(25); // Ts (10 - 40)
   const [coolingConstant, setCoolingConstant] = useState(0.04); // k (0.01 - 0.1)
   
-  // Simulated Chart Data Points
-  const [chartPoints, setChartPoints] = useState<{ x: number; y: number }[]>([]);
+  const chartPoints = useMemo(() => {
+    const totalTime = 60;
+    const step = 2.5;
+    const points: { x: number; y: number }[] = [];
 
-  // Calculate cooling curve data points when sliders change
-  // Formula: T(t) = Ts + (T0 - Ts) * e^(-kt)
-  // Calculate cooling curve data points when sliders change
-  // Formula: T(t) = Ts + (T0 - Ts) * e^(-kt)
-  useEffect(() => {
-    const points = [];
-    const totalTime = 60; // 60 minutes
-    const step = 2.5; // step interval
-    
     for (let t = 0; t <= totalTime; t += step) {
-      // Add subtle experimental sensor noise as per science-expert guideline
-      const noise = t > 0 ? (Math.random() - 0.5) * 0.4 : 0;
-      const temp = ambientTemp + (initialTemp - ambientTemp) * Math.exp(-coolingConstant * t) + noise;
+      const temp = ambientTemp + (initialTemp - ambientTemp) * Math.exp(-coolingConstant * t);
       points.push({ x: t, y: Math.max(0, temp) });
     }
-    setChartPoints(points);
+
+    return points;
   }, [initialTemp, ambientTemp, coolingConstant]);
 
   const handleStartExperiment = () => {
-    setShowSimModal(true);
-    setSimProgress(0);
-    setSimStage("กำลังเชื่อมต่อเซิร์ฟเวอร์จำลอง...");
-
-    const interval = setInterval(() => {
-      setSimProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          return 100;
-        }
-        const next = prev + 25;
-        if (next === 25) setSimStage("ดาวน์โหลดข้อมูลห้องปฏิบัติการฟิสิกส์เสมือน...");
-        if (next === 50) setSimStage("ตรวจสอบทฤษฎีและตัวแปรควบคุม...");
-        if (next === 75) setSimStage("ปรับแต่งเครื่องมือเทอร์โมมิเตอร์และสภาพแวดล้อม...");
-        if (next === 100) setSimStage("เครื่องจำลองพร้อมใช้งานแล้ว! 🔬");
-        return next;
-      });
-    }, 450);
+    router.push(`/labs/${labId}/simulation`);
   };
 
   const closeModal = () => {
@@ -341,35 +59,30 @@ export default function LabDetailPage() {
   const timeToSvgX = (t: number) => 20 + (t / 60) * 160;
   const tempToSvgY = (temp: number) => 100 - (temp / 100) * 90;
 
-  const getSvgPath = () => {
+  const svgPath = useMemo(() => {
     if (chartPoints.length === 0) return "";
     return chartPoints
       .map((p, i) => `${i === 0 ? "M" : "L"}${timeToSvgX(p.x)},${tempToSvgY(p.y)}`)
       .join(" ");
-  };
+  }, [chartPoints]);
 
-  const getSvgAreaPath = () => {
+  const svgAreaPath = useMemo(() => {
     if (chartPoints.length === 0) return "";
-    const linePath = getSvgPath();
     const startX = timeToSvgX(chartPoints[0].x);
     const endX = timeToSvgX(chartPoints[chartPoints.length - 1].x);
-    const baseY = 100; // maps to temp=0
-    return `${linePath} L${endX},${baseY} L${startX},${baseY} Z`;
-  };
+    const baseY = 100;
+    return `${svgPath} L${endX},${baseY} L${startX},${baseY} Z`;
+  }, [chartPoints, svgPath]);
 
   const ambientY = tempToSvgY(ambientTemp);
 
   return (
-    <div className="flex flex-col min-h-screen bg-slate-50 relative pb-16 overflow-hidden">
-      
-      {/* Absolute Decorative Floating Elements */}
-      <DecorativeBackground />
-
+    <div className="flex flex-col min-h-screen bg-[#f8fafc] relative pb-12 overflow-hidden">
       {/* 1. Header/Navbar */}
       <Navbar />
 
       {/* 2. Breadcrumb Navigation */}
-      <div className="w-full max-w-[1440px] mx-auto px-6 sm:px-12 md:px-20 pt-6 pb-2 select-none">
+      <div className="hidden sm:block w-full max-w-[1440px] mx-auto px-6 sm:px-12 md:px-20 pt-6 pb-2 select-none">
         <Breadcrumb category={lab.category} title={lab.title} />
       </div>
 
@@ -383,13 +96,13 @@ export default function LabDetailPage() {
       />
 
       {/* 4. Two-Column Dashboard Content */}
-      <main className="max-w-[1440px] w-full mx-auto px-4 sm:px-12 md:px-20 py-6 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      <main className="max-w-[1440px] w-full mx-auto px-4 sm:px-12 md:px-20 py-5 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           
           {/* Left Column (70%) */}
-          <div className="lg:col-span-8 space-y-7">
+          <div className="lg:col-span-8 space-y-5">
             {/* Overview & Objective cards (Grid layout side-by-side on desktop) */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <InfoCard
                 title="ภาพรวมการทดลอง"
                 icon={ClipboardList}
@@ -432,28 +145,7 @@ export default function LabDetailPage() {
         </div>
       </main>
 
-      {/* 5. Bottom callout banner */}
-      <div className="w-full max-w-4xl mx-auto px-6 py-6 select-none relative z-10">
-        <div className="relative overflow-hidden rounded-full bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-600 p-[1.5px] shadow-lg shadow-indigo-500/10 group hover:shadow-xl hover:shadow-indigo-500/15 transition-all duration-300">
-          <div className="bg-white/95 rounded-full px-8 py-3.5 flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
-            <div className="flex items-center gap-2">
-              <span className="w-5 h-5 flex items-center justify-center shrink-0">🚀</span>
-              <p className="text-xs sm:text-sm font-bold bg-gradient-to-r from-slate-700 via-slate-800 to-slate-900 bg-clip-text text-transparent leading-relaxed tracking-wide">
-                พร้อมเริ่มเรียนรู้แล้วหรือยัง? กดเริ่มทดลองและค้นพบการเปลี่ยนแปลงของอุณหภูมิไปพร้อมกัน!
-              </p>
-            </div>
-            
-            <button
-              onClick={handleStartExperiment}
-              className="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-full text-xs font-bold transition-all duration-300 flex items-center gap-1.5 cursor-pointer active:scale-95 shadow-md shadow-indigo-500/10 shrink-0"
-            >
-              <span>เริ่มทดลอง</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* 6. Simulator Loading & Interactive Console Modal */}
+      {/* 5. Simulator Loading & Interactive Console Modal */}
       {showSimModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/40 backdrop-blur-md animate-in fade-in duration-200">
           <div 
@@ -643,13 +335,13 @@ export default function LabDetailPage() {
                           <text x="183" y={ambientY + 2} fill="#10b981" fontSize="7" fontWeight="extrabold">Tₛ</text>
 
                           {/* Area under the path */}
-                          <path d={getSvgAreaPath()} fill="url(#chartGrad)" />
+                          <path d={svgAreaPath} fill="url(#chartGrad)" />
 
                           {/* Glowing line shadow */}
-                          <path d={getSvgPath()} stroke="#60a5fa" strokeWidth="4.5" strokeLinecap="round" fill="none" opacity="0.3" filter="url(#glow-line)" />
+                          <path d={svgPath} stroke="#60a5fa" strokeWidth="4.5" strokeLinecap="round" fill="none" opacity="0.3" filter="url(#glow-line)" />
                           
                           {/* Interactive Cooling Curve path */}
-                          <path d={getSvgPath()} stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" fill="none" />
+                          <path d={svgPath} stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" fill="none" />
 
                           {/* Hot Initial Point Indicator */}
                           {chartPoints.length > 0 && (
