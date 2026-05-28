@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { SidebarProvider } from "@/context/SidebarContext";
+import AIChatButton from "@/components/AIChatButton";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -17,7 +18,8 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-slate-50 text-slate-900">
         <SidebarProvider>
           {children}
-        </SidebarProvider>
+                  <AIChatButton />
+</SidebarProvider>
       </body>
     </html>
   );

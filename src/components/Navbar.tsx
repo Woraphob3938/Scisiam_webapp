@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { Bell, Sparkles, ChevronDown, Compass, Award, Menu } from "lucide-react";
 import { useSidebar } from "@/context/SidebarContext";
@@ -65,6 +66,7 @@ export default function Navbar() {
           <span className="text-xs sm:text-sm font-bold">{points} แต้ม</span>
         </div>
 
+
         {/* Notification Bell */}
         <div className="relative">
           <button
@@ -91,7 +93,7 @@ export default function Navbar() {
                   </div>
                   <div>
                     <p className="text-xs font-semibold text-slate-800">ภารกิจสำเร็จ!</p>
-                    <p className="text-[10px] text-slate-500 mt-0.5">คุณได้รับ +20 แต้มจากห้องแล็บ Newton's cooling</p>
+                    <p className="text-[10px] text-slate-500 mt-0.5">คุณได้รับ +20 แต้มจากห้องแล็บ Newton&apos;s cooling</p>
                   </div>
                 </div>
               </div>
@@ -108,8 +110,8 @@ export default function Navbar() {
             onClick={() => setShowProfileMenu(!showProfileMenu)}
             className="flex items-center gap-2 hover:bg-slate-50 p-1.5 pr-2.5 rounded-xl transition-all duration-200 select-none cursor-pointer"
           >
-            <div className="w-9 h-9 rounded-full bg-blue-50 flex items-center justify-center overflow-hidden ring-2 ring-indigo-50/50 border border-white shrink-0">
-              <img src="/student_avatar_3d.png" alt="รูปโปรไฟล์" className="w-full h-full object-cover" />
+            <div className="relative w-9 h-9 rounded-full bg-blue-50 flex items-center justify-center overflow-hidden ring-2 ring-indigo-50/50 border border-white shrink-0">
+              <Image src="/student_avatar_3d.png" alt="รูปโปรไฟล์" fill sizes="36px" className="object-cover" />
             </div>
             <div className="hidden sm:flex flex-col text-left">
               <span className="text-xs text-slate-400 font-medium">ยินดีต้อนรับ</span>
