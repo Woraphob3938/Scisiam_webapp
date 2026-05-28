@@ -8,7 +8,7 @@ type ChatMessage = {
   content: string;
 };
 
-const DEFAULT_MODEL = "gpt-4o-mini";
+const DEFAULT_MODEL = "gemini-1.5-flash";
 const MAX_MESSAGES = 10;
 const MAX_MESSAGE_CHARS = 900;
 
@@ -32,51 +32,29 @@ function sanitizeMessages(value: unknown): ChatMessage[] {
     }));
 }
 
-function extractOutputText(payload: unknown): string {
+function extractGeminiText(payload: unknown): string {
   if (!payload || typeof payload !== "object") return "";
-
-  // 1. Standard OpenAI Chat Completion choices
-  const choices = (payload as { choices?: unknown }).choices;
-  if (Array.isArray(choices) && choices.length > 0) {
-    const firstChoice = choices[0] as { message?: { content?: unknown } };
-    if (typeof firstChoice?.message?.content === "string") {
-      return firstChoice.message.content.trim();
-    }
-  }
-
-  // 2. Custom/Alternative response fallback
-  const outputText = (payload as { output_text?: unknown }).output_text;
-  if (typeof outputText === "string") return outputText.trim();
-
-  const output = (payload as { output?: unknown }).output;
-  if (!Array.isArray(output)) return "";
-
-  return output
-    .flatMap((item) => {
-      if (!item || typeof item !== "object") return [];
-      const content = (item as { content?: unknown }).content;
-      if (!Array.isArray(content)) return [];
-
-      return content
-        .map((part) => {
-          if (!part || typeof part !== "object") return "";
-          const text = (part as { text?: unknown }).text;
-          return typeof text === "string" ? text : "";
-        })
-        .filter(Boolean);
-    })
-    .join("\n")
-    .trim();
+  const candidates = (payload as { candidates?: unknown }).candidates;
+  if (!Array.isArray(candidates) || candidates.length === 0) return "";
+  
+  const content = (candidates[0] as { content?: unknown }).content;
+  if (!content || typeof content !== "object") return "";
+  
+  const parts = (content as { parts?: unknown }).parts;
+  if (!Array.isArray(parts) || parts.length === 0) return "";
+  
+  const text = (parts[0] as { text?: unknown }).text;
+  return typeof text === "string" ? text.trim() : "";
 }
 
 export async function POST(request: NextRequest) {
-  const apiKey = process.env.OPENAI_API_KEY;
-  const model = process.env.OPENAI_MODEL || DEFAULT_MODEL;
+  const apiKey = process.env.GEMINI_API_KEY;
+  const model = process.env.GEMINI_MODEL || DEFAULT_MODEL;
 
   if (!apiKey) {
     return NextResponse.json({
       error:
-        "ยังไม่ได้ตั้งค่า OPENAI_API_KEY ใน .env.local กรุณาเพิ่ม key ใหม่ที่ rotate แล้วและ restart dev server",
+        "ยังไม่ได้ตั้งค่า GEMINI_API_KEY ใน .env.local กรุณาเพิ่ม key และ restart dev server",
       needsConfiguration: true,
     });
   }
@@ -108,10 +86,6 @@ export async function POST(request: NextRequest) {
     ? `ห้องแล็บปัจจุบัน: ${lab.title}\nหมวด: ${lab.category}\nคำอธิบาย: ${lab.description}`
     : "ผู้ใช้ยังไม่ได้อยู่ในหน้าห้องแล็บเฉพาะ ให้ตอบเป็นผู้ช่วยวิทยาศาสตร์ทั่วไปของ SciSiam";
 
-  const transcript = messages
-    .map((message) => `${message.role === "user" ? "นักเรียน" : "AI"}: ${message.content}`)
-    .join("\n");
-
   const instructions = [
     "คุณคือ SciSiam AI Tutor ผู้ช่วยสอนวิทยาศาสตร์สำหรับนักเรียนไทยในเว็บ virtual lab",
     "ตอบเป็นภาษาไทย กระชับ อธิบายเป็นขั้นตอน และผูกคำตอบกับบริบทห้องแล็บเมื่อเกี่ยวข้อง",
@@ -121,41 +95,46 @@ export async function POST(request: NextRequest) {
     labContext,
   ].join("\n");
 
-  const response = await fetch("https://api.openai.com/v1/chat/completions", {
+  // Map messages to Gemini contents structure
+  const contents = messages.map((m) => ({
+    role: m.role === "user" ? "user" : "model",
+    parts: [{ text: m.content }],
+  }));
+
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+
+  const response = await fetch(url, {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model,
-      messages: [
-        { role: "system", content: instructions },
-        ...messages.map((m) => ({ role: m.role, content: m.content })),
-      ],
-      max_tokens: 700,
+      contents,
+      systemInstruction: {
+        parts: [{ text: instructions }],
+      },
+      generationConfig: {
+        maxOutputTokens: 1000,
+        temperature: 0.7,
+      },
     }),
   });
 
   const data = (await response.json().catch(() => null)) as unknown;
 
   if (!response.ok) {
-    const message =
-      data && typeof data === "object"
-        ? (data as { error?: { message?: string } }).error?.message
-        : null;
+    const errorObject = data && typeof data === "object" ? (data as { error?: { message?: string } }).error : null;
+    const errorMessage = errorObject?.message || "เรียก Gemini API ไม่สำเร็จ";
 
     return NextResponse.json(
       {
-        error:
-          message ||
-          "เรียก OpenAI API ไม่สำเร็จ กรุณาตรวจสอบ key, model, billing และ quota",
+        error: `${errorMessage} (กรุณาตรวจสอบ API key หรือโควตาการใช้งาน)`,
       },
       { status: response.status }
     );
   }
 
-  const answer = extractOutputText(data);
+  const answer = extractGeminiText(data);
 
   return NextResponse.json({
     answer:
