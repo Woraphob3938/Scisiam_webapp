@@ -124,11 +124,19 @@ export async function POST(request: NextRequest) {
 
   if (!response.ok) {
     const errorObject = data && typeof data === "object" ? (data as { error?: { message?: string } }).error : null;
-    const errorMessage = errorObject?.message || "เรียก Gemini API ไม่สำเร็จ";
+    let errorMessage = errorObject?.message || "เรียก Gemini API ไม่สำเร็จ";
+
+    if (response.status === 503) {
+      errorMessage = "ระบบ AI ของ Google กำลังมีผู้ใช้งานหนาแน่นชั่วคราว (Service Unavailable) กรุณากดส่งข้อความใหม่อีกครั้งครับ";
+    } else if (response.status === 429) {
+      errorMessage = "ความเร็วในการส่งคำถามเกินโควตาฟรีชั่วคราว (Rate Limit Exceeded) กรุณาเว้นระยะห่าง 10-15 วินาทีก่อนถามใหม่อีกครั้งครับ";
+    } else {
+      errorMessage = `${errorMessage} (กรุณาตรวจสอบ API key หรือโควตาการใช้งาน)`;
+    }
 
     return NextResponse.json(
       {
-        error: `${errorMessage} (กรุณาตรวจสอบ API key หรือโควตาการใช้งาน)`,
+        error: errorMessage,
       },
       { status: response.status }
     );
