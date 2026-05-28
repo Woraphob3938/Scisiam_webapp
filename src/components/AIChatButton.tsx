@@ -107,20 +107,9 @@ export default function AIChatButton() {
   };
 
   return (
-    <div className="relative">
-      <button
-        type="button"
-        onClick={() => setIsOpen((current) => !current)}
-        className="group relative flex h-10 w-10 items-center justify-center rounded-xl border border-blue-100 bg-blue-50 text-blue-600 transition-all duration-200 hover:bg-blue-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-        aria-label="เปิด SciSiam AI Tutor"
-        aria-expanded={isOpen}
-      >
-        <Bot className="h-5 w-5" />
-        <span className="absolute -right-0.5 -top-0.5 flex h-3 w-3 items-center justify-center rounded-full bg-emerald-500 ring-2 ring-white" />
-      </button>
-
+    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3 select-none">
       {isOpen && (
-        <div className="fixed left-4 right-4 top-20 z-50 flex h-[min(620px,calc(100vh-96px))] w-auto flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-xl shadow-slate-200/70 sm:absolute sm:left-auto sm:right-0 sm:top-12 sm:w-[min(360px,calc(100vw-32px))]">
+        <div className="w-[min(380px,calc(100vw-32px))] h-[min(560px,calc(100vh-100px))] flex flex-col overflow-hidden rounded-[24px] border border-slate-200/80 bg-white text-left shadow-2xl shadow-slate-300/40 animate-in slide-in-from-bottom-5 fade-in duration-300">
           <div className="border-b border-slate-100 bg-slate-50/70 px-4 py-3">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
@@ -141,7 +130,7 @@ export default function AIChatButton() {
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-white hover:text-slate-700"
+                className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-white hover:text-slate-700 cursor-pointer"
                 aria-label="ปิดหน้าต่าง AI Tutor"
               >
                 <X className="h-4 w-4" />
@@ -204,7 +193,7 @@ export default function AIChatButton() {
               <button
                 type="submit"
                 disabled={!input.trim() || isSending}
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-300 cursor-pointer"
                 aria-label="ส่งคำถามถึง AI Tutor"
               >
                 {isSending ? (
@@ -220,6 +209,22 @@ export default function AIChatButton() {
           </form>
         </div>
       )}
+
+      {/* Floating Action Button */}
+      <button
+        type="button"
+        onClick={() => setIsOpen((current) => !current)}
+        className="relative flex h-14 w-14 items-center justify-center rounded-full bg-blue-600 text-white shadow-xl shadow-blue-500/25 transition-all duration-300 hover:bg-blue-700 hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-blue-100 cursor-pointer"
+        aria-label="เปิด SciSiam AI Tutor"
+        aria-expanded={isOpen}
+      >
+        {isOpen ? <X className="h-6.5 w-6.5" /> : <Bot className="h-6.5 w-6.5" />}
+        {!isOpen && (
+          <span className="absolute right-0.5 top-0.5 flex h-3.5 w-3.5 rounded-full bg-emerald-500 ring-2 ring-white">
+            <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping" />
+          </span>
+        )}
+      </button>
     </div>
   );
 }
