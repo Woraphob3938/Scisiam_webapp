@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
 interface SidebarContextType {
   isCollapsed: boolean;
@@ -27,47 +27,56 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
   // Load state from localStorage on mount
   useEffect(() => {
     const storedCollapsed = localStorage.getItem("scisiam_sidebar_collapsed");
-    if (storedCollapsed === "true") {
-      setIsCollapsed(true);
-    }
-
     const storedDark = localStorage.getItem("scisiam_dark_mode");
-    if (storedDark === "true") {
-      setIsDarkMode(true);
+    const nextCollapsed = storedCollapsed === "true";
+    const nextDark = storedDark === "true";
+
+    if (nextDark) {
       document.documentElement.classList.add("dark");
     } else {
       document.documentElement.classList.remove("dark");
     }
+
+    const frame = window.requestAnimationFrame(() => {
+      setIsCollapsed(nextCollapsed);
+      setIsDarkMode(nextDark);
+    });
+
+    return () => window.cancelAnimationFrame(frame);
   }, []);
 
-  const toggleSidebar = () => {
-    const next = !isCollapsed;
-    setIsCollapsed(next);
-    localStorage.setItem("scisiam_sidebar_collapsed", String(next));
-  };
+  const toggleSidebar = useCallback(() => {
+    setIsCollapsed((prev) => {
+      const next = !prev;
+      localStorage.setItem("scisiam_sidebar_collapsed", String(next));
+      return next;
+    });
+  }, []);
 
-  const toggleDarkMode = () => {
-    const next = !isDarkMode;
-    setIsDarkMode(next);
-    localStorage.setItem("scisiam_dark_mode", String(next));
-    if (next) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  };
+  const toggleDarkMode = useCallback(() => {
+    setIsDarkMode((prev) => {
+      const next = !prev;
+      localStorage.setItem("scisiam_dark_mode", String(next));
+      if (next) {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+      return next;
+    });
+  }, []);
+
+  const value = useMemo(() => ({
+    isCollapsed,
+    setIsCollapsed,
+    toggleSidebar,
+    isDarkMode,
+    setIsDarkMode,
+    toggleDarkMode,
+  }), [isCollapsed, toggleSidebar, isDarkMode, toggleDarkMode]);
 
   return (
-    <SidebarContext.Provider
-      value={{
-        isCollapsed,
-        setIsCollapsed,
-        toggleSidebar,
-        isDarkMode,
-        setIsDarkMode,
-        toggleDarkMode,
-      }}
-    >
+    <SidebarContext.Provider value={value}>
       {children}
     </SidebarContext.Provider>
   );

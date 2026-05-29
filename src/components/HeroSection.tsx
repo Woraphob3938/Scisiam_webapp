@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { CloudLightning, Cpu, Rocket, Search, X, Atom, Beaker, Leaf, ArrowRight } from "lucide-react";
+import { Rocket, Search, X, Atom, Beaker, Leaf, ArrowRight } from "lucide-react";
 import { labsData } from "@/data/labs";
 
 export default function HeroSection() {
@@ -68,7 +68,7 @@ export default function HeroSection() {
   const showDropdown = isFocused && searchQuery.trim().length > 0;
 
   return (
-    <section className="relative w-full py-10 md:py-16 px-6 sm:px-12 md:px-20 overflow-hidden bg-gradient-to-b from-blue-50/70 via-indigo-50/30 to-transparent flex flex-col items-center text-center">
+    <section className="relative w-full px-6 py-8 sm:px-12 md:px-20 md:pt-12 md:pb-4 overflow-hidden bg-gradient-to-b from-blue-50/70 via-indigo-50/30 to-transparent flex flex-col items-center text-center">
       {/* Decorative Wave Background Pattern */}
       <div className="absolute inset-0 z-0 pointer-events-none opacity-40">
         <svg className="w-full h-full" viewBox="0 0 1440 320" fill="none" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
@@ -131,33 +131,12 @@ export default function HeroSection() {
             </h1>
           </div>
 
-          <p className="text-sm sm:text-base md:text-lg text-slate-500 font-medium max-w-md mb-6 leading-relaxed">
+          <p className="text-sm sm:text-base md:text-lg text-slate-500 font-medium max-w-md mb-4 leading-relaxed">
             เลือกห้องแล็บที่ต้องการใช้งาน แล้วเริ่มต้นการผจญภัยทางวิทยาศาสตร์ได้เลย!
           </p>
 
-          {/* Status Badges */}
-          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mb-6">
-            <div className="flex items-center gap-2 px-4 py-2 bg-emerald-50 border border-emerald-100 rounded-full text-emerald-700 shadow-sm transition-all duration-300 hover:bg-emerald-100/50 hover:shadow-md">
-              <span className="relative flex h-2.5 w-2.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-              </span>
-              <span className="text-xs sm:text-sm font-semibold tracking-wide flex items-center gap-1.5">
-                <Cpu className="w-3.5 h-3.5" />
-                Simulation Engine Active
-              </span>
-            </div>
-
-            <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-100 rounded-full text-blue-700 shadow-sm transition-all duration-300 hover:bg-blue-100/50 hover:shadow-md">
-              <CloudLightning className="w-4 h-4 text-blue-500 animate-pulse" />
-              <span className="text-xs sm:text-sm font-semibold tracking-wide">
-                ระบบจำลองออนไลน์
-              </span>
-            </div>
-          </div>
-
           {/* ===== SEARCH INPUT BAR ===== */}
-          <div className="relative w-full max-w-lg">
+          <div className="relative w-full max-w-xl">
             <div className={`flex items-center bg-white border rounded-2xl shadow-sm px-4 py-3 transition-all duration-300 ${
               isFocused 
                 ? "border-blue-400 shadow-lg shadow-blue-500/10 ring-2 ring-blue-100" 
@@ -170,7 +149,7 @@ export default function HeroSection() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onFocus={() => setIsFocused(true)}
-                placeholder="ค้นหาห้องแล็บ เช่น Newton, Osmosis, Titration..."
+                placeholder="ค้นหาห้องแล็บ เช่น Newton, Osmosis..."
                 className="flex-1 bg-transparent outline-none text-sm font-medium text-slate-700 placeholder:text-slate-400 ml-3 leading-normal"
                 aria-label="ค้นหาห้องแล็บวิทยาศาสตร์"
               />
@@ -222,7 +201,7 @@ export default function HeroSection() {
                   <div className="px-4 py-8 text-center">
                     <Search className="w-8 h-8 text-slate-300 mx-auto mb-2" />
                     <p className="text-sm font-bold text-slate-500 leading-normal">ไม่พบห้องแล็บที่ตรงกับคำค้นหา</p>
-                    <p className="text-xs text-slate-400 mt-1 leading-normal">ลองค้นหาด้วยคำอื่น เช่น "Ohm", "DNA", "กรด"</p>
+                    <p className="text-xs text-slate-400 mt-1 leading-normal">ลองค้นหาด้วยคำอื่น เช่น &quot;Ohm&quot;, &quot;DNA&quot;, &quot;กรด&quot;</p>
                   </div>
                 )}
               </div>

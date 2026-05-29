@@ -21,7 +21,7 @@ export function LeftDecorations() {
         </div>
         
         <p className="text-xs sm:text-sm font-semibold text-yellow-900 leading-relaxed font-sans mt-1">
-          "เรียนรู้วันนี้ เพื่ออนาคตที่ดีกว่า" 🎓✨
+          &quot;เรียนรู้วันนี้ เพื่ออนาคตที่ดีกว่า&quot; 🎓✨
         </p>
       </div>
 

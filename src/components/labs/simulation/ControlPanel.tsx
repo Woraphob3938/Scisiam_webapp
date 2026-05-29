@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Sliders, Play, Pause, RotateCcw, FileText, ChevronDown } from "lucide-react";
+import { Sliders, Play, Pause, RotateCcw, FileText, ChevronDown, Plus } from "lucide-react";
 
 interface ControlPanelProps {
   initialTemp: number;
@@ -18,6 +18,7 @@ interface ControlPanelProps {
   onStartStop: () => void;
   onReset: () => void;
   onSave: () => void;
+  onAddPoint: () => void;
   isHeaterOn: boolean;
   onToggleHeater: () => void;
 }
@@ -37,6 +38,7 @@ export default function ControlPanel({
   onStartStop,
   onReset,
   onSave,
+  onAddPoint,
   isHeaterOn,
   onToggleHeater,
 }: ControlPanelProps) {
@@ -207,7 +209,7 @@ export default function ControlPanel({
         <button
           onClick={onStartStop}
           className={`
-            col-span-2 py-3.5 px-4 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2
+            py-3.5 px-4 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2
             transition-all duration-300 transform hover:scale-[1.01] active:scale-95 cursor-pointer shadow-md
             ${
               isRunning
@@ -229,6 +231,15 @@ export default function ControlPanel({
           )}
         </button>
 
+        {/* Add Data Button */}
+        <button
+          onClick={onAddPoint}
+          className="py-3.5 px-4 bg-blue-50 hover:bg-blue-100/70 border border-blue-100 text-blue-600 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all duration-300 transform hover:scale-[1.01] active:scale-95 cursor-pointer shadow-md shadow-blue-500/5"
+        >
+          <Plus className="w-4 h-4" />
+          <span>เพิ่มข้อมูล</span>
+        </button>
+
         {/* Reset Button */}
         <button
           onClick={onReset}
@@ -238,13 +249,13 @@ export default function ControlPanel({
           <span>รีเซ็ต</span>
         </button>
 
-        {/* Save/Submit Button */}
+        {/* Save/Submit Button (Changed to End Experiment) */}
         <button
           onClick={onSave}
           className="py-3 px-4 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all duration-300 transform hover:scale-[1.01] shadow-md shadow-emerald-500/10 active:scale-95 cursor-pointer"
         >
           <FileText className="w-3.5 h-3.5" />
-          <span>บันทึกผล</span>
+          <span>สิ้นสุดการทดลอง</span>
         </button>
 
       </div>

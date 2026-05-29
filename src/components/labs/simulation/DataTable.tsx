@@ -1,19 +1,17 @@
 "use client";
 
 import React from "react";
-import { Plus, Download, Copy, Table, HelpCircle } from "lucide-react";
+import { Download, Copy, Table, HelpCircle } from "lucide-react";
 import { DataPoint } from "./LiveGraph";
 
 interface DataTableProps {
   dataPoints: DataPoint[];
-  onAddPoint: () => void;
   onExportCSV: () => void;
   onCopyData: () => void;
 }
 
 export default function DataTable({
   dataPoints,
-  onAddPoint,
   onExportCSV,
   onCopyData,
 }: DataTableProps) {
@@ -29,14 +27,6 @@ export default function DataTable({
 
         {/* Action Controls */}
         <div className="flex flex-wrap gap-1.5">
-          <button
-            onClick={onAddPoint}
-            className="flex items-center gap-1 px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100/70 border border-blue-100 text-blue-600 rounded-xl text-[10px] sm:text-xs font-bold transition-all duration-200 active:scale-95 cursor-pointer"
-          >
-            <Plus className="w-3 h-3" />
-            <span>เพิ่มข้อมูล</span>
-          </button>
-          
           <button
             onClick={onExportCSV}
             className="flex items-center gap-1 px-2.5 py-1.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-600 rounded-xl text-[10px] sm:text-xs font-bold transition-all duration-200 active:scale-95 cursor-pointer"
@@ -60,7 +50,7 @@ export default function DataTable({
         {dataPoints.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center text-slate-400 gap-1.5 py-12 min-h-[220px]">
             <HelpCircle className="w-8 h-8 text-slate-300 animate-pulse" />
-            <p className="text-xs font-semibold text-center px-4">ยังไม่มีข้อมูลบันทึก กดปุ่ม "เริ่ม" หรือ "เพิ่มข้อมูล"</p>
+            <p className="text-xs font-semibold text-center px-4">ยังไม่มีข้อมูลบันทึก กดปุ่มเริ่มหรือเพิ่มข้อมูล</p>
           </div>
         ) : (
           <div className="overflow-x-auto overflow-y-auto flex-1 max-h-[260px]">

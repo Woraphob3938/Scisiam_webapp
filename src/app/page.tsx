@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -7,9 +7,9 @@ import HeroSection from "@/components/HeroSection";
 import CategoryFilter, { Category } from "@/components/CategoryFilter";
 import LabCard, { LabData } from "@/components/LabCard";
 import Sidebar from "@/components/Sidebar";
+import { useSidebar } from "@/context/SidebarContext";
 import BottomCallout from "@/components/BottomCallout";
 import { Play, BookOpen, X, CheckCircle, HelpCircle } from "lucide-react";
-import { useSidebar } from "@/context/SidebarContext";
 
 import { labsData } from "@/data/labs";
 export default function Home() {
@@ -42,52 +42,50 @@ export default function Home() {
       {/* 1. Header / Navbar */}
       <Navbar />
 
-      {/* 2. Hero Section */}
-      <HeroSection />
-
-      {/* 3. Filter Category Section */}
-      <CategoryFilter
-        activeCategory={selectedCategory}
-        onCategoryChange={setSelectedCategory}
-      />
-
-      {/* 4. Responsive Layout */}
-      <div className="w-full px-0">
-        <div className="flex gap-8 items-start relative">
-          
-          {/* Left Column: Reusable Sidebar Navigation */}
-          <div className="hidden lg:flex shrink-0 pl-0">
-            <Sidebar activeMenu="หน้าหลัก" />
-          </div>
- 
-          {/* Right Column: Lab Card Grid */}
-          <div className="flex-1 min-w-0 px-4 lg:pl-0 lg:pr-8 py-4">
-            {filteredLabs.length === 0 ? (
-              <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm flex flex-col items-center gap-3">
-                <HelpCircle className="w-12 h-12 text-slate-300" />
-                <h4 className="font-bold text-slate-700 text-lg">ไม่พบห้องแล็บในหมวดหมู่นี้</h4>
-                <p className="text-sm text-slate-400">กรุณาเลือกหมวดหมู่อื่นเพื่อค้นหาห้องแล็บทดลอง</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6.5">
-                {filteredLabs.map((lab) => (
-                  <div key={lab.id} className="h-full">
-                    <LabCard
-                      lab={lab}
-                      onViewDetails={handleViewDetails}
-                      onEnterRoom={handleEnterRoom}
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
- 
-        </div>
+      {/* 2. Persistent desktop sidebar */}
+      <div className="hidden lg:block">
+        <Sidebar activeMenu="หน้าหลัก" />
       </div>
 
-      {/* 5. Bottom Callout Banner */}
-      <BottomCallout />
+      {/* 3. Main Content Area */}
+      <div className={`relative z-10 min-w-0 transition-[padding-left] duration-300 ${isCollapsed ? "lg:pl-[76px]" : "lg:pl-[260px]"}`}>
+        
+        {/* Hero Section */}
+        <HeroSection />
+
+        {/* Filter Category Section */}
+        <CategoryFilter
+          activeCategory={selectedCategory}
+          onCategoryChange={setSelectedCategory}
+        />
+
+        {/* Lab Card Grid */}
+        <div className="w-full px-4 lg:px-8 py-4">
+          {filteredLabs.length === 0 ? (
+            <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm flex flex-col items-center gap-3">
+              <HelpCircle className="w-12 h-12 text-slate-300" />
+              <h4 className="font-bold text-slate-700 text-lg">ไม่พบห้องแล็บในหมวดหมู่นี้</h4>
+              <p className="text-sm text-slate-400">กรุณาเลือกหมวดหมู่อื่นเพื่อค้นหาห้องแล็บทดลอง</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6.5">
+              {filteredLabs.map((lab) => (
+                <div key={lab.id} className="h-full">
+                  <LabCard
+                    lab={lab}
+                    onViewDetails={handleViewDetails}
+                    onEnterRoom={handleEnterRoom}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Bottom Callout Banner */}
+        <BottomCallout />
+
+      </div>
 
       {/* 6. Dynamic Pop-up Modal (Details / Room Entry) */}
       {activeModal && (

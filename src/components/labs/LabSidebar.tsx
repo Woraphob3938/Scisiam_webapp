@@ -3,7 +3,20 @@
 import React from "react";
 import { BarChart2, Clock, Sparkles, Languages, CheckSquare, Info, ShieldAlert, Award, Beaker } from "lucide-react";
 
-export default function LabSidebar() {
+interface LabSidebarProps {
+  labId?: string;
+}
+
+export default function LabSidebar({ labId = "newtons-cooling" }: LabSidebarProps) {
+  const isOhmsLaw = labId === "ohms-law";
+  const isHookesLaw = labId === "hookes-law";
+  const isAcidBase = labId === "acid-base-titration";
+  const isBoylesLaw = labId === "boyles-law";
+  const isCharlesLaw = labId === "charles-law";
+  const isPhotosynthesis = labId === "photosynthesis-rate";
+  const isMendelian = labId === "mendels-inheritance";
+  const isMitosis = labId === "mitosis-division";
+
   // 1. Lab details rows
   const labInfoRows = [
     { label: "ระดับ", value: "ปานกลาง", icon: BarChart2, color: "text-amber-500", valColor: "text-amber-600 font-bold" },
@@ -12,12 +25,34 @@ export default function LabSidebar() {
     { label: "ภาษา", value: "ไทย 🇹🇭", icon: Languages, color: "text-indigo-500", valColor: "text-slate-700 font-semibold" },
   ];
 
+  const adviceList = [
+    "ตรวจสอบอุปกรณ์ให้พร้อมและปลอดภัยก่อนกดเริ่มทำการทดลอง",
+    isMitosis
+      ? "สังเกตตำแหน่งโครโมโซมในแต่ละระยะและอย่าข้าม checkpoint ก่อนเปรียบเทียบผล"
+      : isMendelian
+      ? "เริ่มจากการอ่าน genotype ของพ่อแม่ แล้วใช้ตาราง Punnett ตรวจสัดส่วนก่อนสุ่มตัวอย่าง"
+      : isPhotosynthesis
+      ? "ปรับทีละปัจจัย เช่น แสงหรือ CO₂ เพื่อดูปัจจัยจำกัดของอัตราการสังเคราะห์แสงอย่างชัดเจน"
+      : isCharlesLaw
+      ? "ใช้อุณหภูมิหน่วยเคลวินในการตรวจสอบอัตราส่วน V/T และรอให้ลูกสูบนิ่งก่อนบันทึกปริมาตร"
+      : isBoylesLaw
+      ? "ปรับลูกสูบทีละช่วงและรอให้ความดันนิ่งก่อนบันทึกค่าเพื่อให้กราฟ P-V แม่นยำ"
+      : isAcidBase
+      ? "อ่านค่าปริมาตรจากบิวเรตที่ระดับสายตาและหยดสารช้าลงเมื่อ pH เปลี่ยนเร็ว"
+      : isHookesLaw
+      ? "ค่อย ๆ เพิ่มตุ้มน้ำหนักทีละก้อนเพื่อให้ระบบอยู่ในสมดุลก่อนอ่านค่าระยะยืด"
+      : isOhmsLaw 
+      ? "บันทึกข้อมูลค่ากระแสไฟฟ้าและแรงดันไฟฟ้าอย่างสม่ำเสมอเพื่อความแม่นยำของกราฟ" 
+      : "บันทึกข้อมูลและค่าอุณหภูมิอย่างสม่ำเสมอเพื่อความแม่นยำของกราฟ",
+    "สังเกตและจดบันทึกสิ่งต่าง ๆ ที่เกิดขึ้นระหว่างการทดลองลงในสมุดบันทึก",
+  ];
+
   return (
-    <aside className="w-full flex flex-col gap-6.5 select-none lg:sticky lg:top-24 self-start">
+    <aside className="w-full flex flex-col gap-4 select-none lg:sticky lg:top-24 self-start">
       
       {/* CARD 1: ข้อมูลห้องแล็บ */}
-      <div className="bg-white/85 backdrop-blur-md rounded-2xl border border-white/40 p-5.5 shadow-xl shadow-slate-100/30 hover:shadow-2xl hover:shadow-slate-200/40 hover:-translate-y-0.5 transition-all duration-300">
-        <h3 className="text-sm sm:text-base font-bold text-slate-800 mb-4 flex items-center gap-2 border-b border-slate-50 pb-2.5">
+      <div className="bg-white rounded-2xl border border-slate-200/70 p-5">
+        <h3 className="text-sm sm:text-base font-bold text-slate-900 mb-3 flex items-center gap-2 border-b border-slate-100 pb-2.5">
           <Info className="w-4.5 h-4.5 text-blue-500" />
           ข้อมูลห้องแล็บ
         </h3>
@@ -38,9 +73,9 @@ export default function LabSidebar() {
       </div>
 
       {/* CARD 2: ความคืบหน้า */}
-      <div className="bg-white/85 backdrop-blur-md rounded-2xl border border-white/40 p-5.5 shadow-xl shadow-slate-100/30 hover:shadow-2xl hover:shadow-slate-200/40 hover:-translate-y-0.5 transition-all duration-300">
+      <div className="bg-white rounded-2xl border border-slate-200/70 p-5">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm sm:text-base font-bold text-slate-800 flex items-center gap-2">
+          <h3 className="text-sm sm:text-base font-bold text-slate-900 flex items-center gap-2">
             <CheckSquare className="w-4.5 h-4.5 text-emerald-500" />
             ความคืบหน้า
           </h3>
@@ -61,20 +96,16 @@ export default function LabSidebar() {
       </div>
 
       {/* CARD 3: คำแนะนำก่อนเริ่ม */}
-      <div className="bg-white/85 backdrop-blur-md rounded-2xl border border-white/40 p-5.5 shadow-xl shadow-slate-100/30 hover:shadow-2xl hover:shadow-slate-200/40 hover:-translate-y-0.5 transition-all duration-300">
-        <h3 className="text-sm sm:text-base font-bold text-slate-800 mb-3.5 flex items-center gap-2">
+      <div className="bg-white rounded-2xl border border-slate-200/70 p-5">
+        <h3 className="text-sm sm:text-base font-bold text-slate-900 mb-3.5 flex items-center gap-2">
           <ShieldAlert className="w-4.5 h-4.5 text-amber-500" />
           คำแนะนำก่อนเริ่ม
         </h3>
         <ul className="space-y-2.5 text-left">
-          {[
-            "ตรวจสอบอุปกรณ์ให้พร้อมและปลอดภัยก่อนกดเริ่มทำการทดลอง",
-            "บันทึกข้อมูลและค่าอุณหภูมิอย่างสม่ำเสมอเพื่อความแม่นยำของกราฟ",
-            "สังเกตและจดบันทึกสิ่งต่าง ๆ ที่เกิดขึ้นระหว่างการทดลองลงในสมุดบันทึก",
-          ].map((bullet, idx) => (
+          {adviceList.map((bullet, idx) => (
             <li key={idx} className="flex items-start gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0 mt-1.5" />
-              <p className="text-[11px] sm:text-xs text-slate-400 font-semibold leading-relaxed">
+              <p className="text-[11px] sm:text-xs text-slate-400 font-semibold leading-relaxed leading-1.4">
                 {bullet}
               </p>
             </li>
@@ -83,7 +114,7 @@ export default function LabSidebar() {
       </div>
 
       {/* CARD 4: ภารกิจนักวิทย์ */}
-      <div className="bg-white/85 backdrop-blur-md rounded-2xl border border-white/40 p-5.5 shadow-xl shadow-slate-100/30 hover:shadow-2xl hover:shadow-slate-200/40 hover:-translate-y-0.5 transition-all duration-300 relative overflow-hidden group">
+      <div className="bg-white rounded-2xl border border-slate-200/70 p-5 relative overflow-hidden group">
         <div className="absolute top-0 right-0 w-12 h-12 bg-purple-500/5 rounded-bl-full" />
         
         <div className="flex items-center gap-2.5 mb-3 border-b border-slate-50 pb-2">

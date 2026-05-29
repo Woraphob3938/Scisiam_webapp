@@ -73,7 +73,7 @@ export default function LiveGraph({ dataPoints }: LiveGraphProps) {
         {dataPoints.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center text-slate-400 gap-1.5 py-8">
             <HelpCircle className="w-8 h-8 text-slate-300 animate-pulse" />
-            <p className="text-xs font-semibold">กดปุ่ม "เริ่ม" เพื่อพล็อตกราฟเรียลไทม์</p>
+            <p className="text-xs font-semibold">กดปุ่มเริ่มเพื่อพล็อตกราฟเรียลไทม์</p>
           </div>
         ) : (
           <svg className="w-full h-full min-h-[176px]" viewBox="0 0 320 160" fill="none" xmlns="http://www.w3.org/2000/svg">

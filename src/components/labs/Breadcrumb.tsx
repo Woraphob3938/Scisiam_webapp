@@ -24,16 +24,6 @@ export default function Breadcrumb({ category, title }: BreadcrumbProps) {
 
         <ChevronRight className="w-4 h-4 text-slate-300" />
 
-        {/* Labs Directory Link */}
-        <Link
-          href="/"
-          className="text-slate-400 hover:text-blue-600 transition-colors duration-200"
-        >
-          ห้องแล็บ
-        </Link>
-
-        <ChevronRight className="w-4 h-4 text-slate-300" />
-
         {/* Category Filter Link */}
         <Link
           href={`/?category=${category}`}

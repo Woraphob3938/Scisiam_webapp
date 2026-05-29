@@ -1,4 +1,4 @@
-import { LabData } from "@/components/LabCard";
+import type { LabData } from "@/components/LabCard";
 
 export const labsData: LabData[] = [
   {
@@ -254,3 +254,7 @@ export const labsData: LabData[] = [
     description: "วิเคราะห์อัตราการเต้นของหัวใจและความดันเลือดภายใต้การตอบสนองต่อการทำกิจกรรมและระดับสารกระตุ้นจำลอง"
   }
 ];
+
+export const labsById: Record<string, LabData> = Object.fromEntries(
+  labsData.map((lab) => [lab.id, lab])
+);

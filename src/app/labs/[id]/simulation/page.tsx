@@ -12,15 +12,60 @@ import DataTable from "@/components/labs/simulation/DataTable";
 import FormulaCard from "@/components/labs/simulation/FormulaCard";
 import ExperimentSteps from "@/components/labs/simulation/ExperimentSteps";
 import LearningSidebar from "@/components/labs/simulation/LearningSidebar";
-import BottomCallout from "@/components/BottomCallout";
 import DecorativeBackground from "@/components/labs/DecorativeBackground";
 
-import { Sparkles, ArrowRight } from "lucide-react";
+import OhmsLawSimulation from "@/components/labs/simulation/OhmsLawSimulation";
+import HookesLawSimulation from "@/components/labs/simulation/HookesLawSimulation";
+import AcidBaseTitrationSimulation from "@/components/labs/simulation/AcidBaseTitrationSimulation";
+import BoylesLawSimulation from "@/components/labs/simulation/BoylesLawSimulation";
+import CharlesLawSimulation from "@/components/labs/simulation/CharlesLawSimulation";
+import PhotosynthesisRateSimulation from "@/components/labs/simulation/PhotosynthesisRateSimulation";
+import MendelianGeneticsSimulation from "@/components/labs/simulation/MendelianGeneticsSimulation";
+import MitosisCellCycleSimulation from "@/components/labs/simulation/MitosisCellCycleSimulation";
 
 export default function SimulationRoomPage() {
   const params = useParams();
-  const router = useRouter();
   const labId = (params?.id as string) || "newtons-cooling";
+
+  // Route to Ohm's Law simulation if labId matches
+  if (labId === "ohms-law") {
+    return <OhmsLawSimulation />;
+  }
+
+  // Route to Hooke's Law simulation if labId matches
+  if (labId === "hookes-law") {
+    return <HookesLawSimulation />;
+  }
+
+  if (labId === "acid-base-titration") {
+    return <AcidBaseTitrationSimulation />;
+  }
+
+  if (labId === "boyles-law") {
+    return <BoylesLawSimulation />;
+  }
+
+  if (labId === "charles-law") {
+    return <CharlesLawSimulation />;
+  }
+
+  if (labId === "photosynthesis-rate") {
+    return <PhotosynthesisRateSimulation />;
+  }
+
+  if (labId === "mendels-inheritance") {
+    return <MendelianGeneticsSimulation />;
+  }
+
+  if (labId === "mitosis-division") {
+    return <MitosisCellCycleSimulation />;
+  }
+
+  return <NewtonCoolingSimulation labId={labId} />;
+}
+
+function NewtonCoolingSimulation({ labId }: { labId: string }) {
+  const router = useRouter();
 
   // Simulator configurations
   const [initialTemp, setInitialTemp] = useState(90); // T0
@@ -76,6 +121,8 @@ export default function SimulationRoomPage() {
   // Handle setting active currentTemp base on initialTemp before start
   useEffect(() => {
     if (!isRunning && elapsedSeconds === 0) {
+      // Keep the preview thermometer synced with the slider before the simulation starts.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setCurrentTemp(initialTemp);
     }
   }, [initialTemp, isRunning, elapsedSeconds]);
@@ -273,7 +320,28 @@ export default function SimulationRoomPage() {
 
   // Save results and redirect
   const handleSaveResults = () => {
-    alert("บันทึกความคืบหน้าและประวัติผลการทดลองในโปรไฟล์ผู้ใช้สำเร็จ! 🎉");
+    if (dataPoints.length === 0) {
+      alert("ไม่พบข้อมูลการทดลองสำหรับบันทึกผล! กรุณากดเริ่มทดลองและเก็บบันทึกข้อมูลก่อน");
+      return;
+    }
+    
+    const experimentData = {
+      labId,
+      timestamp: new Date().toLocaleString("th-TH"),
+      initialTemp,
+      ambientTemp,
+      coolingConstant,
+      dataPoints,
+    };
+    
+    localStorage.setItem("scisiam_saved_cooling_experiment", JSON.stringify(experimentData));
+    
+    // Add points for completing the lab (+25 points)
+    const currentPoints = Number(localStorage.getItem("scisiam_points") || "120");
+    localStorage.setItem("scisiam_points", String(currentPoints + 25));
+    window.dispatchEvent(new Event("points-updated"));
+
+    alert("บันทึกข้อมูลการทดลอง (กราฟอุณหภูมิและตารางบันทึกผล) สำเร็จ! 🎉");
     router.push(`/labs/${labId}`);
   };
 
@@ -329,26 +397,26 @@ export default function SimulationRoomPage() {
                   onStartStop={handleStartStop}
                   onReset={handleReset}
                   onSave={handleSaveResults}
+                  onAddPoint={handleAddPoint}
                   isHeaterOn={isHeaterOn}
                   onToggleHeater={handleToggleHeater}
                 />
               </div>
             </div>
 
-            {/* Row 2: Live Graph & Log Data Table & Formula */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6.5">
-              <div className="lg:col-span-5 md:col-span-6 col-span-1 h-full">
-                <LiveGraph dataPoints={dataPoints} />
-              </div>
-              <div className="lg:col-span-4 md:col-span-6 col-span-1 h-full">
+            {/* Row 2: Log Data Table & Live Graph & Formula (Stacked horizontally/full-width) */}
+            <div className="flex flex-col gap-6.5">
+              <div className="w-full">
                 <DataTable
                   dataPoints={dataPoints}
-                  onAddPoint={handleAddPoint}
                   onExportCSV={handleExportCSV}
                   onCopyData={handleCopyData}
                 />
               </div>
-              <div className="lg:col-span-3 md:col-span-12 col-span-1 h-full">
+              <div className="w-full">
+                <LiveGraph dataPoints={dataPoints} />
+              </div>
+              <div className="w-full">
                 <FormulaCard />
               </div>
             </div>
@@ -365,28 +433,6 @@ export default function SimulationRoomPage() {
 
         </div>
       </main>
-
-      {/* 5. Custom Bottom Callout Banner */}
-      <div className="w-full max-w-4xl mx-auto px-6 py-6 select-none relative z-10">
-        <div className="relative overflow-hidden rounded-full bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-600 p-[1.5px] shadow-lg shadow-indigo-500/10 group hover:shadow-xl hover:shadow-indigo-500/15 transition-all duration-300">
-          <div className="bg-white/95 rounded-full px-8 py-3 flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-amber-500 fill-amber-300 animate-pulse shrink-0" />
-              <p className="text-xs sm:text-sm font-bold bg-gradient-to-r from-slate-700 via-slate-800 to-slate-900 bg-clip-text text-transparent leading-relaxed tracking-wide">
-                ทดลองเสร็จแล้วหรือยัง? วิเคราะห์ผลและบันทึกการเรียนรู้ของคุณได้ทันที! 🚀
-              </p>
-            </div>
-            
-            <button
-              onClick={handleSaveResults}
-              className="px-5 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-full text-xs font-bold transition-all duration-300 flex items-center gap-1 cursor-pointer active:scale-95 shadow-md shadow-indigo-500/10"
-            >
-              <span>ไปยังหน้าบันทึกผล</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </div>
-      </div>
 
     </div>
   );

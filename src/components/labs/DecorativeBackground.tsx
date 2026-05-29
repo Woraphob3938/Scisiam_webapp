@@ -42,7 +42,7 @@ export default function DecorativeBackground() {
           </div>
           
           <p className="text-xs font-bold text-yellow-900 leading-relaxed font-sans text-left mt-0.5">
-            "ทุกการทดลอง คือก้าวเล็ก ๆ ของนักวิทย์ตัวจริง!" 🚀🌟
+            &quot;ทุกการทดลอง คือก้าวเล็ก ๆ ของนักวิทย์ตัวจริง!&quot; 🚀🌟
           </p>
         </div>
       </div>

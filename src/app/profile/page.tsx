@@ -1,19 +1,16 @@
 "use client";
 
-import React, { useState } from "react";
-import Link from "next/link";
+import React, { useState, useEffect, useMemo } from "react";
+import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import Breadcrumb from "@/components/labs/Breadcrumb";
 import DecorativeBackground from "@/components/labs/DecorativeBackground";
 import Sidebar from "@/components/Sidebar";
 import { useSidebar } from "@/context/SidebarContext";
 import { 
-  Home,
   FlaskConical,
   ClipboardCheck,
   Award,
-  History,
-  User,
   Star,
   CheckCircle,
   Lock,
@@ -25,6 +22,13 @@ import {
   ChevronRight,
   BookOpen
 } from "lucide-react";
+
+interface SavedCoolingExperiment {
+  timestamp?: string;
+  initialTemp?: number;
+  ambientTemp?: number;
+  coolingConstant?: number;
+}
 
 export default function ProfilePage() {
   const { isCollapsed } = useSidebar();
@@ -38,6 +42,22 @@ export default function ProfilePage() {
       setIsEditingName(false);
     }
   };
+
+  // State to hold saved experiment from simulation
+  const [savedExperiment, setSavedExperiment] = useState<SavedCoolingExperiment | null>(null);
+
+  useEffect(() => {
+    const raw = localStorage.getItem("scisiam_saved_cooling_experiment");
+    if (raw) {
+      try {
+        // Hydrate saved local experiment after mount to avoid server/client mismatch.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setSavedExperiment(JSON.parse(raw) as SavedCoolingExperiment);
+      } catch (e) {
+        console.error("Failed to parse saved experiment", e);
+      }
+    }
+  }, []);
 
   // Mock data matching the screenshot
   const stats = [
@@ -79,44 +99,65 @@ export default function ProfilePage() {
     }
   ];
 
-  const activities = [
-    {
-      id: 1,
-      title: "ทำห้องแล็บ Newton's law of cooling สำเร็จ",
-      subtitle: "ได้รับ 25 คะแนน",
-      points: "+25",
-      time: "2 ชั่วโมงที่แล้ว",
-      icon: FlaskConical,
-      iconColor: "text-blue-500 bg-blue-50/80 border border-blue-100/50"
-    },
-    {
-      id: 2,
-      title: "ทำภารกิจ ประจำวัน สำเร็จ",
-      subtitle: "ได้รับ 15 คะแนน",
-      points: "+15",
-      time: "1 วันที่แล้ว",
-      icon: Award,
-      iconColor: "text-amber-500 bg-amber-50/80 border border-amber-100/50"
-    },
-    {
-      id: 3,
-      title: "เข้าเรียนรู้ห้องแล็บ การเคลื่อนที่แบบโปรเจกไตล์",
-      subtitle: "ได้รับ 10 คะแนน",
-      points: "+10",
-      time: "2 วันที่แล้ว",
-      icon: BookOpen,
-      iconColor: "text-blue-500 bg-blue-50/80 border border-blue-100/50"
-    },
-    {
-      id: 4,
-      title: "ทำภารกิจ นักวิทย์ตัวน้อย สำเร็จ",
-      subtitle: "ได้รับ 20 คะแนน",
-      points: "+20",
-      time: "3 วันที่แล้ว",
-      icon: CheckCircle,
-      iconColor: "text-emerald-500 bg-emerald-50/80 border border-emerald-100/50"
+  const activities = useMemo(() => {
+    const base = [
+      {
+        id: 2,
+        title: "ทำภารกิจ ประจำวัน สำเร็จ",
+        subtitle: "ได้รับ 15 คะแนน",
+        points: "+15",
+        time: "1 วันที่แล้ว",
+        icon: Award,
+        iconColor: "text-amber-500 bg-amber-50/80 border border-amber-100/50"
+      },
+      {
+        id: 3,
+        title: "เข้าเรียนรู้ห้องแล็บ การเคลื่อนที่แบบโปรเจกไตล์",
+        subtitle: "ได้รับ 10 คะแนน",
+        points: "+10",
+        time: "2 วันที่แล้ว",
+        icon: BookOpen,
+        iconColor: "text-blue-500 bg-blue-50/80 border border-blue-100/50"
+      },
+      {
+        id: 4,
+        title: "ทำภารกิจ นักวิทย์ตัวน้อย สำเร็จ",
+        subtitle: "ได้รับ 20 คะแนน",
+        points: "+20",
+        time: "3 วันที่แล้ว",
+        icon: CheckCircle,
+        iconColor: "text-emerald-500 bg-emerald-50/80 border border-emerald-100/50"
+      }
+    ];
+
+    if (savedExperiment) {
+      return [
+        {
+          id: 1,
+          title: "ทำห้องแล็บ Newton's law of cooling สำเร็จ",
+          subtitle: `บันทึกผลอุณหภูมิ (T₀=${savedExperiment.initialTemp ?? "-"}°C, Tₛ=${savedExperiment.ambientTemp ?? "-"}°C, k=${(savedExperiment.coolingConstant ?? 0).toFixed(3)})`,
+          points: "+25",
+          time: savedExperiment.timestamp || "เมื่อสักครู่",
+          icon: FlaskConical,
+          iconColor: "text-blue-500 bg-blue-50/80 border border-blue-100/50"
+        },
+        ...base
+      ];
     }
-  ];
+
+    return [
+      {
+        id: 1,
+        title: "ทำห้องแล็บ Newton's law of cooling สำเร็จ",
+        subtitle: "ได้รับ 25 คะแนน",
+        points: "+25",
+        time: "2 ชั่วโมงที่แล้ว",
+        icon: FlaskConical,
+        iconColor: "text-blue-500 bg-blue-50/80 border border-blue-100/50"
+      },
+      ...base
+    ];
+  }, [savedExperiment]);
 
   const activeMissions = [
     {
@@ -166,22 +207,20 @@ export default function ProfilePage() {
       {/* 1. Header/Navbar */}
       <Navbar />
 
-      {/* 2. Breadcrumb Navigation */}
-      <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-8 md:px-12 pt-6 pb-2 select-none z-10">
-        <Breadcrumb category="Dashboard" title="โปรไฟล์ผู้ใช้ / Profile" />
+      {/* 2. Persistent desktop sidebar */}
+      <div className="hidden lg:block">
+        <Sidebar activeMenu="โปรไฟล์" />
       </div>
 
-      {/* 3. Main Split Container */}
-      <main className="w-full px-0 py-2 relative z-10">
-        <div className="flex gap-8 items-start relative">
-          
-          {/* LEFT COLUMN: SIDEBAR MENU (col-span-3, hidden on mobile) */}
-          <div className="hidden lg:flex shrink-0 pl-0">
-            <Sidebar activeMenu="โปรไฟล์" />
-          </div>
- 
-          {/* RIGHT COLUMN: MAIN PROFILE CONTENTS (col-span-9) */}
-          <div className="flex-1 min-w-0 px-4 lg:pl-0 lg:pr-8 space-y-8">
+      <div className={`relative z-10 min-w-0 transition-[padding-left] duration-300 ${isCollapsed ? "lg:pl-[76px]" : "lg:pl-[260px]"}`}>
+        {/* 3. Breadcrumb Navigation */}
+        <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-8 md:px-12 pt-6 pb-2 select-none">
+          <Breadcrumb category="Dashboard" title="โปรไฟล์ผู้ใช้ / Profile" />
+        </div>
+
+        {/* 4. Main Profile Content */}
+        <main className="w-full px-4 py-2 lg:px-8">
+          <div className="min-w-0 space-y-8">
             
             {/* PROFILE HEADER CARD */}
             <section className="bg-gradient-to-br from-[#f0f7ff]/95 via-[#f8fbff]/90 to-[#e0f2fe]/40 backdrop-blur-xl border border-blue-100/40 rounded-[32px] p-6 sm:p-8 flex flex-col md:flex-row justify-between items-center gap-6 relative shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden">
@@ -201,7 +240,7 @@ export default function ProfilePage() {
                     className="w-24 h-24 rounded-full bg-blue-50/50 border-4 border-white shadow-md flex items-center justify-center relative overflow-hidden select-none"
                     aria-label="รูปโปรไฟล์นักเรียน"
                   >
-                    <img src="/student_avatar_3d.png" alt="Mascot Avatar" className="w-full h-full object-cover" />
+                    <Image src="/student_avatar_3d.png" alt="Mascot Avatar" fill sizes="96px" className="object-cover" />
                     <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent translate-y-[-100%] group-hover/avatar:translate-y-[100%] transition-transform duration-1000 ease-in-out" />
                   </div>
                   <button 
@@ -280,7 +319,7 @@ export default function ProfilePage() {
                   {/* Status Quote */}
                   <div className="mt-4 flex justify-center sm:justify-start">
                     <div className="bg-white/80 border border-blue-100/30 rounded-xl px-4 py-1.5 inline-flex items-center text-xs font-bold text-slate-600 italic select-none leading-normal">
-                      "เรียนรู้ทุกวัน เก่งขึ้นทุกวัน! 🚀"
+                      &quot;เรียนรู้ทุกวัน เก่งขึ้นทุกวัน! 🚀&quot;
                     </div>
                   </div>
 
@@ -475,7 +514,12 @@ export default function ProfilePage() {
                   
                   {/* Peeking Mascot Penguin */}
                   <div className="absolute -left-2 -bottom-5 w-24 h-24 select-none pointer-events-none z-10 overflow-hidden">
-                    <img src="/penguin_expressions.png" alt="Penguin mascot" className="absolute w-[300%] max-w-none left-0 top-[-5%] object-contain" />
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src="/penguin_expressions.png"
+                      alt="Penguin mascot"
+                      className="absolute left-0 top-[-5%] h-auto w-[300%] max-w-none object-contain"
+                    />
                   </div>
                   
                   <div className="flex items-center gap-4 pl-20">
@@ -511,9 +555,8 @@ export default function ProfilePage() {
             </section>
 
           </div>
-
-        </div>
-      </main>
+        </main>
+      </div>
 
     </div>
   );

@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { Atom, ArrowLeft, Radio, Cloud } from "lucide-react";
+import { Atom, ArrowLeft } from "lucide-react";
 
 interface SimulationHeroProps {
   labId: string;
@@ -27,26 +27,11 @@ export default function SimulationHero({ labId }: SimulationHeroProps) {
             <span className="px-3.5 py-1 bg-blue-50 text-blue-700 border border-blue-100 text-xs font-bold rounded-full">
               Physics
             </span>
-
-            {/* Glowing active simulator badge */}
-            <span className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs font-semibold rounded-full">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-              </span>
-              กำลังทดลอง
-            </span>
-
-            {/* Online Sync badge */}
-            <span className="flex items-center gap-1.5 px-3 py-1 bg-blue-50 border border-blue-100 text-blue-600 text-xs font-semibold rounded-full">
-              <Cloud className="w-3.5 h-3.5 animate-pulse" />
-              ออนไลน์
-            </span>
           </div>
 
           {/* Title */}
           <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-slate-800 tracking-tight mb-2">
-            Newton's law of cooling Simulation
+            Newton&apos;s law of cooling Simulation
           </h1>
 
           {/* Description */}

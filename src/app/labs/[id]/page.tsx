@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Breadcrumb from "@/components/labs/Breadcrumb";
@@ -16,23 +16,115 @@ import { labsById } from "@/data/labs";
 
 const DEFAULT_LAB_ID = "newtons-cooling";
 
+interface SavedExperiment {
+  labId: string;
+  timestamp: string;
+  initialTemp?: number;
+  ambientTemp?: number;
+  coolingConstant?: number;
+  voltage?: number;
+  resistance?: number;
+  gasMoles?: number;
+  temperature?: number;
+  pressure?: number;
+  targetTemperature?: number;
+  lightIntensity?: number;
+  carbonDioxide?: number;
+  waterLevel?: number;
+  parentA?: string;
+  parentB?: string;
+  traitLabel?: string;
+  sampleSize?: number;
+  spindleHealth?: number;
+  dnaIntegrity?: number;
+  cycleCount?: number;
+  cellCount?: number;
+  dataPoints: {
+    time?: number;
+    temp?: number;
+    ambient?: number;
+    voltage?: number;
+    current?: number;
+    volume?: number;
+    pressure?: number;
+    pv?: number;
+    temperatureC?: number;
+    kelvin?: number;
+    ratio?: number;
+    rate?: number;
+    oxygen?: number;
+    lightIntensity?: number;
+    carbonDioxide?: number;
+    waterLevel?: number;
+    genotype?: string;
+    phenotype?: string;
+    stage?: string;
+    progress?: number;
+    cycle?: number;
+    checkpoint?: number;
+    cellCount?: number;
+  }[];
+}
+
 export default function LabDetailPage() {
   const params = useParams();
   const router = useRouter();
   const labId = (params?.id as string) || DEFAULT_LAB_ID;
+  const isOhmsLaw = labId === "ohms-law";
+  const isHookesLaw = labId === "hookes-law";
+  const isAcidBase = labId === "acid-base-titration";
+  const isBoylesLaw = labId === "boyles-law";
+  const isCharlesLaw = labId === "charles-law";
+  const isPhotosynthesis = labId === "photosynthesis-rate";
+  const isMendelian = labId === "mendels-inheritance";
+  const isMitosis = labId === "mitosis-division";
 
   // Fallback to Newton's Law of Cooling as primary demo
   const lab = labsById[labId] || labsById[DEFAULT_LAB_ID];
 
+  // Saved experiment history state
+  const [savedData, setSavedData] = useState<SavedExperiment | null>(null);
+
+  useEffect(() => {
+    const key = isMitosis ? "scisiam_saved_mitosis_experiment" : isMendelian ? "scisiam_saved_mendelian_experiment" : isPhotosynthesis ? "scisiam_saved_photosynthesis_experiment" : isCharlesLaw ? "scisiam_saved_charles_experiment" : isBoylesLaw ? "scisiam_saved_boyle_experiment" : isAcidBase ? "scisiam_saved_titration_experiment" : isHookesLaw ? "scisiam_saved_hookes_experiment" : isOhmsLaw ? "scisiam_saved_ohms_experiment" : "scisiam_saved_cooling_experiment";
+    const raw = localStorage.getItem(key);
+    if (raw) {
+      try {
+        const parsed = JSON.parse(raw) as SavedExperiment;
+        if (parsed && parsed.labId === labId) {
+          // eslint-disable-next-line react-hooks/set-state-in-effect
+          setSavedData(parsed);
+        }
+      } catch (e) {
+        console.error("Failed to parse saved experiment", e);
+      }
+    } else {
+      setSavedData(null);
+    }
+  }, [labId, isAcidBase, isBoylesLaw, isCharlesLaw, isHookesLaw, isMendelian, isMitosis, isOhmsLaw, isPhotosynthesis]);
+
+  const handleClearSavedData = () => {
+    if (confirm("คุณต้องการลบประวัติผลการทดลองที่บันทึกไว้ล่าสุดหรือไม่?")) {
+      const key = isMitosis ? "scisiam_saved_mitosis_experiment" : isMendelian ? "scisiam_saved_mendelian_experiment" : isPhotosynthesis ? "scisiam_saved_photosynthesis_experiment" : isCharlesLaw ? "scisiam_saved_charles_experiment" : isBoylesLaw ? "scisiam_saved_boyle_experiment" : isAcidBase ? "scisiam_saved_titration_experiment" : isHookesLaw ? "scisiam_saved_hookes_experiment" : isOhmsLaw ? "scisiam_saved_ohms_experiment" : "scisiam_saved_cooling_experiment";
+      localStorage.removeItem(key);
+      setSavedData(null);
+    }
+  };
+
   // Simulation states
   const [showSimModal, setShowSimModal] = useState(false);
-  const [simProgress, setSimProgress] = useState(0);
-  const [simStage, setSimStage] = useState("");
+  const [simProgress] = useState(0);
+  const [simStage] = useState("");
   
   // Real-time Interactive Simulator Inputs
   const [initialTemp, setInitialTemp] = useState(90); // T0 (60 - 100)
   const [ambientTemp, setAmbientTemp] = useState(25); // Ts (10 - 40)
   const [coolingConstant, setCoolingConstant] = useState(0.04); // k (0.01 - 0.1)
+
+  // Ohm's law inputs
+  const [ohmsVoltage, setOhmsVoltage] = useState(12.0); // V (0 - 24)
+  const [ohmsResistance, setOhmsResistance] = useState(100.0); // R (10 - 500)
+  const ohmsCurrent = useMemo(() => ohmsVoltage / ohmsResistance, [ohmsVoltage, ohmsResistance]);
   
   const chartPoints = useMemo(() => {
     const totalTime = 60;
@@ -76,6 +168,68 @@ export default function LabDetailPage() {
 
   const ambientY = tempToSvgY(ambientTemp);
 
+  // Ohm's law preview paths
+  const ohmsPreviewLinePath = useMemo(() => {
+    const endY = 100 - ((24 / ohmsResistance) / 2.5) * 90;
+    return `M20,100 L180,${endY}`;
+  }, [ohmsResistance]);
+
+  const ohmsPreviewAreaPath = useMemo(() => {
+    const endY = 100 - ((24 / ohmsResistance) / 2.5) * 90;
+    return `M20,100 L180,${endY} L180,100 Z`;
+  }, [ohmsResistance]);
+
+  const savedSvgPath = useMemo(() => {
+    if (!savedData || savedData.dataPoints.length === 0) return "";
+    if (isBoylesLaw) {
+      return savedData.dataPoints
+        .map((p, i) => `${i === 0 ? "M" : "L"}${20 + (((p.volume ?? 250) - 250) / 550) * 160},${100 - (((p.pressure ?? 55) - 55) / 185) * 90}`)
+        .join(" ");
+    }
+    if (isCharlesLaw) {
+      return savedData.dataPoints
+        .map((p, i) => `${i === 0 ? "M" : "L"}${20 + ((p.temperatureC ?? 0) / 90) * 160},${100 - (((p.volume ?? 430) - 430) / 230) * 90}`)
+        .join(" ");
+    }
+    if (isPhotosynthesis) {
+      return savedData.dataPoints
+        .map((p, i) => `${i === 0 ? "M" : "L"}${20 + ((p.time ?? 0) / 10) * 160},${100 - ((p.rate ?? 0) / 100) * 90}`)
+        .join(" ");
+    }
+    if (isMendelian) {
+      const total = Math.max(1, savedData.dataPoints.length);
+      let dominant = 0;
+      return savedData.dataPoints
+        .map((p, i) => {
+          if (p.phenotype === "เด่น") dominant += 1;
+          const x = 20 + (i / Math.max(1, total - 1)) * 160;
+          const y = 100 - (dominant / (i + 1)) * 90;
+          return `${i === 0 ? "M" : "L"}${x},${y}`;
+        })
+        .join(" ");
+    }
+    if (isMitosis) {
+      return savedData.dataPoints
+        .map((p, i) => `${i === 0 ? "M" : "L"}${20 + (i / Math.max(1, savedData.dataPoints.length - 1)) * 160},${100 - ((p.progress ?? 0) / 100) * 90}`)
+        .join(" ");
+    }
+    if (isOhmsLaw) {
+      return savedData.dataPoints
+        .map((p, i) => `${i === 0 ? "M" : "L"}${20 + ((p.voltage ?? 0) / 24) * 160},${100 - ((p.current ?? 0) / 2.5) * 90}`)
+        .join(" ");
+    }
+    return savedData.dataPoints
+      .map((p, i) => `${i === 0 ? "M" : "L"}${timeToSvgX(p.time ?? 0)},${tempToSvgY(p.temp ?? 0)}`)
+      .join(" ");
+  }, [savedData, isBoylesLaw, isCharlesLaw, isMendelian, isMitosis, isOhmsLaw, isPhotosynthesis]);
+
+  const savedAmbientPath = useMemo(() => {
+    if (!savedData || savedData.dataPoints.length === 0 || isBoylesLaw || isCharlesLaw || isOhmsLaw || isPhotosynthesis || isMendelian || isMitosis) return "";
+    return savedData.dataPoints
+      .map((p, i) => `${i === 0 ? "M" : "L"}${timeToSvgX(p.time ?? 0)},${tempToSvgY(p.ambient ?? 0)}`)
+      .join(" ");
+  }, [savedData, isBoylesLaw, isCharlesLaw, isMendelian, isMitosis, isOhmsLaw, isPhotosynthesis]);
+
   return (
     <div className="flex flex-col min-h-screen bg-[#f8fafc] relative pb-12 overflow-hidden">
       {/* 1. Header/Navbar */}
@@ -88,6 +242,7 @@ export default function LabDetailPage() {
 
       {/* 3. Hero Section Details */}
       <LabHero
+        labId={labId}
         title={lab.title}
         category={lab.category}
         status={lab.status}
@@ -108,7 +263,39 @@ export default function LabDetailPage() {
                 icon={ClipboardList}
                 iconBg="bg-blue-50"
                 iconColor="text-blue-600"
-                bullets={[
+                bullets={isMitosis ? [
+                  "ศึกษาลำดับระยะของวัฏจักรเซลล์และการแบ่งนิวเคลียสแบบไมโทซิส",
+                  "สังเกตการขดตัว การเรียงตัว และการแยกของโครโมโซมในแต่ละระยะ",
+                  "วิเคราะห์บทบาทของ checkpoint ที่ช่วยลดข้อผิดพลาดระหว่างการแบ่งเซลล์"
+                ] : isMendelian ? [
+                  "ศึกษาการถ่ายทอดลักษณะทางพันธุกรรมแบบยีนเดียวตามกฎของเมนเดล",
+                  "ใช้ตาราง Punnett คาดการณ์จีโนไทป์และฟีโนไทป์ของรุ่นลูก",
+                  "เปรียบเทียบสัดส่วนที่สุ่มได้กับสัดส่วนทางทฤษฎี เช่น 3:1 หรือ 1:2:1"
+                ] : isPhotosynthesis ? [
+                  "ศึกษาปัจจัยที่มีผลต่ออัตราการสังเคราะห์แสง ได้แก่ ความเข้มแสง CO₂ อุณหภูมิ และน้ำ",
+                  "ติดตามการเกิดออกซิเจนใน chamber พืชแบบปิดเพื่อประเมินอัตราปฏิกิริยา",
+                  "เปรียบเทียบกราฟ rate-time เพื่อระบุปัจจัยจำกัดของกระบวนการสังเคราะห์แสง"
+                ] : isCharlesLaw ? [
+                  "ศึกษาความสัมพันธ์เชิงเส้นระหว่างอุณหภูมิสัมบูรณ์ (T) และปริมาตร (V) ของแก๊สที่ความดันคงที่",
+                  "ปรับอุณหภูมิของอ่างน้ำควบคุมและสังเกตการขยายตัวของแก๊สในกระบอกลูกสูบ",
+                  "สร้างกราฟ V-T และตรวจสอบว่าอัตราส่วน V/T มีค่าใกล้คงที่ตามกฎของชาร์ล"
+                ] : isBoylesLaw ? [
+                  "ศึกษาความสัมพันธ์ผกผันระหว่างความดัน (P) และปริมาตร (V) ของแก๊สที่อุณหภูมิคงที่",
+                  "ปรับลูกสูบในกระบอกแก๊สเพื่อเปลี่ยนปริมาตรและสังเกตค่าความดันจากเกจ",
+                  "สร้างกราฟ P-V และตรวจสอบว่าผลคูณ PV มีค่าใกล้คงที่ตามกฎของบอยล์"
+                ] : isAcidBase ? [
+                  "ศึกษากระบวนการไทเทรตกรด-เบสด้วยบิวเรต ขวดรูปชมพู่ และอินดิเคเตอร์",
+                  "ติดตามค่า pH และการเปลี่ยนสีของสารละลายเมื่อหยดสารมาตรฐานลงทีละช่วง",
+                  "วิเคราะห์จุดสมมูลจากกราฟ pH-volume เพื่อหาความเข้มข้นของสารตัวอย่าง"
+                ] : isHookesLaw ? [
+                  "ศึกษาความสัมพันธ์ระหว่างแรงดึง (F) กับระยะยืดของสปริง (x)",
+                  "เพิ่มตุ้มน้ำหนักทีละขั้นและวัดระยะยืดของสปริงจากตำแหน่งสมดุล",
+                  "สร้างกราฟ F-x เพื่อหาค่าคงที่สปริง (k) จากความชันของเส้นกราฟ"
+                ] : isOhmsLaw ? [
+                  "ศึกษาความสัมพันธ์ของกระแสไฟฟ้า แรงดันไฟฟ้า และความต้านทานไฟฟ้า",
+                  "ปรับค่าแรงดันตกคร่อมตัวต้านทานและบันทึกกระแสไฟฟ้าที่ไหลผ่าน",
+                  "สร้างกราฟความสัมพันธ์ระหว่างแรงดันและกระแสเพื่อยืนยันกฎของโอห์ม"
+                ] : [
                   "ศึกษาการลดลงของอุณหภูมิของวัตถุร้อนในสภาพแวดล้อมควบคุมความเย็น",
                   "เก็บข้อมูลอุณหภูมิของวัตถุตามช่วงเวลาเพื่อสังเกตแนวโน้ม",
                   "วิเคราะห์และเปรียบเทียบผลลัพธ์กับสมการของกฎการเย็นตัวของนิวตัน"
@@ -119,7 +306,39 @@ export default function LabDetailPage() {
                 icon={Target}
                 iconBg="bg-emerald-50"
                 iconColor="text-emerald-600"
-                bullets={[
+                bullets={isMitosis ? [
+                  "จำแนกระยะ Interphase, Prophase, Metaphase, Anaphase, Telophase และ Cytokinesis ได้",
+                  "อธิบายการแยกโครมาทิดและการเกิดเซลล์ลูกที่มีชุดโครโมโซมเหมือนเดิมได้",
+                  "เชื่อมโยง checkpoint กับความถูกต้องของการแบ่งเซลล์ได้"
+                ] : isMendelian ? [
+                  "อธิบายความแตกต่างของ genotype และ phenotype ได้อย่างถูกต้อง",
+                  "คำนวณและตีความผลจากตาราง Punnett สำหรับการผสมแบบ monohybrid ได้",
+                  "วิเคราะห์ความคลาดเคลื่อนระหว่างผลสุ่มกับค่าทฤษฎีเมื่อจำนวนตัวอย่างเปลี่ยนได้"
+                ] : isPhotosynthesis ? [
+                  "อธิบายสมการสังเคราะห์แสงและบทบาทของแสง CO₂ และน้ำได้",
+                  "อ่านค่าอัตราการเกิดออกซิเจนและตีความสภาวะที่เหมาะสมของพืชได้",
+                  "วิเคราะห์แนวคิดปัจจัยจำกัดเมื่อปรับตัวแปรแวดล้อมทีละตัวได้"
+                ] : isCharlesLaw ? [
+                  "อธิบายกฎของชาร์ล V₁/T₁ = V₂/T₂ ได้เมื่อความดันและจำนวนโมลคงที่",
+                  "อ่านค่าอุณหภูมิ ปริมาตร และแปลงอุณหภูมิเป็นหน่วยเคลวินได้ถูกต้อง",
+                  "วิเคราะห์กราฟเส้นตรง V-T และตรวจสอบค่า V/T จากข้อมูลทดลองได้"
+                ] : isBoylesLaw ? [
+                  "อธิบายกฎของบอยล์ P₁V₁ = P₂V₂ ได้เมื่ออุณหภูมิและจำนวนโมลคงที่",
+                  "อ่านค่าปริมาตรกระบอกแก๊สและความดันจากเกจเพื่อบันทึกข้อมูลได้",
+                  "วิเคราะห์กราฟความสัมพันธ์ผกผันและตรวจสอบค่า PV จากข้อมูลทดลองได้"
+                ] : isAcidBase ? [
+                  "อธิบายหลักสโตอิชิโอเมทรีของปฏิกิริยากรด-เบสที่จุดสมมูลได้",
+                  "อ่านค่า pH และปริมาตรสารมาตรฐานจากบิวเรตเพื่อคำนวณความเข้มข้นได้",
+                  "ตีความรูปทรงกราฟไทเทรชันและช่วงเปลี่ยนสีของอินดิเคเตอร์ได้อย่างถูกต้อง"
+                ] : isHookesLaw ? [
+                  "อธิบายหลักการของกฎของฮุค F = -kx ได้อย่างถูกต้อง",
+                  "รู้วิธีติดตั้งอุปกรณ์สปริง ตุ้มน้ำหนัก และวัดระยะยืดอย่างแม่นยำ",
+                  "สามารถคำนวณค่าคงที่สปริง (k) จากความชันของกราฟ F-x ได้"
+                ] : isOhmsLaw ? [
+                  "อธิบายความสัมพันธ์ตามกฎของโอห์ม V = I x R ได้อย่างถูกต้อง",
+                  "รู้วิธีต่อและใช้งานเครื่องจ่ายแรงดัน แอมมิเตอร์ และโวลต์มิเตอร์ในวงจรปิด",
+                  "สามารถคำนวณและวิเคราะห์ความต้านทานจากความชัน (Slope) ของกราฟได้"
+                ] : [
                   "อธิบายหลักทฤษฎีกฎการเย็นตัวของนิวตันได้อย่างถูกต้อง",
                   "รู้วิธีเก็บและบันทึกข้อมูลอุณหภูมิในระบบแล็บฟิสิกส์ได้อย่างแม่นยำ",
                   "สามารถวิเคราะห์เส้นโค้งกราฟและตีความค่าคงที่อัตราการเย็นตัวได้"
@@ -128,18 +347,334 @@ export default function LabDetailPage() {
             </div>
 
             {/* Equipment checklist section */}
-            <EquipmentList />
+            <EquipmentList labId={labId} />
 
             {/* Timelines Steps progress */}
-            <ExperimentSteps />
+            <ExperimentSteps labId={labId} />
 
             {/* Theoretical formulas and graph */}
-            <TheoryCard />
+            <TheoryCard labId={labId} />
+            {/* 4. Saved Experiment Results (Only if exists in localStorage) */}
+            {savedData && (
+              <div className="bg-white rounded-[24px] border border-slate-200/70 p-5 sm:p-6 shadow-xl shadow-slate-100/30 hover:shadow-2xl transition-all duration-300">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-5 border-b border-slate-100 pb-3 gap-3">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="w-5.5 h-5.5 text-emerald-500 animate-pulse" />
+                    <div className="text-left">
+                      <h2 className="text-base sm:text-lg font-bold text-slate-800">
+                        ผลการทดลองล่าสุดที่บันทึกไว้
+                      </h2>
+                      <p className="text-[10px] sm:text-xs text-slate-400 font-semibold mt-0.5">
+                        บันทึกเมื่อ: {savedData.timestamp}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={handleClearSavedData}
+                    className="text-xs font-bold text-red-500 bg-red-50 hover:bg-red-100 border border-red-100/60 px-3 py-1.5 rounded-xl cursor-pointer active:scale-95 transition-all"
+                  >
+                    ลบข้อมูลที่บันทึก
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
+                  
+                  {/* Left column: SVG Line Graph */}
+                  <div className="bg-slate-950 rounded-2xl border border-slate-800 p-4 select-none flex flex-col justify-between">
+                    <div className="flex items-center justify-between text-[9px] text-slate-500 font-bold border-b border-slate-900 pb-1.5 mb-2">
+                      <span>SAVED EXPERIMENT GRAPH</span>
+                      {isOhmsLaw ? (
+                        <span className="text-emerald-400">V_max = {savedData.voltage}V | R = {savedData.resistance}Ω</span>
+                      ) : isBoylesLaw ? (
+                        <span className="text-emerald-400">n = {(savedData.gasMoles ?? 0).toFixed(3)} mol | T = {savedData.temperature ?? "-"}°C</span>
+                      ) : isCharlesLaw ? (
+                        <span className="text-emerald-400">n = {(savedData.gasMoles ?? 0).toFixed(3)} mol | P = {savedData.pressure ?? "-"} kPa</span>
+                      ) : isPhotosynthesis ? (
+                        <span className="text-emerald-400">Light = {savedData.lightIntensity ?? "-"}% | CO₂ = {savedData.carbonDioxide ?? "-"} ppm</span>
+                      ) : isMendelian ? (
+                        <span className="text-emerald-400">{savedData.parentA ?? "-"} × {savedData.parentB ?? "-"} | n = {savedData.dataPoints.length}</span>
+                      ) : isMitosis ? (
+                        <span className="text-emerald-400">Cells = {savedData.cellCount ?? "-"} | Checkpoint = {savedData.spindleHealth ?? "-"}%</span>
+                      ) : (
+                        <span className="text-emerald-400">T₀ = {savedData.initialTemp}°C | Tₛ = {savedData.ambientTemp}°C | k = {(savedData.coolingConstant ?? 0).toFixed(3)}</span>
+                      )}
+                    </div>
+
+                    <svg className="w-full h-44" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      {/* Grid Lines */}
+                      <line x1="20" y1="10" x2="180" y2="10" stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
+                      <line x1="20" y1="32.5" x2="180" y2="32.5" stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
+                      <line x1="20" y1="55" x2="180" y2="55" stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
+                      <line x1="20" y1="77.5" x2="180" y2="77.5" stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
+                      <line x1="20" y1="100" x2="180" y2="100" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
+
+                      {/* Axes metrics */}
+                      {isOhmsLaw ? (
+                        <>
+                          <text x="17" y="12.5" fill="#475569" fontSize="6.5" fontWeight="bold" textAnchor="end">2.5A</text>
+                          <text x="17" y="35" fill="#475569" fontSize="6.5" fontWeight="bold" textAnchor="end">2.0A</text>
+                          <text x="17" y="57.5" fill="#475569" fontSize="6.5" fontWeight="bold" textAnchor="end">1.5A</text>
+                          <text x="17" y="80" fill="#475569" fontSize="6.5" fontWeight="bold" textAnchor="end">1.0A</text>
+                        </>
+                      ) : isCharlesLaw ? (
+                        <>
+                          <text x="17" y="12.5" fill="#475569" fontSize="6.5" fontWeight="bold" textAnchor="end">660ml</text>
+                          <text x="17" y="35" fill="#475569" fontSize="6.5" fontWeight="bold" textAnchor="end">600ml</text>
+                          <text x="17" y="57.5" fill="#475569" fontSize="6.5" fontWeight="bold" textAnchor="end">545ml</text>
+                          <text x="17" y="80" fill="#475569" fontSize="6.5" fontWeight="bold" textAnchor="end">485ml</text>
+                        </>
+                      ) : isPhotosynthesis ? (
+                        <>
+                          <text x="17" y="12.5" fill="#475569" fontSize="6.5" fontWeight="bold" textAnchor="end">100%</text>
+                          <text x="17" y="35" fill="#475569" fontSize="6.5" fontWeight="bold" textAnchor="end">75%</text>
+                          <text x="17" y="57.5" fill="#475569" fontSize="6.5" fontWeight="bold" textAnchor="end">50%</text>
+                          <text x="17" y="80" fill="#475569" fontSize="6.5" fontWeight="bold" textAnchor="end">25%</text>
+                        </>
+                      ) : isMendelian || isMitosis ? (
+                        <>
+                          <text x="17" y="12.5" fill="#475569" fontSize="6.5" fontWeight="bold" textAnchor="end">100%</text>
+                          <text x="17" y="35" fill="#475569" fontSize="6.5" fontWeight="bold" textAnchor="end">75%</text>
+                          <text x="17" y="57.5" fill="#475569" fontSize="6.5" fontWeight="bold" textAnchor="end">50%</text>
+                          <text x="17" y="80" fill="#475569" fontSize="6.5" fontWeight="bold" textAnchor="end">25%</text>
+                        </>
+                      ) : (
+                        <>
+                          <text x="17" y="12.5" fill="#475569" fontSize="6.5" fontWeight="bold" textAnchor="end">100°C</text>
+                          <text x="17" y="35" fill="#475569" fontSize="6.5" fontWeight="bold" textAnchor="end">75°C</text>
+                          <text x="17" y="57.5" fill="#475569" fontSize="6.5" fontWeight="bold" textAnchor="end">50°C</text>
+                          <text x="17" y="80" fill="#475569" fontSize="6.5" fontWeight="bold" textAnchor="end">25°C</text>
+                        </>
+                      )}
+
+                      {/* Ambient baseline (dashed) */}
+                      {!isBoylesLaw && !isCharlesLaw && !isPhotosynthesis && !isMendelian && !isMitosis && !isOhmsLaw && (
+                        <path d={savedAmbientPath} stroke="#10b981" strokeWidth="1.25" strokeDasharray="3 2" fill="none" opacity="0.8" />
+                      )}
+                      
+                      {/* Curve / line (solid) */}
+                      <path d={savedSvgPath} stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" fill="none" />
+                      
+                      {/* Data Points overlay circles */}
+                      {savedData.dataPoints.map((p, idx) => {
+                        const cx = isBoylesLaw ? (20 + (((p.volume ?? 250) - 250) / 550) * 160) : isCharlesLaw ? (20 + ((p.temperatureC ?? 0) / 90) * 160) : isPhotosynthesis ? (20 + ((p.time ?? 0) / 10) * 160) : isMendelian || isMitosis ? (20 + (idx / Math.max(1, savedData.dataPoints.length - 1)) * 160) : isOhmsLaw ? (20 + ((p.voltage ?? 0) / 24) * 160) : timeToSvgX(p.time ?? 0);
+                        const cy = isBoylesLaw ? (100 - (((p.pressure ?? 55) - 55) / 185) * 90) : isCharlesLaw ? (100 - (((p.volume ?? 430) - 430) / 230) * 90) : isPhotosynthesis ? (100 - ((p.rate ?? 0) / 100) * 90) : isMendelian ? (100 - (savedData.dataPoints.slice(0, idx + 1).filter((point) => point.phenotype === "เด่น").length / (idx + 1)) * 90) : isMitosis ? (100 - ((p.progress ?? 0) / 100) * 90) : isOhmsLaw ? (100 - ((p.current ?? 0) / 2.5) * 90) : tempToSvgY(p.temp ?? 0);
+                        return (
+                          <circle
+                            key={idx}
+                            cx={cx}
+                            cy={cy}
+                            r="1.5"
+                            fill="#ffffff"
+                            stroke="#3b82f6"
+                            strokeWidth="1"
+                          />
+                        );
+                      })}
+
+                      {/* Horizontal axis time line */}
+                      <line x1="20" y1="110" x2="180" y2="110" stroke="rgba(255,255,255,0.15)" strokeWidth="1" />
+                      {isBoylesLaw ? (
+                        <>
+                          <text x="20" y="118" fill="#94a3b8" fontSize="6" fontWeight="bold" textAnchor="middle">250</text>
+                          <text x="100" y="118" fill="#94a3b8" fontSize="6" fontWeight="bold" textAnchor="middle">525</text>
+                          <text x="180" y="118" fill="#94a3b8" fontSize="6" fontWeight="bold" textAnchor="middle">800</text>
+                          <text x="195" y="118" fill="#94a3b8" fontSize="6" fontWeight="bold">ml</text>
+                        </>
+                      ) : isCharlesLaw ? (
+                        <>
+                          <text x="20" y="118" fill="#94a3b8" fontSize="6" fontWeight="bold" textAnchor="middle">0</text>
+                          <text x="100" y="118" fill="#94a3b8" fontSize="6" fontWeight="bold" textAnchor="middle">45</text>
+                          <text x="180" y="118" fill="#94a3b8" fontSize="6" fontWeight="bold" textAnchor="middle">90</text>
+                          <text x="195" y="118" fill="#94a3b8" fontSize="6" fontWeight="bold">°C</text>
+                        </>
+                      ) : isPhotosynthesis ? (
+                        <>
+                          <text x="20" y="118" fill="#94a3b8" fontSize="6" fontWeight="bold" textAnchor="middle">0</text>
+                          <text x="100" y="118" fill="#94a3b8" fontSize="6" fontWeight="bold" textAnchor="middle">5</text>
+                          <text x="180" y="118" fill="#94a3b8" fontSize="6" fontWeight="bold" textAnchor="middle">10</text>
+                          <text x="195" y="118" fill="#94a3b8" fontSize="6" fontWeight="bold">min</text>
+                        </>
+                      ) : isMendelian || isMitosis ? (
+                        <>
+                          <text x="20" y="118" fill="#94a3b8" fontSize="6" fontWeight="bold" textAnchor="middle">start</text>
+                          <text x="100" y="118" fill="#94a3b8" fontSize="6" fontWeight="bold" textAnchor="middle">mid</text>
+                          <text x="180" y="118" fill="#94a3b8" fontSize="6" fontWeight="bold" textAnchor="middle">end</text>
+                        </>
+                      ) : isOhmsLaw ? (
+                        <>
+                          <text x="20" y="118" fill="#94a3b8" fontSize="6" fontWeight="bold" textAnchor="middle">0</text>
+                          <text x="60" y="118" fill="#94a3b8" fontSize="6" fontWeight="bold" textAnchor="middle">6</text>
+                          <text x="100" y="118" fill="#94a3b8" fontSize="6" fontWeight="bold" textAnchor="middle">12</text>
+                          <text x="140" y="118" fill="#94a3b8" fontSize="6" fontWeight="bold" textAnchor="middle">18</text>
+                          <text x="180" y="118" fill="#94a3b8" fontSize="6" fontWeight="bold" textAnchor="middle">24</text>
+                          <text x="195" y="118" fill="#94a3b8" fontSize="6" fontWeight="bold">แรงดัน (V)</text>
+                        </>
+                      ) : (
+                        <>
+                          <text x="180" y="118" fill="#94a3b8" fontSize="6" fontWeight="bold" textAnchor="middle">60</text>
+                          <text x="195" y="118" fill="#94a3b8" fontSize="6" fontWeight="bold">นาที</text>
+                        </>
+                      )}
+                    </svg>
+
+                    <div className="flex items-center justify-center gap-4 mt-2 text-[9px] font-bold text-slate-500 select-none">
+                      {isBoylesLaw ? (
+                        <div className="flex items-center gap-1.5">
+                          <span className="w-2.5 h-0.5 bg-blue-500 rounded-full" />
+                          <span>ความดันแก๊ส (P)</span>
+                        </div>
+                      ) : isCharlesLaw ? (
+                        <div className="flex items-center gap-1.5">
+                          <span className="w-2.5 h-0.5 bg-blue-500 rounded-full" />
+                          <span>ปริมาตรแก๊ส (V)</span>
+                        </div>
+                      ) : isPhotosynthesis ? (
+                        <div className="flex items-center gap-1.5">
+                          <span className="w-2.5 h-0.5 bg-blue-500 rounded-full" />
+                          <span>อัตราการสังเคราะห์แสง</span>
+                        </div>
+                      ) : isMendelian ? (
+                        <div className="flex items-center gap-1.5">
+                          <span className="w-2.5 h-0.5 bg-blue-500 rounded-full" />
+                          <span>สัดส่วนลักษณะเด่นสะสม</span>
+                        </div>
+                      ) : isMitosis ? (
+                        <div className="flex items-center gap-1.5">
+                          <span className="w-2.5 h-0.5 bg-blue-500 rounded-full" />
+                          <span>ความคืบหน้าแต่ละระยะ</span>
+                        </div>
+                      ) : isOhmsLaw ? (
+                        <div className="flex items-center gap-1.5">
+                          <span className="w-2.5 h-0.5 bg-blue-500 rounded-full" />
+                          <span>กระแสไฟฟ้า (I)</span>
+                        </div>
+                      ) : (
+                        <>
+                          <div className="flex items-center gap-1.5">
+                            <span className="w-2.5 h-0.5 bg-blue-500 rounded-full" />
+                            <span>อุณหภูมิวัตถุ (T)</span>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="w-2.5 h-0.5 border-t border-dashed border-emerald-500" />
+                            <span>อุณหภูมิแวดล้อม (Tₛ)</span>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Right column: Data Table */}
+                  <div className="border border-slate-100 rounded-2xl bg-slate-50/20 p-4 flex flex-col justify-between max-h-[220px]">
+                    <div className="overflow-x-auto overflow-y-auto flex-1">
+                      <table className="w-full text-left border-collapse">
+                        <thead>
+                          <tr className="bg-slate-100 border-b border-slate-200 text-slate-500 font-bold text-[10px] sm:text-xs">
+                            {isOhmsLaw ? (
+                              <>
+                                <th className="py-2 px-3">จุดวัด</th>
+                                <th className="py-2 px-3">แรงดัน (V)</th>
+                                <th className="py-2 px-3">กระแสไฟฟ้า (A)</th>
+                              </>
+                            ) : isBoylesLaw ? (
+                              <>
+                                <th className="py-2 px-3">จุดวัด</th>
+                                <th className="py-2 px-3">ปริมาตร (ml)</th>
+                                <th className="py-2 px-3">ความดัน (kPa)</th>
+                              </>
+                            ) : isCharlesLaw ? (
+                              <>
+                                <th className="py-2 px-3">จุดวัด</th>
+                                <th className="py-2 px-3">อุณหภูมิ (°C)</th>
+                                <th className="py-2 px-3">ปริมาตร (ml)</th>
+                              </>
+                            ) : isPhotosynthesis ? (
+                              <>
+                                <th className="py-2 px-3">เวลา (นาที)</th>
+                                <th className="py-2 px-3">Rate (%)</th>
+                                <th className="py-2 px-3">O₂</th>
+                              </>
+                            ) : isMendelian ? (
+                              <>
+                                <th className="py-2 px-3">ลำดับ</th>
+                                <th className="py-2 px-3">Genotype</th>
+                                <th className="py-2 px-3">Phenotype</th>
+                              </>
+                            ) : isMitosis ? (
+                              <>
+                                <th className="py-2 px-3">Cycle</th>
+                                <th className="py-2 px-3">Stage</th>
+                                <th className="py-2 px-3">Checkpoint</th>
+                              </>
+                            ) : (
+                              <>
+                                <th className="py-2 px-3">เวลา (นาที)</th>
+                                <th className="py-2 px-3">อุณหภูมิวัตถุ (°C)</th>
+                                <th className="py-2 px-3">อุณหภูมิสิ่งแวดล้อม (°C)</th>
+                              </>
+                            )}
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 text-[10px] sm:text-xs font-semibold text-slate-600">
+                          {savedData.dataPoints.map((p, idx) => (
+                            <tr key={idx} className="hover:bg-slate-100/50 transition-colors">
+                              {isOhmsLaw ? (
+                                <>
+                                  <td className="py-1.5 px-3 font-mono">#{idx + 1}</td>
+                                  <td className="py-1.5 px-3 font-mono text-rose-600">{(p.voltage ?? 0).toFixed(1)} V</td>
+                                  <td className="py-1.5 px-3 font-mono text-blue-600">{(p.current ?? 0).toFixed(3)} A</td>
+                                </>
+                              ) : isBoylesLaw ? (
+                                <>
+                                  <td className="py-1.5 px-3 font-mono">#{idx + 1}</td>
+                                  <td className="py-1.5 px-3 font-mono text-blue-600">{(p.volume ?? 0).toFixed(0)} ml</td>
+                                  <td className="py-1.5 px-3 font-mono text-cyan-600">{(p.pressure ?? 0).toFixed(1)} kPa</td>
+                                </>
+                              ) : isCharlesLaw ? (
+                                <>
+                                  <td className="py-1.5 px-3 font-mono">#{idx + 1}</td>
+                                  <td className="py-1.5 px-3 font-mono text-orange-600">{(p.temperatureC ?? 0).toFixed(1)} °C</td>
+                                  <td className="py-1.5 px-3 font-mono text-cyan-600">{(p.volume ?? 0).toFixed(1)} ml</td>
+                                </>
+                              ) : isPhotosynthesis ? (
+                                <>
+                                  <td className="py-1.5 px-3 font-mono">{(p.time ?? 0).toFixed(1)}</td>
+                                  <td className="py-1.5 px-3 font-mono text-emerald-600">{(p.rate ?? 0).toFixed(1)}%</td>
+                                  <td className="py-1.5 px-3 font-mono text-cyan-600">{(p.oxygen ?? 0).toFixed(1)}</td>
+                                </>
+                              ) : isMendelian ? (
+                                <>
+                                  <td className="py-1.5 px-3 font-mono">#{idx + 1}</td>
+                                  <td className="py-1.5 px-3 font-mono text-violet-600">{p.genotype ?? "-"}</td>
+                                  <td className="py-1.5 px-3 text-emerald-600">{p.phenotype ?? "-"}</td>
+                                </>
+                              ) : isMitosis ? (
+                                <>
+                                  <td className="py-1.5 px-3 font-mono">{p.cycle ?? idx + 1}</td>
+                                  <td className="py-1.5 px-3 text-cyan-600">{p.stage ?? "-"}</td>
+                                  <td className="py-1.5 px-3 font-mono text-violet-600">{p.checkpoint ?? 0}%</td>
+                                </>
+                              ) : (
+                                <>
+                                  <td className="py-1.5 px-3 font-mono">{(p.time ?? 0).toFixed(1)}</td>
+                                  <td className="py-1.5 px-3 font-mono text-rose-600">{(p.temp ?? 0).toFixed(1)}</td>
+                                  <td className="py-1.5 px-3 font-mono text-blue-600">{(p.ambient ?? 0).toFixed(1)}</td>
+                                </>
+                              )}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Right Sidebar Column (30%) */}
           <div className="lg:col-span-4 lg:sticky lg:top-24 self-start">
-            <LabSidebar />
+            <LabSidebar labId={labId} />
           </div>
 
         </div>
@@ -157,7 +692,9 @@ export default function LabDetailPage() {
             <div className="px-6 py-4 bg-slate-50/80 border-b border-slate-100 flex justify-between items-center select-none backdrop-blur-md">
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-blue-600 animate-pulse" />
-                <span className="text-xs sm:text-sm font-bold text-slate-700 leading-relaxed">เครื่องทดลองเย็นตัวจำลองเสมือนจริง</span>
+                <span className="text-xs sm:text-sm font-bold text-slate-700 leading-relaxed">
+                  {isOhmsLaw ? "เครื่องจำลองวงจรไฟฟ้ากระแสตรงเสมือนจริง" : "เครื่องทดลองเย็นตัวจำลองเสมือนจริง"}
+                </span>
               </div>
               <button 
                 onClick={closeModal}
@@ -203,7 +740,9 @@ export default function LabDetailPage() {
                     <div className="flex-1 min-w-0">
                       <h4 className="text-sm font-bold leading-normal">จำลองระบบทำงานเรียบร้อย!</h4>
                       <p className="text-xs text-emerald-700/90 font-medium mt-0.5 leading-relaxed break-words">
-                        ลองปรับตั้งค่าตัวแปรจำลองด้านล่าง เพื่อดูการฟิตติ้งเส้นโค้งอุณหภูมิตามกฎนิวตันในทันที
+                        {isOhmsLaw 
+                          ? "ลองปรับตั้งค่าตัวแปรจำลองด้านล่าง เพื่อดูความชันของเส้นกราฟตามกฎของโอห์มในทันที"
+                          : "ลองปรับตั้งค่าตัวแปรจำลองด้านล่าง เพื่อดูการฟิตติ้งเส้นโค้งอุณหภูมิตามกฎนิวตันในทันที"}
                       </p>
                     </div>
                   </div>
@@ -211,82 +750,147 @@ export default function LabDetailPage() {
                   {/* Two Column Layout for controls vs output */}
                   <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
                     
-                    {/* Simulator Sliders (Left 5 Columns) */}
+                    {/* Simulator Sliders */}
                     <div className="md:col-span-5 bg-slate-50/50 border border-slate-100 p-5 rounded-2xl flex flex-col justify-between gap-4">
-                      <div>
-                        <h5 className="text-[10px] sm:text-xs font-extrabold text-slate-400 uppercase leading-relaxed flex items-center gap-1.5 mb-4 select-none">
-                          <Sliders className="w-4 h-4 text-indigo-500" />
-                          ตัวแปรทดลองควบคุม
-                        </h5>
+                      {isOhmsLaw ? (
+                        /* Ohm's Law Controls */
+                        <div>
+                          <h5 className="text-[10px] sm:text-xs font-extrabold text-slate-400 uppercase leading-relaxed flex items-center gap-1.5 mb-4 select-none">
+                            <Sliders className="w-4 h-4 text-indigo-500" />
+                            ตัวแปรทดลองควบคุม
+                          </h5>
 
-                        {/* Sliders Stack */}
-                        <div className="space-y-4">
-                          {/* Slider 1: Initial Temp T0 */}
-                          <div className="group bg-white p-3 rounded-xl border border-slate-100 hover:border-slate-200/60 hover:shadow-xs transition-all duration-200 select-none">
-                            <div className="flex justify-between items-center text-xs font-bold mb-1.5">
-                              <span className="text-slate-600 flex items-center gap-1.5 leading-normal">
-                                <Thermometer className="w-4 h-4 text-rose-500 group-hover:animate-bounce" />
-                                อุณหภูมิเริ่มต้น (T₀)
-                              </span>
-                              <span className="text-rose-600 font-extrabold text-xs bg-rose-50 px-2 py-0.5 rounded border border-rose-100">{initialTemp} °C</span>
+                          <div className="space-y-4">
+                            {/* Voltage */}
+                            <div className="group bg-white p-3 rounded-xl border border-slate-100 hover:border-slate-200/60 hover:shadow-xs transition-all duration-200 select-none">
+                              <div className="flex justify-between items-center text-xs font-bold mb-1.5">
+                                <span className="text-slate-600 flex items-center gap-1.5 leading-normal">
+                                  <Zap className="w-4 h-4 text-blue-500 group-hover:scale-110" />
+                                  แรงดันไฟฟ้า (V)
+                                </span>
+                                <span className="text-blue-600 font-extrabold text-xs bg-blue-50 px-2 py-0.5 rounded border border-blue-100">{ohmsVoltage.toFixed(1)} V</span>
+                              </div>
+                              <input
+                                type="range"
+                                min="0"
+                                max="24"
+                                step="0.5"
+                                value={ohmsVoltage}
+                                onChange={(e) => setOhmsVoltage(Number(e.target.value))}
+                                className="w-full h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                              />
                             </div>
-                            <input
-                              type="range"
-                              min="60"
-                              max="100"
-                              value={initialTemp}
-                              onChange={(e) => setInitialTemp(Number(e.target.value))}
-                              className="w-full h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-rose-500"
-                            />
-                          </div>
 
-                          {/* Slider 2: Ambient Temp Ts */}
-                          <div className="group bg-white p-3 rounded-xl border border-slate-100 hover:border-slate-200/60 hover:shadow-xs transition-all duration-200 select-none">
-                            <div className="flex justify-between items-center text-xs font-bold mb-1.5">
-                              <span className="text-slate-600 flex items-center gap-1.5 leading-normal">
-                                <Sun className="w-4 h-4 text-amber-500 group-hover:animate-spin-slow" />
-                                อุณหภูมิแวดล้อม (Tₛ)
-                              </span>
-                              <span className="text-emerald-600 font-extrabold text-xs bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">{ambientTemp} °C</span>
+                            {/* Resistance */}
+                            <div className="group bg-white p-3 rounded-xl border border-slate-100 hover:border-slate-200/60 hover:shadow-xs transition-all duration-200 select-none">
+                              <div className="flex justify-between items-center text-xs font-bold mb-1.5">
+                                <span className="text-slate-600 flex items-center gap-1.5 leading-normal">
+                                  <Sliders className="w-4 h-4 text-amber-500 group-hover:rotate-45" />
+                                  ความต้านทาน (R)
+                                </span>
+                                <span className="text-amber-600 font-extrabold text-xs bg-amber-50 px-2 py-0.5 rounded border border-amber-100">{ohmsResistance.toFixed(0)} Ω</span>
+                              </div>
+                              <input
+                                type="range"
+                                min="10"
+                                max="500"
+                                step="10"
+                                value={ohmsResistance}
+                                onChange={(e) => setOhmsResistance(Number(e.target.value))}
+                                className="w-full h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-amber-500"
+                              />
                             </div>
-                            <input
-                              type="range"
-                              min="10"
-                              max="40"
-                              value={ambientTemp}
-                              onChange={(e) => setAmbientTemp(Number(e.target.value))}
-                              className="w-full h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-emerald-500"
-                            />
-                          </div>
 
-                          {/* Slider 3: Cooling Rate Constant k */}
-                          <div className="group bg-white p-3 rounded-xl border border-slate-100 hover:border-slate-200/60 hover:shadow-xs transition-all duration-200 select-none">
-                            <div className="flex justify-between items-center text-xs font-bold mb-1.5">
-                              <span className="text-slate-600 flex items-center gap-1.5 leading-normal">
-                                <Zap className="w-4 h-4 text-blue-500 group-hover:scale-110 transition-transform" />
-                                อัตราการเย็นตัว (k)
-                              </span>
-                              <span className="text-blue-600 font-extrabold text-xs bg-blue-50 px-2 py-0.5 rounded border border-blue-100">{coolingConstant.toFixed(3)}</span>
+                            {/* Computed Current Output */}
+                            <div className="group bg-white p-3 rounded-xl border border-slate-100 hover:border-slate-200/60 hover:shadow-xs transition-all duration-200 select-none">
+                              <div className="flex justify-between items-center text-xs font-bold">
+                                <span className="text-slate-600 flex items-center gap-1.5 leading-normal">
+                                  <CheckCircle className="w-4 h-4 text-emerald-500" />
+                                  กระแสไฟฟ้าผลลัพธ์ (I)
+                                </span>
+                                <span className="text-emerald-600 font-extrabold text-xs bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">{ohmsCurrent.toFixed(3)} A</span>
+                              </div>
                             </div>
-                            <input
-                              type="range"
-                              min="0.01"
-                              max="0.1"
-                              step="0.005"
-                              value={coolingConstant}
-                              onChange={(e) => setCoolingConstant(Number(e.target.value))}
-                              className="w-full h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-blue-500"
-                            />
                           </div>
                         </div>
-                      </div>
+                      ) : (
+                        /* Cooling Controls */
+                        <div>
+                          <h5 className="text-[10px] sm:text-xs font-extrabold text-slate-400 uppercase leading-relaxed flex items-center gap-1.5 mb-4 select-none">
+                            <Sliders className="w-4 h-4 text-indigo-500" />
+                            ตัวแปรทดลองควบคุม
+                          </h5>
+
+                          <div className="space-y-4">
+                            <div className="group bg-white p-3 rounded-xl border border-slate-100 hover:border-slate-200/60 hover:shadow-xs transition-all duration-200 select-none">
+                              <div className="flex justify-between items-center text-xs font-bold mb-1.5">
+                                <span className="text-slate-600 flex items-center gap-1.5 leading-normal">
+                                  <Thermometer className="w-4 h-4 text-rose-500 group-hover:animate-bounce" />
+                                  อุณหภูมิเริ่มต้น (T₀)
+                                </span>
+                                <span className="text-rose-600 font-extrabold text-xs bg-rose-50 px-2 py-0.5 rounded border border-rose-100">{initialTemp} °C</span>
+                              </div>
+                              <input
+                                type="range"
+                                min="60"
+                                max="100"
+                                value={initialTemp}
+                                onChange={(e) => setInitialTemp(Number(e.target.value))}
+                                className="w-full h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-rose-500"
+                              />
+                            </div>
+
+                            <div className="group bg-white p-3 rounded-xl border border-slate-100 hover:border-slate-200/60 hover:shadow-xs transition-all duration-200 select-none">
+                              <div className="flex justify-between items-center text-xs font-bold mb-1.5">
+                                <span className="text-slate-600 flex items-center gap-1.5 leading-normal">
+                                  <Sun className="w-4 h-4 text-amber-500 group-hover:animate-spin-slow" />
+                                  อุณหภูมิแวดล้อม (Tₛ)
+                                </span>
+                                <span className="text-emerald-600 font-extrabold text-xs bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">{ambientTemp} °C</span>
+                              </div>
+                              <input
+                                type="range"
+                                min="10"
+                                max="40"
+                                value={ambientTemp}
+                                onChange={(e) => setAmbientTemp(Number(e.target.value))}
+                                className="w-full h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                              />
+                            </div>
+
+                            <div className="group bg-white p-3 rounded-xl border border-slate-100 hover:border-slate-200/60 hover:shadow-xs transition-all duration-200 select-none">
+                              <div className="flex justify-between items-center text-xs font-bold mb-1.5">
+                                <span className="text-slate-600 flex items-center gap-1.5 leading-normal">
+                                  <Zap className="w-4 h-4 text-blue-500 group-hover:scale-110 transition-transform" />
+                                  อัตราการเย็นตัว (k)
+                                </span>
+                                <span className="text-blue-600 font-extrabold text-xs bg-blue-50 px-2 py-0.5 rounded border border-blue-100">{coolingConstant.toFixed(3)}</span>
+                              </div>
+                              <input
+                                type="range"
+                                min="0.01"
+                                max="0.1"
+                                step="0.005"
+                                value={coolingConstant}
+                                onChange={(e) => setCoolingConstant(Number(e.target.value))}
+                                className="w-full h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      )}
 
                       {/* Reset button */}
                       <button
                         onClick={() => {
-                          setInitialTemp(90);
-                          setAmbientTemp(25);
-                          setCoolingConstant(0.04);
+                          if (isOhmsLaw) {
+                            setOhmsVoltage(12.0);
+                            setOhmsResistance(100.0);
+                          } else {
+                            setInitialTemp(90);
+                            setAmbientTemp(25);
+                            setCoolingConstant(0.04);
+                          }
                         }}
                         className="w-full py-2.5 bg-white hover:bg-slate-50 border border-slate-200 text-slate-600 rounded-xl text-xs font-bold transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 shadow-xs"
                       >
@@ -295,13 +899,15 @@ export default function LabDetailPage() {
                       </button>
                     </div>
 
-                    {/* Output Real-time Graph (Right 7 Columns) */}
+                    {/* Output Real-time Graph */}
                     <div className="md:col-span-7 flex flex-col justify-between">
                       <div className="w-full h-full bg-slate-950/95 border border-slate-800 p-4 rounded-2xl flex flex-col justify-between shadow-inner relative overflow-hidden">
                         {/* Title block inside graph */}
                         <div className="flex items-center justify-between text-[9px] text-slate-500 font-bold select-none border-b border-slate-900 pb-1.5 mb-2">
                           <span>TELEMETRY GRAPH (REAL-TIME)</span>
-                          <span className="text-indigo-400">MODEL: T(t) = Tₛ + (T₀ - Tₛ)e⁻ᵏᵗ</span>
+                          <span className="text-indigo-400">
+                            {isOhmsLaw ? "MODEL: I = V / R" : "MODEL: T(t) = Tₛ + (T₀ - Tₛ)e⁻ᵏᵗ"}
+                          </span>
                         </div>
                         <svg className="w-full h-44" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
                           <defs>
@@ -324,37 +930,65 @@ export default function LabDetailPage() {
                           <line x1="20" y1="77.5" x2="180" y2="77.5" stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
                           <line x1="20" y1="100" x2="180" y2="100" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
 
-                          {/* Axes labels */}
-                          <text x="17" y="12.5" fill="#475569" fontSize="6.5" fontWeight="bold" textAnchor="end">100°C</text>
-                          <text x="17" y="35" fill="#475569" fontSize="6.5" fontWeight="bold" textAnchor="end">75°C</text>
-                          <text x="17" y="57.5" fill="#475569" fontSize="6.5" fontWeight="bold" textAnchor="end">50°C</text>
-                          <text x="17" y="80" fill="#475569" fontSize="6.5" fontWeight="bold" textAnchor="end">25°C</text>
+                          {isOhmsLaw ? (
+                            /* Ohm's Law Graph Metrics */
+                            <>
+                              <text x="17" y="12.5" fill="#475569" fontSize="6.5" fontWeight="bold" textAnchor="end">2.5A</text>
+                              <text x="17" y="35" fill="#475569" fontSize="6.5" fontWeight="bold" textAnchor="end">2.0A</text>
+                              <text x="17" y="57.5" fill="#475569" fontSize="6.5" fontWeight="bold" textAnchor="end">1.5A</text>
+                              <text x="17" y="80" fill="#475569" fontSize="6.5" fontWeight="bold" textAnchor="end">1.0A</text>
 
-                          {/* Ambient Temp Ts line */}
-                          <line x1="20" y1={ambientY} x2="180" y2={ambientY} stroke="#10b981" strokeWidth="1.25" strokeDasharray="3 2" opacity="0.8" />
-                          <text x="183" y={ambientY + 2} fill="#10b981" fontSize="7" fontWeight="extrabold">Tₛ</text>
+                              {/* Area under curve */}
+                              <path d={ohmsPreviewAreaPath} fill="url(#chartGrad)" />
 
-                          {/* Area under the path */}
-                          <path d={svgAreaPath} fill="url(#chartGrad)" />
+                              {/* Glowing path */}
+                              <path d={ohmsPreviewLinePath} stroke="#60a5fa" strokeWidth="4.5" strokeLinecap="round" fill="none" opacity="0.3" filter="url(#glow-line)" />
 
-                          {/* Glowing line shadow */}
-                          <path d={svgPath} stroke="#60a5fa" strokeWidth="4.5" strokeLinecap="round" fill="none" opacity="0.3" filter="url(#glow-line)" />
-                          
-                          {/* Interactive Cooling Curve path */}
-                          <path d={svgPath} stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" fill="none" />
+                              {/* Solid path */}
+                              <path d={ohmsPreviewLinePath} stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" fill="none" />
 
-                          {/* Hot Initial Point Indicator */}
-                          {chartPoints.length > 0 && (
-                            <circle cx="20" cy={tempToSvgY(initialTemp)} r="3" fill="#f43f5e" />
+                              {/* Operating Point Indicator dot */}
+                              <circle cx={20 + (ohmsVoltage / 24) * 160} cy={100 - (ohmsCurrent / 2.5) * 90} r="3.5" fill="#f43f5e" />
+                              
+                              <line x1="20" y1="110" x2="180" y2="110" stroke="rgba(255,255,255,0.15)" strokeWidth="1" />
+                              <text x="20" y="118" fill="#94a3b8" fontSize="6" fontWeight="bold" textAnchor="middle">0</text>
+                              <text x="60" y="118" fill="#94a3b8" fontSize="6" fontWeight="bold" textAnchor="middle">6</text>
+                              <text x="100" y="118" fill="#94a3b8" fontSize="6" fontWeight="bold" textAnchor="middle">12</text>
+                              <text x="140" y="118" fill="#94a3b8" fontSize="6" fontWeight="bold" textAnchor="middle">18</text>
+                              <text x="180" y="118" fill="#94a3b8" fontSize="6" fontWeight="bold" textAnchor="middle">24</text>
+                              <text x="195" y="118" fill="#94a3b8" fontSize="6" fontWeight="bold">แรงดัน (V)</text>
+                            </>
+                          ) : (
+                            /* Cooling Graph Metrics */
+                            <>
+                              <text x="17" y="12.5" fill="#475569" fontSize="6.5" fontWeight="bold" textAnchor="end">100°C</text>
+                              <text x="17" y="35" fill="#475569" fontSize="6.5" fontWeight="bold" textAnchor="end">75°C</text>
+                              <text x="17" y="57.5" fill="#475569" fontSize="6.5" fontWeight="bold" textAnchor="end">50°C</text>
+                              <text x="17" y="80" fill="#475569" fontSize="6.5" fontWeight="bold" textAnchor="end">25°C</text>
+
+                              {/* Ambient Temp Ts line */}
+                              <line x1="20" y1={ambientY} x2="180" y2={ambientY} stroke="#10b981" strokeWidth="1.25" strokeDasharray="3 2" opacity="0.8" />
+                              <text x="183" y={ambientY + 2} fill="#10b981" fontSize="7" fontWeight="extrabold">Tₛ</text>
+
+                              {/* Area under the path */}
+                              <path d={svgAreaPath} fill="url(#chartGrad)" />
+
+                              {/* Glowing line shadow */}
+                              <path d={svgPath} stroke="#60a5fa" strokeWidth="4.5" strokeLinecap="round" fill="none" opacity="0.3" filter="url(#glow-line)" />
+                              
+                              {/* Interactive Cooling Curve path */}
+                              <path d={svgPath} stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" fill="none" />
+
+                              {/* Hot Initial Point Indicator */}
+                              {chartPoints.length > 0 && (
+                                <circle cx="20" cy={tempToSvgY(initialTemp)} r="3" fill="#f43f5e" />
+                              )}
+
+                              <line x1="20" y1="110" x2="180" y2="110" stroke="rgba(255,255,255,0.15)" strokeWidth="1" />
+                              <text x="180" y="118" fill="#94a3b8" fontSize="6" fontWeight="bold" textAnchor="middle">60</text>
+                              <text x="195" y="118" fill="#94a3b8" fontSize="6" fontWeight="bold">นาที</text>
+                            </>
                           )}
-
-                          {/* Horizontal axis time line */}
-                          <line x1="20" y1="110" x2="180" y2="110" stroke="rgba(255,255,255,0.15)" strokeWidth="1" />
-                          
-                          {/* Time tick labels */}
-                          <text x="180" y="118" fill="#94a3b8" fontSize="6" fontWeight="bold" textAnchor="middle">60</text>
-                          
-                          <text x="195" y="118" fill="#94a3b8" fontSize="6" fontWeight="bold">นาที</text>
                         </svg>
                       </div>
                     </div>

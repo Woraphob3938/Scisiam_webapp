@@ -22,7 +22,7 @@ export default function CategoryFilter({
   ];
 
   return (
-    <div className="w-full flex justify-center py-6 px-4">
+    <div className="w-full flex justify-center px-4 pt-0 pb-5 md:pb-6">
       <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 max-w-2xl bg-white/60 p-2 rounded-2xl sm:rounded-full border border-slate-100/80 shadow-xs backdrop-blur-xs">
         {categoriesList.map((category) => {
           const Icon = category.icon;
