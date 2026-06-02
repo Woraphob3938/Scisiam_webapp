@@ -112,8 +112,8 @@ export default function HeroSection() {
 
   return (
     <section className="relative w-full overflow-visible border-b border-slate-200/70 bg-[linear-gradient(180deg,#eff6ff_0%,#ffffff_62%,#f8fafc_100%)] px-4 py-5 sm:px-8 lg:px-10 lg:py-7">
-      <div className="mx-auto grid w-full max-w-6xl items-center gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
-        <div className="flex min-w-0 flex-col items-center text-center lg:items-start lg:text-left">
+      <div className="mx-auto flex w-full max-w-2xl flex-col items-center text-center">
+        <div className="flex min-w-0 w-full flex-col items-center text-center">
           <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-blue-100 bg-white/90 px-3 py-1 text-[11px] font-bold leading-[1.45] text-blue-700 shadow-sm shadow-blue-100/60">
             <CheckCircle2 className="h-3.5 w-3.5" />
             <span>{readyLabCount} ห้องพร้อมทดลองจาก {labsData.length} ห้อง</span>
@@ -126,7 +126,7 @@ export default function HeroSection() {
             ค้นหา เลือกหมวด แล้วเริ่มจากห้องที่พร้อมทดลองได้ทันที
           </p>
 
-          <div className="mt-3 flex flex-wrap justify-center gap-2 lg:justify-start">
+          <div className="mt-3 flex flex-wrap justify-center gap-2">
             {["Physics", "Chemistry", "Biology"].map((label) => (
               <span
                 key={label}
@@ -137,114 +137,110 @@ export default function HeroSection() {
             ))}
           </div>
 
-          <div className="relative mt-5 w-full max-w-2xl">
-          <div
-            className={`flex items-center rounded-2xl border bg-white px-4 py-3 shadow-sm transition-all duration-200 ${
-              isFocused
-                ? "border-blue-300 shadow-lg shadow-blue-500/10 ring-4 ring-blue-100/70"
-                : "border-slate-200 hover:border-slate-300"
-            }`}
-          >
-            <Search
-              className={`h-5 w-5 shrink-0 transition-colors ${
-                isFocused ? "text-blue-600" : "text-slate-400"
-              }`}
-            />
-            <input
-              ref={inputRef}
-              type="text"
-              value={searchQuery}
-              onChange={(event) => setSearchQuery(event.target.value)}
-              onFocus={() => setIsFocused(true)}
-              placeholder="ค้นหาห้องแล็บ เช่น Newton, Osmosis, Titration..."
-              className="ml-3 min-w-0 flex-1 bg-transparent text-sm font-semibold leading-[1.5] text-slate-700 outline-none placeholder:text-slate-400"
-              aria-label="ค้นหาห้องแล็บวิทยาศาสตร์"
-            />
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={() => {
-                  setSearchQuery("");
-                  inputRef.current?.focus();
-                }}
-                className="rounded-full p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
-                aria-label="ล้างการค้นหา"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            )}
-          </div>
-
-          {showDropdown && (
+          <div className="relative mt-5 w-full">
             <div
-              ref={dropdownRef}
-              className="absolute left-0 right-0 top-full z-50 mt-2 overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-xl shadow-slate-200/60"
+              className={`flex items-center rounded-2xl border bg-white px-4 py-3 shadow-sm transition-all duration-200 ${
+                isFocused
+                  ? "border-blue-300 shadow-lg shadow-blue-500/10 ring-4 ring-blue-100/70"
+                  : "border-slate-200 hover:border-slate-300"
+              }`}
             >
-              {searchResults.length > 0 ? (
-                <div className="max-h-80 overflow-y-auto py-2">
-                  {searchResults.map((lab) => {
-                    const meta = categoryMeta[lab.category];
-                    const Icon = meta.icon;
-                    const readiness = getLabReadiness(lab.id);
-
-                    return (
-                      <button
-                        key={lab.id}
-                        type="button"
-                        disabled={!readiness.isReady}
-                        onClick={() => {
-                          if (!readiness.isReady) return;
-                          router.push(`/labs/${lab.id}`);
-                          setSearchQuery("");
-                          setIsFocused(false);
-                        }}
-                        className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors enabled:hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-75"
-                      >
-                        <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border ${meta.badge}`}>
-                          <Icon className={`h-4 w-4 ${meta.iconColor}`} />
-                        </span>
-                        <span className="min-w-0 flex-1">
-                          <span className="block truncate text-sm font-bold leading-[1.5] text-slate-800">
-                            {lab.title}
-                          </span>
-                          <span className="block truncate text-[11px] font-semibold leading-relaxed text-slate-400">
-                            {lab.description}
-                          </span>
-                        </span>
-                        <span
-                          className={`hidden shrink-0 rounded-full border px-2 py-1 text-[10px] font-bold leading-[1.4] sm:inline-flex ${
-                            readiness.isReady
-                              ? "border-emerald-100 bg-emerald-50 text-emerald-700"
-                              : "border-amber-100 bg-amber-50 text-amber-700"
-                          }`}
-                        >
-                          {readiness.label}
-                        </span>
-                        {readiness.isReady && (
-                          <ArrowRight className="h-4 w-4 shrink-0 text-slate-300" />
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="px-4 py-8 text-center">
-                  <Search className="mx-auto mb-2 h-8 w-8 text-slate-300" />
-                  <p className="text-sm font-bold leading-[1.5] text-slate-500">
-                    ไม่พบห้องแล็บที่ตรงกับคำค้นหา
-                  </p>
-                  <p className="mt-1 text-xs font-medium leading-relaxed text-slate-400">
-                    ลองค้นหาด้วยคำอื่น เช่น &quot;Ohm&quot;, &quot;DNA&quot;, &quot;กรด&quot;
-                  </p>
-                </div>
+              <Search
+                className={`h-5 w-5 shrink-0 transition-colors ${
+                  isFocused ? "text-blue-600" : "text-slate-400"
+                }`}
+              />
+              <input
+                ref={inputRef}
+                type="text"
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                onFocus={() => setIsFocused(true)}
+                placeholder="ค้นหาห้องแล็บ เช่น Newton, Osmosis, Titration..."
+                className="ml-3 min-w-0 flex-1 bg-transparent text-sm font-semibold leading-[1.5] text-slate-700 outline-none placeholder:text-slate-400"
+                aria-label="ค้นหาห้องแล็บวิทยาศาสตร์"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchQuery("");
+                    inputRef.current?.focus();
+                  }}
+                  className="rounded-full p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+                  aria-label="ล้างการค้นหา"
+                >
+                  <X className="h-4 w-4" />
+                </button>
               )}
             </div>
-          )}
-          </div>
-        </div>
 
-        <div className="hidden h-[210px] overflow-hidden rounded-[24px] border border-blue-100 bg-white/80 p-4 shadow-sm shadow-blue-100/60 lg:block">
-          <LabBenchIllustration />
+            {showDropdown && (
+              <div
+                ref={dropdownRef}
+                className="absolute left-0 right-0 top-full z-50 mt-2 overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-xl shadow-slate-200/60"
+              >
+                {searchResults.length > 0 ? (
+                  <div className="max-h-80 overflow-y-auto py-2">
+                    {searchResults.map((lab) => {
+                      const meta = categoryMeta[lab.category];
+                      const Icon = meta.icon;
+                      const readiness = getLabReadiness(lab.id);
+
+                      return (
+                        <button
+                          key={lab.id}
+                          type="button"
+                          disabled={!readiness.isReady}
+                          onClick={() => {
+                            if (!readiness.isReady) return;
+                            router.push(`/labs/${lab.id}`);
+                            setSearchQuery("");
+                            setIsFocused(false);
+                          }}
+                          className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors enabled:hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-75"
+                        >
+                          <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border ${meta.badge}`}>
+                            <Icon className={`h-4 w-4 ${meta.iconColor}`} />
+                          </span>
+                          <span className="min-w-0 flex-1">
+                            <span className="block truncate text-sm font-bold leading-[1.5] text-slate-800">
+                              {lab.title}
+                            </span>
+                            <span className="block truncate text-[11px] font-semibold leading-relaxed text-slate-400">
+                              {lab.description}
+                            </span>
+                          </span>
+                          <span
+                            className={`hidden shrink-0 rounded-full border px-2 py-1 text-[10px] font-bold leading-[1.4] sm:inline-flex ${
+                              readiness.isReady
+                                ? "border-emerald-100 bg-emerald-50 text-emerald-700"
+                                : "border-amber-100 bg-amber-50 text-amber-700"
+                            }`}
+                          >
+                            {readiness.label}
+                          </span>
+                          {readiness.isReady && (
+                            <ArrowRight className="h-4 w-4 shrink-0 text-slate-300" />
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="px-4 py-8 text-center">
+                    <Search className="mx-auto mb-2 h-8 w-8 text-slate-300" />
+                    <p className="text-sm font-bold leading-[1.5] text-slate-500">
+                      ไม่พบห้องแล็บที่ตรงกับคำค้นหา
+                    </p>
+                    <p className="mt-1 text-xs font-medium leading-relaxed text-slate-400">
+                      ลองค้นหาด้วยคำอื่น เช่น &quot;Ohm&quot;, &quot;DNA&quot;, &quot;กรด&quot;
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </section>
