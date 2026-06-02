@@ -84,7 +84,7 @@ const parseLocalTimestamp = (storageKeys: string[]) => {
 
 export function readLocalLearningSnapshot(): LearningSnapshot {
   if (typeof window === "undefined") {
-    return { points: 120, completedCount: 0, completedLabIds: [], recentRuns: [] };
+    return { points: 0, completedCount: 0, completedLabIds: [], recentRuns: [] };
   }
 
   const completedLabIds: string[] = [];
@@ -106,7 +106,7 @@ export function readLocalLearningSnapshot(): LearningSnapshot {
   });
 
   return {
-    points: Number(window.localStorage.getItem("scisiam_points") || "120"),
+    points: Number(window.localStorage.getItem("scisiam_points") || "0"),
     completedCount: completedLabIds.length,
     completedLabIds,
     recentRuns,
@@ -188,7 +188,7 @@ export async function loadSupabaseLearningSnapshot(): Promise<LearningSnapshot |
   }
 
   return {
-    points: profile?.totalPoints ?? 120,
+    points: profile?.totalPoints ?? 0,
     completedCount: completedIds.size,
     completedLabIds: [...completedIds],
     recentRuns,

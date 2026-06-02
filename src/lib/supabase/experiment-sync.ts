@@ -39,7 +39,7 @@ export function saveExperimentLocally({
   window.localStorage.setItem(localStorageKey, JSON.stringify(localPayload));
 
   if (!wasAlreadySaved && localPoints > 0) {
-    const currentPoints = Number(window.localStorage.getItem("scisiam_points") || "120");
+    const currentPoints = Number(window.localStorage.getItem("scisiam_points") || "0");
     window.localStorage.setItem("scisiam_points", String(currentPoints + localPoints));
   }
 

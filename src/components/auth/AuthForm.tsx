@@ -134,7 +134,7 @@ export default function AuthForm({ initialMode }: AuthFormProps) {
           email: normalizedEmail,
           role,
           displayName: fullName.trim(),
-          totalPoints: 145,
+          totalPoints: 0,
         });
       } else {
         const { data, error: signInError } = await supabase.auth.signInWithPassword({
@@ -527,7 +527,7 @@ async function ensureProfile(input: {
   const fallbackProfile = {
     display_name: input.displayName,
     role: input.role as ScisiamUserRole,
-    total_points: 145,
+    total_points: 0,
   };
 
   await supabase.from("profiles").upsert({

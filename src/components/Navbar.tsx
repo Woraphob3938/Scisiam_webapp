@@ -17,12 +17,13 @@ export default function Navbar() {
   const { toggleSidebar } = useSidebar();
   const [showNotification, setShowNotification] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const [points, setPoints] = useState(120);
+  const [points, setPoints] = useState(0);
   
   // Auth state variables
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState("student");
   const [userName, setUserName] = useState("นักเรียน");
+  const [notifications, setNotifications] = useState<Array<{ id: string; title: string; message: string; type: string }>>([]);
 
   useEffect(() => {
     const loadPoints = () => {
@@ -30,7 +31,7 @@ export default function Navbar() {
       if (stored) {
         setPoints(Number(stored));
       } else {
-        localStorage.setItem("scisiam_points", "120");
+        localStorage.setItem("scisiam_points", "0");
       }
     };
 
@@ -68,7 +69,7 @@ export default function Navbar() {
 
       const nextRole = profile?.role || "student";
       const nextName = profile?.display_name || user.email?.split("@")[0] || "นักเรียน";
-      const nextPoints = profile?.total_points ?? Number(localStorage.getItem("scisiam_points") || "145");
+      const nextPoints = profile?.total_points ?? Number(localStorage.getItem("scisiam_points") || "0");
 
       setIsLoggedIn(true);
       setRole(nextRole);
@@ -105,6 +106,58 @@ export default function Navbar() {
     };
   }, []);
 
+  useEffect(() => {
+    const checkNotifications = () => {
+      const items: Array<{ id: string; title: string; message: string; type: string }> = [];
+      
+      if (typeof window !== "undefined") {
+        const labs = [
+          { key: "scisiam_saved_hookes_experiment", name: "Hooke's Law" },
+          { key: "scisiam_saved_ideal_gas_experiment", name: "Ideal Gas Law" },
+          { key: "scisiam_saved_ohms_experiment", name: "Ohm's Law" },
+          { key: "scisiam_saved_cooling_experiment", name: "Newton's Cooling" },
+          { key: "scisiam_saved_titration_experiment", name: "Acid-Base Titration" },
+          { key: "scisiam_saved_photosynthesis_experiment", name: "Photosynthesis Rate" },
+          { key: "scisiam_saved_mendelian_experiment", name: "Mendelian Genetics" },
+          { key: "scisiam_saved_mitosis_experiment", name: "Mitosis Cell Cycle" },
+          { key: "scisiam_saved_hess_experiment", name: "Hess's Law" },
+        ];
+
+        labs.forEach((lab) => {
+          if (localStorage.getItem(lab.key)) {
+            items.push({
+              id: lab.key,
+              title: "บันทึกแล็บสำเร็จ! 🧪",
+              message: `คุณได้ทำการจำลองและบันทึกผลแล็บ ${lab.name} เรียบร้อยแล้ว`,
+              type: "lab",
+            });
+          }
+        });
+
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith("scisiam_claimed_mission_")) {
+            items.push({
+              id: key,
+              title: "รับรางวัลภารกิจ! 💎",
+              message: `คุณได้เคลมแต้มรางวัลจากภารกิจสำเร็จแล้ว`,
+              type: "mission",
+            });
+          }
+        }
+      }
+      setNotifications(items);
+    };
+
+    checkNotifications();
+    window.addEventListener("storage", checkNotifications);
+    window.addEventListener(SCISIAM_POINTS_EVENT, checkNotifications);
+    return () => {
+      window.removeEventListener("storage", checkNotifications);
+      window.removeEventListener(SCISIAM_POINTS_EVENT, checkNotifications);
+    };
+  }, []);
+
   const handleSignOut = async () => {
     setShowProfileMenu(false);
 
@@ -116,7 +169,7 @@ export default function Navbar() {
     setIsLoggedIn(false);
     setRole("student");
     setUserName("นักเรียน");
-    setPoints(120);
+    setPoints(0);
     window.location.href = "/";
   };
 
@@ -159,8 +212,12 @@ export default function Navbar() {
             aria-label="การแจ้งเตือน"
           >
             <Bell className="w-5 h-5" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white animate-ping" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white" />
+            {notifications.length > 0 && (
+              <>
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white animate-ping" />
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white" />
+              </>
+            )}
           </button>
 
           {/* Simple Dropdown for notifications */}
@@ -168,18 +225,26 @@ export default function Navbar() {
             <div className="absolute right-0 mt-2.5 w-72 bg-white rounded-2xl shadow-xl border border-slate-100 py-2.5 text-left z-50 animate-in fade-in slide-in-from-top-2 duration-200">
               <div className="px-4 py-1.5 border-b border-slate-50 flex justify-between items-center">
                 <span className="font-semibold text-slate-800 text-sm">การแจ้งเตือน</span>
-                <span className="text-[10px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded-md font-semibold">ใหม่ 1</span>
+                <span className="text-[10px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded-md font-semibold">ใหม่ {notifications.length}</span>
               </div>
               <div className="max-h-60 overflow-y-auto px-2 py-1.5 space-y-1">
-                <div className="p-2.5 hover:bg-slate-50 rounded-xl cursor-pointer transition-all duration-200 flex gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
-                    <Award className="w-4 h-4" />
+                {notifications.length === 0 ? (
+                  <div className="py-8 text-center text-slate-400 font-semibold text-xs">
+                    ไม่มีการแจ้งเตือนในขณะนี้
                   </div>
-                  <div>
-                    <p className="text-xs font-semibold text-slate-800">ภารกิจสำเร็จ!</p>
-                    <p className="text-[10px] text-slate-500 mt-0.5">คุณได้รับ +20 แต้มจากห้องแล็บ Newton&apos;s cooling</p>
-                  </div>
-                </div>
+                ) : (
+                  notifications.map((n) => (
+                    <div key={n.id} className="p-2.5 hover:bg-slate-50 rounded-xl cursor-pointer transition-all duration-200 flex gap-2">
+                      <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                        <Award className="w-4 h-4" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-semibold text-slate-800 truncate">{n.title}</p>
+                        <p className="text-[10px] text-slate-500 mt-0.5 break-words">{n.message}</p>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           )}
