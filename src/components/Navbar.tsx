@@ -173,6 +173,9 @@ export default function Navbar() {
     window.location.href = "/";
   };
 
+  const displayedPoints = isLoggedIn ? points : 0;
+  const displayedNotifications = isLoggedIn ? notifications : [];
+
   return (
     <nav className="sticky top-0 z-50 w-full bg-white/85 backdrop-blur-md border-b border-slate-100 shadow-xs px-4 sm:px-8 py-3.5 flex items-center justify-between transition-all duration-300">
       {/* Logo Section */}
@@ -200,7 +203,7 @@ export default function Navbar() {
         {/* Points/Stars Counter */}
         <div className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 hover:bg-amber-100/70 border border-amber-200/50 text-amber-700 rounded-full shadow-xs cursor-pointer select-none transition-all duration-300 hover:scale-105 active:scale-95">
           <Sparkles className="w-4 h-4 text-amber-500 fill-amber-400 animate-pulse" />
-          <span className="text-xs sm:text-sm font-bold">{points} แต้ม</span>
+          <span className="text-xs sm:text-sm font-bold">{displayedPoints} แต้ม</span>
         </div>
 
 
@@ -212,7 +215,7 @@ export default function Navbar() {
             aria-label="การแจ้งเตือน"
           >
             <Bell className="w-5 h-5" />
-            {notifications.length > 0 && (
+            {displayedNotifications.length > 0 && (
               <>
                 <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white animate-ping" />
                 <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white" />
@@ -225,15 +228,15 @@ export default function Navbar() {
             <div className="absolute right-0 mt-2.5 w-72 bg-white rounded-2xl shadow-xl border border-slate-100 py-2.5 text-left z-50 animate-in fade-in slide-in-from-top-2 duration-200">
               <div className="px-4 py-1.5 border-b border-slate-50 flex justify-between items-center">
                 <span className="font-semibold text-slate-800 text-sm">การแจ้งเตือน</span>
-                <span className="text-[10px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded-md font-semibold">ใหม่ {notifications.length}</span>
+                <span className="text-[10px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded-md font-semibold">ใหม่ {displayedNotifications.length}</span>
               </div>
               <div className="max-h-60 overflow-y-auto px-2 py-1.5 space-y-1">
-                {notifications.length === 0 ? (
+                {displayedNotifications.length === 0 ? (
                   <div className="py-8 text-center text-slate-400 font-semibold text-xs">
                     ไม่มีการแจ้งเตือนในขณะนี้
                   </div>
                 ) : (
-                  notifications.map((n) => (
+                  displayedNotifications.map((n) => (
                     <div key={n.id} className="p-2.5 hover:bg-slate-50 rounded-xl cursor-pointer transition-all duration-200 flex gap-2">
                       <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
                         <Award className="w-4 h-4" />
