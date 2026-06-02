@@ -30,8 +30,8 @@ export default function CategoryFilter({
 
   return (
     <div className="flex w-full justify-center px-4 pb-5 pt-4 md:pb-6">
-      <div className="w-full max-w-2xl overflow-x-auto rounded-2xl border border-slate-200/80 bg-white p-1.5 shadow-sm [scrollbar-width:none] sm:rounded-full [&::-webkit-scrollbar]:hidden">
-        <div className="flex min-w-max items-center gap-1.5">
+      <div className="w-full max-w-2xl rounded-full border border-slate-200/80 bg-white p-1.5 shadow-sm">
+        <div className="grid grid-cols-4 w-full gap-1.5">
         {categoriesList.map((category) => {
           const Icon = category.icon;
           const isActive = activeCategory === category.id;
@@ -42,7 +42,7 @@ export default function CategoryFilter({
               type="button"
               onClick={() => onCategoryChange(category.id)}
               className={`
-                flex min-h-10 shrink-0 cursor-pointer select-none items-center gap-1.5 rounded-full border px-3 py-2 text-xs font-bold leading-[1.45] tracking-normal sm:gap-2 sm:px-4 sm:text-sm
+                flex min-h-10 cursor-pointer select-none items-center justify-center gap-1.5 rounded-full border px-2 py-2 text-xs font-bold leading-[1.45] tracking-normal sm:gap-2 sm:px-4 sm:text-sm
                 transition-all duration-200 active:scale-[0.98] focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100
                 ${
                   isActive
@@ -57,7 +57,7 @@ export default function CategoryFilter({
                   isActive ? "text-white" : "text-slate-400"
                 }`}
               />
-              <span>{category.name}</span>
+              <span className="truncate">{category.name}</span>
             </button>
           );
         })}

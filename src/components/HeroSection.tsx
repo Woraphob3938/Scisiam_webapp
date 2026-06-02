@@ -114,11 +114,6 @@ export default function HeroSection() {
     <section className="relative w-full overflow-visible border-b border-slate-200/70 bg-[linear-gradient(180deg,#eff6ff_0%,#ffffff_62%,#f8fafc_100%)] px-4 py-5 sm:px-8 lg:px-10 lg:py-7">
       <div className="mx-auto flex w-full max-w-2xl flex-col items-center text-center">
         <div className="flex min-w-0 w-full flex-col items-center text-center">
-          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-blue-100 bg-white/90 px-3 py-1 text-[11px] font-bold leading-[1.45] text-blue-700 shadow-sm shadow-blue-100/60">
-            <CheckCircle2 className="h-3.5 w-3.5" />
-            <span>{readyLabCount} ห้องพร้อมทดลองจาก {labsData.length} ห้อง</span>
-          </div>
-
           <h1 className="text-3xl font-extrabold leading-[1.25] tracking-normal text-slate-900 sm:text-4xl lg:text-5xl">
             รายชื่อห้องแล็บ
           </h1>
@@ -126,18 +121,7 @@ export default function HeroSection() {
             ค้นหา เลือกหมวด แล้วเริ่มจากห้องที่พร้อมทดลองได้ทันที
           </p>
 
-          <div className="mt-3 flex flex-wrap justify-center gap-2">
-            {["Physics", "Chemistry", "Biology"].map((label) => (
-              <span
-                key={label}
-                className="rounded-full border border-slate-200 bg-white/80 px-3 py-1 text-[11px] font-extrabold leading-[1.45] text-slate-500"
-              >
-                {label}
-              </span>
-            ))}
-          </div>
-
-          <div className="relative mt-5 w-full">
+          <div className="relative mt-6 w-full">
             <div
               className={`flex items-center rounded-2xl border bg-white px-4 py-3 shadow-sm transition-all duration-200 ${
                 isFocused
