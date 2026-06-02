@@ -1,228 +1,243 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { CheckCircle, Clock, HelpCircle, LayoutGrid } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import CategoryFilter, { Category } from "@/components/CategoryFilter";
-import LabCard, { LabData } from "@/components/LabCard";
+import LabCard from "@/components/LabCard";
 import Sidebar from "@/components/Sidebar";
 import { useSidebar } from "@/context/SidebarContext";
-import BottomCallout from "@/components/BottomCallout";
-import { Play, BookOpen, X, CheckCircle, HelpCircle } from "lucide-react";
-
 import { labsData } from "@/data/labs";
+import { isLabReady } from "@/data/labReadiness";
+
+type AvailabilityFilter = "ready" | "all" | "inDevelopment";
+
+const INITIAL_VISIBLE_LABS = 12;
+
 export default function Home() {
   const router = useRouter();
   const { isCollapsed } = useSidebar();
   const [selectedCategory, setSelectedCategory] = useState<Category>("All");
-  const [activeModal, setActiveModal] = useState<{ type: "details" | "enter"; lab: LabData } | null>(null);
-  const [enterProgress, setEnterProgress] = useState(0);
-  const [enterStage, setEnterStage] = useState("");
+  const [availabilityFilter, setAvailabilityFilter] =
+    useState<AvailabilityFilter>("ready");
+  const [showAllLabs, setShowAllLabs] = useState(false);
 
-  const filteredLabs = labsData.filter((lab) => {
-    if (selectedCategory === "All") return true;
-    return lab.category === selectedCategory;
-  });
+  useEffect(() => {
+    const category = new URLSearchParams(window.location.search).get("category");
+    const validCategories: Category[] = ["All", "Physics", "Chemistry", "Biology"];
+
+    if (category && validCategories.includes(category as Category)) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSelectedCategory(category as Category);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setShowAllLabs(false);
+    }
+  }, []);
+
+  const filteredLabs = useMemo(() => {
+    return labsData.filter((lab) => {
+      const matchesCategory =
+        selectedCategory === "All" || lab.category === selectedCategory;
+      const ready = isLabReady(lab.id);
+      const matchesAvailability =
+        availabilityFilter === "all" ||
+        (availabilityFilter === "ready" && ready) ||
+        (availabilityFilter === "inDevelopment" && !ready);
+
+      return matchesCategory && matchesAvailability;
+    });
+  }, [availabilityFilter, selectedCategory]);
+
+  const availabilityCounts = useMemo(() => {
+    const categoryLabs =
+      selectedCategory === "All"
+        ? labsData
+        : labsData.filter((lab) => lab.category === selectedCategory);
+
+    const ready = categoryLabs.filter((lab) => isLabReady(lab.id)).length;
+
+    return {
+      all: categoryLabs.length,
+      ready,
+      inDevelopment: categoryLabs.length - ready,
+    };
+  }, [selectedCategory]);
+
+  const visibleLabs = showAllLabs
+    ? filteredLabs
+    : filteredLabs.slice(0, INITIAL_VISIBLE_LABS);
+  const hiddenLabCount = filteredLabs.length - visibleLabs.length;
+  const availabilityHeading =
+    availabilityFilter === "ready"
+      ? "พร้อมทดลองทันที"
+      : availabilityFilter === "inDevelopment"
+        ? "กำลังจัดทำ"
+        : "ห้องแล็บทั้งหมด";
 
   const handleViewDetails = (id: string) => {
+    if (!isLabReady(id)) return;
     router.push(`/labs/${id}`);
   };
 
   const handleEnterRoom = (id: string) => {
+    if (!isLabReady(id)) return;
     router.push(`/labs/${id}/simulation`);
   };
 
-  const closeModal = () => {
-    setActiveModal(null);
+  const handleCategoryChange = (category: Category) => {
+    setSelectedCategory(category);
+    setShowAllLabs(false);
+  };
+
+  const handleAvailabilityChange = (filter: AvailabilityFilter) => {
+    setAvailabilityFilter(filter);
+    setShowAllLabs(false);
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-slate-50 font-sans antialiased pb-12 selection:bg-indigo-500 selection:text-white">
-      {/* 1. Header / Navbar */}
+    <div className="flex min-h-screen flex-col bg-slate-50 font-sans antialiased selection:bg-blue-600 selection:text-white">
       <Navbar />
 
-      {/* 2. Persistent desktop sidebar */}
       <div className="hidden lg:block">
         <Sidebar activeMenu="หน้าหลัก" />
       </div>
 
-      {/* 3. Main Content Area */}
-      <div className={`relative z-10 min-w-0 transition-[padding-left] duration-300 ${isCollapsed ? "lg:pl-[76px]" : "lg:pl-[260px]"}`}>
-        
-        {/* Hero Section */}
+      <main
+        className={`relative z-10 min-w-0 pb-12 transition-[padding-left] duration-300 ${
+          isCollapsed ? "lg:pl-[76px]" : "lg:pl-[260px]"
+        }`}
+      >
         <HeroSection />
 
-        {/* Filter Category Section */}
         <CategoryFilter
           activeCategory={selectedCategory}
-          onCategoryChange={setSelectedCategory}
+          onCategoryChange={handleCategoryChange}
         />
 
-        {/* Lab Card Grid */}
-        <div className="w-full px-4 lg:px-8 py-4">
+        <section className="w-full px-4 pb-8 pt-1 lg:px-8">
+          <div className="mb-4 flex flex-col gap-3 rounded-2xl border border-slate-200/70 bg-white px-4 py-4 shadow-sm shadow-slate-200/40 lg:flex-row lg:items-center lg:justify-between lg:px-5">
+            <div className="min-w-0">
+              <p className="text-xs font-bold leading-[1.45] text-blue-600">
+                ห้องแล็บสำหรับเริ่มใช้งาน
+              </p>
+              <h2 className="mt-1 text-lg font-extrabold leading-[1.45] tracking-normal text-slate-900">
+                {availabilityHeading}
+              </h2>
+              <p className="mt-1 text-sm font-semibold leading-relaxed text-slate-500">
+                แสดง {filteredLabs.length} ห้อง
+                {selectedCategory !== "All" ? ` ในหมวด ${selectedCategory}` : ""} จากทั้งหมด {labsData.length} ห้อง
+              </p>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2 lg:flex lg:overflow-x-auto lg:pb-1 lg:[scrollbar-width:none] lg:[&::-webkit-scrollbar]:hidden">
+              {[
+                {
+                  id: "ready" as AvailabilityFilter,
+                  label: "พร้อมทดลอง",
+                  shortLabel: "พร้อม",
+                  count: availabilityCounts.ready,
+                  icon: CheckCircle,
+                  active: "border-emerald-200 bg-emerald-600 text-white shadow-md shadow-emerald-500/15",
+                },
+                {
+                  id: "all" as AvailabilityFilter,
+                  label: "ทั้งหมด",
+                  shortLabel: "ทั้งหมด",
+                  count: availabilityCounts.all,
+                  icon: LayoutGrid,
+                  active: "border-blue-200 bg-blue-600 text-white shadow-md shadow-blue-500/15",
+                },
+                {
+                  id: "inDevelopment" as AvailabilityFilter,
+                  label: "กำลังจัดทำ",
+                  shortLabel: "จัดทำ",
+                  count: availabilityCounts.inDevelopment,
+                  icon: Clock,
+                  active: "border-amber-200 bg-amber-500 text-white shadow-md shadow-amber-500/15",
+                },
+              ].map((option) => {
+                const Icon = option.icon;
+                const isActive = availabilityFilter === option.id;
+
+                return (
+                  <button
+                    key={option.id}
+                    type="button"
+                    onClick={() => handleAvailabilityChange(option.id)}
+                    className={`inline-flex min-h-11 w-full shrink-0 items-center justify-center gap-2 rounded-xl border px-3 py-2 text-xs font-extrabold leading-[1.45] transition-all duration-200 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100 lg:w-auto lg:px-3.5 ${
+                      isActive
+                        ? option.active
+                        : "border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300 hover:bg-white hover:text-slate-900"
+                    }`}
+                    aria-pressed={isActive}
+                  >
+                    <Icon className="hidden h-4 w-4 sm:block" />
+                    <span className="sm:hidden">{option.shortLabel}</span>
+                    <span className="hidden sm:inline">{option.label}</span>
+                    <span
+                      className={`rounded-full px-2 py-0.5 text-[11px] ${
+                        isActive ? "bg-white/20 text-white" : "bg-white text-slate-500"
+                      }`}
+                    >
+                      {option.count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           {filteredLabs.length === 0 ? (
-            <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm flex flex-col items-center gap-3">
-              <HelpCircle className="w-12 h-12 text-slate-300" />
-              <h4 className="font-bold text-slate-700 text-lg">ไม่พบห้องแล็บในหมวดหมู่นี้</h4>
-              <p className="text-sm text-slate-400">กรุณาเลือกหมวดหมู่อื่นเพื่อค้นหาห้องแล็บทดลอง</p>
+            <div className="flex flex-col items-center gap-3 rounded-2xl border border-slate-100 bg-white p-10 text-center shadow-sm">
+              <HelpCircle className="h-10 w-10 text-slate-300" />
+              <h2 className="text-lg font-bold leading-[1.5] text-slate-700">
+                ไม่พบห้องแล็บในหมวดหมู่นี้
+              </h2>
+              <p className="text-sm font-medium leading-relaxed text-slate-400">
+                ลองเปลี่ยนหมวดหรือเลือกดูห้องแล็บทั้งหมด
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedCategory("All");
+                  setAvailabilityFilter("all");
+                  setShowAllLabs(false);
+                }}
+                className="mt-2 rounded-xl bg-blue-600 px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-blue-700 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
+              >
+                ดูห้องแล็บทั้งหมด
+              </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6.5">
-              {filteredLabs.map((lab) => (
-                <div key={lab.id} className="h-full">
+            <>
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+                {visibleLabs.map((lab) => (
                   <LabCard
+                    key={lab.id}
                     lab={lab}
                     onViewDetails={handleViewDetails}
                     onEnterRoom={handleEnterRoom}
                   />
+                ))}
+              </div>
+
+              {hiddenLabCount > 0 && (
+                <div className="mt-5 flex justify-center">
+                  <button
+                    type="button"
+                    onClick={() => setShowAllLabs(true)}
+                    className="inline-flex min-h-11 items-center justify-center rounded-xl border border-blue-200 bg-white px-5 py-2.5 text-sm font-extrabold leading-[1.45] text-blue-700 shadow-sm transition-all duration-200 hover:border-blue-300 hover:bg-blue-50 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
+                  >
+                    ดูเพิ่มเติมอีก {hiddenLabCount} ห้อง
+                  </button>
                 </div>
-              ))}
-            </div>
+              )}
+            </>
           )}
-        </div>
-
-        {/* Bottom Callout Banner */}
-        <BottomCallout />
-
-      </div>
-
-      {/* 6. Dynamic Pop-up Modal (Details / Room Entry) */}
-      {activeModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
-          <div 
-            className="bg-white w-full max-w-lg rounded-3xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col animate-in zoom-in-95 duration-300"
-            role="dialog"
-            aria-modal="true"
-          >
-            {/* Modal Header */}
-            <div className="px-6 py-4.5 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
-              <span className={`text-xs font-bold px-2.5 py-1 rounded-full border ${
-                activeModal.lab.category === "Physics"
-                  ? "bg-blue-50 text-blue-700 border-blue-100"
-                  : activeModal.lab.category === "Chemistry"
-                  ? "bg-purple-50 text-purple-700 border-purple-100"
-                  : "bg-green-50 text-green-700 border-green-100"
-              }`}>
-                {activeModal.lab.category}
-              </span>
-              <button 
-                onClick={closeModal}
-                className="p-1 rounded-full hover:bg-slate-200/80 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
-                aria-label="ปิดหน้าต่าง"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Modal Body */}
-            <div className="p-6 flex-1">
-              <h3 className="text-xl sm:text-2xl font-bold text-slate-800 mb-3 tracking-tight">
-                {activeModal.lab.title}
-              </h3>
-              
-              {activeModal.type === "details" ? (
-                /* Detail Modal View */
-                <div className="space-y-4">
-                  <p className="text-sm text-slate-500 leading-relaxed">
-                    {activeModal.lab.description}
-                  </p>
-                  
-                  {/* Mock Lab Metadata & Specifications */}
-                  <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100 text-xs sm:text-sm text-slate-600 space-y-2.5">
-                    <div className="flex justify-between items-center">
-                      <span className="font-semibold text-slate-400">ระดับการศึกษา:</span>
-                      <span className="font-bold text-slate-700">มัธยมศึกษาตอนปลาย - อุดมศึกษา</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="font-semibold text-slate-400">เวลาการทดลองเฉลี่ย:</span>
-                      <span className="font-bold text-slate-700">20 - 30 นาที</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="font-semibold text-slate-400">หน่วยการเรียนรู้:</span>
-                      <span className="font-bold text-slate-700">
-                        {activeModal.lab.category === "Physics" ? "ความร้อนและเทอร์โมไดนามิกส์" : activeModal.lab.category === "Chemistry" ? "กรด-เบสและสารละลาย" : "สรีรวิทยาและพลังงานพืช"}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="pt-2 flex gap-2">
-                    <BookOpen className="w-5 h-5 text-indigo-500 shrink-0 mt-0.5" />
-                    <div className="text-xs text-slate-400 leading-relaxed font-semibold">
-                      ห้องแล็บนี้รองรับระบบจำลองกราฟิกสามมิติ พร้อมใบรายงานกิจกรรมการทดลองที่สามารถดาวน์โหลดได้หลังจากทำแบบฝึกหัดเสร็จสิ้น
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                /* Enter Room loading simulation */
-                <div className="space-y-6 py-4 flex flex-col items-center text-center">
-                  {enterProgress < 100 ? (
-                    <div className="w-20 h-20 rounded-full border-4 border-slate-100 border-t-indigo-500 animate-spin flex items-center justify-center shadow-inner" />
-                  ) : (
-                    <div className="w-20 h-20 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/10 border border-emerald-100">
-                      <CheckCircle className="w-10 h-10 animate-bounce" />
-                    </div>
-                  )}
-
-                  <div className="space-y-1.5 w-full">
-                    <p className="text-sm font-bold text-slate-700 transition-colors">
-                      {enterStage}
-                    </p>
-                    <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full transition-all duration-300"
-                        style={{ width: `${enterProgress}%` }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Modal Footer */}
-            <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-3.5">
-              {activeModal.type === "details" ? (
-                <>
-                  <button 
-                    onClick={closeModal}
-                    className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs sm:text-sm font-bold text-slate-600 hover:bg-slate-100 transition-all cursor-pointer"
-                  >
-                    ปิดหน้านี้
-                  </button>
-                  <button 
-                    onClick={() => handleEnterRoom(activeModal.lab.id)}
-                    className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-all shadow-md shadow-indigo-600/10 cursor-pointer"
-                  >
-                    <Play className="w-4 h-4" />
-                    <span>เข้าสู่บทเรียนจำลอง</span>
-                  </button>
-                </>
-              ) : (
-                <button 
-                  onClick={() => {
-                    if (activeModal) {
-                      router.push(`/labs/${activeModal.lab.id}/simulation`);
-                      closeModal();
-                    }
-                  }}
-                  disabled={enterProgress < 100}
-                  className={`
-                    w-full py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-md cursor-pointer
-                    ${
-                      enterProgress < 100 
-                        ? "bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed shadow-none" 
-                        : "bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/10"
-                    }
-                  `}
-                >
-                  {enterProgress < 100 ? "กำลังเตรียมการห้องแล็บ..." : "เริ่มทำแล็บวิทยาศาสตร์กันเลย! 🔬"}
-                </button>
-              )}
-            </div>
-
-          </div>
-        </div>
-      )}
+        </section>
+      </main>
     </div>
   );
 }

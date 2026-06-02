@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
+import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";
 import {
   BarChart3,
   CheckCircle2,
@@ -269,7 +270,7 @@ export default function BoylesLawSimulation() {
     lastLoggedVolumeRef.current = 500;
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (dataPoints.length === 0) {
       alert("ยังไม่มีข้อมูลกฎของบอยล์สำหรับบันทึก กรุณาเริ่มจำลองหรือกดอัดแก๊สก่อน");
       return;
@@ -283,10 +284,24 @@ export default function BoylesLawSimulation() {
       dataPoints,
     };
 
-    localStorage.setItem("scisiam_saved_boyle_experiment", JSON.stringify(experimentData));
-    const currentPoints = Number(localStorage.getItem("scisiam_points") || "120");
-    localStorage.setItem("scisiam_points", String(currentPoints + 25));
-    window.dispatchEvent(new Event("points-updated"));
+    await saveExperimentAndSync({
+      localStorageKey: "scisiam_saved_boyle_experiment",
+      localPayload: experimentData,
+      labId: "boyles-law",
+      title: "Boyle's Gas Law Lab",
+      variables: { gasMoles, temperature, pistonSpeed },
+      liveValues: { volume, pressure, pvValue, progress },
+      graphPoints: dataPoints,
+      tableRows: dataPoints,
+      summary: {
+        finalVolume: volume,
+        finalPressure: pressure,
+        pvValue,
+        dataPointCount: dataPoints.length,
+      },
+      score: Math.round(Math.min(100, Math.max(0, progress))),
+      durationSeconds: Math.round(elapsedSeconds),
+    });
     alert("บันทึกผลการทดลองกฎของบอยล์สำเร็จ");
   };
 

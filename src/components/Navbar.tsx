@@ -3,14 +3,26 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Bell, Sparkles, ChevronDown, Compass, Award, Menu } from "lucide-react";
+import { Bell, Sparkles, ChevronDown, Compass, Award, Menu, User } from "lucide-react";
 import { useSidebar } from "@/context/SidebarContext";
+import {
+  cacheSciSiamAuth,
+  clearSciSiamAuthCache,
+  SCISIAM_AUTH_EVENT,
+  SCISIAM_POINTS_EVENT,
+} from "@/lib/supabase/auth-cache";
+import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 
 export default function Navbar() {
   const { toggleSidebar } = useSidebar();
   const [showNotification, setShowNotification] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [points, setPoints] = useState(120);
+  
+  // Auth state variables
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [role, setRole] = useState("student");
+  const [userName, setUserName] = useState("นักเรียน");
 
   useEffect(() => {
     const loadPoints = () => {
@@ -21,15 +33,92 @@ export default function Navbar() {
         localStorage.setItem("scisiam_points", "120");
       }
     };
-    loadPoints();
 
-    window.addEventListener("points-updated", loadPoints);
+    const loadAuthStateFromCache = () => {
+      const loggedIn = localStorage.getItem("scisiam_logged_in") === "true";
+      setIsLoggedIn(loggedIn);
+      setRole(localStorage.getItem("scisiam_user_role") || "student");
+      setUserName(localStorage.getItem("scisiam_user_name") || "นักเรียน");
+    };
+
+    const loadAuthState = async () => {
+      if (!isSupabaseConfigured()) {
+        loadAuthStateFromCache();
+        return;
+      }
+
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        clearSciSiamAuthCache({ emit: false });
+        setIsLoggedIn(false);
+        setRole("student");
+        setUserName("นักเรียน");
+        return;
+      }
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("display_name, role, total_points")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      const nextRole = profile?.role || "student";
+      const nextName = profile?.display_name || user.email?.split("@")[0] || "นักเรียน";
+      const nextPoints = profile?.total_points ?? Number(localStorage.getItem("scisiam_points") || "145");
+
+      setIsLoggedIn(true);
+      setRole(nextRole);
+      setUserName(nextName);
+      setPoints(nextPoints);
+      cacheSciSiamAuth({
+        email: user.email,
+        role: nextRole,
+        displayName: nextName,
+        totalPoints: nextPoints,
+      }, { emit: false });
+    };
+
+    loadPoints();
+    void loadAuthState();
+
+    const supabase = isSupabaseConfigured() ? createClient() : null;
+    const authSubscription = supabase?.auth.onAuthStateChange(() => {
+      void loadAuthState();
+    }).data.subscription;
+    const handleAuthUpdated = () => void loadAuthState();
+
+    window.addEventListener(SCISIAM_POINTS_EVENT, loadPoints);
+    window.addEventListener(SCISIAM_AUTH_EVENT, handleAuthUpdated);
     window.addEventListener("storage", loadPoints);
+    window.addEventListener("storage", handleAuthUpdated);
+    
     return () => {
-      window.removeEventListener("points-updated", loadPoints);
+      window.removeEventListener(SCISIAM_POINTS_EVENT, loadPoints);
+      window.removeEventListener(SCISIAM_AUTH_EVENT, handleAuthUpdated);
       window.removeEventListener("storage", loadPoints);
+      window.removeEventListener("storage", handleAuthUpdated);
+      authSubscription?.unsubscribe();
     };
   }, []);
+
+  const handleSignOut = async () => {
+    setShowProfileMenu(false);
+
+    if (isSupabaseConfigured()) {
+      await createClient().auth.signOut();
+    }
+
+    clearSciSiamAuthCache();
+    setIsLoggedIn(false);
+    setRole("student");
+    setUserName("นักเรียน");
+    setPoints(120);
+    window.location.href = "/";
+  };
 
   return (
     <nav className="sticky top-0 z-50 w-full bg-white/85 backdrop-blur-md border-b border-slate-100 shadow-xs px-4 sm:px-8 py-3.5 flex items-center justify-between transition-all duration-300">
@@ -47,14 +136,9 @@ export default function Navbar() {
           <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-blue-500/20 group-hover:scale-105 transition-all duration-300">
             <Compass className="w-5.5 h-5.5 animate-spin-slow" />
           </div>
-          <div className="flex flex-col">
-            <span className="text-xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 bg-clip-text text-transparent tracking-tight">
-              SciSiam
-            </span>
-            <span className="text-[10px] text-slate-400 font-medium tracking-wider -mt-1 uppercase">
-              Virtual Lab
-            </span>
-          </div>
+          <span className="text-xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 bg-clip-text text-transparent tracking-tight select-none">
+            SciSiam
+          </span>
         </Link>
       </div>
 
@@ -104,50 +188,61 @@ export default function Navbar() {
         {/* Divider */}
         <span className="h-6 w-px bg-slate-200" />
 
-        {/* User Profile Avatar */}
+        {/* User Profile Avatar / Login Button */}
         <div className="relative">
-          <button
-            onClick={() => setShowProfileMenu(!showProfileMenu)}
-            className="flex items-center gap-2 hover:bg-slate-50 p-1.5 pr-2.5 rounded-xl transition-all duration-200 select-none cursor-pointer"
-          >
-            <div className="relative w-9 h-9 rounded-full bg-blue-50 flex items-center justify-center overflow-hidden ring-2 ring-indigo-50/50 border border-white shrink-0">
-              <Image src="/student_avatar_3d.png" alt="รูปโปรไฟล์" fill sizes="36px" className="object-cover" />
-            </div>
-            <div className="hidden sm:flex flex-col text-left">
-              <span className="text-xs text-slate-400 font-medium">ยินดีต้อนรับ</span>
-              <span className="text-sm font-semibold text-slate-700 -mt-0.5 flex items-center gap-1">
-                สวัสดี, นักเรียน
-                <ChevronDown className="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600" />
-              </span>
-            </div>
-          </button>
+          {isLoggedIn ? (
+            <>
+              <button
+                onClick={() => setShowProfileMenu(!showProfileMenu)}
+                className="flex items-center gap-2 hover:bg-slate-50 p-1.5 pr-2.5 rounded-xl transition-all duration-200 select-none cursor-pointer"
+              >
+                <div className="relative w-9 h-9 rounded-full bg-blue-50 flex items-center justify-center overflow-hidden ring-2 ring-indigo-50/50 border border-white shrink-0">
+                  <Image src="/student_avatar_3d.png" alt="รูปโปรไฟล์" fill sizes="36px" className="object-cover" />
+                </div>
+                <div className="hidden sm:flex flex-col text-left">
+                  <span className="text-xs text-slate-400 font-medium">ยินดีต้อนรับ</span>
+                  <span className="text-sm font-semibold text-slate-700 -mt-0.5 flex items-center gap-1 leading-normal">
+                    สวัสดี, {role === "teacher" ? "คุณครู" : userName}
+                    <ChevronDown className="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600" />
+                  </span>
+                </div>
+              </button>
 
-          {/* Simple Dropdown for profile menu */}
-          {showProfileMenu && (
-            <div className="absolute right-0 mt-2.5 w-48 bg-white rounded-2xl shadow-xl border border-slate-100 py-1.5 text-left z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-              <Link
-                href="/profile"
-                onClick={() => setShowProfileMenu(false)}
-                className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-indigo-600 transition-colors"
-              >
-                โปรไฟล์ของฉัน
-              </Link>
-              <a
-                href="#settings"
-                onClick={() => setShowProfileMenu(false)}
-                className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-indigo-600 transition-colors"
-              >
-                ตั้งค่าบัญชี
-              </a>
-              <hr className="my-1 border-slate-50" />
-              <a
-                href="#logout"
-                onClick={() => setShowProfileMenu(false)}
-                className="block px-4 py-2 text-sm text-rose-600 hover:bg-rose-50 transition-colors"
-              >
-                ออกจากระบบ
-              </a>
-            </div>
+              {/* Simple Dropdown for profile menu */}
+              {showProfileMenu && (
+                <div className="absolute right-0 mt-2.5 w-48 bg-white rounded-2xl shadow-xl border border-slate-100 py-1.5 text-left z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                  <Link
+                    href="/profile"
+                    onClick={() => setShowProfileMenu(false)}
+                    className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-indigo-600 transition-colors font-medium leading-normal"
+                  >
+                    โปรไฟล์ของฉัน
+                  </Link>
+                  <a
+                    href="#settings"
+                    onClick={() => setShowProfileMenu(false)}
+                    className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-indigo-600 transition-colors font-medium leading-normal"
+                  >
+                    ตั้งค่าบัญชี
+                  </a>
+                  <hr className="my-1 border-slate-50" />
+                  <button
+                    onClick={() => void handleSignOut()}
+                    className="w-full text-left block px-4 py-2 text-sm text-rose-600 hover:bg-rose-50 transition-colors font-medium leading-normal cursor-pointer"
+                  >
+                    ออกจากระบบ
+                  </button>
+                </div>
+              )}
+            </>
+          ) : (
+            <Link
+              href="/login"
+              className="border border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50 text-slate-700 px-4 py-2 rounded-xl flex items-center gap-2 text-sm font-semibold transition-all duration-200 cursor-pointer shadow-xs hover:scale-102 active:scale-98 select-none leading-normal"
+            >
+              <User className="w-4 h-4 text-slate-500" />
+              <span>เข้าสู่ระบบ</span>
+            </Link>
           )}
         </div>
       </div>

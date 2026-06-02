@@ -2,17 +2,213 @@
 
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import Navbar from "@/components/Navbar";
-import Breadcrumb from "@/components/labs/Breadcrumb";
-import BottomCallout from "@/components/BottomCallout";
-import DecorativeBackground from "@/components/labs/DecorativeBackground";
-import { Sparkles, ArrowRight, Play, Pause, RefreshCw, Zap, Sliders, CheckCircle, Plus, Trash, Download, Clipboard } from "lucide-react";
+import {
+  Play,
+  Pause,
+  RotateCcw,
+  Zap,
+  Sliders,
+  ClipboardList,
+  Trash,
+  Download,
+  Clipboard,
+  Target,
+} from "lucide-react";
+import SharedSimulationShell from "@/components/labs/simulation/SharedSimulationShell";
+import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";
 
 export interface OhmsDataPoint {
   index: number;
   voltage: number;
   resistance: number;
   current: number;
+}
+
+function OhmsGraph({
+  dataPoints,
+  voltage,
+  current,
+  switchStatus,
+}: {
+  dataPoints: OhmsDataPoint[];
+  voltage: number;
+  current: number;
+  switchStatus: boolean;
+}) {
+  const xCoord = (v: number) => 30 + (v / 24) * 150;
+  const yCoord = (i: number) => 100 - (i / 2.5) * 85;
+
+  const currentLinePath = useMemo(() => {
+    if (dataPoints.length === 0) return "";
+    const sorted = [...dataPoints].sort((a, b) => a.voltage - b.voltage);
+    return sorted.map((p, idx) => `${idx === 0 ? "M" : "L"}${xCoord(p.voltage)},${yCoord(p.current)}`).join(" ");
+  }, [dataPoints]);
+
+  return (
+    <section className="flex min-h-[300px] flex-col rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40">
+      <div className="mb-2 flex items-center justify-between border-b border-slate-100 pb-2">
+        <h3 className="flex items-center gap-2 text-sm font-black text-slate-800">
+          <Zap className="h-4.5 w-4.5 text-blue-600" />
+          กราฟผลการทดลอง (V-I Curve)
+        </h3>
+        <span className="text-[10px] font-bold text-blue-600">I = V / R</span>
+      </div>
+      <div className="flex-1 rounded-xl bg-slate-950 p-3 flex flex-col justify-between">
+        <svg className="w-full h-full min-h-[174px]" viewBox="0 0 200 120" fill="none">
+          {/* Grid lines */}
+          <line x1="30" y1="15" x2="180" y2="15" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
+          <line x1="30" y1="36.25" x2="180" y2="36.25" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
+          <line x1="30" y1="57.5" x2="180" y2="57.5" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
+          <line x1="30" y1="78.75" x2="180" y2="78.75" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
+          <line x1="30" y1="100" x2="180" y2="100" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+
+          {/* Y-axis metrics */}
+          <text x="27" y="17.5" fill="#475569" fontSize="6" fontWeight="bold" textAnchor="end">2.5 A</text>
+          <text x="27" y="38.75" fill="#475569" fontSize="6" fontWeight="bold" textAnchor="end">2.0 A</text>
+          <text x="27" y="60" fill="#475569" fontSize="6" fontWeight="bold" textAnchor="end">1.5 A</text>
+          <text x="27" y="81.25" fill="#475569" fontSize="6" fontWeight="bold" textAnchor="end">1.0 A</text>
+
+          {/* Live Operating Position Line */}
+          {currentLinePath && (
+            <path d={currentLinePath} stroke="#3b82f6" strokeWidth="1.5" strokeLinecap="round" fill="none" />
+          )}
+
+          {/* Logged points circles */}
+          {dataPoints.map((p) => (
+            <circle
+              key={p.index}
+              cx={xCoord(p.voltage)}
+              cy={yCoord(p.current)}
+              r="2.5"
+              fill="#22d3ee"
+              stroke="#ffffff"
+              strokeWidth="0.75"
+            />
+          ))}
+
+          {/* Live operating indicator circle */}
+          {switchStatus && (
+            <circle
+              cx={xCoord(voltage)}
+              cy={yCoord(current)}
+              r="3.5"
+              fill="#ef4444"
+            />
+          )}
+
+          {/* Axes lines */}
+          <line x1="30" y1="100" x2="180" y2="100" stroke="rgba(255,255,255,0.15)" strokeWidth="1" />
+          
+          {/* X-axis metrics */}
+          <text x="30" y="108" fill="#94a3b8" fontSize="6.5" fontWeight="bold" textAnchor="middle">0</text>
+          <text x="67.5" y="108" fill="#94a3b8" fontSize="6.5" fontWeight="bold" textAnchor="middle">6</text>
+          <text x="105" y="108" fill="#94a3b8" fontSize="6.5" fontWeight="bold" textAnchor="middle">12</text>
+          <text x="142.5" y="108" fill="#94a3b8" fontSize="6.5" fontWeight="bold" textAnchor="middle">18</text>
+          <text x="180" y="108" fill="#94a3b8" fontSize="6.5" fontWeight="bold" textAnchor="middle">24</text>
+          <text x="195" y="108" fill="#94a3b8" fontSize="6" fontWeight="bold">V</text>
+        </svg>
+      </div>
+    </section>
+  );
+}
+
+function ResultsTable({
+  dataPoints,
+  onClearPoint,
+  onCopyData,
+  onExportCSV,
+}: {
+  dataPoints: OhmsDataPoint[];
+  onClearPoint: (idx: number) => void;
+  onCopyData: () => void;
+  onExportCSV: () => void;
+}) {
+  return (
+    <section className="flex min-h-[300px] flex-col rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40">
+      <div className="mb-2 flex items-center justify-between border-b border-slate-100 pb-2">
+        <h3 className="flex items-center gap-2 text-sm font-black text-slate-800">
+          <ClipboardList className="h-4.5 w-4.5 text-blue-600" />
+          ตารางบันทึกผล
+        </h3>
+        <div className="flex gap-2">
+          <button onClick={onCopyData} className="p-1.5 bg-slate-50 border border-slate-200 text-slate-500 rounded-lg hover:bg-slate-100 transition cursor-pointer">
+            <Clipboard className="w-3.5 h-3.5" />
+          </button>
+          <button onClick={onExportCSV} className="p-1.5 bg-slate-50 border border-slate-200 text-slate-500 rounded-lg hover:bg-slate-100 transition cursor-pointer">
+            <Download className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      </div>
+      <div className="flex-1 overflow-auto rounded-xl border border-slate-100">
+        <table className="w-full text-left text-xs">
+          <thead className="bg-blue-50/70 text-[11px] font-black text-blue-800">
+            <tr>
+              <th className="px-3 py-2">จุดวัด</th>
+              <th className="px-3 py-2">แรงดัน (V)</th>
+              <th className="px-3 py-2">ความต้านทาน (Ω)</th>
+              <th className="px-3 py-2">กระแส (I)</th>
+              <th className="px-3 py-2 text-center">ลบ</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-100 font-bold text-slate-600">
+            {dataPoints.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="py-8 text-center text-slate-400">ไม่มีข้อมูลบันทึก</td>
+              </tr>
+            ) : (
+              dataPoints.map((point) => (
+                <tr key={point.index} className="hover:bg-slate-50/50">
+                  <td className="px-3 py-2 font-mono">#{point.index}</td>
+                  <td className="px-3 py-2 font-mono text-blue-600">{point.voltage.toFixed(1)} V</td>
+                  <td className="px-3 py-2 font-mono text-amber-600">{point.resistance.toFixed(0)} Ω</td>
+                  <td className="px-3 py-2 font-mono text-emerald-600">{point.current.toFixed(3)} A</td>
+                  <td className="px-3 py-2 text-center">
+                    <button onClick={() => onClearPoint(point.index)} className="text-red-500 hover:text-red-700 p-1">
+                      <Trash className="w-3.5 h-3.5" />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
+function TheoryPanel({
+  voltage,
+  resistance,
+  current,
+  switchStatus,
+}: {
+  voltage: number;
+  resistance: number;
+  current: number;
+  switchStatus: boolean;
+}) {
+  return (
+    <section className="flex min-h-[300px] flex-col rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40">
+      <h3 className="mb-2 flex items-center gap-2 border-b border-slate-100 pb-2 text-sm font-black text-slate-800">
+        <Zap className="h-4.5 w-4.5 text-blue-600" />
+        ทฤษฎีและสมการ
+      </h3>
+      <div className="flex flex-1 flex-col justify-between gap-3">
+        <div className="rounded-xl border border-blue-100 bg-blue-50/60 p-4 text-center text-xl font-black text-slate-800 font-mono">
+          I = V / R
+        </div>
+        <p className="text-xs font-semibold leading-relaxed text-slate-500">
+          กระแสไฟฟ้า (I) ในตัวนำจะมีค่าแปรผันตรงกับแรงดันไฟฟ้า (V) และแปรผกผันกับความต้านทาน (R) ของตัวนำนั้น
+        </p>
+        <div className="grid grid-cols-2 gap-2 text-[11px] font-bold text-slate-500">
+          <span className="rounded-lg bg-slate-50 px-2 py-1.5">แรงดัน: <b className="text-blue-700">{voltage.toFixed(1)} V</b></span>
+          <span className="rounded-lg bg-slate-50 px-2 py-1.5">ความต้านทาน: <b className="text-amber-700">{resistance.toFixed(0)} Ω</b></span>
+          <span className="rounded-lg bg-slate-50 px-2 py-1.5">กระแสไฟฟ้า: <b className="text-emerald-700">{(switchStatus ? current : 0.0).toFixed(3)} A</b></span>
+        </div>
+      </div>
+    </section>
+  );
 }
 
 export default function OhmsLawSimulation() {
@@ -59,16 +255,16 @@ export default function OhmsLawSimulation() {
       return;
     }
     const rawI = v / r;
-    // Add minor sensor fluctuation
     const noise = (Math.random() - 0.5) * 0.003;
     const finalI = Math.max(0.0, rawI + noise);
     setCurrent(Math.round(finalI * 1000) / 1000);
   };
 
   useEffect(() => {
-    // Derived readout is intentionally synchronized when circuit controls change.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    updateCurrentValue(voltage, resistance, switchStatus);
+    const timer = setTimeout(() => {
+      updateCurrentValue(voltage, resistance, switchStatus);
+    }, 0);
+    return () => clearTimeout(timer);
   }, [voltage, resistance, switchStatus]);
 
   // Main simulation ticking loop
@@ -139,7 +335,6 @@ export default function OhmsLawSimulation() {
   };
 
   const handleAddPoint = () => {
-    // Add operating point to logs
     setDataPoints((prev) => [
       ...prev,
       {
@@ -183,7 +378,7 @@ export default function OhmsLawSimulation() {
     navigator.clipboard.writeText(content).then(() => alert("คัดลอกตารางข้อมูลลงคลิปบอร์ดแล้ว!"));
   };
 
-  const handleSaveResults = () => {
+  const handleSaveResults = async () => {
     if (dataPoints.length === 0) {
       alert("ไม่พบข้อมูลการทดลองสำหรับบันทึกผล! กรุณากดเริ่มทดลองและเก็บบันทึกข้อมูลก่อน");
       return;
@@ -197,567 +392,310 @@ export default function OhmsLawSimulation() {
       dataPoints,
     };
 
-    localStorage.setItem("scisiam_saved_ohms_experiment", JSON.stringify(experimentData));
-
-    // Award completion points
-    const currentPoints = Number(localStorage.getItem("scisiam_points") || "120");
-    localStorage.setItem("scisiam_points", String(currentPoints + 25));
-    window.dispatchEvent(new Event("points-updated"));
+    await saveExperimentAndSync({
+      localStorageKey: "scisiam_saved_ohms_experiment",
+      localPayload: experimentData,
+      labId: "ohms-law",
+      title: "Ohm's Law & DC Circuits",
+      variables: { voltage, resistance, switchStatus },
+      liveValues: { current, elapsedSeconds, questProgress, questSuccess },
+      graphPoints: dataPoints,
+      tableRows: dataPoints,
+      summary: {
+        maxVoltage: experimentData.voltage,
+        resistance: experimentData.resistance,
+        dataPointCount: dataPoints.length,
+      },
+      score: questSuccess ? 100 : Math.min(100, dataPoints.length * 20),
+      durationSeconds: Math.round(elapsedSeconds),
+    });
 
     alert("บันทึกข้อมูลการทดลอง (กราฟกระแสไฟฟ้าและตารางผล) สำเร็จ! 🎉");
     router.push(`/labs/ohms-law`);
   };
 
-  // SVG resistor color band calculator
-  const getResistorColors = (r: number) => {
-    const val = Math.round(r);
-    const str = val.toString();
-    let d1 = 0;
-    let d2 = 0;
-    let multiplier = 0;
-
-    if (str.length === 1) {
-      d1 = 0;
-      d2 = val;
-      multiplier = 0;
-    } else if (str.length === 2) {
-      d1 = parseInt(str[0]);
-      d2 = parseInt(str[1]);
-      multiplier = 0;
-    } else {
-      d1 = parseInt(str[0]);
-      d2 = parseInt(str[1]);
-      multiplier = str.length - 2;
-    }
-
-    const colorsMap = [
-      "#000000", // 0: Black
-      "#9c4a1b", // 1: Brown
-      "#ef4444", // 2: Red
-      "#f97316", // 3: Orange
-      "#eab308", // 4: Yellow
-      "#22c55e", // 5: Green
-      "#3b82f6", // 6: Blue
-      "#a855f7", // 7: Violet
-      "#6b7280", // 8: Grey
-      "#ffffff", // 9: White
-    ];
-
-    return [
-      colorsMap[d1] || "#9c4a1b",
-      colorsMap[d2] || "#000000",
-      colorsMap[multiplier] || "#9c4a1b",
-    ];
-  };
-
   const bandColors = getResistorColors(resistance);
   const flowActive = switchStatus && current > 0;
   const flowColor = flowActive ? "#22d3ee" : "#475569";
+  const timeLabel = `${Math.floor(elapsedSeconds / 60).toString().padStart(2, "0")}:${Math.floor(elapsedSeconds % 60).toString().padStart(2, "0")}`;
 
-  // Coordinates translation for the live plot (Current Y vs Voltage X)
-  const xCoord = (v: number) => 30 + (v / 24) * 150;
-  const yCoord = (i: number) => 100 - (i / 2.5) * 85;
-
-  const currentLinePath = useMemo(() => {
-    if (dataPoints.length === 0) return "";
-    // Sort points by voltage to draw line
-    const sorted = [...dataPoints].sort((a, b) => a.voltage - b.voltage);
-    return sorted.map((p, idx) => `${idx === 0 ? "M" : "L"}${xCoord(p.voltage)},${yCoord(p.current)}`).join(" ");
-  }, [dataPoints]);
-
-  return (
-    <div className="flex flex-col min-h-screen bg-slate-50 relative pb-16 overflow-hidden">
-      <DecorativeBackground />
-      <Navbar />
-
-      {/* Breadcrumb */}
-      <div className="w-full max-w-[1440px] mx-auto px-6 sm:px-12 md:px-20 pt-6 pb-2 select-none">
-        <Breadcrumb category="Physics" title="Ohm's Law & DC Circuits / ห้องทดลองจำลอง" />
+  const scene = (
+    <div className="relative flex h-full min-h-[258px] items-center justify-center overflow-hidden rounded-2xl border border-blue-100 bg-[linear-gradient(135deg,#f8fbff_0%,#eefcff_48%,#fff7fb_100%)]">
+      <div className="absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:18px_18px] opacity-35" />
+      <div className="absolute left-5 top-5 rounded-2xl border border-white/70 bg-white/75 px-3 py-2 text-left shadow-sm backdrop-blur">
+        <p className="text-[10px] font-black uppercase text-blue-600">circuit status</p>
+        <p className="mt-0.5 text-xs font-bold text-slate-600">
+          {flowActive ? "Flow Active" : "Open Circuit"}
+        </p>
       </div>
 
-      {/* Hero Header */}
-      <div className="max-w-[1440px] w-full mx-auto px-6 sm:px-12 md:px-20 pt-3 select-none relative z-10">
-        <div className="bg-white rounded-3xl border border-slate-200/60 p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shadow-xs">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-extrabold uppercase bg-blue-50 text-blue-600 px-2.5 py-1 rounded-md border border-blue-100/50">
-                PHYSICS SIMULATOR
-              </span>
-              <span className="h-1.5 w-1.5 rounded-full bg-slate-300" />
-              <span className="text-xs font-bold text-slate-400">ACTIVE ROOM</span>
-            </div>
-            <h1 className="text-xl sm:text-2xl font-black text-slate-800 tracking-wide mt-2">
-              ห้องปฏิบัติการจำลองวงจรไฟฟ้ากระแสตรง (DC Circuits)
-            </h1>
-          </div>
-          <div className="flex items-center gap-2.5 bg-slate-50 border border-slate-100 rounded-2xl px-4 py-2.5 shrink-0 self-start md:self-auto">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-xs font-extrabold text-slate-600 leading-normal">
-              สถานะ: ระบบจำลองแบบ Interactive พร้อมทำงาน
-            </span>
-          </div>
-        </div>
-      </div>
+      <svg className="relative z-10 w-full max-w-[280px] h-48" viewBox="0 0 300 160">
+        {/* Wires */}
+        <path d="M 40 60 L 40 40 L 110 40" stroke="#475569" strokeWidth="2.5" fill="none" />
+        <path d="M 190 40 L 260 40 L 260 65" stroke="#475569" strokeWidth="2.5" fill="none" />
+        <path d="M 260 105 L 260 130 L 180 130" stroke="#475569" strokeWidth="2.5" fill="none" />
+        <path d="M 120 130 L 40 130 L 40 110" stroke="#475569" strokeWidth="2.5" fill="none" />
 
-      {/* Main Grid */}
-      <main className="max-w-[1440px] w-full mx-auto px-4 sm:px-12 md:px-20 py-6 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          
-          {/* Left Area (75%) */}
-          <div className="lg:col-span-9 space-y-6">
-            
-            {/* Viewport and controls */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
-              
-              {/* Circuit Viewport */}
-              <div className="bg-slate-950 rounded-3xl border border-slate-800 p-5 flex flex-col justify-between relative overflow-hidden min-h-[300px] shadow-lg shadow-slate-950/20 select-none">
-                <div className="flex justify-between items-center z-10">
-                  <div className="flex items-center gap-2 bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5">
-                    <span className={`w-2 h-2 rounded-full ${flowActive ? "bg-emerald-500 animate-pulse" : "bg-red-500"}`} />
-                    <span className="text-[10px] font-extrabold text-slate-300 uppercase">
-                      {flowActive ? "Circuit Active" : "Circuit Inactive"}
-                    </span>
-                  </div>
-                  <span className="text-[9px] font-bold text-slate-500 tracking-wider">HUD CONSOLE v1.0</span>
-                </div>
+        {/* Flowing electrons */}
+        {flowActive && (
+          <>
+            <circle cx="60" cy="40" r="3.5" fill="#22d3ee" className="animate-pulse" />
+            <circle cx="90" cy="40" r="3.5" fill="#22d3ee" className="animate-pulse" />
+            <circle cx="260" cy="50" r="3.5" fill="#22d3ee" className="animate-pulse" />
+            <circle cx="260" cy="120" r="3.5" fill="#22d3ee" className="animate-pulse" />
+            <circle cx="215" cy="130" r="3.5" fill="#22d3ee" className="animate-pulse" />
+            <circle cx="85" cy="130" r="3.5" fill="#22d3ee" className="animate-pulse" />
+            <circle cx="40" cy="50" r="3.5" fill="#22d3ee" className="animate-pulse" />
+            <circle cx="40" cy="120" r="3.5" fill="#22d3ee" className="animate-pulse" />
+          </>
+        )}
 
-                <div className="flex-1 flex items-center justify-center py-4">
-                  <svg className="w-full max-w-[280px] h-48" viewBox="0 0 300 160">
-                    {/* Wires */}
-                    <path d="M 40 60 L 40 40 L 110 40" stroke="#475569" strokeWidth="2.5" fill="none" />
-                    <path d="M 190 40 L 260 40 L 260 65" stroke="#475569" strokeWidth="2.5" fill="none" />
-                    <path d="M 260 105 L 260 130 L 180 130" stroke="#475569" strokeWidth="2.5" fill="none" />
-                    <path d="M 120 130 L 40 130 L 40 110" stroke="#475569" strokeWidth="2.5" fill="none" />
+        {/* Directional current indicators */}
+        <path d="M 75 37 L 80 40 L 75 43" stroke={flowColor} strokeWidth="1.5" fill="none" />
+        <path d="M 257 52 L 260 57 L 263 52" stroke={flowColor} strokeWidth="1.5" fill="none" />
+        <path d="M 85 127 L 80 130 L 85 133" stroke={flowColor} strokeWidth="1.5" fill="none" />
+        <path d="M 37 53 L 40 48 L 43 53" stroke={flowColor} strokeWidth="1.5" fill="none" />
 
-                    {/* Flowing electrons */}
-                    {flowActive && (
-                      <>
-                        <circle cx="60" cy="40" r="3.5" fill="#22d3ee" className="animate-pulse" />
-                        <circle cx="90" cy="40" r="3.5" fill="#22d3ee" className="animate-pulse" />
-                        <circle cx="260" cy="50" r="3.5" fill="#22d3ee" className="animate-pulse" />
-                        <circle cx="260" cy="120" r="3.5" fill="#22d3ee" className="animate-pulse" />
-                        <circle cx="215" cy="130" r="3.5" fill="#22d3ee" className="animate-pulse" />
-                        <circle cx="85" cy="130" r="3.5" fill="#22d3ee" className="animate-pulse" />
-                        <circle cx="40" cy="50" r="3.5" fill="#22d3ee" className="animate-pulse" />
-                        <circle cx="40" cy="120" r="3.5" fill="#22d3ee" className="animate-pulse" />
-                      </>
-                    )}
+        {/* DC Power Supply */}
+        <rect x="15" y="60" width="50" height="50" rx="6" fill="#1e293b" stroke="#3b82f6" strokeWidth="1.5" />
+        <circle cx="30" cy="98" r="4.5" fill="#f43f5e" />
+        <circle cx="50" cy="98" r="4.5" fill="#0f172a" stroke="#475569" strokeWidth="1" />
+        <text x="40" y="78" fill="#60a5fa" fontSize="9" fontWeight="900" textAnchor="middle">{voltage.toFixed(1)}V</text>
+        <text x="40" y="88" fill="#64748b" fontSize="6.5" fontWeight="bold" textAnchor="middle">DC Source</text>
 
-                    {/* Directional current indicators */}
-                    <path d="M 75 37 L 80 40 L 75 43" stroke={flowColor} strokeWidth="1.5" fill="none" />
-                    <path d="M 257 52 L 260 57 L 263 52" stroke={flowColor} strokeWidth="1.5" fill="none" />
-                    <path d="M 85 127 L 80 130 L 85 133" stroke={flowColor} strokeWidth="1.5" fill="none" />
-                    <path d="M 37 53 L 40 48 L 43 53" stroke={flowColor} strokeWidth="1.5" fill="none" />
+        {/* Resistor */}
+        <rect x="110" y="30" width="80" height="20" rx="5" fill="#f8fafc" stroke="#475569" strokeWidth="1.5" />
+        <line x1="90" y1="40" x2="110" y2="40" stroke="#475569" strokeWidth="2.5" />
+        <line x1="190" y1="40" x2="210" y2="40" stroke="#475569" strokeWidth="2.5" />
+        {/* Color Bands */}
+        <rect x="122" y="30.7" width="5.5" height="18.6" fill={bandColors[0]} />
+        <rect x="137" y="30.7" width="5.5" height="18.6" fill={bandColors[1]} />
+        <rect x="152" y="30.7" width="5.5" height="18.6" fill={bandColors[2]} />
+        <rect x="172" y="30.7" width="5.5" height="18.6" fill="#d4af37" />
+        <text x="150" y="24" fill="#94a3b8" fontSize="8" fontWeight="bold" textAnchor="middle">{resistance.toFixed(0)} Ω</text>
 
-                    {/* DC Power Supply */}
-                    <rect x="15" y="60" width="50" height="50" rx="6" fill="#1e293b" stroke="#3b82f6" strokeWidth="1.5" />
-                    <circle cx="30" cy="98" r="4.5" fill="#f43f5e" />
-                    <circle cx="50" cy="98" r="4.5" fill="#0f172a" stroke="#475569" strokeWidth="1" />
-                    <text x="40" y="78" fill="#60a5fa" fontSize="9" fontWeight="900" textAnchor="middle">{voltage.toFixed(1)}V</text>
-                    <text x="40" y="88" fill="#64748b" fontSize="6.5" fontWeight="bold" textAnchor="middle">DC Source</text>
+        {/* Ammeter */}
+        <circle cx="260" cy="85" r="20" fill="#1e293b" stroke="#eab308" strokeWidth="1.5" />
+        <text x="260" y="80" fill="#eab308" fontSize="12" fontWeight="900" textAnchor="middle">A</text>
+        <text x="260" y="96" fill="#eab308" fontSize="9.5" fontWeight="900" textAnchor="middle">{(switchStatus ? current : 0.0).toFixed(3)}A</text>
 
-                    {/* Resistor */}
-                    <rect x="110" y="30" width="80" height="20" rx="5" fill="#f8fafc" stroke="#475569" strokeWidth="1.5" />
-                    <line x1="90" y1="40" x2="110" y2="40" stroke="#475569" strokeWidth="2.5" />
-                    <line x1="190" y1="40" x2="210" y2="40" stroke="#475569" strokeWidth="2.5" />
-                    {/* Color Bands */}
-                    <rect x="122" y="30.7" width="5.5" height="18.6" fill={bandColors[0]} />
-                    <rect x="137" y="30.7" width="5.5" height="18.6" fill={bandColors[1]} />
-                    <rect x="152" y="30.7" width="5.5" height="18.6" fill={bandColors[2]} />
-                    <rect x="172" y="30.7" width="5.5" height="18.6" fill="#d4af37" /> {/* Gold Tolerance */}
-                    <text x="150" y="24" fill="#94a3b8" fontSize="8" fontWeight="bold" textAnchor="middle">{resistance.toFixed(0)} Ω</text>
-
-                    {/* Ammeter */}
-                    <circle cx="260" cy="85" r="20" fill="#1e293b" stroke="#eab308" strokeWidth="1.5" />
-                    <text x="260" y="80" fill="#eab308" fontSize="12" fontWeight="900" textAnchor="middle">A</text>
-                    <text x="260" y="96" fill="#eab308" fontSize="9.5" fontWeight="900" textAnchor="middle">{(switchStatus ? current : 0.0).toFixed(3)}A</text>
-
-                    {/* Switch */}
-                    <circle cx="120" cy="130" r="3.5" fill="#94a3b8" />
-                    <circle cx="180" cy="130" r="3.5" fill="#94a3b8" />
-                    {switchStatus ? (
-                      <line x1="120" y1="130" x2="180" y2="130" stroke="#34d399" strokeWidth="4.5" strokeLinecap="round" />
-                    ) : (
-                      <line x1="120" y1="130" x2="165" y2="105" stroke="#ef4444" strokeWidth="4.5" strokeLinecap="round" />
-                    )}
-                    <text x="150" y="148" fill="#64748b" fontSize="8" fontWeight="bold" textAnchor="middle">
-                      {switchStatus ? "สวิตช์ปิด (วงจรทำงาน)" : "สวิตช์เปิด (ตัดวงจร)"}
-                    </text>
-                  </svg>
-                </div>
-
-                <div className="flex justify-between items-center text-[10px] text-slate-400 font-semibold border-t border-slate-900 pt-3">
-                  <span>RUN TIME: {elapsedSeconds.toFixed(1)}s</span>
-                  <span className="text-cyan-400">AMPS: {(switchStatus ? current : 0.0).toFixed(3)} A</span>
-                </div>
-              </div>
-
-              {/* Control Panel */}
-              <div className="bg-white rounded-3xl border border-slate-200/60 p-5 flex flex-col justify-between gap-5 shadow-xs">
-                <div>
-                  <h3 className="text-xs sm:text-sm font-extrabold text-slate-800 border-b border-slate-100 pb-3 flex items-center gap-2 select-none">
-                    <Sliders className="w-5 h-5 text-indigo-500" />
-                    แผงควบคุมวงจรจำลอง (DC Controls)
-                  </h3>
-
-                  {/* Inputs Stack */}
-                  <div className="space-y-4 mt-4">
-                    {/* Switch Toggle */}
-                    <div className="flex justify-between items-center bg-slate-50 border border-slate-100 p-2.5 rounded-2xl select-none">
-                      <span className="text-xs font-bold text-slate-600">🔌 สวิตช์ปิด-เปิดวงจร</span>
-                      <button
-                        onClick={() => setSwitchStatus(!switchStatus)}
-                        className={`px-4 py-1.5 rounded-xl text-xs font-extrabold border cursor-pointer active:scale-95 transition-all ${
-                          switchStatus 
-                            ? "bg-emerald-500 border-emerald-600 text-white shadow-xs" 
-                            : "bg-red-500 border-red-600 text-white shadow-xs"
-                        }`}
-                      >
-                        {switchStatus ? "🟢 สับสวิตช์ลง (Closed)" : "🔴 ยกสวิตช์ขึ้น (Open)"}
-                      </button>
-                    </div>
-
-                    {/* Voltage control */}
-                    <div className="group bg-slate-50/50 p-3 rounded-2xl border border-slate-100 hover:border-slate-200/50 transition-all select-none">
-                      <div className="flex justify-between items-center text-xs font-bold mb-1.5">
-                        <span className="text-slate-600 flex items-center gap-1.5">
-                          <Zap className="w-4 h-4 text-blue-500" />
-                          แรงดันไฟฟ้า (Voltage)
-                        </span>
-                        <span className="text-blue-600 font-extrabold text-xs bg-blue-50 px-2.5 py-0.5 rounded border border-blue-100">
-                          {voltage.toFixed(1)} V
-                        </span>
-                      </div>
-                      <input
-                        type="range"
-                        min="0"
-                        max="24"
-                        step="0.5"
-                        value={voltage}
-                        onChange={(e) => setVoltage(Number(e.target.value))}
-                        className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-500"
-                      />
-                      <div className="flex items-center gap-1.5 mt-2">
-                        {[-5, -1, 1, 5].map((val) => (
-                          <button
-                            key={val}
-                            onClick={() => setVoltage((prev) => Math.max(0, Math.min(24, prev + val)))}
-                            className="flex-1 py-1 text-[10px] font-black text-slate-600 bg-white border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50 transition active:scale-95"
-                          >
-                            {val > 0 ? `+${val}V` : `${val}V`}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Resistance control */}
-                    <div className="group bg-slate-50/50 p-3 rounded-2xl border border-slate-100 hover:border-slate-200/50 transition-all select-none">
-                      <div className="flex justify-between items-center text-xs font-bold mb-1.5">
-                        <span className="text-slate-600 flex items-center gap-1.5">
-                          <Sliders className="w-4 h-4 text-amber-500" />
-                          ความต้านทาน (Resistance)
-                        </span>
-                        <span className="text-amber-600 font-extrabold text-xs bg-amber-50 px-2.5 py-0.5 rounded border border-amber-100">
-                          {resistance.toFixed(0)} Ω
-                        </span>
-                      </div>
-                      <input
-                        type="range"
-                        min="10"
-                        max="500"
-                        step="10"
-                        value={resistance}
-                        onChange={(e) => setResistance(Number(e.target.value))}
-                        className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-amber-500"
-                      />
-                      <div className="flex items-center gap-1.5 mt-2">
-                        {[-50, -10, 10, 50].map((val) => (
-                          <button
-                            key={val}
-                            onClick={() => setResistance((prev) => Math.max(10, Math.min(500, prev + val)))}
-                            className="flex-1 py-1 text-[10px] font-black text-slate-600 bg-white border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50 transition active:scale-95"
-                          >
-                            {val > 0 ? `+${val}Ω` : `${val}Ω`}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Primary Actions */}
-                <div className="space-y-2 border-t border-slate-100 pt-3">
-                  <div className="flex items-center gap-3">
-                    <button
-                      onClick={handleStartStop}
-                      className={`flex-1 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition-all shadow-xs ${
-                        isRunning 
-                          ? "bg-amber-500 text-white border border-amber-600 shadow-amber-500/10" 
-                          : "bg-indigo-600 text-white border border-indigo-700 shadow-indigo-500/10"
-                      }`}
-                    >
-                      {isRunning ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
-                      <span>{isRunning ? "พักการจำลอง (Pause)" : "เริ่มการจำลอง (Start)"}</span>
-                    </button>
-
-                    <button
-                      onClick={handleAddPoint}
-                      className="py-2.5 px-4 bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-xl text-xs font-bold hover:bg-emerald-100 transition cursor-pointer active:scale-95 flex items-center gap-1.5"
-                    >
-                      <Plus className="w-4 h-4" />
-                      <span>บันทึกจุดวัด</span>
-                    </button>
-                  </div>
-
-                  <button
-                    onClick={handleReset}
-                    className="w-full py-2.5 bg-slate-50 border border-slate-200 text-slate-500 rounded-xl text-xs font-bold hover:bg-slate-100 transition cursor-pointer active:scale-95 flex items-center justify-center gap-1.5"
-                  >
-                    <RefreshCw className="w-3.5 h-3.5" />
-                    <span>รีเซ็ตค่าเครื่องมือ (Reset)</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Row 2: Table & Live Graph */}
-            <div className="flex flex-col gap-6">
-              
-              {/* Log Data Table */}
-              <div className="bg-white rounded-3xl border border-slate-200/60 p-5 shadow-xs">
-                <div className="flex justify-between items-center border-b border-slate-100 pb-3 mb-4 select-none">
-                  <div>
-                    <h3 className="text-xs sm:text-sm font-extrabold text-slate-800">
-                      ตารางบันทึกผลการทดลอง
-                    </h3>
-                    <p className="text-[10px] text-slate-400 font-semibold mt-0.5">
-                      จุดวัดพารามิเตอร์ V, R และกระแสไฟฟ้า I เพื่อใช้พล็อตกราฟหาค่าความต้านทาน
-                    </p>
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={handleCopyData}
-                      className="p-2 bg-slate-50 border border-slate-200 text-slate-500 rounded-xl text-xs font-bold hover:bg-slate-100 cursor-pointer active:scale-95 flex items-center gap-1.5"
-                      title="คัดลอกตาราง"
-                    >
-                      <Clipboard className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={handleExportCSV}
-                      className="p-2 bg-slate-50 border border-slate-200 text-slate-500 rounded-xl text-xs font-bold hover:bg-slate-100 cursor-pointer active:scale-95 flex items-center gap-1.5"
-                      title="ส่งออก CSV"
-                    >
-                      <Download className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-
-                <div className="overflow-x-auto select-text">
-                  <table className="w-full text-left border-collapse min-w-[400px]">
-                    <thead>
-                      <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-extrabold text-[10px] sm:text-xs">
-                        <th className="py-2.5 px-4 w-16">จุดวัด</th>
-                        <th className="py-2.5 px-4">แรงดันไฟฟ้า (Voltage, V)</th>
-                        <th className="py-2.5 px-4">ความต้านทาน (Resistance, R)</th>
-                        <th className="py-2.5 px-4">กระแสไฟฟ้า (Current, I)</th>
-                        <th className="py-2.5 px-4 w-12 text-center">จัดการ</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100 text-[11px] sm:text-xs font-bold text-slate-600">
-                      {dataPoints.length === 0 ? (
-                        <tr>
-                          <td colSpan={5} className="py-8 text-center text-slate-400 select-none">
-                            ไม่มีข้อมูลผลการทดลองที่บันทึกไว้ในตาราง
-                          </td>
-                        </tr>
-                      ) : (
-                        dataPoints.map((p) => (
-                          <tr key={p.index} className="hover:bg-slate-50/50 transition">
-                            <td className="py-2 px-4 font-mono">#{p.index}</td>
-                            <td className="py-2 px-4 font-mono text-blue-600">{p.voltage.toFixed(1)} V</td>
-                            <td className="py-2 px-4 font-mono text-amber-600">{p.resistance.toFixed(0)} Ω</td>
-                            <td className="py-2 px-4 font-mono text-emerald-600">{p.current.toFixed(3)} A</td>
-                            <td className="py-2 px-4 text-center">
-                              <button
-                                onClick={() => handleClearPoint(p.index)}
-                                className="text-red-500 hover:text-red-700 cursor-pointer p-1 rounded hover:bg-red-50"
-                              >
-                                <Trash className="w-3.5 h-3.5" />
-                              </button>
-                            </td>
-                          </tr>
-                        ))
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              {/* Live Scatter Graph */}
-              <div className="bg-white rounded-3xl border border-slate-200/60 p-5 shadow-xs">
-                <div className="border-b border-slate-100 pb-3 mb-4 select-none">
-                  <h3 className="text-xs sm:text-sm font-extrabold text-slate-800">
-                    กราฟผลการทดลองตามกฎของโอห์ม (V-I Curve)
-                  </h3>
-                  <p className="text-[10px] text-slate-400 font-semibold mt-0.5">
-                    กราฟแสดงกระแสไฟฟ้า (I) ในหน่วยแอมแปร์ บนแกน Y เทียบกับแรงดันไฟฟ้า (V) บนแกน X
-                  </p>
-                </div>
-
-                <div className="bg-slate-950 p-4 rounded-2xl flex flex-col justify-between select-none relative overflow-hidden">
-                  <div className="flex justify-between items-center text-[9px] text-slate-500 font-bold border-b border-slate-900 pb-1.5 mb-2">
-                    <span>LIVE RELATION SCATTER GRAPH</span>
-                    <span className="text-emerald-400">กฎของโอห์ม: I = V / R</span>
-                  </div>
-
-                  <svg className="w-full h-48" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    {/* Grid lines */}
-                    <line x1="30" y1="15" x2="180" y2="15" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
-                    <line x1="30" y1="36.25" x2="180" y2="36.25" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
-                    <line x1="30" y1="57.5" x2="180" y2="57.5" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
-                    <line x1="30" y1="78.75" x2="180" y2="78.75" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
-                    <line x1="30" y1="100" x2="180" y2="100" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
-
-                    {/* Y-axis metrics */}
-                    <text x="27" y="17.5" fill="#475569" fontSize="6" fontWeight="bold" textAnchor="end">2.5 A</text>
-                    <text x="27" y="38.75" fill="#475569" fontSize="6" fontWeight="bold" textAnchor="end">2.0 A</text>
-                    <text x="27" y="60" fill="#475569" fontSize="6" fontWeight="bold" textAnchor="end">1.5 A</text>
-                    <text x="27" y="81.25" fill="#475569" fontSize="6" fontWeight="bold" textAnchor="end">1.0 A</text>
-
-                    {/* Live Operating Position Line */}
-                    {currentLinePath && (
-                      <path d={currentLinePath} stroke="#10b981" strokeWidth="1.5" strokeLinecap="round" fill="none" />
-                    )}
-
-                    {/* Logged points circles */}
-                    {dataPoints.map((p) => (
-                      <circle
-                        key={p.index}
-                        cx={xCoord(p.voltage)}
-                        cy={yCoord(p.current)}
-                        r="2.5"
-                        fill="#22d3ee"
-                        stroke="#ffffff"
-                        strokeWidth="0.75"
-                      />
-                    ))}
-
-                    {/* Live operating indicator circle */}
-                    {switchStatus && (
-                      <circle
-                        cx={xCoord(voltage)}
-                        cy={yCoord(current)}
-                        r="3.5"
-                        fill="#ef4444"
-                        className="animate-ping"
-                      />
-                    )}
-
-                    {/* Axes lines */}
-                    <line x1="30" y1="100" x2="180" y2="100" stroke="rgba(255,255,255,0.15)" strokeWidth="1" />
-                    
-                    {/* X-axis metrics */}
-                    <text x="30" y="108" fill="#94a3b8" fontSize="6.5" fontWeight="bold" textAnchor="middle">0</text>
-                    <text x="67.5" y="108" fill="#94a3b8" fontSize="6.5" fontWeight="bold" textAnchor="middle">6</text>
-                    <text x="105" y="108" fill="#94a3b8" fontSize="6.5" fontWeight="bold" textAnchor="middle">12</text>
-                    <text x="142.5" y="108" fill="#94a3b8" fontSize="6.5" fontWeight="bold" textAnchor="middle">18</text>
-                    <text x="180" y="108" fill="#94a3b8" fontSize="6.5" fontWeight="bold" textAnchor="middle">24</text>
-                    <text x="195" y="108" fill="#94a3b8" fontSize="6" fontWeight="bold">แรงดัน (V)</text>
-                  </svg>
-                </div>
-              </div>
-
-              {/* Theory formula card */}
-              <div className="bg-white rounded-3xl border border-slate-200/60 p-5 shadow-xs select-none text-left">
-                <h3 className="text-xs sm:text-sm font-extrabold text-slate-800 border-b border-slate-100 pb-3 mb-4">
-                  สูตรความสัมพันธ์ทางฟิสิกส์ (Physical Formula)
-                </h3>
-                <div className="bg-slate-50 border border-slate-200/50 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-                  <div className="text-center sm:text-left">
-                    <span className="text-[10px] text-slate-400 font-bold uppercase block mb-1">สมการตามกฎของโอห์ม</span>
-                    <div className="text-2xl font-mono font-bold text-slate-800">I = V / R</div>
-                  </div>
-                  <div className="text-[11px] sm:text-xs text-slate-500 font-semibold space-y-1 border-t sm:border-t-0 sm:border-l border-slate-200 pt-3 sm:pt-0 sm:pl-4 w-full sm:w-auto">
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-bold text-indigo-600">V</span>
-                      <span>= แรงดันไฟฟ้าตกคร่อมตัวต้านทาน (V)</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-bold text-emerald-600">I</span>
-                      <span>= กระแสไฟฟ้าที่วัดได้ในวงจร (A)</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-bold text-amber-600">R</span>
-                      <span>= ความต้านทานไฟฟ้าของโหลด (Ω)</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Right Sidebar Area (25%) */}
-          <div className="lg:col-span-3 select-none">
-            <div className="bg-white rounded-3xl border border-slate-200/60 p-5 space-y-5">
-              
-              {/* Quest Section */}
-              <div className="bg-slate-50 border border-slate-100 rounded-2xl p-4 relative overflow-hidden group">
-                <div className="absolute top-0 right-0 w-12 h-12 bg-indigo-500/5 rounded-bl-full" />
-                <h3 className="text-xs sm:text-sm font-extrabold text-indigo-950 flex items-center gap-2 border-b border-indigo-100/60 pb-2 mb-3">
-                  <Sparkles className="w-4 h-4 text-indigo-500" />
-                  ภารกิจจำลอง
-                </h3>
-                <p className="text-[11px] text-slate-500 font-semibold leading-relaxed leading-1.4 text-left">
-                  ปรับค่าควบคุมแรงดันและความต้านทานเพื่อให้กระแสไฟฟ้าคงอยู่ที่ **0.1 A ถึง 0.2 A** ต่อเนื่องเป็นเวลา 20 วินาที
-                </p>
-
-                {/* Progress bar */}
-                <div className="space-y-2 mt-4">
-                  <div className="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden relative">
-                    <div
-                      className="h-full bg-gradient-to-r from-indigo-500 to-blue-500 rounded-full transition-all duration-300"
-                      style={{ width: `${(questProgress / 20) * 100}%` }}
-                    />
-                  </div>
-                  <div className="flex justify-between items-center text-[10px] font-bold">
-                    <span className="text-slate-400">PROGRESS</span>
-                    <span className="text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md">
-                      {questProgress.toFixed(1)} / 20.0 วินาที
-                    </span>
-                  </div>
-                </div>
-
-                {questSuccess && (
-                  <div className="mt-4 bg-emerald-50 border border-emerald-100 text-emerald-800 text-[10px] font-bold p-2.5 rounded-xl text-center">
-                    🎉 ภารกิจสำเร็จแล้ว! คุณได้รับ +25 คะแนน
-                  </div>
-                )}
-              </div>
-
-              {/* Lab Guideline tips */}
-              <div>
-                <h3 className="text-xs sm:text-sm font-extrabold text-slate-800 mb-3 text-left">คำแนะนำข้อเสนอแนะ</h3>
-                <ul className="space-y-2.5 text-left text-[11px] sm:text-xs text-slate-400 font-semibold leading-relaxed">
-                  <li className="flex items-start gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0 mt-1.5" />
-                    <span>ค่อย ๆ เพิ่มระดับแรงดันเพื่อดูความแปรผันของกระแสไฟฟ้าเชิงเส้น</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0 mt-1.5" />
-                    <span>ทดลองเปลี่ยนขนาดความต้านทานเพื่อศึกษาการเปลี่ยนความชัน (Slope) ของเส้นโค้งกราฟความสัมพันธ์</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0 mt-1.5" />
-                    <span>เพื่อหลีกเลี่ยงกระแสที่สูงเกินจนเกิดลัดวงจร ไม่ควรป้อนแรงดันสูงสุดที่ความต้านทานต่ำสุด</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </main>
-
+        {/* Switch */}
+        <circle cx="120" cy="130" r="3.5" fill="#94a3b8" />
+        <circle cx="180" cy="130" r="3.5" fill="#94a3b8" />
+        {switchStatus ? (
+          <line x1="120" y1="130" x2="180" y2="130" stroke="#34d399" strokeWidth="4.5" strokeLinecap="round" />
+        ) : (
+          <line x1="120" y1="130" x2="165" y2="105" stroke="#ef4444" strokeWidth="4.5" strokeLinecap="round" />
+        )}
+      </svg>
     </div>
   );
+
+  const controls = (
+    <div className="space-y-4">
+      {/* Switch Status */}
+      <div className="flex justify-between items-center bg-slate-50 border border-slate-200 p-2.5 rounded-xl">
+        <span className="text-xs font-bold text-slate-600">🔌 สวิตช์ปิด-เปิดวงจร</span>
+        <button
+          onClick={() => setSwitchStatus(!switchStatus)}
+          className={`px-4 py-1.5 rounded-xl text-xs font-extrabold border cursor-pointer active:scale-95 transition-all ${
+            switchStatus 
+              ? "bg-emerald-500 border-emerald-600 text-white shadow-xs" 
+              : "bg-red-500 border-red-600 text-white shadow-xs"
+          }`}
+        >
+          {switchStatus ? "🟢 สับสวิตช์ลง (Closed)" : "🔴 ยกสวิตช์ขึ้น (Open)"}
+        </button>
+      </div>
+
+      {/* Voltage control */}
+      <div className="group bg-slate-50/50 p-3 rounded-2xl border border-slate-100 hover:border-slate-200/50 transition-all select-none">
+        <div className="flex justify-between items-center text-xs font-bold mb-1.5">
+          <span className="text-slate-600 flex items-center gap-1.5">
+            <Zap className="w-4 h-4 text-blue-500" />
+            แรงดันไฟฟ้า (Voltage)
+          </span>
+          <span className="text-blue-600 font-extrabold text-xs bg-blue-50 px-2.5 py-0.5 rounded border border-blue-100">
+            {voltage.toFixed(1)} V
+          </span>
+        </div>
+        <input
+          type="range"
+          min="0"
+          max="24"
+          step="0.5"
+          value={voltage}
+          onChange={(e) => setVoltage(Number(e.target.value))}
+          className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-500"
+        />
+        <div className="flex items-center gap-1.5 mt-2">
+          {[-5, -1, 1, 5].map((val) => (
+            <button
+              key={val}
+              onClick={() => setVoltage((prev) => Math.max(0, Math.min(24, prev + val)))}
+              className="flex-1 py-1 text-[10px] font-black text-slate-600 bg-white border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50 transition active:scale-95"
+            >
+              {val > 0 ? `+${val}V` : `${val}V`}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Resistance control */}
+      <div className="group bg-slate-50/50 p-3 rounded-2xl border border-slate-100 hover:border-slate-200/50 transition-all select-none">
+        <div className="flex justify-between items-center text-xs font-bold mb-1.5">
+          <span className="text-slate-600 flex items-center gap-1.5">
+            <Sliders className="w-4 h-4 text-amber-500" />
+            ความต้านทาน (Resistance)
+          </span>
+          <span className="text-amber-600 font-extrabold text-xs bg-amber-50 px-2.5 py-0.5 rounded border border-amber-100">
+            {resistance.toFixed(0)} Ω
+          </span>
+        </div>
+        <input
+          type="range"
+          min="10"
+          max="500"
+          step="10"
+          value={resistance}
+          onChange={(e) => setResistance(Number(e.target.value))}
+          className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-amber-500"
+        />
+        <div className="flex items-center gap-1.5 mt-2">
+          {[-50, -10, 10, 50].map((val) => (
+            <button
+              key={val}
+              onClick={() => setResistance((prev) => Math.max(10, Math.min(500, prev + val)))}
+              className="flex-1 py-1 text-[10px] font-black text-slate-600 bg-white border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50 transition active:scale-95"
+            >
+              {val > 0 ? `+${val}Ω` : `${val}Ω`}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Actions */}
+      <div className="grid grid-cols-4 gap-2 pt-1">
+        <button onClick={handleStartStop} className={`col-span-2 inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-xs font-black text-white shadow-sm ${isRunning ? "bg-slate-700" : "bg-blue-600 hover:bg-blue-700"}`}>
+          {isRunning ? <Pause className="h-4 w-4 fill-white stroke-none" /> : <Play className="h-4 w-4 fill-white stroke-none" />}
+          {isRunning ? "หยุดชั่วคราว" : "เริ่มจำลอง"}
+        </button>
+        <button onClick={handleAddPoint} className="inline-flex items-center justify-center rounded-xl border border-blue-100 bg-blue-50 text-xs font-black text-blue-700 hover:bg-blue-100">บันทึกจุด</button>
+        <button onClick={handleReset} className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50" aria-label="รีเซ็ต">
+          <RotateCcw className="h-4 w-4" />
+        </button>
+      </div>
+    </div>
+  );
+
+  return (
+    <SharedSimulationShell
+      accent="blue"
+      labId="ohms-law"
+      category="Physics"
+      title="Ohm's Law & DC Circuits"
+      subtitle="ศึกษาความสัมพันธ์ระหว่างความต่างศักย์ กระแสไฟฟ้า และความต้านทานในวงจรไฟฟ้ากระแสตรงตามกฎของโอห์ม"
+      statusLabel={flowActive ? "ต่อวงจรทำงาน" : "วงจรเปิด/ตัดกระแส"}
+      icon={Zap}
+      sceneTitle="แผนภาพวงจรไฟฟ้าจำลอง"
+      scene={scene}
+      controlsTitle="แผงควบคุมวงจร"
+      controls={controls}
+      metrics={[
+        { label: "แรงดัน", value: `${voltage.toFixed(1)} V`, tone: "blue" },
+        { label: "ความต้านทาน", value: `${resistance.toFixed(0)} Ω`, tone: "orange" },
+        { label: "กระแสไฟฟ้า", value: `${(switchStatus ? current : 0.0).toFixed(3)} A`, tone: "emerald" },
+        { label: "เวลา", value: timeLabel, tone: "cyan" },
+      ]}
+      graph={
+        <OhmsGraph
+          dataPoints={dataPoints}
+          voltage={voltage}
+          current={current}
+          switchStatus={switchStatus}
+        />
+      }
+      table={
+        <ResultsTable
+          dataPoints={dataPoints}
+          onClearPoint={handleClearPoint}
+          onCopyData={handleCopyData}
+          onExportCSV={handleExportCSV}
+        />
+      }
+      theory={
+        <TheoryPanel
+          voltage={voltage}
+          resistance={resistance}
+          current={current}
+          switchStatus={switchStatus}
+        />
+      }
+      steps={[
+        { label: "ตั้งค่าโหลด", icon: Sliders },
+        { label: "สับสวิตช์ลง", icon: Play },
+        { label: "ปรับแรงดัน", icon: Zap },
+        { label: "บันทึกจุด", icon: ClipboardList },
+        { label: "หาความชัน", icon: Target },
+      ]}
+      learningGoals={[
+        "ศึกษาความสัมพันธ์ของกระแสไฟฟ้ากับแรงดัน",
+        "ศึกษาความสัมพันธ์ของกระแสไฟฟ้ากับความต้านทาน",
+        "หาความต้านทานไฟฟ้าจากความชันของกราฟ",
+        "เรียนรู้กฎของโอห์มและการประยุกต์ใช้งาน",
+      ]}
+      progressLabel="ระยะเวลาที่กระแสอยู่ในช่วงภารกิจ"
+      progressValue={`${questProgress.toFixed(1)} / 20 วินาที`}
+      progressPercent={(questProgress / 20) * 100}
+      tips={[
+        "ค่อย ๆ เพิ่มระดับแรงดันเพื่อดูความแปรผันของกระแสไฟฟ้าเชิงเส้น",
+        "ทดลองเปลี่ยนขนาดความต้านทานเพื่อศึกษาผลกระทบต่อความชันกราฟ",
+        "ระวังอย่าใช้กระแสไฟฟ้าสูงเกินไปจนเกิดความร้อนสูงในวงจร",
+        "จดบันทึกค่าอย่างน้อย 5 จุดเพื่อนำไปพล็อตกราฟหาค่าความชัน",
+      ]}
+      onSave={handleSaveResults}
+    />
+  );
 }
+
+// Helpers
+const getResistorColors = (r: number) => {
+  const val = Math.round(r);
+  const str = val.toString();
+  let d1 = 0;
+  let d2 = 0;
+  let multiplier = 0;
+
+  if (str.length === 1) {
+    d1 = 0;
+    d2 = val;
+    multiplier = 0;
+  } else if (str.length === 2) {
+    d1 = parseInt(str[0]);
+    d2 = parseInt(str[1]);
+    multiplier = 0;
+  } else {
+    d1 = parseInt(str[0]);
+    d2 = parseInt(str[1]);
+    multiplier = str.length - 2;
+  }
+
+  const colorsMap = [
+    "#000000", // 0: Black
+    "#9c4a1b", // 1: Brown
+    "#ef4444", // 2: Red
+    "#f97316", // 3: Orange
+    "#eab308", // 4: Yellow
+    "#22c55e", // 5: Green
+    "#3b82f6", // 6: Blue
+    "#a855f7", // 7: Violet
+    "#6b7280", // 8: Grey
+    "#ffffff", // 9: White
+  ];
+
+  return [
+    colorsMap[d1] || "#9c4a1b",
+    colorsMap[d2] || "#000000",
+    colorsMap[multiplier] || "#9c4a1b",
+  ];
+};

@@ -13,6 +13,7 @@ import {
   Shuffle,
 } from "lucide-react";
 import SharedSimulationShell from "@/components/labs/simulation/SharedSimulationShell";
+import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";
 
 type Genotype = "YY" | "Yy" | "yy";
 
@@ -291,7 +292,7 @@ export default function MendelianGeneticsSimulation() {
     resultsRef.current = [];
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (results.length === 0) {
       alert("ยังไม่มีข้อมูล Mendelian Genetics สำหรับบันทึก กรุณาเริ่มจำลองหรือสุ่มลูกหลานก่อน");
       return;
@@ -307,10 +308,23 @@ export default function MendelianGeneticsSimulation() {
       dataPoints: results,
     };
 
-    localStorage.setItem("scisiam_saved_mendelian_experiment", JSON.stringify(experimentData));
-    const currentPoints = Number(localStorage.getItem("scisiam_points") || "120");
-    localStorage.setItem("scisiam_points", String(currentPoints + 25));
-    window.dispatchEvent(new Event("points-updated"));
+    await saveExperimentAndSync({
+      localStorageKey: "scisiam_saved_mendelian_experiment",
+      localPayload: experimentData,
+      labId: "mendels-inheritance",
+      title: "Mendelian Genetics Lab",
+      variables: { parentA, parentB, traitLabel, sampleSize },
+      liveValues: { dominantPct, counts, progress },
+      graphPoints: results,
+      tableRows: results,
+      summary: {
+        traitLabel,
+        sampleSize,
+        dataPointCount: results.length,
+        dominantPercent: dominantPct,
+      },
+      score: Math.round(Math.min(100, Math.max(0, progress))),
+    });
     alert("บันทึกผลการทดลอง Mendelian Genetics สำเร็จ");
   };
 

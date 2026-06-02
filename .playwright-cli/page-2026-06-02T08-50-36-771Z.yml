@@ -1,0 +1,267 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - navigation [ref=e3]:
+      - generic [ref=e4]:
+        - button "เปิด/ปิด เมนูด้านข้าง" [ref=e5] [cursor=pointer]:
+          - img [ref=e6]
+        - link "SciSiam" [ref=e7] [cursor=pointer]:
+          - /url: /
+          - img [ref=e9]
+          - generic [ref=e12]: SciSiam
+      - generic [ref=e13]:
+        - generic [ref=e14] [cursor=pointer]:
+          - img [ref=e15]
+          - generic [ref=e18]: 120 แต้ม
+        - button "การแจ้งเตือน" [ref=e20]:
+          - img [ref=e21]
+        - link "เข้าสู่ระบบ" [ref=e28] [cursor=pointer]:
+          - /url: /login
+          - img [ref=e29]
+          - generic [ref=e32]: เข้าสู่ระบบ
+    - main [ref=e33]:
+      - generic [ref=e34]:
+        - generic [ref=e35]:
+          - link "หน้าแรก" [ref=e36] [cursor=pointer]:
+            - /url: /
+            - img [ref=e37]
+            - text: หน้าแรก
+          - img [ref=e40]
+          - link "Physics" [ref=e42] [cursor=pointer]:
+            - /url: /?category=Physics
+          - img [ref=e43]
+          - link "Newton's Law of Cooling" [ref=e45] [cursor=pointer]:
+            - /url: /labs/newtons-cooling
+          - img [ref=e46]
+          - generic [ref=e48]: Simulator
+        - generic [ref=e49]:
+          - generic [ref=e50]:
+            - generic [ref=e52]:
+              - generic [ref=e53]:
+                - img [ref=e55]
+                - generic [ref=e57]: Physics
+                - generic [ref=e58]: กำลังวัดอุณหภูมิ
+              - heading "Newton's Law of Cooling Simulator" [level=1] [ref=e59]
+              - paragraph [ref=e60]: ทดลองศึกษาความร้อนและการเย็นตัวของของเหลวตามกฎการเย็นตัวของนิวตัน ควบคุมฮีตเตอร์สั่งการอุณหภูมิ และอ่านค่าเซ็นเซอร์อุณหภูมิแบบ Real-time
+            - generic [ref=e61]:
+              - generic [ref=e63]:
+                - generic [ref=e64]:
+                  - heading "ห้องปฏิบัติการจำลองความร้อน" [level=2] [ref=e65]:
+                    - img [ref=e66]
+                    - text: ห้องปฏิบัติการจำลองความร้อน
+                  - generic [ref=e68]: กำลังวัดอุณหภูมิ
+                - generic [ref=e69]:
+                  - generic [ref=e71]:
+                    - generic [ref=e72]: สภาพแวดล้อม
+                    - generic [ref=e73]:
+                      - img [ref=e74]
+                      - generic [ref=e87]: ห้อง (Air)
+                    - generic [ref=e88]:
+                      - img [ref=e89]
+                      - generic [ref=e93]: อากาศนิ่ง
+                  - generic [ref=e94]:
+                    - generic [ref=e95]:
+                      - generic [ref=e96]: AMBIENT
+                      - generic [ref=e97]: 25.0°C
+                    - img [ref=e98]
+                  - img [ref=e102]
+              - generic [ref=e118]:
+                - heading "แผงควบคุมอุณหภูมิ" [level=2] [ref=e119]:
+                  - img [ref=e120]
+                  - text: แผงควบคุมอุณหภูมิ
+                - generic [ref=e125]:
+                  - generic [ref=e126]:
+                    - generic [ref=e127]:
+                      - generic [ref=e128]:
+                        - img [ref=e129]
+                        - text: อุณหภูมิเริ่มต้น (T₀)
+                      - generic [ref=e131]: 90 °C
+                    - slider "อุณหภูมิเริ่มต้น (T₀) 90 °C" [disabled] [ref=e132]: "90"
+                  - generic [ref=e133]:
+                    - generic [ref=e134]:
+                      - generic [ref=e135]:
+                        - img [ref=e136]
+                        - text: อุณหภูมิสิ่งแวดล้อม (Tₛ)
+                      - generic [ref=e138]: 25 °C
+                    - slider "อุณหภูมิสิ่งแวดล้อม (Tₛ) 25 °C" [disabled] [ref=e139]: "25"
+                  - generic [ref=e140]:
+                    - generic [ref=e141]:
+                      - generic [ref=e142]:
+                        - img [ref=e143]
+                        - text: ค่าคงที่การเย็นตัว (k)
+                      - generic [ref=e144]: 0.120 /นาที
+                    - slider "ค่าคงที่การเย็นตัว (k) 0.120 /นาที" [disabled] [ref=e145]: "0.121"
+                  - generic [ref=e146]:
+                    - generic [ref=e147]:
+                      - generic [ref=e148]: ช่วงบันทึกข้อมูล
+                      - generic [ref=e149]:
+                        - combobox "ช่วงบันทึกข้อมูล" [disabled] [ref=e150]:
+                          - option "10 วินาที"
+                          - option "30 วินาที" [selected]
+                          - option "1 นาที"
+                        - img
+                    - generic [ref=e151]:
+                      - generic [ref=e152]: ความเร็วการจำลอง
+                      - generic [ref=e153]:
+                        - combobox "ความเร็วการจำลอง" [ref=e154]:
+                          - option "0.5x ช้า"
+                          - option "1x (ปกติ)" [selected]
+                          - option "2x เร็ว"
+                          - option "5x เร็วมาก"
+                        - img
+                  - button "♨️ ปิดฮีตเตอร์ (เย็นตัวปกติ)" [ref=e156] [cursor=pointer]:
+                    - generic [ref=e158]: ♨️ ปิดฮีตเตอร์ (เย็นตัวปกติ)
+                  - generic [ref=e159]:
+                    - button "หยุดชั่วคราว" [active] [ref=e341] [cursor=pointer]:
+                      - img [ref=e342]
+                      - text: หยุดชั่วคราว
+                    - button "บันทึกจุด" [ref=e163] [cursor=pointer]
+                    - button "รีเซ็ต" [ref=e164] [cursor=pointer]:
+                      - img [ref=e165]
+                - generic [ref=e168]:
+                  - generic [ref=e169]: "อุณหภูมิน้ำ: 89.9°C"
+                  - generic [ref=e170]: "สิ่งแวดล้อม: 25.0°C"
+                  - generic [ref=e171]: "เวลา: 00:00"
+                  - generic [ref=e172]: "สถานะฮีตเตอร์: ❄️ ปิด/เย็นลง"
+                - button "บันทึกผลการทดลอง" [ref=e173]:
+                  - img [ref=e174]
+                  - text: บันทึกผลการทดลอง
+            - generic [ref=e178]:
+              - generic [ref=e180]:
+                - generic [ref=e181]:
+                  - heading "กราฟอุณหภูมิกับเวลา" [level=3] [ref=e182]:
+                    - img [ref=e183]
+                    - text: กราฟอุณหภูมิกับเวลา
+                  - generic [ref=e186]: T - t Decay
+                - img [ref=e345]:
+                  - generic [ref=e346]: "100"
+                  - generic [ref=e347]: "75"
+                  - generic [ref=e348]: "50"
+                  - generic [ref=e349]: "25"
+                  - generic [ref=e350]: "0"
+                  - generic [ref=e351]: Temp (°C)
+                  - generic [ref=e352]: "0"
+                  - generic [ref=e353]: "15"
+                  - generic [ref=e354]: "30"
+                  - generic [ref=e355]: "45"
+                  - generic [ref=e356]: "60"
+                  - generic [ref=e357]: t (min)
+                - generic [ref=e359]:
+                  - generic [ref=e362]: อุณหภูมิวัตถุ (T)
+                  - generic [ref=e365]: อุณหภูมิแวดล้อม (Tₛ)
+              - generic [ref=e194]:
+                - generic [ref=e195]:
+                  - heading "ตารางบันทึกผล" [level=3] [ref=e196]:
+                    - img [ref=e197]
+                    - text: ตารางบันทึกผล
+                  - generic [ref=e200]:
+                    - button "คัดลอกข้อมูล" [ref=e201] [cursor=pointer]:
+                      - img [ref=e202]
+                    - button "Export CSV" [ref=e205] [cursor=pointer]:
+                      - img [ref=e206]
+                - table [ref=e366]:
+                  - rowgroup [ref=e367]:
+                    - row "เวลา (นาที) วัตถุ (T) แวดล้อม (Tₛ) ลบ" [ref=e368]:
+                      - columnheader "เวลา (นาที)" [ref=e369]
+                      - columnheader "วัตถุ (T)" [ref=e370]
+                      - columnheader "แวดล้อม (Tₛ)" [ref=e371]
+                      - columnheader "ลบ" [ref=e372]
+                  - rowgroup [ref=e373]:
+                    - row "0.00 90.0°C 25.0°C" [ref=e374]:
+                      - cell "0.00" [ref=e375]
+                      - cell "90.0°C" [ref=e376]
+                      - cell "25.0°C" [ref=e377]
+                      - cell [ref=e378]:
+                        - button [ref=e379] [cursor=pointer]:
+                          - img [ref=e380]
+              - generic [ref=e216]:
+                - heading "ทฤษฎีและสูตรการคำนวณ" [level=3] [ref=e217]:
+                  - img [ref=e218]
+                  - text: ทฤษฎีและสูตรการคำนวณ
+                - generic [ref=e220]:
+                  - generic [ref=e222]:
+                    - generic [ref=e223]:
+                      - generic [ref=e224]: dT
+                      - generic [ref=e226]: dt
+                    - generic [ref=e227]:
+                      - text: = -k(T - T
+                      - subscript [ref=e228]: s
+                      - text: )
+                  - paragraph [ref=e229]: อัตราการเปลี่ยนแปลงอุณหภูมิของวัตถุจะแปรผันตรงกับผลต่างระหว่างอุณหภูมิของตัววัตถุ (T) และอุณหภูมิสภาพแวดล้อม (Tₛ) ค่าอัตราดังกล่าวจะมีค่าเป็นลบเสมอยามที่ระบบกำลังสูญเสียความร้อนสู่ภายนอก
+                  - generic [ref=e230]:
+                    - generic [ref=e231]: "T: อุณหภูมิวัตถุ"
+                    - generic [ref=e232]: "Tₛ: แวดล้อม"
+            - generic [ref=e233]:
+              - generic [ref=e234]:
+                - generic [ref=e235]:
+                  - img [ref=e236]
+                  - generic [ref=e237]: "1"
+                - generic [ref=e238]: ตั้งค่าเริ่มต้น
+              - generic [ref=e239]:
+                - generic [ref=e240]:
+                  - img [ref=e241]
+                  - generic [ref=e243]: "2"
+                - generic [ref=e244]: เริ่มจำลอง
+              - generic [ref=e245]:
+                - generic [ref=e246]:
+                  - img [ref=e247]
+                  - generic [ref=e250]: "3"
+                - generic [ref=e251]: สังเกตความเย็น
+              - generic [ref=e252]:
+                - generic [ref=e253]:
+                  - img [ref=e254]
+                  - generic [ref=e257]: "4"
+                - generic [ref=e258]: บันทึกข้อมูล
+              - generic [ref=e259]:
+                - generic [ref=e260]:
+                  - img [ref=e261]
+                  - generic [ref=e265]: "5"
+                - generic [ref=e266]: วิเคราะห์และสรุป
+          - complementary [ref=e267]:
+            - generic [ref=e268]:
+              - heading "เป้าหมายการเรียนรู้" [level=2] [ref=e269]:
+                - img [ref=e270]
+                - text: เป้าหมายการเรียนรู้
+              - list [ref=e274]:
+                - listitem [ref=e275]:
+                  - generic [ref=e277]: เข้าใจกฎการเย็นตัวของของเหลวตามทฤษฎีนิวตัน
+                - listitem [ref=e278]:
+                  - generic [ref=e280]: ศึกษาผลกระทบของอุณหภูมิสิ่งแวดล้อมต่ออัตราการเย็นตัว
+                - listitem [ref=e281]:
+                  - generic [ref=e283]: วิเคราะห์กราฟความสัมพันธ์ระหว่างอุณหภูมิกับเวลา
+                - listitem [ref=e284]:
+                  - generic [ref=e286]: ฝึกคำนวณและประเมินค่าคงที่การระบายความร้อน (k)
+            - generic [ref=e287]:
+              - heading "ความคืบหน้า" [level=2] [ref=e288]:
+                - img [ref=e289]
+                - text: ความคืบหน้า
+              - generic [ref=e292]:
+                - generic [ref=e294]: 0%
+                - generic [ref=e295]:
+                  - paragraph [ref=e296]: ระยะเวลาที่อุณหภูมิอยู่ในช่วงภารกิจ
+                  - paragraph [ref=e297]: 0.0 / 20 วินาที
+            - generic [ref=e298]:
+              - heading "คะแนนเมื่อสำเร็จ" [level=2] [ref=e299]:
+                - img [ref=e300]
+                - text: คะแนนเมื่อสำเร็จ
+              - paragraph [ref=e303]: +25 คะแนน
+              - paragraph [ref=e304]: บันทึกผลพร้อมกราฟและตารางข้อมูลครบถ้วน
+            - generic [ref=e305]:
+              - heading "คำแนะนำในการทดลอง" [level=2] [ref=e306]:
+                - img [ref=e307]
+                - text: คำแนะนำในการทดลอง
+              - list [ref=e310]:
+                - listitem [ref=e311]:
+                  - img [ref=e312]
+                  - generic [ref=e315]: ค่อย ๆ เพิ่มหรือลดอุณหภูมิแวดล้อมเพื่อสังเกตแนวโน้มอัตราการระบายความร้อน
+                - listitem [ref=e316]:
+                  - img [ref=e317]
+                  - generic [ref=e320]: ค่าคงที่ k ที่สูงขึ้นหมายความว่าของเหลวจะคายความร้อนเร็วขึ้น
+                - listitem [ref=e321]:
+                  - img [ref=e322]
+                  - generic [ref=e325]: ภารกิจควบคุมอุณหภูมิน้ำให้อยู่ในช่วง 50°C - 60°C ต่อเนื่องเป็นเวลา 20 วินาทีสำเร็จคุณจะได้รับคะแนนพิเศษ
+                - listitem [ref=e326]:
+                  - img [ref=e327]
+                  - generic [ref=e330]: พยายามสลับเปิด-ปิดฮีตเตอร์เพื่อรักษาระดับอุณหภูมิในช่วงเป้าหมายของภารกิจ
+  - button "Open Next.js Dev Tools" [ref=e336] [cursor=pointer]:
+    - img [ref=e337]
+  - alert [ref=e340]

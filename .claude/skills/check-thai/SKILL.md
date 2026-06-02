@@ -1,17 +1,28 @@
 ---
 name: check-thai
-description: Audit the codebase to ensure compliance with the Thai Typography Guidelines in AGENTS.md. Triggered by typing /check-thai.
+description: Audit SciSiam Thai typography and copy layout for readable line height, word wrapping, letter spacing, button fit, mobile overflow, and consistency with AGENTS.md.
 ---
-# Check Thai - Thai Typography Auditor (ทักษะตรวจสอบการจัดรูปแบบอักษรไทย)
+# Check Thai - Thai Typography Audit
 
-เมื่อทักษะนี้เปิดใช้งาน (พิมพ์ `/check-thai`):
+Use when editing Thai UI text, lab descriptions, buttons, cards, sidebars, profile, or AI Tutor copy.
 
-1. **สแกนโค้ดหาเนื้อหาภาษาไทย**: สแกนโค้ดในไฟล์ `.tsx`, `.ts`, และไฟล์ `.css` ภายใต้โฟลเดอร์ `src/` เพื่อค้นหาคำภาษาไทย (เช่น ข้อความบนการ์ด, คำบรรยาย, หัวข้อ, หรือข้อความต้อนรับ)
-2. **ตรวจสอบเกณฑ์ตามระเบียบ `AGENTS.md`**:
-   - **Line Height**: ตรวจสอบว่าคลาส Tailwind มีการกำหนดระยะบรรทัดที่พอเหมาะกับภาษาไทย เช่น `leading-relaxed`, `leading-loose`, `leading-[1.5]`, `leading-[1.6]` หรือ `leading-[1.7]` หรือไม่ หากเป็นค่าเริ่มต้นที่สั้นเกินไป ให้แจ้งข้อเสนอแนะ
-   - **Word Break & Overflow**: ตรวจดูว่าพารากราฟคำอธิบายยาวๆ มีการใส่ `break-words` (`overflow-wrap: break-word`) หรือ `break-keep` ป้องกันการแหว่งพยัญชนะไทยหรือไม่
-   - **Letter Spacing**: ค้นหาว่ามีการเผลอใช้งานคลาสบีบช่องไฟ เช่น `tracking-tight` หรือ `tracking-tighter` บนแท็กแสดงผลภาษาไทยหรือไม่ (ห้ามใช้ระยะชิดกับอักษรไทยเด็ดขาด)
-   - **Font Family**: ยืนยันว่าหน้าจอหลักใช้ฟอนต์ Prompt ไร้หัวเป็นหลัก (`font-sans`)
-3. **รายงานผลการตรวจสอบ**:
-   * แสดงรายชื่อไฟล์และเลขบรรทัดที่ไม่ผ่านเกณฑ์
-   * แนะนำวิธีแก้ไขและตัวอย่างโค้ดที่ถูกต้อง เพื่อให้แอปพลิเคชันมีสุนทรียภาพทางศิลปะภาษาไทยที่สมบูรณ์แบบ
+## What To Check
+
+- Thai paragraphs use `leading-relaxed` or `leading-[1.5]` to `leading-[1.7]`.
+- Thai text does not use `tracking-tight`, `tracking-tighter`, or negative letter spacing.
+- Long Thai text has `break-words`, `[word-break:keep-all]`, or layout constraints that prevent overflow.
+- Button labels fit at mobile width and do not crowd icons.
+- Text does not overlap floating AI Tutor, nav, tabs, or card actions.
+- Copy tone is student-friendly, clear, and consistent with SciSiam.
+
+Useful searches:
+
+```powershell
+rg -n "[ก-๙]" src
+rg -n "tracking-tight|tracking-tighter|leading-none|leading-tight|text-justify" src
+```
+
+## Report Format
+
+- List file/line, issue, and suggested class or wording.
+- Separate true readability bugs from optional polish.

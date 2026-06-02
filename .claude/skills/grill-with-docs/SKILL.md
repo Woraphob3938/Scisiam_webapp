@@ -1,14 +1,20 @@
 ---
 name: grill-with-docs
-description: Run a Socratic interview while documenting architectural decisions and project context in CONTEXT.md. Triggered by typing /grill-with-docs.
+description: Align on major SciSiam architectural decisions and update the existing project docs only when the decision changes durable project rules.
 ---
-# Grill With Docs - Architecture Context Alignment (ทักษะสัมภาษณ์และจัดระเบียบบริบทโครงการ)
+# Grill With Docs - Durable Decisions
 
-เมื่อทักษะนี้เปิดใช้งาน (พิมพ์ `/grill-with-docs`):
+Use for decisions that affect future agents: lab data architecture, deploy/package strategy, AI backend policy, score/progress storage, or design system changes.
 
-1. **ดำเนินการสัมภาษณ์ซักถาม**: ถามคำถามเพื่อทำความเข้าใจโครงสร้างและสถาปัตยกรรมร่วมกับผู้พัฒนา
-2. **สร้างหรืออัปเดตไฟล์ `CONTEXT.md`** ที่รากของโปรเจกต์:
-   * เขียนรวบรวมข้อสรุปที่ได้จากการตัดสินใจ เช่น สถาปัตยกรรมหลัก, ขอบเขต และข้อตกลงการเชื่อมต่อจำลองการทดลอง
-   * บันทึกคำศัพท์เฉพาะ (Terminology) เช่น อัตราการเย็นตัวจำลอง, อัตราไทเทรต, อัตราสังเคราะห์แสง เพื่อให้ AI มีความเข้าใจตรงกันกับศัพท์เดิมในโค้ด
-   * บันทึกรูปแบบดีไซน์การ์ดและปุ่มแก้ว (Glassmorphic Rules) เพื่อไม่ให้หน้าใหม่ฉีกดีไซน์ไปจากเดิม
-3. **การเข้าถึงและอัปเดตในภายหลัง**: เมื่อมีการแก้ไขสถาปัตยกรรมที่สำคัญ ให้หยิบเอาเอกสารนี้ขึ้นมาปรับปรุงอยู่เสมอ เพื่อให้การทำงานในรอบถัดไปไม่หลงลืมข้อตกลง
+## Workflow
+
+1. Ask 1-3 focused questions to clarify the decision.
+2. Check existing docs first: `AGENTS.md`, `DESIGN.md`, and relevant source files.
+3. Update existing docs when the decision creates a durable rule.
+4. Create a new `CONTEXT.md` only if the user explicitly wants a separate decision log.
+
+## Do Not
+
+- Do not create docs for one-off implementation details.
+- Do not duplicate `AGENTS.md` or `DESIGN.md`.
+- Do not turn every feature request into a documentation task.

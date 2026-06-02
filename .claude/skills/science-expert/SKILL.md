@@ -1,49 +1,45 @@
 ---
 name: science-expert
-description: Act as a Computational Science Expert to review, design, and implement highly accurate scientific simulations. Enforces thermodynamic equations, chemical stoichiometry, logarithmic pH math, and multi-variable biological rates in code. Triggered by typing /science-expert.
+description: Review, design, and implement scientifically credible SciSiam lab simulations. Use for physics, chemistry, biology formulas, units, edge cases, graphs, tables, and experiment realism.
 ---
-# Science Expert - Scientific & Simulation Advisor (ทักษะผู้เชี่ยวชาญจำลองการทดลองวิทยาศาสตร์)
+# Science Expert - SciSiam Simulation Advisor
 
-เมื่อทักษะนี้เปิดใช้งาน (พิมพ์ `/science-expert` หรือเมื่อแก้ไขคำนวณสูตรฟิสิกส์ เคมี ชีววิทยา):
+Use this skill when changing simulation math, graphs, lab variables, formulas, experiment text, or scientific explanations.
 
----
+## Workflow
 
-## 1. ขอบเขตความเชี่ยวชาญและการคำนวณ (Scientific Rigor)
+1. Identify the lab, subject, variables, units, and expected learning outcome.
+2. Verify the governing model before coding. Prefer simple school-level models that are correct, explainable, and stable.
+3. Keep calculations deterministic by default. Add experimental noise only when it improves realism and can be disabled or seeded for testing.
+4. Guard math edge cases such as divide-by-zero, negative Kelvin, `Math.log10(0)`, impossible pH, empty history arrays, and invalid user input.
+5. Confirm UI labels, graph axes, table headers, and saved results use the same units and variable names as the formula.
 
-### ⚛️ ด้านฟิสิกส์ (Physics Simulation)
-*   **กฎการเย็นตัวของนิวตัน (Newton's Law of Cooling)**:
-    *   อัตราการเปลี่ยนแปลงอุณหภูมิเทียบกับเวลา: $\frac{dT}{dt} = -k(T - T_{env})$
-    *   สมการคำนวณอุณหภูมิในลูปจำลอง (แบบ Euler Method):
-        `T_new = T_env + (T_current - T_env) * Math.exp(-k * dt)`
-    *   **การเพิ่มความสมจริง**: ต้องคำนึงถึงปริมาณมวลน้ำ ($m$), ความจุความร้อนจำเพาะ ($c$), และกำลังไฟฟ้าของฮีตเตอร์ต้มน้ำ ($P$) ตามสมการ $Q = mc\Delta T$ และ $Q = P \cdot t$ เพื่อให้ความเร็วในการต้มสัมพันธ์กับปริมาณน้ำจริง
-*   **หน่วยวัด**: อุณหภูมิ (°C/K), เวลา (วินาที), ค่าคงที่การระบายความร้อน ($k$)
+## SciSiam Models
 
-### 🧪 ด้านเคมี (Chemistry Simulation)
-*   **การคำนวณค่า pH ในการไทเทรตกรด-เบส**:
-    *   ห้ามใช้การประมาณค่าแบบเส้นตรงเด็ดขาด ให้ใช้สูตรสมดุลเคมีและค่าโมลจริง:
-        *   คำนวณหาจำนวนโมลเริ่มต้นของกรด ($n_{H^+}$) และเบส ($n_{OH^-}$) จากปริมาตร ($V$) และความเข้มข้นโมลาร์ ($M$)
-        *   หาจำนวนสารที่เหลือจากการทำปฏิกิริยาพอดี (Neutralization): $n_{excess} = |n_{H^+} - n_{OH^-}|$
-        *   คำนวณความเข้มข้นโมลาร์ใหม่หลังผสมปริมาตรเข้าด้วยกัน: $[H^+] = \frac{n_{excess}}{V_{total}}$
-        *   หาค่า pH จากความเข้มข้นเชิงลอการิทึม: $pH = -\log_{10}[H^+]$ (หรือ $pH = 14 - (-\log_{10}[OH^-])$ ในกรณีเบสล้น)
-*   **การจำลองสีตัวบ่งชี้ (Indicator Color Transition)**:
-    *   จำลองการเปลี่ยนสีของฟีนอล์ฟทาลีน (Phenolphthalein) แบบสมูทด้วยการคำนวณค่าสี RGB ตามสเกล pH ระหว่าง 8.2 ถึง 10.0 (ไม่ใช่สลับสีแดง/ใสทันที) เพื่อความสมจริง
+- Newton cooling: use `dT/dt = -k(T - Ts)`. For exact per-step updates use `T_next = Ts + (T_current - Ts) * exp(-k * dt)`. If using Euler, name it explicitly as `T_next = T_current - k * (T_current - Ts) * dt`.
+- Ohm's law: use `V = IR`; keep voltage, current, resistance units consistent and prevent invalid negative resistance.
+- Hooke's law: use `F = kx`; keep extension in meters internally when calculating SI force.
+- Acid-base titration: calculate moles and excess `[H+]` or `[OH-]`; do not approximate pH linearly near the equivalence point.
+- Boyle's law: keep temperature constant and use inverse relation `P1V1 = P2V2`.
+- Charles's law: calculate with Kelvin, not Celsius, using `V1/T1 = V2/T2`.
+- Photosynthesis: model limiting factors for light, CO2, and temperature; avoid pretending the model is real sensor data.
+- Mendelian genetics: keep genotype/phenotype ratios explainable from Punnett squares.
+- Mitosis: keep phase names, order, and visual states biologically accurate.
 
-### 🌿 ด้านชีววิทยา (Biology Simulation)
-*   **อัตราการสังเคราะห์แสง (Photosynthesis Chamber)**:
-    *   อัตราการสังเคราะห์แสงจะแปรผันตาม **ความเข้มแสง (Light Intensity)**, **ความเข้มข้นคาร์บอนไดออกไซด์ (CO2)**, และ **อุณหภูมิ (Temperature)**
-    *   **สูตรการสังเคราะห์แสงร่วม (Limiting Factors)**:
-        *   ผลของแสง: แปรผกผันตามระยะห่างกำลังสอง (Inverse-square law) และจำกัดด้วยจุดอิ่มตัวแสง (Light Saturation Point)
-        *   ผลของอุณหภูมิ: เป็นกราฟระฆังคว่ำตามการทำงานของเอนไซม์ (จุดเหมาะสมที่สุด ~25-35 °C เกินกว่านั้นเอนไซม์จะแปลงสภาพและอัตราลดลงฮวบฮาบ)
-        *   ใช้การคำนวณแบบจำกัดตัวแปร (Liebig's Law of the Minimum) เพื่อหาว่าปัจจัยใดเป็นตัวจำกัดอัตราสังเคราะห์แสงจริงในเวลานั้น
+## Code Rules
 
----
+- Store continuously changing simulation internals in `useRef`; expose throttled flat state to React.
+- Use real elapsed `dt` in loops so results are stable across slow and fast devices.
+- Use `useMemo` for graph paths, table rows, derived metrics, and expensive SVG/canvas calculations.
+- Limit history length.
+- Do not add randomness inside render.
+- Add comments only where the science model is not obvious.
 
-## 2. กฎการสร้างตัวจำลองในโค้ด (Simulation Code Standards)
+## Validation
 
-1.  **การใส่สัญญาณรบกวนการทดลอง (Experimental Noise)**:
-    *   เพื่อจำลองให้เหมือนดึงค่าจากเซ็นเซอร์จริงในแล็บ ให้บวกค่าความคลาดเคลื่อนแบบสุ่มเล็กน้อย (Gaussian/Random noise) ลงในตัวแปรแสดงผลบนกราฟเสมอ เช่น:
-        `const noisyTemp = currentTemp + (Math.random() - 0.5) * 0.15;`
-2.  **การแยก Thread คำนวณ (Separation of Physics Loop)**:
-    *   ลูปจำลองฟิสิกส์ต้องคำนวณอิงตามเวลาจริงเดลต้า ($dt$) เพื่อให้กราฟรันได้เร็วคงที่ในทุกอุปกรณ์ ไม่แปรผันตามความเร็วเครื่องคอมพิวเตอร์
-3.  **ความปลอดภัยและหน่วยวัด**:
-    *   ตรวจสอบความถูกต้องของตัวแปรและป้องกันบั๊กทางคณิตศาสตร์ เช่น ค่าความเข้มข้นเข้าใกล้ศูนย์ ($[H^+] = 0$) ซึ่งจะทำให้ฟังก์ชัน `Math.log10` คืนค่า `-Infinity` ส่งผลให้แอปพลิเคชันค้าง
+Before finishing, check:
+
+- Formula output against one known hand-calculated example.
+- Units in UI, graph, table, and saved result.
+- Reset/start/pause/save behavior.
+- `npm run lint` and `npm run build` when code changes.

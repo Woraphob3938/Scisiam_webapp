@@ -1,0 +1,306 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - navigation [ref=e3]:
+      - generic [ref=e4]:
+        - button "เปิด/ปิด เมนูด้านข้าง" [ref=e5] [cursor=pointer]:
+          - img [ref=e6]
+        - link "SciSiam" [ref=e7] [cursor=pointer]:
+          - /url: /
+          - img [ref=e9]
+          - generic [ref=e12]: SciSiam
+      - generic [ref=e13]:
+        - generic [ref=e14] [cursor=pointer]:
+          - img [ref=e15]
+          - generic [ref=e18]: 120 แต้ม
+        - button "การแจ้งเตือน" [ref=e20]:
+          - img [ref=e21]
+        - link "เข้าสู่ระบบ" [ref=e28] [cursor=pointer]:
+          - /url: /login
+          - img [ref=e29]
+          - generic [ref=e32]: เข้าสู่ระบบ
+    - complementary [ref=e33]:
+      - navigation "เมนูหลักการนำทาง" [ref=e35]:
+        - link "หน้าหลัก" [ref=e36] [cursor=pointer]:
+          - /url: /
+          - img [ref=e37]
+          - generic [ref=e40]: หน้าหลัก
+        - link "ห้องแล็บของฉัน" [ref=e41] [cursor=pointer]:
+          - /url: "#"
+          - img [ref=e42]
+          - generic [ref=e44]: ห้องแล็บของฉัน
+        - link "ภารกิจนักวิทย์" [ref=e45] [cursor=pointer]:
+          - /url: "#"
+          - img [ref=e46]
+          - generic [ref=e50]: ภารกิจนักวิทย์
+        - link "คะแนนและรางวัล" [ref=e51] [cursor=pointer]:
+          - /url: "#"
+          - img [ref=e52]
+          - generic [ref=e55]: คะแนนและรางวัล
+        - link "ประวัติการเรียนรู้" [ref=e56] [cursor=pointer]:
+          - /url: "#"
+          - img [ref=e57]
+          - generic [ref=e61]: ประวัติการเรียนรู้
+        - link "โปรไฟล์" [ref=e62] [cursor=pointer]:
+          - /url: /profile
+          - img [ref=e63]
+          - generic [ref=e66]: โปรไฟล์
+    - main [ref=e67]:
+      - generic [ref=e69]:
+        - generic [ref=e70]:
+          - generic [ref=e71]:
+            - img [ref=e72]
+            - generic [ref=e75]: 18 ห้องพร้อมทดลองจาก 36 ห้อง
+          - heading "รายชื่อห้องแล็บ" [level=1] [ref=e76]
+          - paragraph [ref=e77]: ค้นหา เลือกหมวด แล้วเริ่มจากห้องที่พร้อมทดลองได้ทันที
+          - generic [ref=e78]:
+            - generic [ref=e79]: Physics
+            - generic [ref=e80]: Chemistry
+            - generic [ref=e81]: Biology
+          - generic [ref=e83]:
+            - img [ref=e84]
+            - textbox "ค้นหาห้องแล็บวิทยาศาสตร์" [ref=e87]:
+              - /placeholder: ค้นหาห้องแล็บ เช่น Newton, Osmosis, Titration...
+        - img [ref=e89]
+      - generic [ref=e115]:
+        - button "ทั้งหมด" [pressed] [ref=e116] [cursor=pointer]:
+          - img [ref=e117]
+          - generic [ref=e122]: ทั้งหมด
+        - button "Physics" [ref=e123] [cursor=pointer]:
+          - img [ref=e124]
+          - generic [ref=e128]: Physics
+        - button "Chemistry" [ref=e129] [cursor=pointer]:
+          - img [ref=e130]
+          - generic [ref=e132]: Chemistry
+        - button "Biology" [ref=e133] [cursor=pointer]:
+          - img [ref=e134]
+          - generic [ref=e137]: Biology
+      - generic [ref=e138]:
+        - generic [ref=e139]:
+          - generic [ref=e140]:
+            - paragraph [ref=e141]: ห้องแล็บสำหรับเริ่มใช้งาน
+            - heading "พร้อมทดลองทันที" [level=2] [ref=e142]
+            - paragraph [ref=e143]: แสดง 18 ห้อง จากทั้งหมด 36 ห้อง
+          - generic [ref=e144]:
+            - button "พร้อมทดลอง 18" [pressed] [ref=e145]:
+              - img [ref=e146]
+              - generic [ref=e149]: พร้อมทดลอง
+              - generic [ref=e150]: "18"
+            - button "ทั้งหมด 36" [ref=e151]:
+              - img [ref=e152]
+              - generic [ref=e157]: ทั้งหมด
+              - generic [ref=e158]: "36"
+            - button "กำลังจัดทำ 18" [ref=e159]:
+              - img [ref=e160]
+              - generic [ref=e163]: กำลังจัดทำ
+              - generic [ref=e164]: "18"
+        - generic [ref=e165]:
+          - generic [ref=e166]:
+            - generic [ref=e167]:
+              - img [ref=e169]
+              - generic [ref=e185]:
+                - generic [ref=e186]: Physics
+                - generic [ref=e187]: พร้อมทดลอง
+              - heading "Newton's law of cooling" [level=3] [ref=e188]
+              - paragraph [ref=e189]: เรียนรู้เกี่ยวกับการระบายความร้อนของวัตถุตามกฎการเย็นตัวของนิวตัน วิเคราะห์อัตราการสูญเสียความร้อนสอดคล้องกับอุณหภูมิแวดล้อมจำลอง
+            - generic [ref=e190]:
+              - button "รายละเอียด" [ref=e191] [cursor=pointer]:
+                - img [ref=e192]
+                - generic [ref=e195]: รายละเอียด
+              - button "เข้าห้อง" [ref=e196] [cursor=pointer]:
+                - generic [ref=e197]: เข้าห้อง
+                - img [ref=e198]
+          - generic [ref=e200]:
+            - generic [ref=e201]:
+              - img [ref=e203]
+              - generic [ref=e219]:
+                - generic [ref=e220]: Physics
+                - generic [ref=e221]: พร้อมทดลอง
+              - heading "Ohm's Law & DC Circuits" [level=3] [ref=e222]
+              - paragraph [ref=e223]: ศึกษาความสัมพันธ์ระหว่างความต่างศักย์ กระแสไฟฟ้า และความต้านทานในวงจรไฟฟ้ากระแสตรงตามกฎของโอห์ม
+            - generic [ref=e224]:
+              - button "รายละเอียด" [ref=e225] [cursor=pointer]:
+                - img [ref=e226]
+                - generic [ref=e229]: รายละเอียด
+              - button "เข้าห้อง" [ref=e230] [cursor=pointer]:
+                - generic [ref=e231]: เข้าห้อง
+                - img [ref=e232]
+          - generic [ref=e234]:
+            - generic [ref=e235]:
+              - img [ref=e237]:
+                - generic [ref=e247]: 500g
+                - generic [ref=e249]: F
+              - generic [ref=e250]:
+                - generic [ref=e251]: Physics
+                - generic [ref=e252]: พร้อมทดลอง
+              - heading "Hooke's Law of Elasticity" [level=3] [ref=e253]
+              - paragraph [ref=e254]: ศึกษาความยืดหยุ่นของสปริงและแรงดึงกลับตามระยะยืด วิเคราะห์ค่าคงตัวของสปริงตามกฎของฮุค
+            - generic [ref=e255]:
+              - button "รายละเอียด" [ref=e256] [cursor=pointer]:
+                - img [ref=e257]
+                - generic [ref=e260]: รายละเอียด
+              - button "เข้าห้อง" [ref=e261] [cursor=pointer]:
+                - generic [ref=e262]: เข้าห้อง
+                - img [ref=e263]
+          - generic [ref=e265]:
+            - generic [ref=e266]:
+              - img [ref=e268]:
+                - generic [ref=e271]: Air (n₁)
+                - generic [ref=e272]: Glass (n₂)
+                - generic [ref=e279]: θ₁
+                - generic [ref=e280]: θ₂
+              - generic [ref=e281]:
+                - generic [ref=e282]: Physics
+                - generic [ref=e283]: พร้อมทดลอง
+              - heading "Snell's Law of Refraction" [level=3] [ref=e284]
+              - paragraph [ref=e285]: ศึกษาดัชนีหักเหของแสงและการเดินทางผ่านตัวกลางต่างชนิดกัน วิเคราะห์ความสัมพันธ์ของมุมตามกฎของสเนลล์
+            - generic [ref=e286]:
+              - button "รายละเอียด" [ref=e287] [cursor=pointer]:
+                - img [ref=e288]
+                - generic [ref=e291]: รายละเอียด
+              - button "เข้าห้อง" [ref=e292] [cursor=pointer]:
+                - generic [ref=e293]: เข้าห้อง
+                - img [ref=e294]
+          - generic [ref=e296]:
+            - generic [ref=e297]:
+              - img [ref=e299]:
+                - generic [ref=e319]: P
+              - generic [ref=e320]:
+                - generic [ref=e321]: Physics
+                - generic [ref=e322]: พร้อมทดลอง
+              - heading "Ideal Gas Law Simulation" [level=3] [ref=e323]
+              - paragraph [ref=e324]: วิเคราะห์การเปลี่ยนแปลงสถานะของแก๊สอุดมคติผ่านการเปลี่ยนตัวแปรความดัน ปริมาตร และอุณหภูมิ
+            - generic [ref=e325]:
+              - button "รายละเอียด" [ref=e326] [cursor=pointer]:
+                - img [ref=e327]
+                - generic [ref=e330]: รายละเอียด
+              - button "เข้าห้อง" [ref=e331] [cursor=pointer]:
+                - generic [ref=e332]: เข้าห้อง
+                - img [ref=e333]
+          - generic [ref=e335]:
+            - generic [ref=e336]:
+              - img [ref=e338]:
+                - generic [ref=e348]: m
+                - generic [ref=e350]: F = ma
+                - generic [ref=e352]: a
+              - generic [ref=e353]:
+                - generic [ref=e354]: Physics
+                - generic [ref=e355]: พร้อมทดลอง
+              - heading "Newton's Second Law of Motion" [level=3] [ref=e356]
+              - paragraph [ref=e357]: ศึกษาผลของแรงลัพธ์และมวลที่มีต่อความเร่งของวัตถุจำลองตามกฎการเคลื่อนที่ข้อที่สองของนิวตัน
+            - generic [ref=e358]:
+              - button "รายละเอียด" [ref=e359] [cursor=pointer]:
+                - img [ref=e360]
+                - generic [ref=e363]: รายละเอียด
+              - button "เข้าห้อง" [ref=e364] [cursor=pointer]:
+                - generic [ref=e365]: เข้าห้อง
+                - img [ref=e366]
+          - generic [ref=e368]:
+            - generic [ref=e369]:
+              - img [ref=e371]:
+                - generic [ref=e374]: m₁
+                - generic [ref=e376]: v₁
+                - generic [ref=e378]: m₂
+                - generic [ref=e380]: v₂
+              - generic [ref=e382]:
+                - generic [ref=e383]: Physics
+                - generic [ref=e384]: พร้อมทดลอง
+              - heading "Conservation of Linear Momentum" [level=3] [ref=e385]
+              - paragraph [ref=e386]: จำลองการชนของวัตถุบนแนวเส้นตรงเพื่อวิเคราะห์การอนุรักษ์โมเมนตัมและพลังงานจลน์ในการชน
+            - generic [ref=e387]:
+              - button "รายละเอียด" [ref=e388] [cursor=pointer]:
+                - img [ref=e389]
+                - generic [ref=e392]: รายละเอียด
+              - button "เข้าห้อง" [ref=e393] [cursor=pointer]:
+                - generic [ref=e394]: เข้าห้อง
+                - img [ref=e395]
+          - generic [ref=e397]:
+            - generic [ref=e398]:
+              - img [ref=e400]:
+                - generic [ref=e402]:
+                  - generic [ref=e404]: "N"
+                  - generic [ref=e406]: S
+                - generic [ref=e416]: V
+              - generic [ref=e417]:
+                - generic [ref=e418]: Physics
+                - generic [ref=e419]: พร้อมทดลอง
+              - heading "Faraday's Electromagnetic Induction" [level=3] [ref=e420]
+              - paragraph [ref=e421]: ศึกษาการเกิดกระแสไฟฟ้าเหนี่ยวนำและแรงเคลื่อนไฟฟ้าเหนี่ยวนำจากการเปลี่ยนแปลงของฟลักซ์แม่เหล็ก
+            - generic [ref=e422]:
+              - button "รายละเอียด" [ref=e423] [cursor=pointer]:
+                - img [ref=e424]
+                - generic [ref=e427]: รายละเอียด
+              - button "เข้าห้อง" [ref=e428] [cursor=pointer]:
+                - generic [ref=e429]: เข้าห้อง
+                - img [ref=e430]
+          - generic [ref=e432]:
+            - generic [ref=e433]:
+              - img [ref=e435]:
+                - generic [ref=e446]: P₁
+                - generic [ref=e447]: P₂
+              - generic [ref=e448]:
+                - generic [ref=e449]: Physics
+                - generic [ref=e450]: พร้อมทดลอง
+              - heading "Bernoulli's Principle & Fluid Dynamics" [level=3] [ref=e451]
+              - paragraph [ref=e452]: ศึกษาความสัมพันธ์ระหว่างความเร็วและความดันของของไหลในท่อที่มีหน้าตัดต่างกันตามหลักการแบร์นูลลี
+            - generic [ref=e453]:
+              - button "รายละเอียด" [ref=e454] [cursor=pointer]:
+                - img [ref=e455]
+                - generic [ref=e458]: รายละเอียด
+              - button "เข้าห้อง" [ref=e459] [cursor=pointer]:
+                - generic [ref=e460]: เข้าห้อง
+                - img [ref=e461]
+          - generic [ref=e463]:
+            - generic [ref=e464]:
+              - img [ref=e466]:
+                - generic [ref=e472]: Metal Cathode
+                - generic [ref=e473]:
+                  - generic [ref=e475]: "-"
+                  - generic [ref=e478]: "-"
+                  - generic [ref=e481]: "-"
+              - generic [ref=e483]:
+                - generic [ref=e484]: Physics
+                - generic [ref=e485]: พร้อมทดลอง
+              - heading "Einstein's Photoelectric Effect" [level=3] [ref=e486]
+              - paragraph [ref=e487]: วิเคราะห์พลังงานจลน์สูงสุดของโฟโตอิเล็กตรอนที่หลุดจากผิวโลหะตามฟังก์ชันงานและความถี่ของแสง
+            - generic [ref=e488]:
+              - button "รายละเอียด" [ref=e489] [cursor=pointer]:
+                - img [ref=e490]
+                - generic [ref=e493]: รายละเอียด
+              - button "เข้าห้อง" [ref=e494] [cursor=pointer]:
+                - generic [ref=e495]: เข้าห้อง
+                - img [ref=e496]
+          - generic [ref=e498]:
+            - generic [ref=e499]:
+              - img [ref=e501]
+              - generic [ref=e511]:
+                - generic [ref=e512]: Physics
+                - generic [ref=e513]: พร้อมทดลอง
+              - heading "Kepler's Third Law of Planetary Motion" [level=3] [ref=e514]
+              - paragraph [ref=e515]: วิเคราะห์คาบการโคจรและระยะห่างเฉลี่ยจากดวงอาทิตย์ของดาวเคราะห์จำลองตามกฎข้อที่สามของเคปเลอร์
+            - generic [ref=e516]:
+              - button "รายละเอียด" [ref=e517] [cursor=pointer]:
+                - img [ref=e518]
+                - generic [ref=e521]: รายละเอียด
+              - button "เข้าห้อง" [ref=e522] [cursor=pointer]:
+                - generic [ref=e523]: เข้าห้อง
+                - img [ref=e524]
+          - generic [ref=e526]:
+            - generic [ref=e527]:
+              - img [ref=e529]:
+                - generic [ref=e536]: P = σAT⁴
+              - generic [ref=e537]:
+                - generic [ref=e538]: Physics
+                - generic [ref=e539]: พร้อมทดลอง
+              - heading "Stefan-Boltzmann Law of Blackbody Radiation" [level=3] [ref=e540]
+              - paragraph [ref=e541]: ศึกษาอัตราการแผ่รังสีความร้อนของวัตถุดำและอัตราการสูญเสียพลังงานที่แปรผันตามอุณหภูมิสัมบูรณ์ยกกำลังสี่
+            - generic [ref=e542]:
+              - button "รายละเอียด" [ref=e543] [cursor=pointer]:
+                - img [ref=e544]
+                - generic [ref=e547]: รายละเอียด
+              - button "เข้าห้อง" [ref=e548] [cursor=pointer]:
+                - generic [ref=e549]: เข้าห้อง
+                - img [ref=e550]
+        - button "ดูเพิ่มเติมอีก 6 ห้อง" [ref=e553]
+  - button "Open Next.js Dev Tools" [ref=e559] [cursor=pointer]:
+    - img [ref=e560]
+  - alert [ref=e563]

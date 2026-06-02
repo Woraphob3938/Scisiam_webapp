@@ -1,15 +1,21 @@
 ---
 name: grill-me
-description: Run an interactive Socratic interview to align on requirements, architecture, and edge cases before generating code. Triggered by typing /grill-me or when starting a complex task.
+description: Ask focused alignment questions before ambiguous, high-risk, or architecture-changing SciSiam work. Use for unclear requirements, new large features, packaging decisions, or data model changes.
 ---
-# Grill Me - Alignment Skill (ทักษะซักถามแนวทางปฏิบัติงาน)
+# Grill Me - Alignment Check
 
-เมื่อทักษะนี้เปิดใช้งาน (พิมพ์ `/grill-me` หรือเมื่อมีงานพัฒนาที่ซับซ้อน):
+Use this skill only when the task is ambiguous, high-impact, or likely to create rework. Do not block simple, explicit fixes.
 
-1. **ระงับการทำงานเขียนโค้ดทันที**: อย่าเพิ่งเริ่มแก้ไขไฟล์หรือสร้างโค้ดใดๆ 
-2. **ทำการตั้งคำถามสัมภาษณ์ (Socratic Interview)**: ยิงคำถามสั้นๆ แต่เจาะลึก 3-5 ข้อ เพื่อช่วยผู้ใช้ตัดสินใจและระบุทิศทางให้ชัดเจน:
-   - **ขอบเขตและข้อกำหนด (Requirements)**: ผลลัพธ์สุดท้ายหรือพฤติกรรมของฟีเจอร์ที่อยากให้เกิดคืออะไร?
-   - **แนวทางสถาปัตยกรรม (Architecture)**: ส่วนนี้ควรเป็น Next.js Server Component หรือ Client Component? มีโครงสร้างเดิมที่ต้องนำไปประยุกต์ร่วมหรือไม่?
-   - **กรณีขอบเขต (Edge Cases)**: มีกรณีไหนที่จะทำเกิดข้อผิดพลาด (เช่น การกรอกฟิลด์ว่าง หรือไม่มีข้อมูลเซ็นเซอร์) และเราควรแก้ปัญหานั้นอย่างไร?
-   - **ความสวยงามและ Thai Typography**: การออกแบบในส่วนข้อความภาษาไทยและการไล่เฉดสีควรคุมธีมแบบไหน?
-3. **สรุปเป็นโครงร่างงาน (Implementation Layout)**: เมื่อผู้ใช้งานตอบคำถามเรียบร้อยแล้ว ให้สรุปทิศทางออกมาเป็นโครงร่างขั้นตอนสั้นๆ เพื่อให้มั่นใจว่าเข้าใจตรงกัน แล้วจึงค่อยดำเนินงานต่อ
+## Ask 1-3 Questions
+
+Choose the smallest useful set:
+
+- What outcome should the user see when the task is finished?
+- Which route/component/data source owns this behavior?
+- Should this be prototype-only local state or production-ready backend state?
+- For UI work, what is the primary action and what should be visually de-emphasized?
+- For labs, should unsupported labs be hidden, shown as coming soon, or implemented with a placeholder shell?
+
+## After Answers
+
+Summarize the decision in a short implementation outline, then proceed. Avoid long interviews unless the user explicitly asks to plan.

@@ -413,6 +413,738 @@ const RetortStandVisual = () => (
   </svg>
 );
 
+const LaserSourceVisual = () => (
+  <svg viewBox="0 0 96 96" className="h-14 w-14" fill="none" aria-hidden="true">
+    <rect x="20" y="38" width="46" height="20" rx="4" fill="#fecaca" stroke="#ef4444" strokeWidth="3" />
+    <rect x="66" y="44" width="10" height="8" rx="1" fill="#475569" />
+    <line x1="76" y1="48" x2="86" y2="48" stroke="#ef4444" strokeWidth="4" strokeLinecap="round" />
+    <text x="48" y="90" fill="#dc2626" fontSize="9" fontWeight="800" textAnchor="middle">LASER</text>
+  </svg>
+);
+
+const AcrylicBlockVisual = () => (
+  <svg viewBox="0 0 96 96" className="h-14 w-14" fill="none" aria-hidden="true">
+    <path d="M18 48 C18 20 78 20 78 48 Z" fill="#e0f2fe" stroke="#38bdf8" strokeWidth="3.5" />
+    <line x1="16" y1="48" x2="80" y2="48" stroke="#0284c7" strokeWidth="3" />
+    <text x="48" y="90" fill="#0284c7" fontSize="9" fontWeight="800" textAnchor="middle">PRISM</text>
+  </svg>
+);
+
+const ProtractorVisual = () => (
+  <svg viewBox="0 0 96 96" className="h-14 w-14" fill="none" aria-hidden="true">
+    <circle cx="48" cy="48" r="32" fill="#fafafa" stroke="#94a3b8" strokeWidth="3" />
+    <line x1="48" y1="16" x2="48" y2="80" stroke="#64748b" strokeWidth="1.5" strokeDasharray="2 2" />
+    <line x1="16" y1="48" x2="80" y2="48" stroke="#64748b" strokeWidth="1.5" strokeDasharray="2 2" />
+    <text x="48" y="90" fill="#475569" fontSize="9" fontWeight="800" textAnchor="middle">ANGLE</text>
+  </svg>
+);
+
+const OpticalBenchVisual = () => (
+  <svg viewBox="0 0 96 96" className="h-14 w-14" fill="none" aria-hidden="true">
+    <rect x="14" y="44" width="68" height="8" rx="2" fill="#e2e8f0" stroke="#64748b" strokeWidth="2.5" />
+    <rect x="28" y="24" width="40" height="20" rx="3" fill="#cbd5e1" stroke="#64748b" strokeWidth="2" />
+    <text x="48" y="90" fill="#475569" fontSize="9" fontWeight="800" textAnchor="middle">BENCH</text>
+  </svg>
+);
+
+const GasTankVisual = () => (
+  <svg viewBox="0 0 96 96" className="h-14 w-14" fill="none" aria-hidden="true">
+    <rect x="30" y="20" width="36" height="56" rx="10" fill="#ecfdf5" stroke="#10b981" strokeWidth="3" />
+    <path d="M41 20 V12 H55 V20" stroke="#059669" strokeWidth="3" />
+    <circle cx="48" cy="48" r="8" fill="#d1fae5" stroke="#059669" strokeWidth="2" />
+    <text x="48" y="90" fill="#059669" fontSize="9" fontWeight="800" textAnchor="middle">TANK</text>
+  </svg>
+);
+
+const HeaterCoolerVisual = () => (
+  <svg viewBox="0 0 96 96" className="h-14 w-14" fill="none" aria-hidden="true">
+    <rect x="20" y="48" width="56" height="28" rx="6" fill="#fef2f2" stroke="#ef4444" strokeWidth="3" />
+    <path d="M 32,48 C 35,32 43,24 48,12 C 53,24 61,32 64,48 Z" fill="#f97316" />
+    <text x="48" y="90" fill="#b91c1c" fontSize="9" fontWeight="800" textAnchor="middle">BURNER</text>
+  </svg>
+);
+
+const WoodenTrackVisual = () => (
+  <svg viewBox="0 0 96 96" className="h-14 w-14" fill="none" aria-hidden="true">
+    <rect x="10" y="40" width="76" height="12" rx="2" fill="#ffedd5" stroke="#ea580c" strokeWidth="2.5" />
+    <line x1="20" y1="40" x2="20" y2="46" stroke="#ea580c" strokeWidth="1.5" />
+    <line x1="48" y1="40" x2="48" y2="46" stroke="#ea580c" strokeWidth="1.5" />
+    <line x1="76" y1="40" x2="76" y2="46" stroke="#ea580c" strokeWidth="1.5" />
+    <text x="48" y="90" fill="#c2410c" fontSize="9" fontWeight="800" textAnchor="middle">TRACK</text>
+  </svg>
+);
+
+const DynamicsCartVisual = () => (
+  <svg viewBox="0 0 96 96" className="h-14 w-14" fill="none" aria-hidden="true">
+    <rect x="18" y="32" width="60" height="24" rx="4" fill="#f5f3ff" stroke="#8b5cf6" strokeWidth="3" />
+    <circle cx="30" cy="62" r="8" fill="#475569" stroke="#334155" strokeWidth="2" />
+    <circle cx="66" cy="62" r="8" fill="#475569" stroke="#334155" strokeWidth="2" />
+    <text x="48" y="90" fill="#6d28d9" fontSize="9" fontWeight="800" textAnchor="middle">CART</text>
+  </svg>
+);
+
+const PulleySystemVisual = () => (
+  <svg viewBox="0 0 96 96" className="h-14 w-14" fill="none" aria-hidden="true">
+    <circle cx="48" cy="36" r="16" fill="#cbd5e1" stroke="#475569" strokeWidth="3" />
+    <circle cx="48" cy="36" r="4" fill="#475569" />
+    <line x1="32" y1="36" x2="32" y2="70" stroke="#475569" strokeWidth="2" />
+    <line x1="64" y1="36" x2="64" y2="70" stroke="#475569" strokeWidth="2" />
+    <rect x="24" y="70" width="16" height="12" rx="1" fill="#64748b" />
+    <text x="48" y="90" fill="#475569" fontSize="9" fontWeight="800" textAnchor="middle">PULLEY</text>
+  </svg>
+);
+
+const PhotogateVisual = () => (
+  <svg viewBox="0 0 96 96" className="h-14 w-14" fill="none" aria-hidden="true">
+    <path d="M30 20 H66 V66 H50 V36 H46 V66 H30 Z" fill="#334155" stroke="#1e293b" strokeWidth="2.5" />
+    <circle cx="48" cy="28" r="3.5" fill="#22c55e" />
+    <text x="48" y="90" fill="#1e293b" fontSize="9" fontWeight="800" textAnchor="middle">SENSOR</text>
+  </svg>
+);
+
+const MomentumTrackVisual = () => (
+  <svg viewBox="0 0 96 96" className="h-14 w-14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <rect x="10" y="55" width="76" height="8" fill="#94a3b8" rx="1" />
+    <rect x="25" y="43" width="22" height="12" fill="#8b5cf6" rx="2" />
+    <circle cx="30" cy="55" r="3" fill="#1e293b" />
+    <circle cx="42" cy="55" r="3" fill="#1e293b" />
+    <rect x="52" y="43" width="22" height="12" fill="#3b82f6" rx="2" />
+    <circle cx="57" cy="55" r="3" fill="#1e293b" />
+    <circle cx="69" cy="55" r="3" fill="#1e293b" />
+    <text x="48" y="85" fill="#475569" fontSize="8" fontWeight="800" textAnchor="middle">MOMENTUM</text>
+  </svg>
+);
+
+const MagnetCoilVisual = () => (
+  <svg viewBox="0 0 96 96" className="h-14 w-14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <rect x="12" y="24" width="30" height="14" fill="#ef4444" rx="1" />
+    <rect x="42" y="24" width="30" height="14" fill="#3b82f6" rx="1" />
+    <text x="20" y="34" fill="#ffffff" fontSize="8" fontWeight="900">N</text>
+    <text x="58" y="34" fill="#ffffff" fontSize="8" fontWeight="900">S</text>
+    <path d="M25 65 C 25 50, 71 50, 71 65" stroke="#f59e0b" strokeWidth="3" fill="none" />
+    <path d="M30 68 C 30 54, 66 54, 66 68" stroke="#f59e0b" strokeWidth="3" fill="none" />
+    <text x="48" y="86" fill="#b45309" fontSize="8" fontWeight="800" textAnchor="middle">INDUCTION</text>
+  </svg>
+);
+
+const VenturiTubeVisual = () => (
+  <svg viewBox="0 0 96 96" className="h-14 w-14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <path d="M10 32 L32 32 L40 44 L56 44 L64 32 L86 32 L86 64 L64 64 L56 52 L40 52 L32 64 L10 64 Z" fill="#eff6ff" stroke="#3b82f6" strokeWidth="3.5" />
+    <line x1="20" y1="36" x2="20" y2="72" stroke="#60a5fa" strokeWidth="2.5" />
+    <line x1="48" y1="46" x2="48" y2="72" stroke="#60a5fa" strokeWidth="2.5" />
+    <line x1="76" y1="36" x2="76" y2="72" stroke="#60a5fa" strokeWidth="2.5" />
+    <text x="48" y="86" fill="#1d4ed8" fontSize="8" fontWeight="800" textAnchor="middle">BERNOULLI</text>
+  </svg>
+);
+
+const PhotoCellVisual = () => (
+  <svg viewBox="0 0 96 96" className="h-14 w-14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <circle cx="48" cy="45" r="26" fill="#f8fafc" stroke="#64748b" strokeWidth="3" />
+    <rect x="35" y="32" width="6" height="26" fill="#475569" />
+    <line x1="56" y1="28" x2="56" y2="62" stroke="#ef4444" strokeWidth="2.5" />
+    <circle cx="56" cy="45" r="1.5" fill="#ef4444" />
+    <text x="48" y="86" fill="#334155" fontSize="8" fontWeight="800" textAnchor="middle">PHOTO-CELL</text>
+  </svg>
+);
+
+const PlanetaryOrbitVisual = () => (
+  <svg viewBox="0 0 96 96" className="h-14 w-14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <ellipse cx="48" cy="48" rx="36" ry="20" stroke="#cbd5e1" strokeWidth="2.5" strokeDasharray="3 2" />
+    <circle cx="36" cy="48" r="9" fill="#f59e0b" />
+    <circle cx="76" cy="40" r="4.5" fill="#3b82f6" />
+    <text x="48" y="88" fill="#1e293b" fontSize="8" fontWeight="800" textAnchor="middle">KEPLER</text>
+  </svg>
+);
+
+const WienSpectrumVisual = () => (
+  <svg viewBox="0 0 96 96" className="h-14 w-14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <path d="M12 70 Q 25 15, 32 15 T 48 55 T 84 70" stroke="#f97316" strokeWidth="3" fill="none" />
+    <line x1="12" y1="72" x2="84" y2="72" stroke="#475569" strokeWidth="2" />
+    <line x1="14" y1="12" x2="14" y2="72" stroke="#475569" strokeWidth="2" />
+    <circle cx="32" cy="15" r="3" fill="#ef4444" />
+    <text x="48" y="86" fill="#ea580c" fontSize="8" fontWeight="800" textAnchor="middle">BLACKBODY</text>
+  </svg>
+);
+
+const SpectrophotometerVisual = () => (
+  <svg viewBox="0 0 96 96" className="h-14 w-14" fill="none" aria-hidden="true">
+    <rect x="18" y="24" width="60" height="48" rx="8" fill="#eff6ff" stroke="#3b82f6" strokeWidth="3" />
+    <rect x="26" y="32" width="22" height="12" rx="2" fill="#1e293b" />
+    <path d="M56 38 H70" stroke="#f43f5e" strokeWidth="4" strokeLinecap="round" />
+    <circle cx="56" cy="38" r="4" fill="#eab308" />
+    <circle cx="70" cy="38" r="3" fill="#10b981" />
+    <text x="48" y="86" fill="#2563eb" fontSize="9" fontWeight="800" textAnchor="middle">SPECTRO</text>
+  </svg>
+);
+
+const CuvetteVisual = () => (
+  <svg viewBox="0 0 96 96" className="h-14 w-14" fill="none" aria-hidden="true">
+    <rect x="34" y="14" width="28" height="68" rx="4" fill="rgba(255,255,255,0.7)" stroke="#0891b2" strokeWidth="3" />
+    <rect x="38" y="28" width="20" height="50" rx="2" fill="#2563eb" opacity="0.7" />
+    <line x1="42" y1="20" x2="42" y2="76" stroke="#ffffff" strokeWidth="1.5" opacity="0.4" />
+    <text x="48" y="94" fill="#0891b2" fontSize="9" fontWeight="800" textAnchor="middle">CUVETTE</text>
+  </svg>
+);
+
+const CalorimeterVisual = () => (
+  <svg viewBox="0 0 96 96" className="h-14 w-14" fill="none" aria-hidden="true">
+    <path d="M26 26 L32 74 C33 80 39 84 46 84 H50 C57 84 63 80 64 74 L70 26 Z" fill="#cbd5e1" stroke="#94a3b8" strokeWidth="3" />
+    <ellipse cx="48" cy="26" rx="22" ry="6" fill="#e2e8f0" stroke="#cbd5e1" strokeWidth="2" />
+    <path d="M42 12 V65 H52" stroke="#64748b" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+    <text x="48" y="94" fill="#475569" fontSize="9" fontWeight="800" textAnchor="middle">CALORIMETER</text>
+  </svg>
+);
+
+const EquilibriumTubesVisual = () => (
+  <svg viewBox="0 0 96 96" className="h-14 w-14" fill="none" aria-hidden="true">
+    <rect x="28" y="16" width="14" height="60" rx="7" fill="rgba(255,255,255,0.8)" stroke="#94a3b8" strokeWidth="2" />
+    <rect x="30" y="42" width="10" height="32" rx="5" fill="#f59e0b" opacity="0.8" />
+    <rect x="54" y="16" width="14" height="60" rx="7" fill="rgba(255,255,255,0.8)" stroke="#94a3b8" strokeWidth="2" />
+    <rect x="56" y="32" width="10" height="42" rx="5" fill="#991b1b" opacity="0.8" />
+    <text x="48" y="90" fill="#475569" fontSize="9" fontWeight="800" textAnchor="middle">EQUILIBRIUM</text>
+  </svg>
+);
+
+const momentumEquipments: EquipmentItem[] = [
+  {
+    id: "momentum-track",
+    name: "รางทดลองการชนแรงเสียดทานต่ำ",
+    role: "รองรับการเคลื่อนที่ชนกันของรถเข็นทั้ง 2 คันเพื่อตรวจสอบโมเมนตัม",
+    note: "ตรวจสอบการปรับระดับรางให้อยู่ในแนวราบเสมอกันก่อนเริ่มทดลอง",
+    unit: "m",
+    tone: "cyan",
+    visual: <MomentumTrackVisual />,
+  },
+  {
+    id: "cart1",
+    name: "รถทดลองคันที่ 1 (Cart 1)",
+    role: "รถเข็นที่มีมวล m1 เคลื่อนที่เข้าชนด้วยความเร็วเริ่มต้น u1",
+    note: "ปรับมวลรถและแรงผลักความเร็วได้ตามต้องการในการตั้งค่า",
+    unit: "kg",
+    tone: "rose",
+    visual: <MomentumTrackVisual />,
+  },
+  {
+    id: "cart2",
+    name: "รถทดลองคันที่ 2 (Cart 2)",
+    role: "รถเข็นเป้าหมายที่มีมวล m2 เคลื่อนที่ด้วยความเร็วเริ่มต้น u2",
+    note: "ปรับให้หยุดนิ่ง (u2 = 0) หรือวิ่งสวนทางกันเพื่อทดสอบการชนหลายรูปแบบ",
+    unit: "kg",
+    tone: "blue",
+    visual: <MomentumTrackVisual />,
+  },
+  {
+    id: "collision-sensor",
+    name: "เซนเซอร์วัดการชนแนวตรง",
+    role: "ดักวัดความเร็วก่อนชนและหลังชนเพื่อประมวลผลคำนวณ",
+    note: "บันทึกข้อมูลแบบแบ่งจังหวะเพื่อศึกษาความเร็วรวมสัมบูรณ์",
+    unit: "m/s",
+    tone: "amber",
+    visual: <PhotogateVisual />,
+  }
+];
+
+const faradayEquipments: EquipmentItem[] = [
+  {
+    id: "magnet",
+    name: "แท่งแม่เหล็กถาวรขั้วเหนือ-ใต้",
+    role: "แหล่งกำเนิดฟลักซ์แม่เหล็กผ่านขดลวดโซลินอยด์",
+    note: "ปรับขั้วความแรงแม่เหล็กเพื่อเหนี่ยวนำกระแสทิศตรงข้ามตาม Lenz's Law",
+    unit: "T",
+    tone: "rose",
+    visual: <MagnetCoilVisual />,
+  },
+  {
+    id: "solenoid-coil",
+    name: "ขดลวดทองแดงนำกระแส",
+    role: "ขดลวดพันรอบที่เกิดแรงเคลื่อนไฟฟ้าเหนี่ยวนำขณะมีสนามแม่เหล็กเคลื่อนผ่าน",
+    note: "เปลี่ยนจำนวนรอบ (1-3 รอบ) เพื่อดูผลกระทบต่อขนาดแรงดันเหนี่ยวนำ",
+    unit: "Turns",
+    tone: "amber",
+    visual: <MagnetCoilVisual />,
+  },
+  {
+    id: "analog-voltmeter",
+    name: "เครื่องวัดแรงดันไฟฟ้า (Voltmeter)",
+    role: "แสดงขนาดและทิศทางของแรงดันไฟฟ้าเหนี่ยวนำที่เกิดขึ้นเรียลไทม์",
+    note: "สังเกตการแกว่งสลับทิศของเข็มชี้วัดตามทิศทางเคลื่อนที่ของแม่เหล็ก",
+    unit: "V",
+    tone: "blue",
+    visual: <MagnetCoilVisual />,
+  }
+];
+
+const bernoulliEquipments: EquipmentItem[] = [
+  {
+    id: "venturi-tube",
+    name: "ท่อทดลองเวนทูรี (Venturi Tube)",
+    role: "ท่อแก้วใสที่มีระดับพื้นที่หน้าตัดแคบ-กว้างสลับเพื่อเร่งการไหลของของเหลว",
+    note: "พื้นที่ท่อแคบจะเกิดอัตราไหลเร่งความเร็วส่งผลให้แรงดันน้ำลดต่ำลง",
+    unit: "m²",
+    tone: "blue",
+    visual: <VenturiTubeVisual />,
+  },
+  {
+    id: "water-pump",
+    name: "เครื่องปั๊มของเหลวควบคุมอัตราไหล",
+    role: "จ่ายกระแสน้ำเข้าท่อด้วยอัตราการไหลคงตัวเพื่อตรวจสอบสภาวะไหลต่อเวลา",
+    note: "ปรับปริมาตรการไหลเพื่อวัดการกระจายความดันในแต่ละพิกัดตำแหน่ง",
+    unit: "L/s",
+    tone: "cyan",
+    visual: <VenturiTubeVisual />,
+  },
+  {
+    id: "manometers",
+    name: "เครื่องวัดมาโนมิเตอร์มาตรวัดความสูงของเหลว",
+    role: "วัดความดันสถิตในแต่ละช่วงท่อด้วยระดับความต่างความสูงของเหลวเหนี่ยวนำ",
+    note: "สังเกตความแตกต่างความดันระหว่างจุดท่อกว้างและท่อคอดเวนทูรี",
+    unit: "kPa",
+    tone: "amber",
+    visual: <VenturiTubeVisual />,
+  }
+];
+
+const photoelectricEquipments: EquipmentItem[] = [
+  {
+    id: "photocell",
+    name: "หลอดแก้วโฟโตเซลล์ (Photocell)",
+    role: "หลอดสูญญากาศบรรจุแผ่นโลหะตัวรับ Cathode เพื่อปลดปล่อยอิเล็กตรอนเมื่อเจอแสง",
+    note: "เปลี่ยนชนิดโลหะเพื่อเปรียบเทียบค่าฟังก์ชันงาน (Work Function)",
+    unit: "eV",
+    tone: "rose",
+    visual: <PhotoCellVisual />,
+  },
+  {
+    id: "monochromator",
+    name: "หลอดแสงตกกระทบปรับความยาวคลื่น",
+    role: "ฉายโฟตอนลงผิวโลหะด้วยการปรับความยาวคลื่นแสงและความถี่",
+    note: "แสงที่มีความถี่สูงกว่าความถี่ขีดเริ่มเท่านั้นที่จะทำให้อิเล็กตรอนหลุดลอย",
+    unit: "nm",
+    tone: "amber",
+    visual: <PhotoCellVisual />,
+  },
+  {
+    id: "microammeter",
+    name: "เครื่องวัดกระแสไฟฟ้าละเอียด (Microammeter)",
+    role: "วัดปริมาณกระแสโฟโตอิเล็กตรอนที่เคลื่อนที่ข้ามไปยังขั้วแอโนด",
+    note: "เมื่อปรับแรงดันไฟฟ้าต้านจนเท่ากับ Stopping Voltage กระแสจะกลายเป็นศูนย์",
+    unit: "µA",
+    tone: "blue",
+    visual: <PhotoCellVisual />,
+  }
+];
+
+const keplerEquipments: EquipmentItem[] = [
+  {
+    id: "orbit-canvas",
+    name: "ระนาบแบบจำลองวงโคจรรี (Orbit System)",
+    role: "จำลองเส้นทางการโคจรดาวเคราะห์และการเคลื่อนที่สัมพัทธ์ในอวกาศ",
+    note: "สังเกตความเร็วที่เปลี่ยนไปตามระยะทางห่างดวงอาทิตย์ในแต่ละช่วง",
+    unit: "AU",
+    tone: "blue",
+    visual: <PlanetaryOrbitVisual />,
+  },
+  {
+    id: "star-sun",
+    name: "ดวงอาทิตย์แหล่งมวลศูนย์กลาง (Sun focus)",
+    role: "ดึงดาวเคราะห์ให้โคจรรอบด้วยแรงโน้มถ่วงซึ่งอยู่ที่ตำแหน่งจุดโฟกัสของวงรี",
+    note: "เปรียบเทียบคาบความกว้างตามกฎ $T^2 \\propto a^3$ สอดคล้องกับค่าคงที่ของระบบ",
+    unit: "M☉",
+    tone: "orange",
+    visual: <PlanetaryOrbitVisual />,
+  },
+  {
+    id: "planetary-tracker",
+    name: "เครื่องวัดคาบและพิกัดดาวเคราะห์",
+    role: "บันทึกเวลาโคจรครบรอบวงเพื่อประเมินคาบปีการโคจรเฉลี่ย",
+    note: "ปรับขนาดกึ่งแกนเอกเพื่อทดสอบความคงตัวของอัตราส่วน Kepler",
+    unit: "Years",
+    tone: "amber",
+    visual: <PlanetaryOrbitVisual />,
+  }
+];
+
+const stefanBoltzmannEquipments: EquipmentItem[] = [
+  {
+    id: "blackbody-furnace",
+    name: "เครื่องกำเนิดรังสีวัตถุดำ (Blackbody Cavity)",
+    role: "จำลองการแผ่รังสีแม่เหล็กไฟฟ้าสมบูรณ์แบบที่อุณหภูมิควบคุม",
+    note: "ปรับระดับอุณหภูมิ (K) สังเกตการเปลี่ยนสีดวงดาวสะท้อนความเข้มคลื่นแผ่",
+    unit: "K",
+    tone: "rose",
+    visual: <WienSpectrumVisual />,
+  },
+  {
+    id: "radiation-pyrometer",
+    name: "เครื่องวัดพลังงานความเข้มการแผ่รังสี (Pyrometer)",
+    role: "ดักจับความร้อนรังสีเพื่อนำมาประมวลผลความหนาแน่นกำลังการแผ่รังสี",
+    note: "กำลังรวมการแผ่จะแปรผันตามอุณหภูมิสัมบูรณ์เคลวินยกกำลังสี่ ($T^4$)",
+    unit: "W/m²",
+    tone: "orange",
+    visual: <WienSpectrumVisual />,
+  },
+  {
+    id: "spectrophotometer",
+    name: "เครื่องสเปกโตรมิเตอร์คัดความกว้างช่วงคลื่น",
+    role: "วัดความหนาแน่นสเปกตรัมการแผ่พลังงานในความถี่คลื่นต่างๆ",
+    note: "วิเคราะห์ความสัมพันธ์ Wien's Displacement สำหรับความยาวคลื่นยอดความเข้มสูงสุด",
+    unit: "nm",
+    tone: "blue",
+    visual: <WienSpectrumVisual />,
+  }
+];
+
+const leChateliersEquipments: EquipmentItem[] = [
+  {
+    id: "equilibrium-tubes",
+    name: "ชุดหลอดทดลองสมดุลเคมี",
+    role: "ใช้เปรียบเทียบสีของสารละลายที่สภาวะสมดุลควบคุมและสภาวะที่ถูกรบกวน",
+    note: "ประกอบด้วยหลอดควบคุม และหลอดทดลองการเปลี่ยนอุณหภูมิ/ความเข้มข้น",
+    unit: "ชุด",
+    tone: "rose",
+    visual: <EquilibriumTubesVisual />,
+  },
+  {
+    id: "fe-scn-solutions",
+    name: "สารละลาย FeCl₃ และ KSCN",
+    role: "สารตั้งต้นสำหรับเกิดปฏิกิริสารประกอบเชิงซ้อนสีแดงของ [Fe(SCN)]²⁺",
+    note: "ความเข้มข้นต่ำมากเพื่อให้อ่านค่าสีและการเปลี่ยนแปลงได้ชัดเจน",
+    unit: "M",
+    tone: "amber",
+    visual: <BeakerVisual />,
+  },
+  {
+    id: "naf-solution",
+    name: "สารละลาย Sodium Fluoride (NaF)",
+    role: "สารรรบกวนระบบโดยทำปฏิกิริยากับ Fe³⁺ เกิดเป็นสารประกอบเชิงซ้อนไม่มีสี [FeF₆]³⁻",
+    note: "ช่วยให้สังเกตการเลื่อนของสมดุลกลับมาทางซ้ายได้ชัดเจน",
+    unit: "M",
+    tone: "blue",
+    visual: <PipetteVisual />,
+  },
+  {
+    id: "temp-water-bath",
+    name: "อ่างน้ำร้อน-อ่างน้ำเย็น",
+    role: "ใช้ปรับเปลี่ยนอุณหภูมิของระบบเพื่อรบกวนสมดุลเคมี (ตามผลของปฏิกิริยาดูด/คายความร้อน)",
+    note: "น้ำร้อน 70-80°C และน้ำแข็งน้ำเย็นใกล้ 0°C",
+    unit: "°C",
+    tone: "orange",
+    visual: <HeaterCoolerVisual />,
+  }
+];
+
+const beerLambertEquipments: EquipmentItem[] = [
+  {
+    id: "spectrophotometer-device",
+    name: "เครื่องสเปกโทรโฟโตมิเตอร์",
+    role: "แหล่งกำเนิดแสงช่วงคลื่นเดี่ยวและตรวจวัดความเข้มแสงที่ผ่านสารละลาย",
+    note: "ตรวจสอบการคาลิเบรตเครื่องด้วยน้ำกลั่น (Blank) ก่อนเริ่มวัดค่าจริง",
+    unit: "ชุด",
+    tone: "blue",
+    visual: <SpectrophotometerVisual />,
+  },
+  {
+    id: "optical-cuvette",
+    name: "คิวเวตต์แก้วมาตรฐาน (Cuvette)",
+    role: "หลอดใสสี่เหลี่ยมสำหรับใส่สารละลายตัวอย่าง มีขนาดความกว้างแสงผ่าน 1 cm และ 2 cm",
+    note: "ห้ามสัมผัสด้านใสที่แสงผ่านเพื่อหลีกเลี่ยงการหักเหแสงจากรอยนิ้วมือ",
+    unit: "cm",
+    tone: "cyan",
+    visual: <CuvetteVisual />,
+  },
+  {
+    id: "solute-concentrates",
+    name: "สารละลายเกลือโลหะสีเข้มข้น",
+    role: "สารละลายทองแดงซัลเฟต (CuSO₄) หรือโคบอลต์คลอไรด์ (CoCl₂) ที่มีความเข้มข้นต่าง ๆ",
+    note: "เตรียมสารเจือจางความเข้มข้นอย่างเป็นระบบเพื่อใช้สร้างกราฟมาตรฐาน",
+    unit: "M",
+    tone: "amber",
+    visual: <BeakerVisual />,
+  },
+  {
+    id: "deionized-water",
+    name: "น้ำกลั่นบริสุทธิ์ (DI Water)",
+    role: "ใช้สำหรับเตรียมสารละลายเจือจางและใช้เป็น Blank สำหรับหักลบค่าการดูดกลืนแสงเริ่มต้น",
+    note: "ล้างคิวเวตต์ด้วยน้ำกลั่นและเช็ดให้แห้งสนิททุกครั้งก่อนเปลี่ยนความเข้มข้น",
+    unit: "ml",
+    tone: "cyan",
+    visual: <PipetteVisual />,
+  }
+];
+
+const hesssLawEquipments: EquipmentItem[] = [
+  {
+    id: "foam-calorimeter",
+    name: "แคลอริมิเตอร์ถ้วยโฟม (Calorimeter)",
+    role: "ระบบเกือบปิดจำลองสภาวะอะเดียแบติก (ความดันคงที่และจำกัดการถ่ายเทความร้อนภายนอก)",
+    note: "ประกอบด้วยถ้วยโฟมซ้อนกันสองชั้นเพื่อลดการสูญเสียความร้อนไปยังสิ่งแวดล้อม",
+    unit: "ชุด",
+    tone: "cyan",
+    visual: <CalorimeterVisual />,
+  },
+  {
+    id: "chemical-reactants-hess",
+    name: "สารเคมี NaOH (โซเดียมไฮดรอกไซด์) และ HCl (กรดไฮโดรคลอริก)",
+    role: "สารเคมีหลักสำหรับทำปฏิกิริยา 3 ขั้นตอนเพื่อยืนยันกฎของเฮสส์",
+    note: "ระมัดระวังการสัมผัสโซดาไฟเม็ด และไอระเหยเข้มข้นของกรดไฮโดรคลอริก",
+    unit: "g / M",
+    tone: "rose",
+    visual: <BeakerVisual />,
+  },
+  {
+    id: "temp-probe-calorimetry",
+    name: "หัววัดอุณหภูมิแบบดิจิทัล / เทอร์โมมิเตอร์",
+    role: "ตรวจวัดอุณหภูมิที่เปลี่ยนไปของน้ำ/สารละลายเพื่อคำนวณปริมาณความร้อน (q = mcΔT)",
+    note: "มีความละเอียดสูงถึง 0.1°C เพื่อความแม่นยำในการหาอุณหภูมิสูงสุด",
+    unit: "°C",
+    tone: "orange",
+    visual: <ThermometerVisual />,
+  },
+  {
+    id: "stirring-bar",
+    name: "แท่งแก้วคนสารละลาย",
+    role: "ช่วยเร่งการละลายและการผสมของสารให้เกิดปฏิกิริยาอย่างทั่วถึงและรวดเร็ว",
+    note: "คนอย่างสม่ำเสมอและระวังอย่าให้แท่งแก้วกระทบกระแทกหัววัดเทอร์โมมิเตอร์",
+    unit: "อัน",
+    tone: "blue",
+    visual: <PipetteVisual />,
+  }
+];
+
+const galvanicCellEquipments: EquipmentItem[] = [
+  {
+    id: "galvanic-half-cells",
+    name: "บีกเกอร์ครึ่งเซลล์โลหะ",
+    role: "ภาชนะสำหรับใส่สารละลาย ZnSO₄ และ CuSO₄ พร้อมแผ่นโลหะที่ทำหน้าที่เป็นขั้วไฟฟ้า",
+    note: "แยกครึ่งเซลล์ออกจากกันเพื่อให้สังเกตการเกิดออกซิเดชันและรีดักชันได้ชัดเจน",
+    unit: "M",
+    tone: "cyan",
+    visual: <BeakerVisual />,
+  },
+  {
+    id: "galvanic-salt-bridge",
+    name: "สะพานเกลือ (Salt Bridge)",
+    role: "รักษาสมดุลประจุระหว่างครึ่งเซลล์และทำให้วงจรไอออนปิดครบ",
+    note: "ใช้สารละลาย KNO₃ หรือ NaNO₃ ในวุ้นเพื่อหลีกเลี่ยงไอออนรบกวน",
+    unit: "KNO₃",
+    tone: "blue",
+    visual: <PipetteVisual />,
+  },
+  {
+    id: "galvanic-voltmeter",
+    name: "โวลต์มิเตอร์ดิจิทัล",
+    role: "วัดแรงดันไฟฟ้าระหว่างขั้วแอโนดและแคโทดของเซลล์กัลวานิก",
+    note: "ต่อขั้วบวกกับแคโทดและขั้วลบกับแอโนดเพื่ออ่านค่า Ecell ได้ถูกต้อง",
+    unit: "V",
+    tone: "rose",
+    visual: <VoltmeterVisual />,
+  },
+  {
+    id: "galvanic-wires",
+    name: "สายไฟและคลิปปากจระเข้",
+    role: "เชื่อมต่ออิเล็กโทรดกับโวลต์มิเตอร์เพื่อให้เกิดการไหลของอิเล็กตรอนในวงจรภายนอก",
+    note: "ตรวจสอบผิวโลหะและจุดสัมผัสให้สะอาดก่อนเริ่มบันทึกค่า",
+    unit: "Ω",
+    tone: "amber",
+    visual: <WiresVisual />,
+  },
+];
+
+const chemicalKineticsEquipments: EquipmentItem[] = [
+  {
+    id: "kinetics-reactant-beakers",
+    name: "บีกเกอร์สารตั้งต้น",
+    role: "เตรียมสารตั้งต้นหลายความเข้มข้นเพื่อเปรียบเทียบผลต่ออัตราการเกิดปฏิกิริยา",
+    note: "ปรับความเข้มข้นทีละตัวแปรเพื่อไม่ให้ผลการทดลองปะปนกัน",
+    unit: "M",
+    tone: "cyan",
+    visual: <BeakerVisual />,
+  },
+  {
+    id: "kinetics-stopwatch",
+    name: "นาฬิกาจับเวลา",
+    role: "จับเวลาตั้งแต่เริ่มผสมสารจนถึงจุดสังเกต เช่น สีเปลี่ยนหรือความขุ่นถึงระดับกำหนด",
+    note: "เริ่มจับเวลาทันทีเมื่อสารสัมผัสกันเพื่อให้ข้อมูลอัตราแม่นยำ",
+    unit: "s",
+    tone: "amber",
+    visual: <StopwatchVisual />,
+  },
+  {
+    id: "kinetics-water-bath",
+    name: "อ่างควบคุมอุณหภูมิ",
+    role: "ปรับอุณหภูมิของระบบเพื่อทดสอบผลของพลังงานจลน์ต่อความถี่การชน",
+    note: "รอให้สารตั้งต้นมีอุณหภูมิคงที่ก่อนเริ่มผสม",
+    unit: "°C",
+    tone: "orange",
+    visual: <HeaterCoolerVisual />,
+  },
+  {
+    id: "kinetics-catalyst",
+    name: "สารตัวเร่งปฏิกิริยา",
+    role: "ลดพลังงานก่อกัมมันต์และเพิ่มอัตราการเกิดปฏิกิริยาโดยไม่ถูกใช้หมด",
+    note: "เปรียบเทียบผลก่อนและหลังเติมตัวเร่งในเงื่อนไขเดียวกัน",
+    unit: "%",
+    tone: "rose",
+    visual: <PipetteVisual />,
+  },
+];
+
+const solubilityProductEquipments: EquipmentItem[] = [
+  {
+    id: "ksp-precipitation-tubes",
+    name: "ชุดหลอดทดลองตกตะกอน",
+    role: "ใช้ผสมไอออนบวกและไอออนลบเพื่อสังเกตการเกิดตะกอนของเกลือละลายยาก",
+    note: "เทียบความขุ่นของสารละลายเพื่อประเมินจุดเริ่มอิ่มตัว",
+    unit: "ชุด",
+    tone: "cyan",
+    visual: <EquilibriumTubesVisual />,
+  },
+  {
+    id: "ksp-ion-solutions",
+    name: "สารละลายไอออนมาตรฐาน",
+    role: "สารละลาย Ag⁺, Cl⁻, Ca²⁺ หรือ OH⁻ ที่ทราบความเข้มข้นสำหรับคำนวณ Qsp",
+    note: "ใช้ปิเปตตวงปริมาตรให้เท่ากันทุกครั้งเพื่อลดความคลาดเคลื่อน",
+    unit: "M",
+    tone: "blue",
+    visual: <PipetteVisual />,
+  },
+  {
+    id: "ksp-conductivity-meter",
+    name: "เครื่องวัดการนำไฟฟ้า",
+    role: "ติดตามปริมาณไอออนอิสระในสารละลายก่อนและหลังเกิดตะกอน",
+    note: "ค่าการนำไฟฟ้าลดลงเมื่อไอออนถูกดึงออกจากสารละลายเป็นของแข็ง",
+    unit: "mS/cm",
+    tone: "amber",
+    visual: <PHMeterVisual />,
+  },
+  {
+    id: "ksp-filter-paper",
+    name: "กระดาษกรองและกรวยกรอง",
+    role: "แยกตะกอนออกจากสารละลายเพื่อสังเกตปริมาณและสีของผลิตภัณฑ์",
+    note: "ล้างตะกอนด้วยน้ำกลั่นปริมาณน้อยเพื่อไม่ให้สูญเสียตัวอย่าง",
+    unit: "g",
+    tone: "rose",
+    visual: <CuvetteVisual />,
+  },
+];
+
+const avogadrosLawEquipments: EquipmentItem[] = [
+  {
+    id: "avogadro-gas-syringe",
+    name: "กระบอกเก็บแก๊ส",
+    role: "วัดปริมาตรแก๊สที่เกิดขึ้นจากปฏิกิริยาและเทียบเป็นปริมาตรต่อโมล",
+    note: "อ่านปริมาตรเมื่ออุณหภูมิและความดันของแก๊สคงที่",
+    unit: "L",
+    tone: "blue",
+    visual: <GasSyringeVisual />,
+  },
+  {
+    id: "avogadro-reactor-flask",
+    name: "ขวดปฏิกิริยา",
+    role: "ให้โลหะหรือคาร์บอเนตทำปฏิกิริยากับกรดเพื่อผลิตแก๊สปริมาณที่คำนวณได้",
+    note: "ปิดระบบให้สนิทเพื่อไม่ให้แก๊สรั่วก่อนเข้าสู่กระบอกเก็บ",
+    unit: "mol",
+    tone: "cyan",
+    visual: <ErlenmeyerVisual />,
+  },
+  {
+    id: "avogadro-thermometer",
+    name: "เทอร์โมมิเตอร์และบารอมิเตอร์",
+    role: "วัดอุณหภูมิและความดันเพื่อปรับปริมาตรแก๊สกลับสู่สภาวะมาตรฐาน",
+    note: "ใช้ Kelvin และ kPa ในการคำนวณกฎแก๊ส",
+    unit: "K/kPa",
+    tone: "orange",
+    visual: <ThermometerVisual />,
+  },
+  {
+    id: "avogadro-balance",
+    name: "เครื่องชั่งสารตั้งต้น",
+    role: "วัดมวลสารที่ใช้เพื่อคำนวณจำนวนโมลของแก๊สที่ควรเกิดขึ้น",
+    note: "บันทึกมวลก่อนปฏิกิริยาและใช้มวลโมลาร์ในการแปลงหน่วย",
+    unit: "g",
+    tone: "amber",
+    visual: <MassSetVisual />,
+  },
+];
+
+const electrolysisEquipments: EquipmentItem[] = [
+  {
+    id: "electrolysis-power-supply",
+    name: "แหล่งจ่ายไฟกระแสตรง",
+    role: "จ่ายกระแสไฟฟ้าคงที่ให้เซลล์อิเล็กโทรไลซิสเพื่อบังคับปฏิกิริยารีดอกซ์",
+    note: "ตั้งค่ากระแสและเวลาให้แน่นอนเพื่อใช้กฎของฟาราเดย์คำนวณมวลที่ชุบ",
+    unit: "A",
+    tone: "blue",
+    visual: <PowerSupplyVisual />,
+  },
+  {
+    id: "electrolysis-electrolyte",
+    name: "สารละลายอิเล็กโทรไลต์โลหะ",
+    role: "ให้ไอออนโลหะ เช่น Cu²⁺ หรือ Ni²⁺ สำหรับเคลื่อนที่ไปเกาะที่แคโทด",
+    note: "ความเข้มข้นสูงและสะอาดช่วยให้ผิวชุบเรียบสม่ำเสมอ",
+    unit: "M",
+    tone: "cyan",
+    visual: <BeakerVisual />,
+  },
+  {
+    id: "electrolysis-electrodes",
+    name: "แผ่นโลหะแอโนดและแคโทด",
+    role: "แอโนดละลายให้ไอออนโลหะ ส่วนแคโทดเป็นชิ้นงานที่รับโลหะเคลือบผิว",
+    note: "ขัดผิวชิ้นงานและชั่งมวลก่อนเริ่มทดลอง",
+    unit: "g",
+    tone: "rose",
+    visual: <PhotoCellVisual />,
+  },
+  {
+    id: "electrolysis-wires",
+    name: "สายไฟและคลิปหนีบ",
+    role: "เชื่อมต่อขั้วไฟฟ้ากับแหล่งจ่ายไฟให้ทิศทางกระแสถูกต้อง",
+    note: "ตรวจ polarity ก่อนเปิดไฟเพื่อไม่ให้โลหะไปเกาะผิดขั้ว",
+    unit: "±",
+    tone: "amber",
+    visual: <WiresVisual />,
+  },
+];
+
+const colligativeEquipments: EquipmentItem[] = [
+  {
+    id: "colligative-thermometer",
+    name: "เทอร์โมมิเตอร์ความละเอียดสูง",
+    role: "วัดจุดเยือกแข็งและจุดเดือดของตัวทำละลายก่อนและหลังเติมตัวละลาย",
+    note: "ใช้ความละเอียด 0.1°C เพื่อเห็นการเปลี่ยนแปลงที่มักมีค่าน้อย",
+    unit: "°C",
+    tone: "orange",
+    visual: <ThermometerVisual />,
+  },
+  {
+    id: "colligative-solvent",
+    name: "ตัวทำละลายบริสุทธิ์",
+    role: "ใช้เป็นค่าอ้างอิงก่อนเติมตัวละลาย เช่น น้ำหรือสารอินทรีย์ที่ปลอดภัย",
+    note: "ต้องทราบค่า Kf และ Kb ของตัวทำละลายเพื่อคำนวณผลเชิงปริมาณ",
+    unit: "Kf/Kb",
+    tone: "cyan",
+    visual: <BeakerVisual />,
+  },
+  {
+    id: "colligative-solute",
+    name: "ตัวละลายไม่ระเหย",
+    role: "ทำให้ความดันไอลดลง ส่งผลให้จุดเยือกแข็งลดและจุดเดือดเพิ่ม",
+    note: "เลือกชนิดไม่แตกตัวหรือแตกตัวเพื่อเปรียบเทียบผลของ van't Hoff factor",
+    unit: "mol/kg",
+    tone: "rose",
+    visual: <MassSetVisual />,
+  },
+  {
+    id: "colligative-bath",
+    name: "อ่างน้ำแข็งและอ่างน้ำร้อน",
+    role: "ควบคุมการเย็นตัวและการเดือดของสารละลายระหว่างการวัดอุณหภูมิ",
+    note: "คนสารอย่างสม่ำเสมอเพื่อให้อุณหภูมิในสารละลายสม่ำเสมอ",
+    unit: "°C",
+    tone: "blue",
+    visual: <HeaterCoolerVisual />,
+  },
+];
+
 export default function EquipmentList({ labId = "newtons-cooling" }: EquipmentListProps) {
   const [showDetails, setShowDetails] = React.useState(false);
   const isOhmsLaw = labId === "ohms-law";
@@ -423,6 +1155,24 @@ export default function EquipmentList({ labId = "newtons-cooling" }: EquipmentLi
   const isPhotosynthesis = labId === "photosynthesis-rate";
   const isMendelian = labId === "mendels-inheritance";
   const isMitosis = labId === "mitosis-division";
+  const isLeChateliers = labId === "le-chateliers-principle";
+  const isBeerLambert = labId === "beer-lambert-law";
+  const isHesssLaw = labId === "hesss-law";
+  const isGalvanicCell = labId === "galvanic-cell";
+  const isChemicalKinetics = labId === "chemical-kinetics";
+  const isSolubilityProduct = labId === "solubility-product";
+  const isAvogadrosLaw = labId === "avogadros-law";
+  const isElectrolysis = labId === "electrolysis-lab";
+  const isColligative = labId === "colligative-properties";
+  const isSnellsLaw = labId === "snells-law";
+  const isIdealGas = labId === "ideal-gas-law";
+  const isNewtonsSecond = labId === "newtons-second-law";
+  const isMomentum = labId === "momentum-conservation";
+  const isFaradaysLaw = labId === "faradays-law";
+  const isBernoulli = labId === "bernoullis-principle";
+  const isPhotoelectric = labId === "photoelectric-effect";
+  const isKepler = labId === "keplers-laws";
+  const isStefanBoltzmann = labId === "stefan-boltzmann";
 
   const coolingEquipments: EquipmentItem[] = [
     {
@@ -856,7 +1606,195 @@ export default function EquipmentList({ labId = "newtons-cooling" }: EquipmentLi
     },
   ];
 
-  const equipments = isMitosis ? mitosisEquipments : isMendelian ? mendelianEquipments : isPhotosynthesis ? photosynthesisEquipments : isCharlesLaw ? charlesLawEquipments : isBoylesLaw ? boylesLawEquipments : isAcidBase ? acidBaseEquipments : isHookesLaw ? hookesLawEquipments : isOhmsLaw ? ohmsLawEquipments : coolingEquipments;
+  const snellsLawEquipments: EquipmentItem[] = [
+    {
+      id: "laser-source",
+      name: "แหล่งกำเนิดแสงเลเซอร์ (Laser Source)",
+      role: "ยิงลำแสงเลเซอร์สีแดงแคบเพื่อสังเกตแนวการเดินทางของแสง",
+      note: "หลีกเลี่ยงการฉายลำแสงเข้าตากลุ่มผู้ทดลองโดยตรง",
+      unit: "laser",
+      tone: "rose",
+      visual: <LaserSourceVisual />,
+    },
+    {
+      id: "acrylic-prism",
+      name: "แท่งแก้ว/อะคริลิกครึ่งวงกลม (Acrylic Block)",
+      role: "ตัวกลางที่มีดัชนีหักเหแสงหนาแน่นสำหรับให้แสงผ่าน",
+      note: "จัดแนวระนาบขอบตรงให้อยู่ตรงเส้นศูนย์สูตรของจานวัดพอดี",
+      unit: "n₂",
+      tone: "blue",
+      visual: <AcrylicBlockVisual />,
+    },
+    {
+      id: "protractor-disk",
+      name: "จานวัดมุมองศา (Protractor Disk)",
+      role: "วัดมุมตกกระทบและมุมหักเหจากเส้นแนวฉากอย่างละเอียด",
+      note: "อ่านค่ามุมที่เส้นกึ่งกลางลำแสงเลเซอร์พาดผ่าน",
+      unit: "องศา",
+      tone: "amber",
+      visual: <ProtractorVisual />,
+    },
+    {
+      id: "optical-bench",
+      name: "ฐานอุปกรณ์แสง (Optical Bench)",
+      role: "ยึดติดตั้งเลเซอร์และจานวัดมุมให้อยู่ในแนวระดับเดียวกัน",
+      note: "ตรวจสอบความมั่นคงเพื่อลดการเลื่อนไหลของมุมลำแสง",
+      unit: "pcs",
+      tone: "cyan",
+      visual: <OpticalBenchVisual />,
+    },
+  ];
+
+  const idealGasEquipments: EquipmentItem[] = [
+    {
+      id: "gas-cylinder-ideal",
+      name: "กระบอกสูบกักเก็บแก๊ส (Gas Cylinder)",
+      role: "ภาชนะปิดเพื่อควบคุมปริมาตร (V) ของแก๊สในระบบ",
+      note: "ตรวจสอบการรั่วซึมรอบแกนลูกสูบอย่างสม่ำเสมอ",
+      unit: "V (L)",
+      tone: "blue",
+      visual: <PistonVisual />,
+    },
+    {
+      id: "gas-tank-ideal",
+      name: "ถังจ่ายปริมาณแก๊ส (Gas Source)",
+      role: "เพิ่มหรือลดจำนวนโมลแก๊ส (n) ในระบบปิด",
+      note: "รักษาระดับจำนวนโมลให้คงที่ขณะศึกษาความสัมพันธ์ P-T",
+      unit: "n (mol)",
+      tone: "cyan",
+      visual: <GasTankVisual />,
+    },
+    {
+      id: "heater-burner",
+      name: "เครื่องทำความร้อนและเย็น (Heater/Cooler)",
+      role: "ปรับเปลี่ยนอุณหภูมิ (T) ของแก๊สในระบบปิดอย่างสม่ำเสมอ",
+      note: "ค่อย ๆ ให้ความร้อนเพื่อความแม่นยำในการวัดความดัน",
+      unit: "T (K)",
+      tone: "orange",
+      visual: <HeaterCoolerVisual />,
+    },
+    {
+      id: "pressure-gauge-ideal",
+      name: "เกจวัดความดันดิจิทัล (Pressure Gauge)",
+      role: "วัดความดันรวม (P) ภายในห้องทดลองแก๊สจำลอง",
+      note: "อ่านค่าเมื่อตัวเลขบนจอเสถียรหลังจากสภาวะคงตัว",
+      unit: "P (kPa)",
+      tone: "amber",
+      visual: <PressureGaugeVisual />,
+    },
+    {
+      id: "thermometer-ideal",
+      name: "เซนเซอร์อุณหภูมิดิจิทัล (Thermometer)",
+      role: "วัดอุณหภูมิสัมบูรณ์เคลวินในสเกลจำลอง",
+      note: "ใช้แปลงค่าเซลเซียสเป็นเคลวินเพื่อคำนวณตามสูตร",
+      unit: "K",
+      tone: "rose",
+      visual: <ThermometerVisual />,
+    },
+  ];
+
+  const newtonsSecondEquipments: EquipmentItem[] = [
+    {
+      id: "wooden-track",
+      name: "รางไม้ทดลองระดับ (Wooden Track)",
+      role: "ทางวิ่งแนวระดับราบที่มีสเกลวัดความยาวละเอียด",
+      note: "ปรับรางให้ขนานกับแนวระนาบพื้นห้องมากที่สุด",
+      unit: "cm",
+      tone: "orange",
+      visual: <WoodenTrackVisual />,
+    },
+    {
+      id: "dynamics-cart",
+      name: "รถทดลองพลศาสตร์ (Dynamics Cart)",
+      role: "ตัวรถเข็นที่มีมวล (m) และสามารถรับน้ำหนักเพิ่มได้",
+      note: "ตรวจสอบล้อว่าหมุนอิสระและมีแรงเสียดทานน้อย",
+      unit: "kg",
+      tone: "rose",
+      visual: <DynamicsCartVisual />,
+    },
+    {
+      id: "pulley-system",
+      name: "รอกเดี่ยวไร้ความฝืด (Pulley System)",
+      role: "เปลี่ยนทิศทางแรงดึงจากน้ำหนักแขวนลากรถทดลอง",
+      note: "จัดให้แนวเส้นเชือกขนานกับรางไม้ทดลองพอดี",
+      unit: "pcs",
+      tone: "blue",
+      visual: <PulleySystemVisual />,
+    },
+    {
+      id: "photogate-timers",
+      name: "เครื่องจับเวลาเซนเซอร์คู่ (Photogate Sensors)",
+      role: "ตรวจจับเวลาและประเมินความเร็วเฉลี่ย/ความเร่งของรถ",
+      note: "ตั้งแผงวัดตัดผ่านลำแสงเลเซอร์ของเซนเซอร์ Gate A และ B",
+      unit: "s",
+      tone: "cyan",
+      visual: <PhotogateVisual />,
+    },
+    {
+      id: "mass-set-newton",
+      name: "ชุดตุ้มน้ำหนักลากจูง (Mass Set)",
+      role: "ใช้แขวนที่ปลายเชือกเพื่อสร้างแรงลากจูงคงที่ (F)",
+      note: "น้ำหนักที่แขวนรวมกับมวลรถเป็นมวลรวมของระบบ",
+      unit: "N",
+      tone: "amber",
+      visual: <MassSetVisual />,
+    },
+  ];
+
+  const equipments = isMitosis
+    ? mitosisEquipments
+    : isMendelian
+    ? mendelianEquipments
+    : isPhotosynthesis
+    ? photosynthesisEquipments
+    : isCharlesLaw
+    ? charlesLawEquipments
+    : isBoylesLaw
+    ? boylesLawEquipments
+    : isAcidBase
+    ? acidBaseEquipments
+    : isLeChateliers
+    ? leChateliersEquipments
+    : isBeerLambert
+    ? beerLambertEquipments
+    : isHesssLaw
+    ? hesssLawEquipments
+    : isGalvanicCell
+    ? galvanicCellEquipments
+    : isChemicalKinetics
+    ? chemicalKineticsEquipments
+    : isSolubilityProduct
+    ? solubilityProductEquipments
+    : isAvogadrosLaw
+    ? avogadrosLawEquipments
+    : isElectrolysis
+    ? electrolysisEquipments
+    : isColligative
+    ? colligativeEquipments
+    : isHookesLaw
+    ? hookesLawEquipments
+    : isOhmsLaw
+    ? ohmsLawEquipments
+    : isSnellsLaw
+    ? snellsLawEquipments
+    : isIdealGas
+    ? idealGasEquipments
+    : isNewtonsSecond
+    ? newtonsSecondEquipments
+    : isMomentum
+    ? momentumEquipments
+    : isFaradaysLaw
+    ? faradayEquipments
+    : isBernoulli
+    ? bernoulliEquipments
+    : isPhotoelectric
+    ? photoelectricEquipments
+    : isKepler
+    ? keplerEquipments
+    : isStefanBoltzmann
+    ? stefanBoltzmannEquipments
+    : coolingEquipments;
+
   const equipmentSubtitle = isMitosis
     ? "รายการอุปกรณ์สำหรับการทดลอง Mitosis & Cell Cycle"
     : isMendelian
@@ -869,11 +1807,52 @@ export default function EquipmentList({ labId = "newtons-cooling" }: EquipmentLi
     ? "รายการอุปกรณ์สำหรับการทดลอง Boyle's Gas Law Lab"
     : isAcidBase
     ? "รายการอุปกรณ์สำหรับการทดลอง Acid-Base Titration Lab"
+    : isLeChateliers
+    ? "รายการอุปกรณ์สำหรับการทดลอง Chemical Equilibrium Shift Lab"
+    : isBeerLambert
+    ? "รายการอุปกรณ์สำหรับการทดลอง Beer-Lambert Spectrophotometry Lab"
+    : isHesssLaw
+    ? "รายการอุปกรณ์สำหรับการทดลอง Hess's Law & Calorimetry Lab"
+    : isGalvanicCell
+    ? "รายการอุปกรณ์สำหรับการทดลอง Galvanic Cells & Voltage"
+    : isChemicalKinetics
+    ? "รายการอุปกรณ์สำหรับการทดลอง Chemical Reaction Rates"
+    : isSolubilityProduct
+    ? "รายการอุปกรณ์สำหรับการทดลอง Solubility Product Constant"
+    : isAvogadrosLaw
+    ? "รายการอุปกรณ์สำหรับการทดลอง Avogadro's Molar Volume"
+    : isElectrolysis
+    ? "รายการอุปกรณ์สำหรับการทดลอง Electrolysis & Metal Plating"
+    : isColligative
+    ? "รายการอุปกรณ์สำหรับการทดลอง Colligative Properties Lab"
     : isHookesLaw
     ? "รายการอุปกรณ์สำหรับการทดลอง Hooke's Law of Elasticity"
     : isOhmsLaw
     ? "รายการอุปกรณ์สำหรับการทดลอง Ohm's Law & DC Circuits"
+    : isSnellsLaw
+    ? "รายการอุปกรณ์สำหรับการทดลอง Snell's Law of Refraction"
+    : isIdealGas
+    ? "รายการอุปกรณ์สำหรับการทดลอง Ideal Gas Law Simulation"
+    : isNewtonsSecond
+    ? "รายการอุปกรณ์สำหรับการทดลอง Newton's Second Law of Motion"
+    : isMomentum
+    ? "รายการอุปกรณ์สำหรับการทดลอง Conservation of Linear Momentum"
+    : isFaradaysLaw
+    ? "รายการอุปกรณ์สำหรับการทดลอง Faraday's Electromagnetic Induction"
+    : isBernoulli
+    ? "รายการอุปกรณ์สำหรับการทดลอง Bernoulli's Principle & Fluid Dynamics"
+    : isPhotoelectric
+    ? "รายการอุปกรณ์สำหรับการทดลอง Einstein's Photoelectric Effect"
+    : isKepler
+    ? "รายการอุปกรณ์สำหรับการทดลอง Kepler's Third Law of Planetary Motion"
+    : isStefanBoltzmann
+    ? "รายการอุปกรณ์สำหรับการทดลอง Stefan-Boltzmann Law of Blackbody Radiation"
     : "รายการอุปกรณ์สำหรับการทดลอง Newton's law of cooling";
+  const equipmentSummary = equipments
+    .slice(0, 3)
+    .map((eq) => eq.name)
+    .join(", ");
+  const remainingEquipmentCount = Math.max(equipments.length - 3, 0);
 
   return (
     <section className="bg-white rounded-2xl border border-slate-200/70 p-4 sm:p-5">
@@ -886,13 +1865,13 @@ export default function EquipmentList({ labId = "newtons-cooling" }: EquipmentLi
             <h2 className="text-sm font-bold text-slate-800 sm:text-base">
               อุปกรณ์ในห้องแล็บ
             </h2>
-            <p className="text-[11px] font-semibold leading-relaxed text-slate-400">
+            <p className="text-[11px] font-semibold leading-relaxed text-slate-500">
               {equipmentSubtitle}
             </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-[11px] font-bold text-slate-400">
+          <span className="text-[11px] font-bold text-slate-500">
             {equipments.length} รายการ
           </span>
           <button
@@ -910,8 +1889,8 @@ export default function EquipmentList({ labId = "newtons-cooling" }: EquipmentLi
       </div>
 
       {!showDetails ? (
-        <div className="mt-3 flex flex-col gap-2 rounded-xl border border-slate-100 bg-slate-50/70 px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-2">
+        <div className="mt-3 flex flex-col gap-2 rounded-xl border border-slate-100 bg-slate-50/80 px-3 py-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex min-w-0 items-start gap-2 sm:items-center">
             <div className="flex -space-x-1.5">
               {equipments.map((eq) => {
                 const tone = toneClasses[eq.tone];
@@ -925,12 +1904,18 @@ export default function EquipmentList({ labId = "newtons-cooling" }: EquipmentLi
                 );
               })}
             </div>
-            <span className="text-[11px] font-bold leading-relaxed text-slate-500">
-              ซ่อนรายการอุปกรณ์ไว้แล้ว
-            </span>
+            <div className="min-w-0">
+              <p className="text-[11px] font-bold leading-relaxed text-slate-700">
+                สรุปอุปกรณ์ {equipments.length} รายการ
+              </p>
+              <p className="text-[11px] font-semibold leading-relaxed text-slate-500">
+                {equipmentSummary}
+                {remainingEquipmentCount > 0 ? ` และอีก ${remainingEquipmentCount} รายการ` : ""}
+              </p>
+            </div>
           </div>
-          <span className="text-[11px] font-extrabold leading-relaxed text-indigo-500">
-            กดดูรายละเอียดเพื่อเปิดรายการเต็ม
+          <span className="text-[11px] font-extrabold leading-relaxed text-indigo-600">
+            เปิดรายละเอียดเพื่อดูบทบาทและหน่วยของแต่ละอุปกรณ์
           </span>
         </div>
       ) : (
@@ -968,7 +1953,7 @@ export default function EquipmentList({ labId = "newtons-cooling" }: EquipmentLi
                 </div>
 
                 <div className="col-span-2 flex items-center justify-between gap-3 border-t border-white/70 pt-2 sm:col-span-1 sm:h-full sm:flex-col sm:items-end sm:justify-center sm:border-l sm:border-t-0 sm:pl-4 sm:pt-0">
-                  <span className="text-[9px] font-bold uppercase text-slate-400">
+                  <span className="text-[9px] font-bold uppercase text-slate-500">
                     หน่วย/ตัวแปร
                   </span>
                   <span className={`rounded-full bg-white px-2.5 py-1 text-xs font-black ${tone.text}`}>

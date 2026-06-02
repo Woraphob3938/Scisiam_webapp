@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Eye, ArrowRight } from "lucide-react";
+import { getLabReadiness } from "@/data/labReadiness";
 
 export interface LabData {
   id: string;
@@ -988,8 +989,8 @@ export default function LabCard({
       accentText: "text-purple-600",
       glow: "soft-glow-chemistry",
       badgeColor: "bg-purple-50 text-purple-700 border-purple-100",
-      btnPrimary: "bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-700 hover:to-fuchsia-700 text-white shadow-md shadow-purple-500/10",
-      btnOutline: "border-purple-200 text-purple-600 hover:bg-purple-50/50",
+      btnPrimary: "bg-purple-600 hover:bg-purple-700 text-white shadow-md shadow-purple-500/10",
+      btnOutline: "border-purple-200 text-purple-700 hover:bg-purple-50/50",
       iconColor: "text-purple-500",
     },
     Biology: {
@@ -1012,6 +1013,7 @@ export default function LabCard({
     btnOutline: "border-slate-200 text-slate-600 hover:bg-slate-50",
     iconColor: "text-slate-500",
   };
+  const readiness = getLabReadiness(lab.id);
 
   // Render proper SVG
   const renderIllustration = () => {
@@ -1109,64 +1111,84 @@ export default function LabCard({
   return (
     <div
       className={`
-        bg-white rounded-3xl border-2 ${themeColors.border} ${themeColors.glow} p-6.5
-        transition-all duration-500 transform hover:-translate-y-2 hover:shadow-2xl
-        flex flex-col justify-between group h-full relative overflow-hidden
+        group relative flex h-full flex-col justify-between overflow-hidden rounded-[24px] border bg-white p-4
+        transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-slate-200/70 focus-within:ring-3 focus-within:ring-blue-100 sm:p-5
+        ${themeColors.border}
       `}
     >
-      {/* Top Background Glow Effect */}
-      <div className={`absolute top-0 right-0 w-32 h-32 rounded-full -mr-16 -mt-16 opacity-10 filter blur-xl ${lab.category === "Physics" ? "bg-blue-600" : lab.category === "Chemistry" ? "bg-purple-600" : "bg-green-600"}`} />
-
       <div>
         {/* SVG Illustration Container */}
-        <div className={`w-full py-4 rounded-2xl ${themeColors.accentBg} flex items-center justify-center mb-5 border border-slate-50`}>
+        <div className={`mb-4 flex h-28 w-full items-center justify-center overflow-hidden rounded-2xl border border-slate-100 ${themeColors.accentBg} ${readiness.isReady ? "" : "opacity-75"} [&>svg]:h-[88px] sm:h-32 sm:[&>svg]:h-24 xl:h-[136px] xl:[&>svg]:h-28`}>
           {renderIllustration()}
         </div>
 
         {/* Lab Header details */}
-        <div className="flex items-center justify-between gap-2 mb-2.5">
+        <div className="mb-2.5 flex items-center justify-between gap-2">
           {/* Department Tag */}
-          <span className={`px-3 py-1 rounded-full text-xs font-bold border ${themeColors.badgeColor}`}>
+          <span className={`rounded-full border px-3 py-1 text-xs font-bold leading-[1.45] ${themeColors.badgeColor}`}>
             {lab.category}
           </span>
-
+          <span
+            className={`rounded-full border px-2.5 py-1 text-[10px] font-extrabold leading-[1.4] ${
+              readiness.isReady
+                ? "border-emerald-100 bg-emerald-50 text-emerald-700"
+                : "border-amber-100 bg-amber-50 text-amber-700"
+            }`}
+          >
+            {readiness.label}
+          </span>
         </div>
 
         {/* Title */}
-        <h3 className="text-xl font-bold text-slate-800 group-hover:text-slate-900 line-clamp-1 mb-2 tracking-tight transition-colors">
+        <h3 className="mb-2 line-clamp-1 text-lg font-extrabold leading-[1.45] tracking-normal text-slate-900 transition-colors group-hover:text-slate-950">
           {lab.title}
         </h3>
 
         {/* Description */}
-        <p className="text-xs sm:text-sm text-slate-400 font-medium line-clamp-2 leading-relaxed mb-6">
+        <p className="mb-5 line-clamp-2 text-xs font-semibold leading-relaxed text-slate-500 sm:text-sm">
           {lab.description}
         </p>
       </div>
 
       {/* Card Action Buttons */}
-      <div className="grid grid-cols-2 gap-3 mt-auto">
+      <div className="mt-auto grid grid-cols-2 gap-3">
         <button
+          type="button"
+          disabled={!readiness.isReady}
           onClick={() => onViewDetails?.(lab.id)}
           className={`
-            flex items-center justify-center gap-1.5 py-2.5 px-3.5 border rounded-2xl text-xs font-bold
-            transition-all duration-300 transform select-none cursor-pointer active:scale-95
-            ${themeColors.btnOutline}
+            flex min-h-11 select-none items-center justify-center gap-1.5 rounded-xl border px-3 py-2.5 text-xs font-bold
+            transition-all duration-200 active:scale-[0.98] focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100
+            ${
+              readiness.isReady
+                ? `${themeColors.btnOutline} cursor-pointer`
+                : "cursor-not-allowed border-slate-200 bg-white text-slate-400"
+            }
           `}
         >
-          <Eye className="w-4 h-4" />
-          <span>รายละเอียด</span>
+          <Eye className="h-4 w-4" />
+          <span>{readiness.isReady ? "รายละเอียด" : "กำลังจัดทำ"}</span>
         </button>
 
         <button
+          type="button"
+          disabled={!readiness.isReady}
           onClick={() => onEnterRoom?.(lab.id)}
+          title={readiness.description}
           className={`
-            flex items-center justify-center gap-1.5 py-2.5 px-3.5 rounded-2xl text-xs font-bold
-            transition-all duration-300 transform select-none cursor-pointer active:scale-95
-            ${themeColors.btnPrimary}
+            flex min-h-11 select-none items-center justify-center gap-1.5 rounded-xl px-3 py-2.5 text-xs font-bold
+            transition-all duration-200 active:scale-[0.98] focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100
+            ${
+              readiness.isReady
+                ? `${themeColors.btnPrimary} cursor-pointer`
+                : "cursor-not-allowed border border-slate-200 bg-slate-100 text-slate-400"
+            }
           `}
         >
-          <span>เข้าห้อง</span>
-          <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+          <span>{readiness.isReady ? "เข้าห้อง" : "เร็ว ๆ นี้"}</span>
+          {readiness.isReady && (
+            <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
+          )}
         </button>
       </div>
     </div>

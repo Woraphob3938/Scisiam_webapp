@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Target, CheckCircle2, TrendingUp, Award, HelpCircle, Check, Sparkles } from "lucide-react";
+import { Target, CheckCircle2, Award, HelpCircle, Check, Sparkles } from "lucide-react";
 
 interface LearningSidebarProps {
   questProgress?: number;

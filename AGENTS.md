@@ -1,75 +1,235 @@
-<!-- BEGIN:nextjs-agent-rules -->
-# SciSiam Web Application - Guidelines & Coding Standards
+<!-- BEGIN:scisiam-agent-rules -->
+# SciSiam Agent Guidelines
 
-คู่มือระเบียบและทักษะการเขียนโค้ดสำหรับโปรเจ็กต์เว็บแอปพลิเคชัน **SciSiam** (Next.js 16.2.6 & React 19)
-
----
-
-## 1. Technology Stack & API Versions
-* **Framework**: Next.js 16.2.6 (App Router) ด้วย React 19
-  > [!WARNING]
-  > Next.js 16 และ React 19 อาจมี APIs หรือพฤติกรรมบางประการที่ต่างจากเวอร์ชันเก่า (เช่น สถาปัตยกรรม Server vs Client Components, API metadata) โปรดศึกษาไกด์ไลน์จาก `node_modules/next/dist/docs/` และสังเกต Deprecation warning ก่อนเขียนโค้ด
-* **Styling**: Tailwind CSS v4 พร้อม `@tailwindcss/postcss` 
-  * ใน Tailwind v4 ไม่มีการใช้ `tailwind.config.js` อีกต่อไป การตั้งค่าธีม คีย์เฟรม อนิเมชั่น และฟอนต์ จะทำผ่าน `@theme` และ CSS Variables ใน [globals.css](file:///d:/Scisiam_app/src/app/globals.css) โดยตรง
-* **Icons**: `lucide-react`
-* **Charts & Vector**: HTML5 Canvas และ SVG ในตัวบราวเซอร์ (ใช้ standard browser SVG tags เท่านั้น ห้ามเผลอนำเข้า components ของ React Native SVG เข้ามาปะปน)
+คู่มือการทำงานสำหรับ agent ที่เข้ามาแก้ไขโปรเจกต์ **SciSiam Virtual Lab** ให้สอดคล้องกับเป้าหมายของโปรเจกต์: เว็บและแอปทดลองวิทยาศาสตร์สำหรับส่งแข่งขัน พร้อมต่อยอดเป็น PC/mobile app ที่ผู้ใช้ดาวน์โหลดไปใช้งานได้จริง
 
 ---
 
-## 2. Core Coding & Simulation Optimization Standards
+## 1. Project Identity
 
-### A. Telemetry Simulation Updates
-* **Rule**: เพื่อลดอาการหน่วง (Input Lag) และป้องกันไม่ให้หน้าจอ Re-render ถี่เกินไป (เช่น 60 ครั้งต่อวินาที) ห้ามนำตัวแปรกายภาพจำลองที่มีการเปลี่ยนแปลงแบบต่อเนื่อง (`waterTemp`, `pHValue`, `carbonDioxide`) ไปผูกเป็น State ที่อัปเดตแบบดิบๆ โดยตรงในลูปคำนวณ
-* **วิธีที่ถูกต้อง**:
-  * ใช้ React `useRef` ในการเก็บสถานะฟิสิกส์ (Physics variables) และ Interval Timer เสมอ
-  * อัปเดตค่าความร้อน อุณหภูมิ และเวลาจำลองภายใน `useRef` แบบ Synchronous ใน Interval จากนั้นจึงส่งค่าอัปเดตที่กรองแล้ว (Flat State) ไปยัง React State เป็นรอบๆ
-  * ล้างค่า Interval (`clearInterval`) ทุกครั้งใน Cleanup function ของ `useEffect` เพื่อป้องกันปัญหาหน่วยความจำรั่วไหล (Memory Leak)
+SciSiam เป็น virtual science lab สำหรับนักเรียนไทย มีจุดขายหลักคือ:
 
-### B. High-Performance Web Graphics (60fps)
-* **Rule**: หลีกเลี่ยงการคำนวณพิกัดการพล็อตกราฟ (LiveGraph coordinates) หรือเส้น SVG หนักๆ ทุกครั้งที่คอมโพเนนต์หลักทำงาน (เช่น ตอนผู้ใช้กรอกตัวเลขตั้งค่า)
-* **วิธีปฏิบัติ**:
-  * ครอบคำนวณพิกัดเหล่านั้นไว้ใน `useMemo` เสมอ โดยผูก Dependency ไว้เฉพาะกับอาร์เรย์ประวัติข้อมูลจำลอง (`history` array) เพื่อคงความเสถียรของหน้าจอ 60fps ขณะที่ผู้ใช้พิมพ์ตอบโต้ในฟิลด์อินพุต
+- รายชื่อห้องแล็บ 36 ห้อง แบ่งเป็น Physics, Chemistry, Biology
+- หน้า detail ของแต่ละ lab ที่อธิบายวัตถุประสงค์ อุปกรณ์ ทฤษฎี และขั้นตอน
+- หน้า simulation ที่ผู้ใช้ปรับตัวแปร ทดลอง ดูผล กราฟ ตาราง และสรุปผล
+- SciSiam AI Tutor สำหรับถามตอบเรื่องวิทยาศาสตร์และบริบทของ lab
+- ระบบคะแนน ความคืบหน้า และโปรไฟล์เพื่อเพิ่มแรงจูงใจ
+- เป้าหมายระยะถัดไปคือ deploy web demo และ package เป็น PC/mobile app
 
-### C. Hydration Mismatch Prevention
-* **Rule**: หน้าเพจใช้ระบบ Next.js App Router ซึ่งอาจมีการ Render ฝั่ง Server ก่อนส่งมายัง Client 
-* **วิธีปฏิบัติ**: หลีกเลี่ยงการเรียกใช้งาน `window`, `document`, หรือการจัดหาค่าสุ่ม/เวลาเรียลไทม์ขณะ Render แรกเริ่ม หากจำเป็นต้องใช้งาน ให้ป้องกัน Hydration mismatch ด้วยหนึ่งในวิธีต่อไปนี้:
-  1. ใช้ `useState` และรันโค้ดเรียก `window` / `localStorage` ภายใน `useEffect` หลังคอมโพเนนต์ Mount แล้วเท่านั้น
-  2. โหลดคอมโพเนนต์ที่มีผลกระทบแบบ Client-Only แบบ Dynamic:
-     ```typescript
-     import dynamic from 'next/dynamic';
-     const LiveSimulation = dynamic(() => import('./SimulationComponent'), { ssr: false });
-     ```
+เมื่อแก้โค้ด ให้คิดเสมอว่าโปรเจกต์นี้เป็น **competition-ready educational product** ไม่ใช่หน้า demo แบบชั่วคราว
 
 ---
 
-## 3. Thai Typography Optimization Skills on Web (เทคนิคอักษรไทยบนเว็บไซต์)
+## 2. Technology Stack
 
-เนื่องจากภาษาไทยมีสระและวรรณยุกต์ลอยตัวอยู่ด้านบนและด้านล่างบรรทัดหลัก การจัดข้อความที่บีบอัดมากเกินไปบนเบราว์เซอร์จะทำให้ตัวอักษรไทยชนกัน หรือแหว่งหายไป ให้ใช้เทคนิคการจัดการอักษรไทยบนเว็บดังต่อไปนี้:
+- **Framework**: Next.js 16.2.6 App Router
+- **React**: React 19
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS v4 ผ่าน `src/app/globals.css` และ CSS variables
+- **Icons**: `lucide-react`
+- **AI API**: server route `src/app/api/ai-tutor/route.ts`
+- **Data source**: `src/data/labs.ts` เป็น source of truth ของรายการ lab
+- **State persistence**: localStorage ใช้ได้เฉพาะข้อมูล local/prototype เช่น saved experiment, UI state, temporary progress
 
-### 1. Comfortable Line Height (สระ/วรรณยุกต์ไม่ชนกัน)
-* **Problem**: หากความสูงบรรทัดชิดกันเกินไป สระและโทนเสียงด้านบน (เช่น ิ, ี, ่, ้) จะซ้อนและชนกับหางของอักษรด้านล่าง (เช่น ป, ฝ, ฟ)
-* **Skill**: กำหนด `line-height` สำหรับพารากราฟและเนื้อหาข้อความภาษาไทยอยู่ระหว่าง **`1.5` ถึง `1.7`** เสมอ
-  * ใน Tailwind CSS v4: ให้เลือกใช้คลาส `leading-relaxed` (1.625) หรือกำหนดคลาสเฉพาะอย่าง `leading-[1.6]` เป็นมาตรฐาน
-  ```html
-  <p className="text-slate-600 leading-relaxed">...</p>
-  ```
+ห้ามเพิ่ม framework หรือ dependency ใหญ่โดยไม่จำเป็น ถ้าต้องเพิ่มให้มีเหตุผลชัดเจนว่าช่วยลดความซับซ้อนหรือจำเป็นกับ target PC/mobile/deploy จริง
 
-### 2. Word Break & Overflow Prevention (การตัดคำและตัดบรรทัดป้องกันคำตกหล่น)
-* **Problem**: บราวเซอร์บางรุ่นจะพยายามตัดคำไทยผิดประเภท ส่งผลให้วรรณยุกต์หลุดเดี่ยวไปอยู่อีกบรรทัด หรือข้อความยาวล้นทะลุกล่องเนื้อหา
-* **Skill**: 
-  * ใช้ `break-words` (`overflow-wrap: break-word`) เป็นฐานบนกล่องพารากราฟเสมอ เพื่อไม่ให้คำภาษาไทยยาวล้นขอบจอ
-  * ใช้การตัดคำสไตล์ `[word-break:keep-all]` หรือ `break-keep` ร่วมด้วยเมื่อต้องการเกาะกลุ่มคำภาษาไทยไม่ให้ตัวอักษรบางตัวตกบรรทัดอย่างน่าเกลียด
-  * **หลีกเลี่ยง**: การใช้ `text-justify` (จัดพอดีขอบซ้าย-ขวา) บนกล่องข้อความภาษาไทยที่มีความยาวน้อย เพราะเบราว์เซอร์จะฉีกตัวอักษรภาษาไทยออกจากกันจนอ่านไม่รู้เรื่อง (เนื่องจากภาษาไทยเขียนติดกันไม่มีเว้นวรรคช่องไฟแบบภาษาอังกฤษ)
+---
 
-### 3. Balanced Letter Spacing (ห้ามใช้ระยะชิด)
-* **Problem**: การบีบตัวอักษรให้ชิดเพื่อความแน่นประหยัดพื้นที่แบบตัวอักษรละติน จะทำให้รูปคำภาษาไทยที่มีโครงสร้างหนาซ้อนกันจนไม่สามารถอ่านได้
-* **Skill**: 
-  * ห้ามใช้คลาสบีบตัวอักษร เช่น `tracking-tight` หรือ `tracking-tighter` กับข้อความภาษาไทย
-  * ให้คงค่าปกติ `tracking-normal` หรือใช้ `tracking-wide` (กว้างขึ้นเล็กน้อย) สำหรับการเน้นข้อความหัวข้อขนาดใหญ่ (Header)
+## 3. Repository Map
 
-### 4. Modern Sans-Serif Font Family (ฟอนต์ดีไซน์โมเดิร์นสะอาดตา)
-* **Problem**: ฟอนต์ระบบเริ่มต้น (System Font) ภาษาไทยในคอมพิวเตอร์มักจะมีหัวกลม (Serif) แบบดั้งเดิม ซึ่งดูเก่าและขัดกับสไตล์แดชบอร์ดวิทยาศาสตร์เชิงทดลอง
-* **Skill**: ใช้ฟอนต์ **'Prompt'** (Google Fonts) ควบคู่กับ **'Inter'** เป็นหลัก ผ่านการตั้งค่า `font-sans` ใน `@theme`
-  * ออกแบบ UI ให้ใช้ฟอนต์ Prompt ไร้หัวดีไซน์พรีเมียม เพื่อให้สอดรับกับตัวเลขสถิติและหน่วยวัดภาษาอังกฤษบนแผงควบคุม Dashboard
+- `src/app/page.tsx`: หน้าแรก รายชื่อห้องแล็บ ค้นหา filter และ entry point
+- `src/app/labs/[id]/page.tsx`: หน้า detail ของ lab
+- `src/app/labs/[id]/simulation/page.tsx`: route เลือก simulation ตาม `labId`
+- `src/components/labs/*`: components สำหรับ detail page
+- `src/components/labs/simulation/*`: simulation components และ shared simulation UI
+- `src/components/AIChatButton.tsx`: floating AI tutor UI
+- `src/app/api/ai-tutor/route.ts`: backend route สำหรับเรียก AI provider
+- `src/data/labs.ts`: ข้อมูล metadata ของ lab ทั้งหมด
+- `src/context/SidebarContext.tsx`: layout/sidebar state
 
-<!-- END:nextjs-agent-rules -->
+ก่อนแก้ feature ให้หา component/shared data เดิมก่อนเสมอ หลีกเลี่ยงการ copy/paste lab ใหม่แบบกระจัดกระจาย
+
+---
+
+## 4. Lab Content Rules
+
+โปรเจกต์มี 36 labs ใน `labsData` ดังนั้นห้ามปล่อยให้ lab ที่ผู้ใช้กดเข้าไปแสดงเนื้อหาผิดหัวข้อ
+
+- ห้าม fallback lab อื่นเป็น Newton cooling โดยไม่มีการบอกผู้ใช้
+- ถ้า simulation ยังไม่สมบูรณ์ ให้ใช้ placeholder ที่ตรงกับชื่อ lab นั้น หรือปิดปุ่มเข้าห้องพร้อมสถานะชัดเจน
+- หน้า detail, equipment, theory, steps, hero image และ simulation ต้องใช้ชื่อ วัตถุประสงค์ อุปกรณ์ และภาพที่สอดคล้องกับ lab
+- ควรใช้ shared template/data-driven structure สำหรับ lab จำนวนมาก แทนการเขียน `if/else` ยาวขึ้นเรื่อย ๆ
+- เมื่อเพิ่ม lab ใหม่ ให้ตรวจทั้ง 2 route:
+  - `/labs/[id]`
+  - `/labs/[id]/simulation`
+
+ถ้าแก้ route selector ใน `src/app/labs/[id]/simulation/page.tsx` ต้องตรวจว่า unsupported lab ไม่ถูกส่งไป simulation ผิดประเภท
+
+---
+
+## 5. Simulation Logic Standards
+
+Simulation ต้องตอบสนองดี ไม่กระตุก และไม่ re-render ถี่เกินไป
+
+- เก็บตัวแปรฟิสิกส์/เคมี/ชีวะที่เปลี่ยนต่อเนื่องใน `useRef` เช่น temperature, pH, pressure, volume, CO2, elapsed time
+- ใช้ React state เฉพาะค่าที่ต้องแสดงบน UI และ throttle/update เป็นรอบที่เหมาะสม
+- ล้าง `setInterval`, `requestAnimationFrame`, timeout และ listener ใน cleanup ของ `useEffect` เสมอ
+- ใช้ `useMemo` สำหรับคำนวณกราฟ, table rows, derived metrics, SVG path หรือ canvas coordinates
+- จำกัด history array ไม่ให้โตไม่สิ้นสุด
+- Controls ควรมี reset, start/pause, save/log data และ feedback ที่ชัดเจน
+- ทุก simulation ควรมีอย่างน้อย: objective, apparatus/viewport, controls, live values, graph/table, theory/formula, steps/progress
+
+สำหรับ shared simulation shell ให้แก้กลางก่อนเพิ่ม UI ซ้ำในแต่ละ lab
+
+---
+
+## 6. AI Tutor And API Security
+
+AI Tutor เป็น feature สำคัญ แต่ต้องปลอดภัยสำหรับ web, PC และ mobile
+
+- ห้ามฝัง API key ใน client component, Electron/Tauri/Capacitor app, `main.js`, public assets หรือไฟล์ใด ๆ ที่จะถูกส่งให้ผู้ใช้
+- ใช้ `GEMINI_API_KEY` เฉพาะฝั่ง server runtime เท่านั้น เช่น `.env.local` ในเครื่อง dev หรือ Environment Variables บน hosting
+- `.env.local` ห้าม commit ขึ้น GitHub
+- `.env.example` ใส่ได้เฉพาะ placeholder ไม่มี key จริง
+- ฝั่ง client ให้เรียก API กลาง เช่น `/api/ai-tutor` หรือ production URL ของ SciSiam backend
+- API route ต้องมี input validation, message length limit, max history, timeout, error handling และ rate limit
+- หลีกเลี่ยงส่ง key ผ่าน query string ให้ใช้ header หรือ server SDK ที่เหมาะสม
+- ข้อความของ AI ต้องบอกได้ว่าอาจผิดพลาด และควรผูกกับบริบท lab ปัจจุบันเมื่อมี `labId`
+
+ถ้าทำ PC/mobile app ให้ถือว่าตัว app ถูกแกะไฟล์ได้เสมอ ดังนั้น app ต้องไม่มี secret ใด ๆ
+
+---
+
+## 7. localStorage And Progress Data
+
+localStorage ใช้ได้กับ prototype หรือ offline convenience แต่ไม่ควรใช้เป็นแหล่งความจริงสำหรับคะแนนจริง
+
+- อ่าน `window`, `document`, `localStorage` เฉพาะหลัง mount ผ่าน `useEffect`
+- ป้องกัน hydration mismatch ใน Next.js App Router
+- อย่าให้ผู้ใช้เพิ่มคะแนนซ้ำได้ง่ายจากการกด save เดิมหลายรอบ
+- ถ้าข้อมูลสำคัญ เช่น score, completed labs, profile, classroom progress ต้องเตรียมทางย้ายไป backend/database
+- หน้า Profile ต้องไม่ใช้ mock data ถ้าแสดงเป็นข้อมูลจริงของผู้ใช้
+
+ถ้ายังเป็น mock ต้องตั้งชื่อ/คอมเมนต์ให้ชัดว่าเป็น placeholder และไม่ควรส่งเป็น production state
+
+---
+
+## 8. UI, UX, And Thai Typography
+
+SciSiam ควรรู้สึกเหมือน lab learning dashboard ที่สะอาด ใช้งานง่าย และเหมาะกับนักเรียนไทย
+
+- หน้าแรกต้องเน้นค้นหา lab, category filter และ lab cards ที่สแกนง่าย
+- หน้า detail ต้องให้ข้อมูลครบแต่ไม่รก แยก hierarchy ชัดเจน
+- หน้า simulation ต้องให้พื้นที่ทดลองเป็นพระเอก controls และ sidebar ต้องไม่บัง flow
+- หลีกเลี่ยง card ซ้อน card และ decoration ที่ไม่มีหน้าที่
+- ใช้ icon จาก `lucide-react` เมื่อมี icon ที่เหมาะสม
+- ปุ่มต้องมีสถานะ hover, disabled, loading เมื่อเกี่ยวข้อง
+- Floating UI เช่น AI Tutor ต้องไม่ทับปุ่มสำคัญบนมือถือ
+- ทดสอบ responsive อย่างน้อย mobile 390px, tablet และ desktop
+
+ภาษาไทย:
+
+- ใช้ `leading-relaxed` หรือ `leading-[1.6]` สำหรับข้อความไทย
+- หลีกเลี่ยง `tracking-tight` และ `tracking-tighter` กับข้อความไทย
+- ใช้ `break-words` หรือ `[word-break:keep-all]` ในกล่องข้อความที่อาจยาว
+- หลีกเลี่ยง `text-justify` ในย่อหน้าภาษาไทยสั้น ๆ
+- ฟอนต์หลักควรสอดคล้องกับ `Prompt` และ `Inter` ตามธีมใน `globals.css`
+
+---
+
+## 9. Performance And React/Next.js Rules
+
+- ใช้ Server Components เป็นค่า default เมื่อไม่ต้องใช้ interaction
+- ใส่ `"use client"` เฉพาะ component ที่ต้องใช้ state, effect, event handler หรือ browser API
+- หลีกเลี่ยง prop drilling ยาว ถ้ามี shared layout state ให้ใช้ context เฉพาะจุด
+- อย่าสร้าง object/array/function ใหม่ใน render แล้วส่งลง component หนักโดยไม่จำเป็น
+- ใช้ `next/image` เมื่อแสดงรูป bitmap ใน app และกำหนด alt text ที่สื่อความหมาย
+- Dynamic route ต้อง handle missing lab id อย่างปลอดภัย
+- อย่าทำงานหนักใน render path ของ simulation
+- หลีกเลี่ยงการ import library ขนาดใหญ่เพื่อแก้ปัญหาเล็ก ๆ
+
+เมื่อแก้ performance ให้ยืนยันด้วย lint/build และ browser QA ไม่ใช่แค่ดูโค้ด
+
+---
+
+## 10. Deployment And Packaging Readiness
+
+เป้าหมายคือให้ใช้งานได้หลาย target:
+
+- **Web demo**: deploy ขึ้น hosting เช่น Vercel หรือ server ที่รองรับ Next.js route handlers
+- **PC app**: Electron หรือ Tauri โดย app ต้องไม่มี API key ฝังอยู่
+- **Mobile app**: Capacitor/PWA หรือทางเลือก native ภายหลัง โดยเรียก AI ผ่าน backend กลาง
+
+ข้อควรระวัง:
+
+- ถ้าใช้ static export จะใช้ API route ในตัวไม่ได้ ต้องแยก backend
+- ไฟล์ build artifacts เช่น `.next`, `dist`, screenshot QA และ local package output ไม่ควร commit
+- ก่อน deploy ให้ตรวจ `npm run lint`, `npm run build`, secret scan และ dependency audit
+- Production AI rate limit แบบ in-memory ไม่พอสำหรับ multi-instance ควรใช้ Redis/Upstash/database เมื่อ deploy จริง
+
+---
+
+## 11. Security Checklist
+
+ก่อน commit หรือ push:
+
+- สแกน secret pattern เช่น `AIza`, `sk-`, `sk-proj`, `GEMINI_API_KEY =`, private tokens
+- ห้าม commit `.env.local`, `.env`, private keys, build output หรือ screenshots ที่มีข้อมูลลับ
+- API route ต้อง validate input และ handle invalid JSON
+- อย่า log API key, request headers ที่มี secret หรือ provider response ที่มีข้อมูล sensitive
+- ถ้า key เคยหลุด ให้ถือว่าต้อง revoke/rotate key แล้วเท่านั้น
+- AI endpoint ต้องมี rate limit และ max output/token budget ที่เหมาะสม
+
+คำสั่งแนะนำ:
+
+```powershell
+rg -n --hidden -g '!node_modules' -g '!.next' -g '!dist' -g '!.git' "AIza|sk-proj|GEMINI_API_KEY\\s*="
+```
+
+---
+
+## 12. Verification Checklist
+
+หลังแก้โค้ดทุกครั้ง ให้รันตามความเหมาะสม:
+
+```powershell
+npm run lint
+npm run build
+```
+
+สำหรับ UI ให้เปิด browser ตรวจหน้าอย่างน้อย:
+
+- `/`
+- `/labs/newtons-cooling`
+- `/labs/newtons-cooling/simulation`
+- lab ที่เพิ่งแก้ detail route
+- lab ที่เพิ่งแก้ simulation route
+- `/profile` ถ้าแตะคะแนน/progress/localStorage
+
+ให้ตรวจ console error, hydration warning, layout overflow, mobile width 390px และ interaction หลัก เช่น search, filter, enter lab, save result, AI tutor
+
+---
+
+## 13. Git Hygiene
+
+- อย่า revert งานของผู้ใช้โดยไม่ขออนุญาต
+- ถ้า working tree dirty ให้แยกให้ออกว่าไฟล์ใดเป็นของงานนี้และไฟล์ใดมีอยู่ก่อน
+- อย่า commit build output หรือไฟล์ local
+- ถ้าแก้ `package-lock.json` ต้องแน่ใจว่าเกิดจาก dependency change ที่ตั้งใจ
+- ก่อนส่งงานให้สรุปไฟล์ที่แก้ คำสั่งที่รัน และ warning ที่ยังเหลือ
+
+---
+
+## 14. Current Priority Backlog
+
+ถ้าไม่มีคำสั่งเฉพาะ ให้จัดลำดับงานสำคัญของ SciSiam ตามนี้:
+
+1. แก้ lab fallback ผิดหัวข้อและทำให้ทั้ง 36 labs มี detail/simulation state ที่ตรงชื่อ
+2. ทำ shared lab detail/simulation data model เพื่อลด copy/paste
+3. ทำ AI Tutor ให้พร้อม deploy ผ่าน backend กลางและ rate limit ที่เหมาะกับ production
+4. ทำ Profile/คะแนน/ความคืบหน้าให้สัมพันธ์กับข้อมูลจริง ไม่ใช่ mock
+5. แก้ save flow ของแต่ละ simulation ให้ครบ
+6. ปรับ responsive/mobile QA โดยเฉพาะ floating AI และ navigation
+7. เตรียม packaging strategy สำหรับ web, PC และ mobile
+
+<!-- END:scisiam-agent-rules -->

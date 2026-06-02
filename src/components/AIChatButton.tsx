@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
 import {
   Bot,
@@ -11,6 +11,8 @@ import {
   X,
 } from "lucide-react";
 import { labsById } from "@/data/labs";
+import { SCISIAM_AUTH_EVENT } from "@/lib/supabase/auth-cache";
+import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 
 type ChatMessage = {
   id: string;
@@ -33,6 +35,41 @@ export default function AIChatButton() {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState("");
   const [isSending, setIsSending] = useState(false);
+  
+  // Conditionally hide AI Chat Button based on login status and page route
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const checkLogin = async () => {
+      if (!isSupabaseConfigured()) {
+        setIsLoggedIn(localStorage.getItem("scisiam_logged_in") === "true");
+        return;
+      }
+
+      const {
+        data: { user },
+      } = await createClient().auth.getUser();
+      setIsLoggedIn(Boolean(user));
+    };
+
+    void checkLogin();
+    const supabase = isSupabaseConfigured() ? createClient() : null;
+    const authSubscription = supabase?.auth.onAuthStateChange(() => {
+      void checkLogin();
+    }).data.subscription;
+    const handleAuthUpdated = () => void checkLogin();
+
+    window.addEventListener(SCISIAM_AUTH_EVENT, handleAuthUpdated);
+    window.addEventListener("storage", handleAuthUpdated);
+    return () => {
+      window.removeEventListener(SCISIAM_AUTH_EVENT, handleAuthUpdated);
+      window.removeEventListener("storage", handleAuthUpdated);
+      authSubscription?.unsubscribe();
+    };
+  }, []);
+
+  const isAuthPage = pathname === "/login" || pathname === "/register";
+
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: "welcome",
@@ -98,7 +135,7 @@ export default function AIChatButton() {
           id: createId(),
           role: "assistant",
           content:
-            "เชื่อมต่อ AI Tutor ไม่สำเร็จ กรุณาตรวจสอบ API route หรือการตั้งค่า OPENAI_API_KEY",
+            "เชื่อมต่อ AI Tutor ไม่สำเร็จ กรุณาตรวจสอบ API route หรือการตั้งค่า GEMINI_API_KEY ฝั่ง server",
         },
       ]);
     } finally {
@@ -106,8 +143,12 @@ export default function AIChatButton() {
     }
   };
 
+  if (!isLoggedIn || isAuthPage) {
+    return null;
+  }
+
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3 select-none">
+    <div className="fixed bottom-3 right-3 z-50 flex flex-col items-end gap-3 select-none sm:bottom-6 sm:right-6">
       {isOpen && (
         <div className="w-[min(380px,calc(100vw-32px))] h-[min(560px,calc(100vh-100px))] flex flex-col overflow-hidden rounded-[24px] border border-slate-200/80 bg-white text-left shadow-2xl shadow-slate-300/40 animate-in slide-in-from-bottom-5 fade-in duration-300">
           <div className="border-b border-slate-100 bg-slate-50/70 px-4 py-3">
@@ -214,11 +255,11 @@ export default function AIChatButton() {
       <button
         type="button"
         onClick={() => setIsOpen((current) => !current)}
-        className="relative flex h-14 w-14 items-center justify-center rounded-full bg-blue-600 text-white shadow-xl shadow-blue-500/25 transition-all duration-300 hover:bg-blue-700 hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-blue-100 cursor-pointer"
+        className="relative flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 text-white shadow-xl shadow-blue-500/25 transition-all duration-300 hover:bg-blue-700 hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-blue-100 cursor-pointer sm:h-14 sm:w-14"
         aria-label="เปิด SciSiam AI Tutor"
         aria-expanded={isOpen}
       >
-        {isOpen ? <X className="h-6.5 w-6.5" /> : <Bot className="h-6.5 w-6.5" />}
+        {isOpen ? <X className="h-5.5 w-5.5 sm:h-6.5 sm:w-6.5" /> : <Bot className="h-5.5 w-5.5 sm:h-6.5 sm:w-6.5" />}
         {!isOpen && (
           <span className="absolute right-0.5 top-0.5 flex h-3.5 w-3.5 rounded-full bg-emerald-500 ring-2 ring-white">
             <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping" />

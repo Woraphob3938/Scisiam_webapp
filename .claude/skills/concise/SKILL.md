@@ -1,18 +1,23 @@
 ---
 name: concise
-description: Enable ultra-concise mode to reduce token usage and speed up responses. Strips pleasantries, filler text, and lengthy code explanations. Triggered by typing /concise.
+description: Use short, direct responses for simple SciSiam questions or status updates without removing required evidence from reviews, audits, security fixes, or verification reports.
 ---
-# Concise Mode - Token Saving & Fast Responses (โหมดประหยัดทราฟฟิกและตอบกลับไว)
+# Concise Mode
 
-เมื่อสกิลนี้เปิดทำงาน (พิมพ์ `/concise` หรือเมื่อต้องการประหยัด Token):
+Use this skill when the user asks for a quick answer, status update, command summary, or small explanation.
 
-1. **การสื่อสารแบบสั้นที่สุด (Ultra-Concise Communication)**:
-   - ตัดบทสนทนาทักทาย ยินดีตอบรับ หรือคำสรุปท้ายคำตอบออกไปทั้งหมด (เช่น ห้ามพูดว่า *"ได้ครับผม ยินดีช่วยเขียนโค้ดครับ..."* หรือ *"หวังว่าโค้ดนี้จะช่วยคุณแก้ไขปัญหา..."*)
-   - เริ่มต้นตอบข้อมูลการวิเคราะห์หรือตอบคำถามโดยมุ่งตรงเข้าสู่ประเด็นเนื้อหาในบรรทัดแรกทันที
-   - หากต้องเขียนอธิบาย ให้ใช้รูปแบบ Bullet points สั้นๆ ความยาวไม่เกิน 1-2 ย่อหน้า
-2. **การลดขนาดของโค้ด (Optimized Code Output)**:
-   - เสนอผลลัพธ์การเขียนโค้ดเฉพาะจุดที่มีการแก้ไขปรับปรุงจริง (Diff format) เท่านั้น 
-   - **ห้าม** เขียนแสดงผลโค้ดซ้ำเต็มทั้งไฟล์เด็ดขาด เว้นแต่จะสั่งสร้างไฟล์ใหม่ทั้งหมดหรือผู้ใช้สั่งเจาะจงเป็นพิเศษ
-   - ตัดบรรทัดคอมเมนต์อธิบายโค้ดที่ไม่จำเป็นออกเพื่อไม่ให้เปลืองพื้นที่
-3. **การประมวลผลคำสั่งเชิงวิเคราะห์**:
-   - เมื่อผู้ใช้ถามคำถาม ให้ตอบกลับเฉพาะคำตอบที่เป็นแกนหลักและทางเลือกที่เลือก โดยตัดทฤษฎีพื้นฐานยาวๆ ที่หาได้ทั่วไปออกไป
+## Rules
+
+- Answer directly in short paragraphs or bullets.
+- Do not paste full files unless explicitly requested.
+- Prefer file links and exact commands over long explanations.
+- Keep optional context out unless it changes the decision.
+
+## Do Not Use For
+
+- Security fixes that require proof.
+- Code reviews or audits where findings need evidence.
+- Build/deploy verification reports.
+- Legal, privacy, or API key guidance where missing caveats could be unsafe.
+
+For those tasks, be concise but still include commands run, results, files changed, and remaining risks.

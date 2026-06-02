@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
+import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";
 import {
   Activity,
   BarChart3,
@@ -307,7 +308,7 @@ export default function CharlesLawSimulation() {
     lastLoggedTempRef.current = 25;
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (dataPoints.length === 0) {
       alert("ยังไม่มีข้อมูลกฎของชาร์ลสำหรับบันทึก กรุณาเริ่มจำลองหรือปรับอุณหภูมิก่อน");
       return;
@@ -322,10 +323,24 @@ export default function CharlesLawSimulation() {
       dataPoints,
     };
 
-    localStorage.setItem("scisiam_saved_charles_experiment", JSON.stringify(experimentData));
-    const currentPoints = Number(localStorage.getItem("scisiam_points") || "120");
-    localStorage.setItem("scisiam_points", String(currentPoints + 25));
-    window.dispatchEvent(new Event("points-updated"));
+    await saveExperimentAndSync({
+      localStorageKey: "scisiam_saved_charles_experiment",
+      localPayload: experimentData,
+      labId: "charles-law",
+      title: "Charles's Temperature-Volume Lab",
+      variables: { gasMoles, pressure: CONSTANT_PRESSURE_KPA, targetTemperature, heatingRate },
+      liveValues: { temperatureC, volume, kelvin, ratio, progress },
+      graphPoints: dataPoints,
+      tableRows: dataPoints,
+      summary: {
+        finalTemperature: temperatureC,
+        finalVolume: volume,
+        charlesRatio: ratio,
+        dataPointCount: dataPoints.length,
+      },
+      score: Math.round(Math.min(100, Math.max(0, progress))),
+      durationSeconds: Math.round(elapsedSeconds),
+    });
     alert("บันทึกผลการทดลองกฎของชาร์ลสำเร็จ");
   };
 

@@ -1,0 +1,208 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-06-02T15:00:50.5814922+07:00",
+  "title": "Design System: SciSiam Virtual Lab",
+  "extensions": {
+    "colorMeta": {
+      "primary-blue": {
+        "role": "primary",
+        "displayName": "SciSiam Action Blue",
+        "canonical": "#2563eb",
+        "tonalRamp": ["#172554", "#1e3a8a", "#1d4ed8", "#2563eb", "#3b82f6", "#93c5fd", "#dbeafe", "#eff6ff"]
+      },
+      "chemistry": {
+        "role": "secondary",
+        "displayName": "Chemistry Purple",
+        "canonical": "#9333ea",
+        "tonalRamp": ["#3b0764", "#581c87", "#7e22ce", "#9333ea", "#a855f7", "#c084fc", "#e9d5ff", "#faf5ff"]
+      },
+      "biology": {
+        "role": "secondary",
+        "displayName": "Biology Green",
+        "canonical": "#22c55e",
+        "tonalRamp": ["#052e16", "#14532d", "#15803d", "#22c55e", "#4ade80", "#86efac", "#dcfce7", "#f0fdf4"]
+      },
+      "app-background": {
+        "role": "neutral",
+        "displayName": "Lab Canvas",
+        "canonical": "#f8fafc",
+        "tonalRamp": ["#020617", "#0f172a", "#334155", "#64748b", "#94a3b8", "#cbd5e1", "#e2e8f0", "#f8fafc"]
+      },
+      "heading": {
+        "role": "neutral",
+        "displayName": "Ink Heading",
+        "canonical": "#0f172a",
+        "tonalRamp": ["#020617", "#0f172a", "#1e293b", "#334155", "#475569", "#64748b", "#94a3b8", "#cbd5e1"]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Page titles and primary lab titles only."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Major sections and simulation headers."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Lab card names and compact panel titles."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Thai descriptions, guidance, theory, and learning copy."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Buttons, tabs, chips, metrics, and compact UI labels."
+      }
+    },
+    "shadows": [
+      {
+        "name": "surface-rest",
+        "value": "0 1px 2px rgba(15,23,42,0.04)",
+        "purpose": "Quiet cards and empty states."
+      },
+      {
+        "name": "interactive-lift",
+        "value": "0 8px 20px rgba(37,99,235,0.10)",
+        "purpose": "Active filters, primary buttons, and subject controls."
+      },
+      {
+        "name": "floating-panel",
+        "value": "0 20px 50px rgba(148,163,184,0.35)",
+        "purpose": "AI Tutor panel, dropdown search results, and dialogs."
+      }
+    ],
+    "motion": [
+      {
+        "name": "state-fast",
+        "value": "150ms ease-out",
+        "purpose": "Hover, focus, and active state feedback."
+      },
+      {
+        "name": "panel-standard",
+        "value": "200ms ease-in-out",
+        "purpose": "Dropdowns, sidebar expansion, and compact panel reveals."
+      },
+      {
+        "name": "science-loop",
+        "value": "4s-20s linear/ease-in-out",
+        "purpose": "Only for experiment-specific motion that represents the science."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "mobile-qa",
+        "value": "390px"
+      },
+      {
+        "name": "tablet",
+        "value": "768px"
+      },
+      {
+        "name": "desktop",
+        "value": "1440px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Primary action for entering a lab, starting a simulation, or saving a result.",
+      "html": "<button class=\"ds-btn-primary\">เข้าห้อง</button>",
+      "css": ".ds-btn-primary{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:12px;background:#2563eb;color:#fff;padding:10px 16px;font-family:Prompt,Inter,sans-serif;font-size:14px;font-weight:800;line-height:1.45;box-shadow:0 8px 20px rgba(37,99,235,.10);transition:background .15s ease-out,transform .15s ease-out,box-shadow .15s ease-out}.ds-btn-primary:hover{background:#1d4ed8;transform:translateY(-1px)}.ds-btn-primary:active{transform:scale(.98)}.ds-btn-primary:focus-visible{outline:3px solid #bfdbfe;outline-offset:2px}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Secondary actions such as details, reset, and back navigation.",
+      "html": "<button class=\"ds-btn-secondary\">รายละเอียด</button>",
+      "css": ".ds-btn-secondary{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid #bfdbfe;border-radius:12px;background:#fff;color:#2563eb;padding:10px 16px;font-family:Prompt,Inter,sans-serif;font-size:14px;font-weight:800;line-height:1.45;transition:background .15s ease-out,border-color .15s ease-out,color .15s ease-out}.ds-btn-secondary:hover{background:#eff6ff;border-color:#93c5fd;color:#1d4ed8}.ds-btn-secondary:focus-visible{outline:3px solid #dbeafe;outline-offset:2px}"
+    },
+    {
+      "name": "Search Input",
+      "kind": "input",
+      "refersTo": "input-search",
+      "description": "Main lab search field used on the home page.",
+      "html": "<label class=\"ds-search\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" aria-hidden=\"true\"><path d=\"m21 21-4.35-4.35M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"/></svg><input placeholder=\"ค้นหาห้องแล็บ เช่น Newton, Osmosis\" /></label>",
+      "css": ".ds-search{display:flex;align-items:center;gap:12px;border:1px solid #e2e8f0;border-radius:16px;background:#fff;color:#94a3b8;padding:12px 16px;box-shadow:0 1px 2px rgba(15,23,42,.04);transition:border-color .15s ease-out,box-shadow .15s ease-out}.ds-search:focus-within{border-color:#93c5fd;box-shadow:0 0 0 4px rgba(191,219,254,.65)}.ds-search input{min-width:0;flex:1;border:0;background:transparent;color:#475569;font-family:Prompt,Inter,sans-serif;font-size:14px;font-weight:700;line-height:1.5;outline:0}.ds-search input::placeholder{color:#94a3b8}"
+    },
+    {
+      "name": "Subject Filter Chip",
+      "kind": "chip",
+      "refersTo": "subject-chip",
+      "description": "Segmented category filter for All, Physics, Chemistry, and Biology.",
+      "html": "<button class=\"ds-chip ds-chip-active\">Physics</button><button class=\"ds-chip\">Chemistry</button>",
+      "css": ".ds-chip{display:inline-flex;align-items:center;justify-content:center;border:1px solid #e2e8f0;border-radius:999px;background:#fff;color:#475569;padding:8px 16px;font-family:Prompt,Inter,sans-serif;font-size:14px;font-weight:800;line-height:1.45;transition:background .15s ease-out,color .15s ease-out,border-color .15s ease-out,transform .15s ease-out}.ds-chip:hover{background:#f8fafc;color:#0f172a}.ds-chip-active{background:#2563eb;border-color:#2563eb;color:#fff;box-shadow:0 8px 20px rgba(37,99,235,.16)}.ds-chip:focus-visible{outline:3px solid #bfdbfe;outline-offset:2px}"
+    },
+    {
+      "name": "Lab Card",
+      "kind": "card",
+      "refersTo": "lab-card",
+      "description": "Discovery card for each virtual lab.",
+      "html": "<article class=\"ds-lab-card\"><div class=\"ds-lab-visual\"></div><div class=\"ds-lab-row\"><span class=\"ds-lab-chip\">Physics</span><span class=\"ds-ready\">พร้อมทดลอง</span></div><h3>Newton's law of cooling</h3><p>เรียนรู้การระบายความร้อนของวัตถุตามกฎการเย็นตัวของนิวตัน</p></article>",
+      "css": ".ds-lab-card{border:1px solid #dbeafe;border-radius:24px;background:#fff;padding:20px;font-family:Prompt,Inter,sans-serif;color:#0f172a;box-shadow:0 1px 2px rgba(15,23,42,.04);transition:transform .18s ease-out,box-shadow .18s ease-out,border-color .18s ease-out}.ds-lab-card:hover{transform:translateY(-2px);border-color:#bfdbfe;box-shadow:0 12px 32px rgba(37,99,235,.08)}.ds-lab-visual{height:132px;border-radius:16px;background:linear-gradient(135deg,#f8fbff,#eff6ff);border:1px solid #eff6ff}.ds-lab-row{display:flex;align-items:center;justify-content:space-between;margin-top:12px}.ds-lab-chip,.ds-ready{border-radius:999px;padding:5px 10px;font-size:12px;font-weight:800;line-height:1.4}.ds-lab-chip{border:1px solid #bfdbfe;background:#eff6ff;color:#2563eb}.ds-ready{border:1px solid #bbf7d0;background:#f0fdf4;color:#15803d}.ds-lab-card h3{margin:12px 0 6px;font-size:18px;line-height:1.45;font-weight:800}.ds-lab-card p{margin:0;color:#475569;font-size:14px;line-height:1.6;font-weight:600}"
+    },
+    {
+      "name": "Sidebar Nav Item",
+      "kind": "nav",
+      "refersTo": "navigation",
+      "description": "Desktop app-shell navigation item.",
+      "html": "<a class=\"ds-nav-item ds-nav-active\" href=\"#\">หน้าหลัก</a><a class=\"ds-nav-item\" href=\"#\">ห้องแล็บของฉัน</a>",
+      "css": ".ds-nav-item{display:flex;align-items:center;gap:14px;border-radius:12px;color:#64748b;padding:12px 16px;font-family:Prompt,Inter,sans-serif;font-size:14px;font-weight:800;line-height:1.45;text-decoration:none;transition:background .15s ease-out,color .15s ease-out}.ds-nav-item:hover{background:#f8fafc;color:#1e293b}.ds-nav-active{background:#eff6ff;color:#2563eb;box-shadow:0 1px 2px rgba(37,99,235,.05)}.ds-nav-item:focus-visible{outline:3px solid #bfdbfe;outline-offset:2px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Calm Science Bench",
+    "overview": "SciSiam is a clean Thai science learning dashboard, not a decorative landing page and not a loud game interface. The product should feel like a modern lab bench: organized, bright, trustworthy, and ready for repeated use by students and teachers. It is polished enough for competition judging, but restrained enough to become a real public web, PC, and mobile app.",
+    "keyCharacteristics": [
+      "Clean white surfaces, soft borders, and restrained science accents.",
+      "Thai-first readability with Prompt as the main UI typeface.",
+      "Apparatus-specific visuals for each lab, never generic atmosphere.",
+      "Product density that supports scanning instead of exhausting the student.",
+      "Honest readiness states for incomplete labs and incomplete production data."
+    ],
+    "rules": [
+      {
+        "name": "The Accent Rarity Rule",
+        "body": "Subject colors are accents, not page themes. A Physics page must not become entirely blue, and a Chemistry section must not flood the screen with purple.",
+        "section": "colors"
+      },
+      {
+        "name": "The Honest State Rule",
+        "body": "Green means ready or successful, amber means preparation or caution, and red means error or danger. Never use semantic colors as decoration.",
+        "section": "colors"
+      },
+      {
+        "name": "The Thai Breath Rule",
+        "body": "Thai text must use comfortable line height (1.45-1.6) and normal letter spacing. Negative tracking on Thai text is forbidden.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat-By-Default Rule",
+        "body": "A panel earns elevation only when it floats, opens, hovers, or must stand above nearby content.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do make search, category filters, and lab cards visible early on the home page.",
+      "Do make the experiment viewport and controls the strongest elements on simulation pages.",
+      "Do use clean white surfaces, soft slate borders, and subject colors only as accents.",
+      "Do keep Thai text breathable with leading-relaxed or leading-[1.6].",
+      "Do show units on numeric controls, graph axes, tables, and formulas.",
+      "Do use real science apparatus visuals that match each lab title."
+    ],
+    "donts": [
+      "Don't build a loud game UI with saturated colors everywhere.",
+      "Don't build a generic gradient landing page when the user needs a usable lab dashboard.",
+      "Don't pack the interface with decorative cards that do not support learning.",
+      "Don't use childish visuals, unclear sci-fi decoration, or fake system-status badges.",
+      "Don't create any layout that makes users hunt for the next useful action.",
+      "Don't let AI Tutor hide important mobile actions."
+    ]
+  }
+}

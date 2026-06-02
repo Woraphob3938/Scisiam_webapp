@@ -10,13 +10,16 @@ interface BreadcrumbProps {
 }
 
 export default function Breadcrumb({ category, title }: BreadcrumbProps) {
+  const categoryHref = ["Physics", "Chemistry", "Biology"].includes(category)
+    ? `/?category=${encodeURIComponent(category)}`
+    : "/";
+
   return (
-    <div className="w-full max-w-[1440px] mx-auto px-6 sm:px-12 md:px-20 pt-6 pb-2">
-      <nav className="flex items-center gap-1.5 text-xs sm:text-sm font-semibold select-none">
+      <nav className="flex min-w-0 items-center gap-1.5 text-xs sm:text-sm font-semibold select-none">
         {/* Home Link */}
         <Link
           href="/"
-          className="flex items-center gap-1.5 text-slate-400 hover:text-blue-600 transition-colors duration-200"
+          className="flex shrink-0 items-center gap-1.5 text-slate-500 hover:text-blue-600 transition-colors duration-200"
         >
           <Home className="w-4.5 h-4.5" />
           <span>หน้าแรก</span>
@@ -26,7 +29,7 @@ export default function Breadcrumb({ category, title }: BreadcrumbProps) {
 
         {/* Category Filter Link */}
         <Link
-          href={`/?category=${category}`}
+          href={categoryHref}
           className="text-blue-600 hover:text-blue-700 transition-colors duration-200"
         >
           {category}
@@ -35,10 +38,9 @@ export default function Breadcrumb({ category, title }: BreadcrumbProps) {
         <ChevronRight className="w-4 h-4 text-slate-300" />
 
         {/* Active Node */}
-        <span className="text-slate-600 font-bold truncate max-w-[180px] sm:max-w-none">
+        <span className="truncate text-slate-700 font-bold max-w-[180px] sm:max-w-none" aria-current="page">
           {title}
         </span>
       </nav>
-    </div>
   );
 }

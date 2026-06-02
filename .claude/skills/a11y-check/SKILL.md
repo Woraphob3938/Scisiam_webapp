@@ -1,33 +1,37 @@
 ---
 name: a11y-check
-description: Audit TSX and HTML files to ensure web accessibility (a11y) standards are met. Checks ARIA labels, image alt tags, semantic structure, focus indicators, and keyboard navigation. Triggered by typing /a11y-check.
+description: Audit SciSiam TSX/HTML UI for accessibility: semantic structure, headings, alt text, ARIA labels, focus states, keyboard navigation, contrast, and mobile usability.
 ---
-# Web Accessibility (A11y) Auditor - สกิลตรวจสอบการเข้าถึงหน้าเว็บสำหรับทุกคน
+# A11y Check - SciSiam Accessibility Audit
 
-เมื่อทักษะนี้เปิดใช้งาน (พิมพ์ `/a11y-check` หรือเมื่อส่งมอบงานหน้าจอ UI):
+Use for UI reviews, new screens, navigation changes, AI Tutor UI, forms, modals, and icon-only controls.
 
-1. **สแกนโครงสร้างองค์ประกอบเว็บ (Semantic Auditing)**:
-   - ตรวจดูการใช้งาน HTML5 Semantic Tags ให้เหมาะสม เพื่อโครงสร้างที่ดีสำหรับผู้ใช้ที่เข้าผ่านโปรแกรมอ่านหน้าจอ (Screen Reader):
-     - หน้าเว็บมีโครงสร้างแบ่งแยกส่วน `header`, `nav`, `main`, `footer`, `section`, หรือ `aside` หรือไม่?
-     - ลำดับความสำคัญของหัวข้อหน้า (Heading hierarchy) ไล่เรียงจาก `<h1>` ไปถึง `<h6>` อย่างสม่ำเสมอโดยไม่สลับลำดับมั่วหรือไม่? (มี `<h1>` หนึ่งเดี่ยวต่อหนึ่งหน้าจอ)
+## Static Checks
 
-2. **ตรวจสอบรูปภาพและกราฟิกตกแต่ง (Image & Media Tags)**:
-   - ค้นหาแท็ก `<img ... />` หรือคอมโพเนนต์ `<Image ... />` ของ Next.js
-   - ตรวจสอบว่ามีพร็อพเพอร์ตี้ `alt` และเขียนบรรยายรายละเอียดของรูปภาพหรือไม่
-   - หากรูปภาพนั้นมีวัตถุประสงค์เพื่อการตกแต่งเป็นแบ็คกราวด์เฉยๆ (Decorative element) ให้ตั้งค่า `alt=""` หรือ `aria-hidden="true"` เพื่อแจ้งให้โปรแกรมอ่านหน้าจอข้ามไป
+- Semantic structure: `header`, `nav`, `main`, `section`, `aside`, `footer` where appropriate.
+- Heading order: one page-level `h1`, no confusing heading jumps.
+- Images: meaningful `alt`; decorative images use `alt=""` or `aria-hidden`.
+- Buttons and links: icon-only controls need `aria-label`; links must describe destination or action.
+- Forms: inputs need labels or accessible names.
+- Focus: do not use `focus:outline-none` without a visible focus replacement.
+- Contrast: avoid pale text on white, especially small Thai text.
 
-3. **ตรวจสอบส่วนประกอบควบคุมและการโต้ตอบ (Interactive Controls)**:
-   - ปุ่มต่างๆ (`<button>` หรือกล่อง `<div>` ที่ทำหน้าที่เป็นปุ่ม) หากไม่ได้ใช้ตัวอักษรบรรยายเป้าหมาย (เช่น เป็นปุ่มไอคอนเฉยๆ) จะต้องระบุ `aria-label` เสมอ
-   - ลิงก์ทุกตัวต้องบ่งบอกจุดหมายปลายทางที่ชัดเจน เช่น ข้อความลิงก์ว่า *"อ่านเพิ่มเติม"* หรือ *"เข้าสู่ห้องแล็บ"* แทนการเขียนว่า *"คลิกที่นี่"*
-   - ตรวจสอบว่ามีการใส่ `tabIndex={0}` สำหรับองค์ประกอบที่ไม่ใช่ปุ่มปกติ แต่ต้องการให้สามารถกด `Tab` เข้ามาสั่งงานได้
+Useful searches:
 
-4. **ตรวจสอบสถานะโฟกัสและการมองเห็น (Focus States & Contrast)**:
-   - ตรวจสอบว่าคลาสสไตล์ไม่มีการซ่อนเส้นโฟกัสแบบดิบๆ เช่น `focus:outline-none` โดยไม่มีคลาสทดแทน
-   - บังคับให้แสดงกรอบโฟกัสที่ชัดเจนเมื่อผู้ใช้กดปุ่ม Tab บนคีย์บอร์ดมาถึงปุ่มนั้น เช่น การใส่คลาส `focus:ring-2 focus:ring-sky-500 focus:outline-none`
-   - ตรวจเช็ค Contrast ของข้อความสีอ่อนบนพื้นหลังขาว ไม่ให้สีซีดจนผู้มีปัญหาทางสายตาอ่านไม่เห็น
+```powershell
+rg -n "<button|aria-label|alt=|focus:outline-none|tabIndex|role=" src
+rg -n "<Image|<img" src
+```
 
-5. **รายงานผล (Report Format)**:
-   - แสดงรายการข้อผิดพลาดแยกตามระดับความสำคัญ:
-     * **[CRITICAL]**: ปิดกั้นการสั่งงานด้วยคีย์บอร์ด หรือไอคอนปุ่มไม่มี `aria-label`
-     * **[WARNING]**: การจัดอันดับ Heading ไม่เหมาะสม หรือขาด `alt` ในรูปภาพประกอบ
-   - เสนอแนวทางแก้ไขเป็นโค้ดเปรียบเทียบก่อน-หลังการปรับปรุงให้เรียบร้อย
+## Browser Checks
+
+- Tab through the affected page.
+- Confirm visible focus order matches visual order.
+- Confirm dialogs/chat panels can close by button and do not trap users unexpectedly.
+- Check mobile width around 390px for overlap and unreachable buttons.
+
+## Report Format
+
+- `CRITICAL`: keyboard-blocking controls, missing accessible names on icon-only controls, unusable modal/chat.
+- `WARNING`: weak heading order, missing alt, poor contrast, focus styling gaps.
+- Include file/line references and a short fix suggestion.

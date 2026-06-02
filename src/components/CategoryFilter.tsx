@@ -21,44 +21,47 @@ export default function CategoryFilter({
     { id: "Biology" as Category, name: "Biology", icon: Leaf, color: "green" },
   ];
 
+  const activeColorClasses: Record<string, string> = {
+    blue: "border-blue-600 bg-blue-600 text-white shadow-md shadow-blue-500/15",
+    indigo: "border-blue-600 bg-blue-600 text-white shadow-md shadow-blue-500/15",
+    purple: "border-purple-600 bg-purple-600 text-white shadow-md shadow-purple-500/15",
+    green: "border-green-600 bg-green-600 text-white shadow-md shadow-green-500/15",
+  };
+
   return (
-    <div className="w-full flex justify-center px-4 pt-0 pb-5 md:pb-6">
-      <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 max-w-2xl bg-white/60 p-2 rounded-2xl sm:rounded-full border border-slate-100/80 shadow-xs backdrop-blur-xs">
+    <div className="flex w-full justify-center px-4 pb-5 pt-4 md:pb-6">
+      <div className="w-full max-w-2xl overflow-x-auto rounded-2xl border border-slate-200/80 bg-white p-1.5 shadow-sm [scrollbar-width:none] sm:rounded-full [&::-webkit-scrollbar]:hidden">
+        <div className="flex min-w-max items-center gap-1.5">
         {categoriesList.map((category) => {
           const Icon = category.icon;
           const isActive = activeCategory === category.id;
 
-          const activeColorClasses: Record<string, string> = {
-            blue: "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/20 scale-[1.02]",
-            indigo: "bg-gradient-to-r from-indigo-600 to-blue-600 text-white shadow-md shadow-indigo-500/20 scale-[1.02]",
-            purple: "bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white shadow-md shadow-purple-500/20 scale-[1.02]",
-            green: "bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-md shadow-green-500/20 scale-[1.02]",
-          };
-
           return (
             <button
               key={category.id}
+              type="button"
               onClick={() => onCategoryChange(category.id)}
               className={`
-                flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold tracking-wide
-                transition-all duration-300 transform select-none cursor-pointer
-                hover:scale-[1.03] active:scale-95
+                flex min-h-10 shrink-0 cursor-pointer select-none items-center gap-1.5 rounded-full border px-3 py-2 text-xs font-bold leading-[1.45] tracking-normal sm:gap-2 sm:px-4 sm:text-sm
+                transition-all duration-200 active:scale-[0.98] focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100
                 ${
                   isActive
                     ? activeColorClasses[category.color] || activeColorClasses.blue
-                    : "bg-white text-slate-600 hover:text-slate-900 border border-slate-200/60 shadow-xs hover:bg-slate-50"
+                    : "border-transparent bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                 }
               `}
+              aria-pressed={isActive}
             >
               <Icon
-                className={`w-4 h-4 ${
-                  isActive ? "text-white animate-pulse" : "text-slate-400"
+                className={`hidden h-4 w-4 sm:block ${
+                  isActive ? "text-white" : "text-slate-400"
                 }`}
               />
               <span>{category.name}</span>
             </button>
           );
         })}
+        </div>
       </div>
     </div>
   );

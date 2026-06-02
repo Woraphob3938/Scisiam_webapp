@@ -1,0 +1,658 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - navigation [ref=e3]:
+      - generic [ref=e4]:
+        - button "เปิด/ปิด เมนูด้านข้าง" [ref=e5] [cursor=pointer]:
+          - img [ref=e6]
+        - link "SciSiam" [ref=e7] [cursor=pointer]:
+          - /url: /
+          - img [ref=e9]
+          - generic [ref=e12]: SciSiam
+      - generic [ref=e13]:
+        - generic [ref=e14] [cursor=pointer]:
+          - img [ref=e15]
+          - generic [ref=e18]: 120 แต้ม
+        - button "การแจ้งเตือน" [ref=e20]:
+          - img [ref=e21]
+        - link "เข้าสู่ระบบ" [ref=e28] [cursor=pointer]:
+          - /url: /login
+          - img [ref=e29]
+          - generic [ref=e32]: เข้าสู่ระบบ
+    - complementary [ref=e33]:
+      - navigation "เมนูหลักการนำทาง" [ref=e35]:
+        - link "หน้าหลัก" [ref=e36] [cursor=pointer]:
+          - /url: /
+          - img [ref=e37]
+          - generic [ref=e40]: หน้าหลัก
+        - link "ห้องแล็บของฉัน" [ref=e41] [cursor=pointer]:
+          - /url: "#"
+          - img [ref=e42]
+          - generic [ref=e44]: ห้องแล็บของฉัน
+        - link "ภารกิจนักวิทย์" [ref=e45] [cursor=pointer]:
+          - /url: "#"
+          - img [ref=e46]
+          - generic [ref=e50]: ภารกิจนักวิทย์
+        - link "คะแนนและรางวัล" [ref=e51] [cursor=pointer]:
+          - /url: "#"
+          - img [ref=e52]
+          - generic [ref=e55]: คะแนนและรางวัล
+        - link "ประวัติการเรียนรู้" [ref=e56] [cursor=pointer]:
+          - /url: "#"
+          - img [ref=e57]
+          - generic [ref=e61]: ประวัติการเรียนรู้
+        - link "โปรไฟล์" [ref=e62] [cursor=pointer]:
+          - /url: /profile
+          - img [ref=e63]
+          - generic [ref=e66]: โปรไฟล์
+    - main [ref=e67]:
+      - generic [ref=e69]:
+        - generic [ref=e70]:
+          - img [ref=e71]
+          - generic [ref=e74]: 18 ห้องพร้อมทดลองจาก 36 ห้อง
+        - heading "รายชื่อห้องแล็บ" [level=1] [ref=e75]
+        - paragraph [ref=e76]: ค้นหา เลือกหมวด แล้วเริ่มทดลองจากห้องแล็บที่พร้อมใช้งาน
+        - generic [ref=e78]:
+          - img [ref=e79]
+          - textbox "ค้นหาห้องแล็บวิทยาศาสตร์" [ref=e82]:
+            - /placeholder: ค้นหาห้องแล็บ เช่น Newton, Osmosis, Titration...
+      - generic [ref=e84]:
+        - button "ทั้งหมด" [ref=e85] [cursor=pointer]:
+          - img [ref=e86]
+          - generic [ref=e91]: ทั้งหมด
+        - button "Physics" [ref=e92] [cursor=pointer]:
+          - img [ref=e93]
+          - generic [ref=e97]: Physics
+        - button "Chemistry" [ref=e98] [cursor=pointer]:
+          - img [ref=e99]
+          - generic [ref=e101]: Chemistry
+        - button "Biology" [ref=e102] [cursor=pointer]:
+          - img [ref=e103]
+          - generic [ref=e106]: Biology
+      - generic [ref=e108]:
+        - generic [ref=e109]:
+          - generic [ref=e110]:
+            - img [ref=e112]
+            - generic [ref=e128]:
+              - generic [ref=e129]: Physics
+              - generic [ref=e130]: พร้อมทดลอง
+            - heading "Newton's law of cooling" [level=3] [ref=e131]
+            - paragraph [ref=e132]: เรียนรู้เกี่ยวกับการระบายความร้อนของวัตถุตามกฎการเย็นตัวของนิวตัน วิเคราะห์อัตราการสูญเสียความร้อนสอดคล้องกับอุณหภูมิแวดล้อมจำลอง
+          - generic [ref=e133]:
+            - button "รายละเอียด" [ref=e134] [cursor=pointer]:
+              - img [ref=e135]
+              - generic [ref=e138]: รายละเอียด
+            - button "เข้าห้อง" [ref=e139] [cursor=pointer]:
+              - generic [ref=e140]: เข้าห้อง
+              - img [ref=e141]
+        - generic [ref=e143]:
+          - generic [ref=e144]:
+            - img [ref=e146]
+            - generic [ref=e162]:
+              - generic [ref=e163]: Physics
+              - generic [ref=e164]: พร้อมทดลอง
+            - heading "Ohm's Law & DC Circuits" [level=3] [ref=e165]
+            - paragraph [ref=e166]: ศึกษาความสัมพันธ์ระหว่างความต่างศักย์ กระแสไฟฟ้า และความต้านทานในวงจรไฟฟ้ากระแสตรงตามกฎของโอห์ม
+          - generic [ref=e167]:
+            - button "รายละเอียด" [ref=e168] [cursor=pointer]:
+              - img [ref=e169]
+              - generic [ref=e172]: รายละเอียด
+            - button "เข้าห้อง" [ref=e173] [cursor=pointer]:
+              - generic [ref=e174]: เข้าห้อง
+              - img [ref=e175]
+        - generic [ref=e177]:
+          - generic [ref=e178]:
+            - img [ref=e180]:
+              - generic [ref=e190]: 500g
+              - generic [ref=e192]: F
+            - generic [ref=e193]:
+              - generic [ref=e194]: Physics
+              - generic [ref=e195]: พร้อมทดลอง
+            - heading "Hooke's Law of Elasticity" [level=3] [ref=e196]
+            - paragraph [ref=e197]: ศึกษาความยืดหยุ่นของสปริงและแรงดึงกลับตามระยะยืด วิเคราะห์ค่าคงตัวของสปริงตามกฎของฮุค
+          - generic [ref=e198]:
+            - button "รายละเอียด" [ref=e199] [cursor=pointer]:
+              - img [ref=e200]
+              - generic [ref=e203]: รายละเอียด
+            - button "เข้าห้อง" [ref=e204] [cursor=pointer]:
+              - generic [ref=e205]: เข้าห้อง
+              - img [ref=e206]
+        - generic [ref=e208]:
+          - generic [ref=e209]:
+            - img [ref=e211]:
+              - generic [ref=e214]: Air (n₁)
+              - generic [ref=e215]: Glass (n₂)
+              - generic [ref=e222]: θ₁
+              - generic [ref=e223]: θ₂
+            - generic [ref=e224]:
+              - generic [ref=e225]: Physics
+              - generic [ref=e226]: พร้อมทดลอง
+            - heading "Snell's Law of Refraction" [level=3] [ref=e227]
+            - paragraph [ref=e228]: ศึกษาดัชนีหักเหของแสงและการเดินทางผ่านตัวกลางต่างชนิดกัน วิเคราะห์ความสัมพันธ์ของมุมตามกฎของสเนลล์
+          - generic [ref=e229]:
+            - button "รายละเอียด" [ref=e230] [cursor=pointer]:
+              - img [ref=e231]
+              - generic [ref=e234]: รายละเอียด
+            - button "เข้าห้อง" [ref=e235] [cursor=pointer]:
+              - generic [ref=e236]: เข้าห้อง
+              - img [ref=e237]
+        - generic [ref=e239]:
+          - generic [ref=e240]:
+            - img [ref=e242]:
+              - generic [ref=e262]: P
+            - generic [ref=e263]:
+              - generic [ref=e264]: Physics
+              - generic [ref=e265]: พร้อมทดลอง
+            - heading "Ideal Gas Law Simulation" [level=3] [ref=e266]
+            - paragraph [ref=e267]: วิเคราะห์การเปลี่ยนแปลงสถานะของแก๊สอุดมคติผ่านการเปลี่ยนตัวแปรความดัน ปริมาตร และอุณหภูมิ
+          - generic [ref=e268]:
+            - button "รายละเอียด" [ref=e269] [cursor=pointer]:
+              - img [ref=e270]
+              - generic [ref=e273]: รายละเอียด
+            - button "เข้าห้อง" [ref=e274] [cursor=pointer]:
+              - generic [ref=e275]: เข้าห้อง
+              - img [ref=e276]
+        - generic [ref=e278]:
+          - generic [ref=e279]:
+            - img [ref=e281]:
+              - generic [ref=e291]: m
+              - generic [ref=e293]: F = ma
+              - generic [ref=e295]: a
+            - generic [ref=e296]:
+              - generic [ref=e297]: Physics
+              - generic [ref=e298]: พร้อมทดลอง
+            - heading "Newton's Second Law of Motion" [level=3] [ref=e299]
+            - paragraph [ref=e300]: ศึกษาผลของแรงลัพธ์และมวลที่มีต่อความเร่งของวัตถุจำลองตามกฎการเคลื่อนที่ข้อที่สองของนิวตัน
+          - generic [ref=e301]:
+            - button "รายละเอียด" [ref=e302] [cursor=pointer]:
+              - img [ref=e303]
+              - generic [ref=e306]: รายละเอียด
+            - button "เข้าห้อง" [ref=e307] [cursor=pointer]:
+              - generic [ref=e308]: เข้าห้อง
+              - img [ref=e309]
+        - generic [ref=e311]:
+          - generic [ref=e312]:
+            - img [ref=e314]:
+              - generic [ref=e317]: m₁
+              - generic [ref=e319]: v₁
+              - generic [ref=e321]: m₂
+              - generic [ref=e323]: v₂
+            - generic [ref=e325]:
+              - generic [ref=e326]: Physics
+              - generic [ref=e327]: พร้อมทดลอง
+            - heading "Conservation of Linear Momentum" [level=3] [ref=e328]
+            - paragraph [ref=e329]: จำลองการชนของวัตถุบนแนวเส้นตรงเพื่อวิเคราะห์การอนุรักษ์โมเมนตัมและพลังงานจลน์ในการชน
+          - generic [ref=e330]:
+            - button "รายละเอียด" [ref=e331] [cursor=pointer]:
+              - img [ref=e332]
+              - generic [ref=e335]: รายละเอียด
+            - button "เข้าห้อง" [ref=e336] [cursor=pointer]:
+              - generic [ref=e337]: เข้าห้อง
+              - img [ref=e338]
+        - generic [ref=e340]:
+          - generic [ref=e341]:
+            - img [ref=e343]:
+              - generic [ref=e345]:
+                - generic [ref=e347]: "N"
+                - generic [ref=e349]: S
+              - generic [ref=e359]: V
+            - generic [ref=e360]:
+              - generic [ref=e361]: Physics
+              - generic [ref=e362]: พร้อมทดลอง
+            - heading "Faraday's Electromagnetic Induction" [level=3] [ref=e363]
+            - paragraph [ref=e364]: ศึกษาการเกิดกระแสไฟฟ้าเหนี่ยวนำและแรงเคลื่อนไฟฟ้าเหนี่ยวนำจากการเปลี่ยนแปลงของฟลักซ์แม่เหล็ก
+          - generic [ref=e365]:
+            - button "รายละเอียด" [ref=e366] [cursor=pointer]:
+              - img [ref=e367]
+              - generic [ref=e370]: รายละเอียด
+            - button "เข้าห้อง" [ref=e371] [cursor=pointer]:
+              - generic [ref=e372]: เข้าห้อง
+              - img [ref=e373]
+        - generic [ref=e375]:
+          - generic [ref=e376]:
+            - img [ref=e378]:
+              - generic [ref=e389]: P₁
+              - generic [ref=e390]: P₂
+            - generic [ref=e391]:
+              - generic [ref=e392]: Physics
+              - generic [ref=e393]: พร้อมทดลอง
+            - heading "Bernoulli's Principle & Fluid Dynamics" [level=3] [ref=e394]
+            - paragraph [ref=e395]: ศึกษาความสัมพันธ์ระหว่างความเร็วและความดันของของไหลในท่อที่มีหน้าตัดต่างกันตามหลักการแบร์นูลลี
+          - generic [ref=e396]:
+            - button "รายละเอียด" [ref=e397] [cursor=pointer]:
+              - img [ref=e398]
+              - generic [ref=e401]: รายละเอียด
+            - button "เข้าห้อง" [ref=e402] [cursor=pointer]:
+              - generic [ref=e403]: เข้าห้อง
+              - img [ref=e404]
+        - generic [ref=e406]:
+          - generic [ref=e407]:
+            - img [ref=e409]:
+              - generic [ref=e415]: Metal Cathode
+              - generic [ref=e416]:
+                - generic [ref=e418]: "-"
+                - generic [ref=e421]: "-"
+                - generic [ref=e424]: "-"
+            - generic [ref=e426]:
+              - generic [ref=e427]: Physics
+              - generic [ref=e428]: พร้อมทดลอง
+            - heading "Einstein's Photoelectric Effect" [level=3] [ref=e429]
+            - paragraph [ref=e430]: วิเคราะห์พลังงานจลน์สูงสุดของโฟโตอิเล็กตรอนที่หลุดจากผิวโลหะตามฟังก์ชันงานและความถี่ของแสง
+          - generic [ref=e431]:
+            - button "รายละเอียด" [ref=e432] [cursor=pointer]:
+              - img [ref=e433]
+              - generic [ref=e436]: รายละเอียด
+            - button "เข้าห้อง" [ref=e437] [cursor=pointer]:
+              - generic [ref=e438]: เข้าห้อง
+              - img [ref=e439]
+        - generic [ref=e441]:
+          - generic [ref=e442]:
+            - img [ref=e444]
+            - generic [ref=e454]:
+              - generic [ref=e455]: Physics
+              - generic [ref=e456]: พร้อมทดลอง
+            - heading "Kepler's Third Law of Planetary Motion" [level=3] [ref=e457]
+            - paragraph [ref=e458]: วิเคราะห์คาบการโคจรและระยะห่างเฉลี่ยจากดวงอาทิตย์ของดาวเคราะห์จำลองตามกฎข้อที่สามของเคปเลอร์
+          - generic [ref=e459]:
+            - button "รายละเอียด" [ref=e460] [cursor=pointer]:
+              - img [ref=e461]
+              - generic [ref=e464]: รายละเอียด
+            - button "เข้าห้อง" [ref=e465] [cursor=pointer]:
+              - generic [ref=e466]: เข้าห้อง
+              - img [ref=e467]
+        - generic [ref=e469]:
+          - generic [ref=e470]:
+            - img [ref=e472]:
+              - generic [ref=e479]: P = σAT⁴
+            - generic [ref=e480]:
+              - generic [ref=e481]: Physics
+              - generic [ref=e482]: พร้อมทดลอง
+            - heading "Stefan-Boltzmann Law of Blackbody Radiation" [level=3] [ref=e483]
+            - paragraph [ref=e484]: ศึกษาอัตราการแผ่รังสีความร้อนของวัตถุดำและอัตราการสูญเสียพลังงานที่แปรผันตามอุณหภูมิสัมบูรณ์ยกกำลังสี่
+          - generic [ref=e485]:
+            - button "รายละเอียด" [ref=e486] [cursor=pointer]:
+              - img [ref=e487]
+              - generic [ref=e490]: รายละเอียด
+            - button "เข้าห้อง" [ref=e491] [cursor=pointer]:
+              - generic [ref=e492]: เข้าห้อง
+              - img [ref=e493]
+        - generic [ref=e495]:
+          - generic [ref=e496]:
+            - img [ref=e498]
+            - generic [ref=e513]:
+              - generic [ref=e514]: Chemistry
+              - generic [ref=e515]: พร้อมทดลอง
+            - heading "Acid-Base Titration Lab" [level=3] [ref=e516]
+            - paragraph [ref=e517]: ทดลองวัดและหาค่าความเข้มข้นของกรดหรือเบสผ่านกระบวนการไทเทรตทางเคมี ติดตามระดับ pH และการเปลี่ยนสีของอินดิเคเตอร์แบบเรียลไทม์
+          - generic [ref=e518]:
+            - button "รายละเอียด" [ref=e519] [cursor=pointer]:
+              - img [ref=e520]
+              - generic [ref=e523]: รายละเอียด
+            - button "เข้าห้อง" [ref=e524] [cursor=pointer]:
+              - generic [ref=e525]: เข้าห้อง
+              - img [ref=e526]
+        - generic [ref=e528]:
+          - generic [ref=e529]:
+            - img [ref=e531]:
+              - generic [ref=e548]: P
+            - generic [ref=e549]:
+              - generic [ref=e550]: Chemistry
+              - generic [ref=e551]: พร้อมทดลอง
+            - heading "Boyle's Gas Law Lab" [level=3] [ref=e552]
+            - paragraph [ref=e553]: ทดลองวัดความสัมพันธ์ระหว่างความดันและปริมาตรของแก๊สที่อุณหภูมิคงที่เพื่อตรวจสอบกฎของบอยล์
+          - generic [ref=e554]:
+            - button "รายละเอียด" [ref=e555] [cursor=pointer]:
+              - img [ref=e556]
+              - generic [ref=e559]: รายละเอียด
+            - button "เข้าห้อง" [ref=e560] [cursor=pointer]:
+              - generic [ref=e561]: เข้าห้อง
+              - img [ref=e562]
+        - generic [ref=e564]:
+          - generic [ref=e565]:
+            - img [ref=e567]
+            - generic [ref=e580]:
+              - generic [ref=e581]: Chemistry
+              - generic [ref=e582]: พร้อมทดลอง
+            - heading "Charles's Temperature-Volume Lab" [level=3] [ref=e583]
+            - paragraph [ref=e584]: วิเคราะห์ความสัมพันธ์เชิงปริมาณระหว่างอุณหภูมิและปริมาตรของแก๊สภายใต้ความดันคงตัวตามกฎของชาร์ล
+          - generic [ref=e585]:
+            - button "รายละเอียด" [ref=e586] [cursor=pointer]:
+              - img [ref=e587]
+              - generic [ref=e590]: รายละเอียด
+            - button "เข้าห้อง" [ref=e591] [cursor=pointer]:
+              - generic [ref=e592]: เข้าห้อง
+              - img [ref=e593]
+        - generic [ref=e595]:
+          - generic [ref=e596]:
+            - img [ref=e598]
+            - generic [ref=e608]:
+              - generic [ref=e609]: Chemistry
+              - generic [ref=e610]: กำลังเตรียม
+            - heading "Chemical Equilibrium Shift" [level=3] [ref=e611]
+            - paragraph [ref=e612]: ศึกษาการเปลี่ยนแปลงสมดุลเคมีเมื่อรบกวนระบบด้วยความดัน อุณหภูมิ และความเข้มข้นสารตามหลักของเลอชาเตอลิเย
+          - generic [ref=e613]:
+            - button "กำลังจัดทำ" [disabled] [ref=e614]:
+              - img [ref=e615]
+              - generic [ref=e618]: กำลังจัดทำ
+            - button "เร็ว ๆ นี้" [disabled] [ref=e619]:
+              - generic [ref=e620]: เร็ว ๆ นี้
+        - generic [ref=e621]:
+          - generic [ref=e622]:
+            - img [ref=e624]:
+              - generic [ref=e628]: Light I₀
+              - generic [ref=e629]: Light I
+            - generic [ref=e630]:
+              - generic [ref=e631]: Chemistry
+              - generic [ref=e632]: กำลังเตรียม
+            - heading "Spectrophotometry & Concentration" [level=3] [ref=e633]
+            - paragraph [ref=e634]: วัดการดูดกลืนแสงของสารละลายที่มีความเข้มข้นต่างกันเพื่อสร้างกราฟมาตรฐานตามกฎของเบียร์-ลัมแบร์ต
+          - generic [ref=e635]:
+            - button "กำลังจัดทำ" [disabled] [ref=e636]:
+              - img [ref=e637]
+              - generic [ref=e640]: กำลังจัดทำ
+            - button "เร็ว ๆ นี้" [disabled] [ref=e641]:
+              - generic [ref=e642]: เร็ว ๆ นี้
+        - generic [ref=e643]:
+          - generic [ref=e644]:
+            - img [ref=e646]
+            - generic [ref=e655]:
+              - generic [ref=e656]: Chemistry
+              - generic [ref=e657]: กำลังเตรียม
+            - heading "Hess's Law & Calorimetry" [level=3] [ref=e658]
+            - paragraph [ref=e659]: ทดลองวัดความร้อนของปฏิกิริยาเคมีหลายขั้นตอนเพื่อพิสูจน์ความไม่ขึ้นกับเส้นทางของเอนทัลปีรวมตามกฎของเฮสส์
+          - generic [ref=e660]:
+            - button "กำลังจัดทำ" [disabled] [ref=e661]:
+              - img [ref=e662]
+              - generic [ref=e665]: กำลังจัดทำ
+            - button "เร็ว ๆ นี้" [disabled] [ref=e666]:
+              - generic [ref=e667]: เร็ว ๆ นี้
+        - generic [ref=e668]:
+          - generic [ref=e669]:
+            - img [ref=e671]:
+              - generic [ref=e684]: V
+            - generic [ref=e685]:
+              - generic [ref=e686]: Chemistry
+              - generic [ref=e687]: กำลังเตรียม
+            - heading "Galvanic Cells & Voltage" [level=3] [ref=e688]
+            - paragraph [ref=e689]: ศึกษาปฏิกิริยารีดอกซ์และการไหลของกระแสไฟฟ้าในเซลล์เคมีไฟฟ้าเพื่อคำนวณหาค่าแรงเคลื่อนไฟฟ้ามาตรฐาน
+          - generic [ref=e690]:
+            - button "กำลังจัดทำ" [disabled] [ref=e691]:
+              - img [ref=e692]
+              - generic [ref=e695]: กำลังจัดทำ
+            - button "เร็ว ๆ นี้" [disabled] [ref=e696]:
+              - generic [ref=e697]: เร็ว ๆ นี้
+        - generic [ref=e698]:
+          - generic [ref=e699]:
+            - img [ref=e701]:
+              - generic [ref=e712]: Ea
+            - generic [ref=e713]:
+              - generic [ref=e714]: Chemistry
+              - generic [ref=e715]: กำลังเตรียม
+            - heading "Chemical Reaction Rates" [level=3] [ref=e716]
+            - paragraph [ref=e717]: วิเคราะห์ปัจจัยที่มีผลต่ออัตราการเกิดปฏิกิริยาเคมี เช่น ความเข้มข้น อุณหภูมิ และตัวเร่งปฏิกิริยาตามทฤษฎีการชน
+          - generic [ref=e718]:
+            - button "กำลังจัดทำ" [disabled] [ref=e719]:
+              - img [ref=e720]
+              - generic [ref=e723]: กำลังจัดทำ
+            - button "เร็ว ๆ นี้" [disabled] [ref=e724]:
+              - generic [ref=e725]: เร็ว ๆ นี้
+        - generic [ref=e726]:
+          - generic [ref=e727]:
+            - img [ref=e729]:
+              - generic [ref=e733]:
+                - generic [ref=e735]: +
+                - generic [ref=e737]: "-"
+                - generic [ref=e739]: +
+                - generic [ref=e741]: "-"
+            - generic [ref=e746]:
+              - generic [ref=e747]: Chemistry
+              - generic [ref=e748]: กำลังเตรียม
+            - heading "Solubility Product Constant" [level=3] [ref=e749]
+            - paragraph [ref=e750]: ศึกษาปฏิกิริยาการเกิดตะกอนและการละลายของเกลือละลายยากเพื่อคำนวณหาค่าคงตัวผลคูณการละลาย
+          - generic [ref=e751]:
+            - button "กำลังจัดทำ" [disabled] [ref=e752]:
+              - img [ref=e753]
+              - generic [ref=e756]: กำลังจัดทำ
+            - button "เร็ว ๆ นี้" [disabled] [ref=e757]:
+              - generic [ref=e758]: เร็ว ๆ นี้
+        - generic [ref=e759]:
+          - generic [ref=e760]:
+            - img [ref=e762]:
+              - generic [ref=e770]: 1 Mole O₂
+              - generic [ref=e783]: 1 Mole CO₂
+            - generic [ref=e784]:
+              - generic [ref=e785]: Chemistry
+              - generic [ref=e786]: กำลังเตรียม
+            - heading "Avogadro's Molar Volume" [level=3] [ref=e787]
+            - paragraph [ref=e788]: ทดลองหาปริมาตรของแก๊ส 1 โมลที่สภาวะมาตรฐาน (STP) และศึกษาความสัมพันธ์กับจำนวนอนุภาคของแก๊ส
+          - generic [ref=e789]:
+            - button "กำลังจัดทำ" [disabled] [ref=e790]:
+              - img [ref=e791]
+              - generic [ref=e794]: กำลังจัดทำ
+            - button "เร็ว ๆ นี้" [disabled] [ref=e795]:
+              - generic [ref=e796]: เร็ว ๆ นี้
+        - generic [ref=e797]:
+          - generic [ref=e798]:
+            - img [ref=e800]
+            - generic [ref=e815]:
+              - generic [ref=e816]: Chemistry
+              - generic [ref=e817]: กำลังเตรียม
+            - heading "Electrolysis & Metal Plating" [level=3] [ref=e818]
+            - paragraph [ref=e819]: ทดลองแยกสารเคมีด้วยไฟฟ้าและชุบโลหะเพื่อวิเคราะห์ความสัมพันธ์ของปริมาณสารตามกฎการแยกสารด้วยไฟฟ้า
+          - generic [ref=e820]:
+            - button "กำลังจัดทำ" [disabled] [ref=e821]:
+              - img [ref=e822]
+              - generic [ref=e825]: กำลังจัดทำ
+            - button "เร็ว ๆ นี้" [disabled] [ref=e826]:
+              - generic [ref=e827]: เร็ว ๆ นี้
+        - generic [ref=e828]:
+          - generic [ref=e829]:
+            - img [ref=e831]
+            - generic [ref=e846]:
+              - generic [ref=e847]: Chemistry
+              - generic [ref=e848]: กำลังเตรียม
+            - heading "Colligative Properties Lab" [level=3] [ref=e849]
+            - paragraph [ref=e850]: ศึกษาการลดลงของจุดเยือกแข็งและการเพิ่มขึ้นของจุดเดือดของตัวทำละลายเมื่อเติมตัวละลายที่ระเหยยาก
+          - generic [ref=e851]:
+            - button "กำลังจัดทำ" [disabled] [ref=e852]:
+              - img [ref=e853]
+              - generic [ref=e856]: กำลังจัดทำ
+            - button "เร็ว ๆ นี้" [disabled] [ref=e857]:
+              - generic [ref=e858]: เร็ว ๆ นี้
+        - generic [ref=e859]:
+          - generic [ref=e860]:
+            - img [ref=e862]
+            - generic [ref=e878]:
+              - generic [ref=e879]: Biology
+              - generic [ref=e880]: พร้อมทดลอง
+            - heading "Photosynthesis Rate Chamber" [level=3] [ref=e881]
+            - paragraph [ref=e882]: ศึกษาระดับกระบวนการสังเคราะห์แสงของพืชสีเขียวในห้องทดลองปิด วิเคราะห์ผลกระทบของแสง ระดับคาร์บอนไดออกไซด์ และอุณหภูมิ
+          - generic [ref=e883]:
+            - button "รายละเอียด" [ref=e884] [cursor=pointer]:
+              - img [ref=e885]
+              - generic [ref=e888]: รายละเอียด
+            - button "เข้าห้อง" [ref=e889] [cursor=pointer]:
+              - generic [ref=e890]: เข้าห้อง
+              - img [ref=e891]
+        - generic [ref=e893]:
+          - generic [ref=e894]:
+            - img [ref=e896]:
+              - generic [ref=e898]:
+                - generic [ref=e900]: "Y"
+                - generic [ref=e901]: "y"
+                - generic [ref=e902]: "Y"
+                - generic [ref=e903]: "y"
+                - generic [ref=e904]: YY
+                - generic [ref=e906]: Yy
+                - generic [ref=e908]: Yy
+                - generic [ref=e910]: yy
+            - generic [ref=e912]:
+              - generic [ref=e913]: Biology
+              - generic [ref=e914]: พร้อมทดลอง
+            - heading "Mendelian Genetics Lab" [level=3] [ref=e915]
+            - paragraph [ref=e916]: ศึกษาการถ่ายทอดลักษณะทางพันธุกรรมของถั่วลันเตาและการจับคู่ยีนในตารางพุนเนตต์ตามกฎของเมนเดล
+          - generic [ref=e917]:
+            - button "รายละเอียด" [ref=e918] [cursor=pointer]:
+              - img [ref=e919]
+              - generic [ref=e922]: รายละเอียด
+            - button "เข้าห้อง" [ref=e923] [cursor=pointer]:
+              - generic [ref=e924]: เข้าห้อง
+              - img [ref=e925]
+        - generic [ref=e927]:
+          - generic [ref=e928]:
+            - img [ref=e930]
+            - generic [ref=e945]:
+              - generic [ref=e946]: Biology
+              - generic [ref=e947]: พร้อมทดลอง
+            - heading "Mitosis & Cell Cycle" [level=3] [ref=e948]
+            - paragraph [ref=e949]: ศึกษาขั้นตอนการจำลองตัวเองและการแบ่งนิวเคลียสแบบไมโทซิสในระยะต่างๆ ผ่านกล้องจุลทรรศน์เสมือน
+          - generic [ref=e950]:
+            - button "รายละเอียด" [ref=e951] [cursor=pointer]:
+              - img [ref=e952]
+              - generic [ref=e955]: รายละเอียด
+            - button "เข้าห้อง" [ref=e956] [cursor=pointer]:
+              - generic [ref=e957]: เข้าห้อง
+              - img [ref=e958]
+        - generic [ref=e960]:
+          - generic [ref=e961]:
+            - img [ref=e963]
+            - generic [ref=e978]:
+              - generic [ref=e979]: Biology
+              - generic [ref=e980]: กำลังเตรียม
+            - heading "Osmosis & Plasmolysis" [level=3] [ref=e981]
+            - paragraph [ref=e982]: ทดลองศึกษาการแพร่และการออสโมซิสของน้ำผ่านเยื่อเลือกผ่านในสภาวะความเข้มข้นสารละลายต่างกัน
+          - generic [ref=e983]:
+            - button "กำลังจัดทำ" [disabled] [ref=e984]:
+              - img [ref=e985]
+              - generic [ref=e988]: กำลังจัดทำ
+            - button "เร็ว ๆ นี้" [disabled] [ref=e989]:
+              - generic [ref=e990]: เร็ว ๆ นี้
+        - generic [ref=e991]:
+          - generic [ref=e992]:
+            - img [ref=e994]:
+              - generic [ref=e997]: ENZYME
+              - generic [ref=e999]: SUBSTRATE
+            - generic [ref=e1001]:
+              - generic [ref=e1002]: Biology
+              - generic [ref=e1003]: กำลังเตรียม
+            - heading "Enzyme Catalysis Lab" [level=3] [ref=e1004]
+            - paragraph [ref=e1005]: วิเคราะห์อัตราการทำงานของเอนไซม์ตามการเปลี่ยนแปลงความเข้มข้นสาร อุณหภูมิ และค่า pH ตามสมการ Michaelis-Menten
+          - generic [ref=e1006]:
+            - button "กำลังจัดทำ" [disabled] [ref=e1007]:
+              - img [ref=e1008]
+              - generic [ref=e1011]: กำลังจัดทำ
+            - button "เร็ว ๆ นี้" [disabled] [ref=e1012]:
+              - generic [ref=e1013]: เร็ว ๆ นี้
+        - generic [ref=e1014]:
+          - generic [ref=e1015]:
+            - img [ref=e1017]
+            - generic [ref=e1031]:
+              - generic [ref=e1032]: Biology
+              - generic [ref=e1033]: กำลังเตรียม
+            - heading "DNA Extraction Chamber" [level=3] [ref=e1034]
+            - paragraph [ref=e1035]: เรียนรู้ขั้นตอนการทำลายผนังเซลล์และตกตะกอนเพื่อแยกสายใยโมเลกุลดีเอ็นเอออกจากตัวอย่างพืชและผลไม้
+          - generic [ref=e1036]:
+            - button "กำลังจัดทำ" [disabled] [ref=e1037]:
+              - img [ref=e1038]
+              - generic [ref=e1041]: กำลังจัดทำ
+            - button "เร็ว ๆ นี้" [disabled] [ref=e1042]:
+              - generic [ref=e1043]: เร็ว ๆ นี้
+        - generic [ref=e1044]:
+          - generic [ref=e1045]:
+            - img [ref=e1047]:
+              - generic [ref=e1051]: Glucose
+              - generic [ref=e1053]: O₂
+              - generic [ref=e1057]: ATP
+              - generic [ref=e1058]: CO₂ + H₂O
+            - generic [ref=e1059]:
+              - generic [ref=e1060]: Biology
+              - generic [ref=e1061]: กำลังเตรียม
+            - heading "Cellular Respiration Lab" [level=3] [ref=e1062]
+            - paragraph [ref=e1063]: ศึกษาการสลายโมเลกุลสารอาหารเพื่อผลิตพลังงาน ATP ทั้งในภาวะที่มีและไม่มีแก๊สออกซิเจน
+          - generic [ref=e1064]:
+            - button "กำลังจัดทำ" [disabled] [ref=e1065]:
+              - img [ref=e1066]
+              - generic [ref=e1069]: กำลังจัดทำ
+            - button "เร็ว ๆ นี้" [disabled] [ref=e1070]:
+              - generic [ref=e1071]: เร็ว ๆ นี้
+        - generic [ref=e1072]:
+          - generic [ref=e1073]:
+            - img [ref=e1075]
+            - generic [ref=e1088]:
+              - generic [ref=e1089]: Biology
+              - generic [ref=e1090]: กำลังเตรียม
+            - heading "Plant Transpiration Potometer" [level=3] [ref=e1091]
+            - paragraph [ref=e1092]: วัดอัตราการคายน้ำของยอดพืชภายใต้สภาวะควบคุม เช่น ความชื้น อุณหภูมิ ลม และความเข้มแสงด้วยโพโทมิเตอร์
+          - generic [ref=e1093]:
+            - button "กำลังจัดทำ" [disabled] [ref=e1094]:
+              - img [ref=e1095]
+              - generic [ref=e1098]: กำลังจัดทำ
+            - button "เร็ว ๆ นี้" [disabled] [ref=e1099]:
+              - generic [ref=e1100]: เร็ว ๆ นี้
+        - generic [ref=e1101]:
+          - generic [ref=e1102]:
+            - img [ref=e1104]
+            - generic [ref=e1124]:
+              - generic [ref=e1125]: Biology
+              - generic [ref=e1126]: กำลังเตรียม
+            - heading "Natural Selection Simulator" [level=3] [ref=e1127]
+            - paragraph [ref=e1128]: จำลองการเปลี่ยนแปลงสัดส่วนลักษณะประชากรสิ่งมีชีวิตตามปัจจัยกดดันของสภาพแวดล้อมตามทฤษฎีวิวัฒนาการ
+          - generic [ref=e1129]:
+            - button "กำลังจัดทำ" [disabled] [ref=e1130]:
+              - img [ref=e1131]
+              - generic [ref=e1134]: กำลังจัดทำ
+            - button "เร็ว ๆ นี้" [disabled] [ref=e1135]:
+              - generic [ref=e1136]: เร็ว ๆ นี้
+        - generic [ref=e1137]:
+          - generic [ref=e1138]:
+            - img [ref=e1140]:
+              - generic [ref=e1146]: A
+              - generic [ref=e1154]: B
+              - generic [ref=e1162]: Rh
+            - generic [ref=e1163]:
+              - generic [ref=e1164]: Biology
+              - generic [ref=e1165]: กำลังเตรียม
+            - heading "Blood Typing & Agglutination" [level=3] [ref=e1166]
+            - paragraph [ref=e1167]: ทดลองหาหมู่เลือดระบบ ABO และ Rh ผ่านการตกตะกอนของเม็ดเลือดแดงเมื่อทำปฏิกิริยากับแอนติบอดีจำลอง
+          - generic [ref=e1168]:
+            - button "กำลังจัดทำ" [disabled] [ref=e1169]:
+              - img [ref=e1170]
+              - generic [ref=e1173]: กำลังจัดทำ
+            - button "เร็ว ๆ นี้" [disabled] [ref=e1174]:
+              - generic [ref=e1175]: เร็ว ๆ นี้
+        - generic [ref=e1176]:
+          - generic [ref=e1177]:
+            - img [ref=e1179]:
+              - generic [ref=e1181]:
+                - generic [ref=e1183]: PRODUCERS
+                - generic [ref=e1185]: HERBIVORES
+                - generic [ref=e1187]: CARNIVORES
+                - generic [ref=e1189]: APEX
+                - generic [ref=e1191]: ENERGY FLOW
+            - generic [ref=e1192]:
+              - generic [ref=e1193]: Biology
+              - generic [ref=e1194]: กำลังเตรียม
+            - heading "Food Chain & Ecology" [level=3] [ref=e1195]
+            - paragraph [ref=e1196]: วิเคราะห์การถ่ายทอดพลังงานและสารอาหารผ่านผู้ผลิต ผู้บริโภค และผู้ย่อยสลายในพีระมิดพลังงานระบบนิเวศ
+          - generic [ref=e1197]:
+            - button "กำลังจัดทำ" [disabled] [ref=e1198]:
+              - img [ref=e1199]
+              - generic [ref=e1202]: กำลังจัดทำ
+            - button "เร็ว ๆ นี้" [disabled] [ref=e1203]:
+              - generic [ref=e1204]: เร็ว ๆ นี้
+        - generic [ref=e1205]:
+          - generic [ref=e1206]:
+            - img [ref=e1208]
+            - generic [ref=e1215]:
+              - generic [ref=e1216]: Biology
+              - generic [ref=e1217]: กำลังเตรียม
+            - heading "Cardiovascular System Lab" [level=3] [ref=e1218]
+            - paragraph [ref=e1219]: วิเคราะห์อัตราการเต้นของหัวใจและความดันเลือดภายใต้การตอบสนองต่อการทำกิจกรรมและระดับสารกระตุ้นจำลอง
+          - generic [ref=e1220]:
+            - button "กำลังจัดทำ" [disabled] [ref=e1221]:
+              - img [ref=e1222]
+              - generic [ref=e1225]: กำลังจัดทำ
+            - button "เร็ว ๆ นี้" [disabled] [ref=e1226]:
+              - generic [ref=e1227]: เร็ว ๆ นี้
+  - button "Open Next.js Dev Tools" [ref=e1233] [cursor=pointer]:
+    - img [ref=e1234]
+  - alert [ref=e1237]

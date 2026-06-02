@@ -5,9 +5,13 @@ import { BarChart2, Clock, Sparkles, Languages, CheckSquare, Info, ShieldAlert, 
 
 interface LabSidebarProps {
   labId?: string;
+  hasSavedResult?: boolean;
 }
 
-export default function LabSidebar({ labId = "newtons-cooling" }: LabSidebarProps) {
+export default function LabSidebar({
+  labId = "newtons-cooling",
+  hasSavedResult = false,
+}: LabSidebarProps) {
   const isOhmsLaw = labId === "ohms-law";
   const isHookesLaw = labId === "hookes-law";
   const isAcidBase = labId === "acid-base-titration";
@@ -16,6 +20,12 @@ export default function LabSidebar({ labId = "newtons-cooling" }: LabSidebarProp
   const isPhotosynthesis = labId === "photosynthesis-rate";
   const isMendelian = labId === "mendels-inheritance";
   const isMitosis = labId === "mitosis-division";
+
+  const labProgress = hasSavedResult ? 100 : 0;
+  const labProgressLabel = hasSavedResult
+    ? "บันทึกผลทดลองล่าสุดแล้ว"
+    : "ยังไม่ได้บันทึกผลทดลอง";
+  const missionProgressLabel = hasSavedResult ? "1 / 1 ห้อง" : "0 / 1 ห้อง";
 
   // 1. Lab details rows
   const labInfoRows = [
@@ -61,7 +71,7 @@ export default function LabSidebar({ labId = "newtons-cooling" }: LabSidebarProp
             const Icon = row.icon;
             return (
               <div key={idx} className="flex items-center justify-between py-3 text-xs sm:text-sm">
-                <div className="flex items-center gap-2.5 text-slate-400 font-semibold">
+                <div className="flex items-center gap-2.5 text-slate-500 font-semibold">
                   <Icon className={`w-4.5 h-4.5 ${row.color}`} />
                   <span>{row.label}</span>
                 </div>
@@ -80,17 +90,17 @@ export default function LabSidebar({ labId = "newtons-cooling" }: LabSidebarProp
             ความคืบหน้า
           </h3>
           <span className="text-xs font-extrabold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">
-            60%
+            {labProgress}%
           </span>
         </div>
 
         {/* Progress Bar Container */}
         <div className="space-y-2">
-          <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden" role="progressbar" aria-valuenow={60} aria-valuemin={0} aria-valuemax={100} aria-label="ความคืบหน้าการทำแล็บ">
-            <div className="h-full bg-emerald-500 rounded-full transition-all duration-500" style={{ width: "60%" }} />
+          <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden" role="progressbar" aria-valuenow={labProgress} aria-valuemin={0} aria-valuemax={100} aria-label="ความคืบหน้าการทำแล็บ">
+            <div className="h-full bg-emerald-500 rounded-full transition-all duration-500" style={{ width: `${labProgress}%` }} />
           </div>
-          <p className="text-[11px] text-slate-400 font-semibold text-left">
-            ทำไปแล้ว 3 / 5 ขั้นตอน
+          <p className="text-[11px] text-slate-500 font-semibold text-left">
+            {labProgressLabel}
           </p>
         </div>
       </div>
@@ -105,7 +115,7 @@ export default function LabSidebar({ labId = "newtons-cooling" }: LabSidebarProp
           {adviceList.map((bullet, idx) => (
             <li key={idx} className="flex items-start gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0 mt-1.5" />
-              <p className="text-[11px] sm:text-xs text-slate-400 font-semibold leading-relaxed leading-1.4">
+              <p className="text-[11px] sm:text-xs text-slate-600 font-semibold leading-[1.55]">
                 {bullet}
               </p>
             </li>
@@ -123,23 +133,23 @@ export default function LabSidebar({ labId = "newtons-cooling" }: LabSidebarProp
           </div>
           <div>
             <h3 className="text-xs sm:text-sm font-bold text-slate-800">ภารกิจนักวิทย์</h3>
-            <p className="text-[10px] text-slate-400 font-semibold">เก็บครบ 5 ห้อง</p>
+            <p className="text-[10px] text-slate-500 font-semibold">ทำแล็บนี้ให้ครบและบันทึกผล</p>
           </div>
         </div>
 
         {/* Progress details */}
         <div className="space-y-2">
-          <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden" role="progressbar" aria-valuenow={60} aria-valuemin={0} aria-valuemax={100} aria-label="ความคืบหน้าภารกิจนักวิทย์">
-            <div className="h-full bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full transition-all duration-500 group-hover:scale-x-105 origin-left" style={{ width: "60%" }} />
+          <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden" role="progressbar" aria-valuenow={labProgress} aria-valuemin={0} aria-valuemax={100} aria-label="ความคืบหน้าภารกิจแล็บนี้">
+            <div className="h-full bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full transition-all duration-500 group-hover:scale-x-105 origin-left" style={{ width: `${labProgress}%` }} />
           </div>
           
           <div className="flex items-center justify-between text-[10px] font-bold">
-            <span className="text-slate-400 flex items-center gap-1">
+            <span className="text-slate-500 flex items-center gap-1">
               <Beaker className="w-3.5 h-3.5 text-purple-500" />
-              Progress
+              สถานะ
             </span>
             <span className="text-purple-600 bg-purple-50 px-2 py-0.5 rounded-md">
-              3 / 5 ห้อง
+              {missionProgressLabel}
             </span>
           </div>
         </div>

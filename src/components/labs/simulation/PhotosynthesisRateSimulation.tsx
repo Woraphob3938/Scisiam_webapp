@@ -16,6 +16,7 @@ import {
   Wind,
 } from "lucide-react";
 import SharedSimulationShell from "@/components/labs/simulation/SharedSimulationShell";
+import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";
 
 interface PhotosynthesisPoint {
   time: number;
@@ -385,7 +386,7 @@ export default function PhotosynthesisRateSimulation() {
     lastLoggedMinuteRef.current = 0;
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (dataPoints.length === 0) {
       alert("ยังไม่มีข้อมูล Photosynthesis Rate สำหรับบันทึก กรุณาเริ่มจำลองหรือเพิ่มจุดข้อมูลก่อน");
       return;
@@ -401,10 +402,23 @@ export default function PhotosynthesisRateSimulation() {
       dataPoints,
     };
 
-    localStorage.setItem("scisiam_saved_photosynthesis_experiment", JSON.stringify(experimentData));
-    const currentPoints = Number(localStorage.getItem("scisiam_points") || "120");
-    localStorage.setItem("scisiam_points", String(currentPoints + 25));
-    window.dispatchEvent(new Event("points-updated"));
+    await saveExperimentAndSync({
+      localStorageKey: "scisiam_saved_photosynthesis_experiment",
+      localPayload: experimentData,
+      labId: "photosynthesis-rate",
+      title: "Photosynthesis Rate Chamber",
+      variables: { lightIntensity, carbonDioxide, temperature, waterLevel },
+      liveValues: { oxygen, rate, elapsedMinutes },
+      graphPoints: dataPoints,
+      tableRows: dataPoints,
+      summary: {
+        finalOxygen: oxygen,
+        rate,
+        dataPointCount: dataPoints.length,
+      },
+      score: Math.round(Math.min(100, Math.max(0, oxygen))),
+      durationSeconds: Math.round(elapsedMinutes * 60),
+    });
     alert("บันทึกผลการทดลอง Photosynthesis Rate สำเร็จ");
   };
 

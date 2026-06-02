@@ -1,0 +1,232 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - navigation [ref=e3]:
+      - generic [ref=e4]:
+        - button "เปิด/ปิด เมนูด้านข้าง" [ref=e5] [cursor=pointer]:
+          - img [ref=e6]
+        - link "SciSiam" [ref=e7] [cursor=pointer]:
+          - /url: /
+          - img [ref=e9]
+          - generic [ref=e12]: SciSiam
+      - generic [ref=e13]:
+        - generic [ref=e14] [cursor=pointer]:
+          - img [ref=e15]
+          - generic [ref=e18]: 120 แต้ม
+        - button "การแจ้งเตือน" [ref=e20]:
+          - img [ref=e21]
+        - link "เข้าสู่ระบบ" [ref=e28] [cursor=pointer]:
+          - /url: /login
+          - img [ref=e29]
+          - generic [ref=e32]: เข้าสู่ระบบ
+    - navigation [ref=e34]:
+      - link "หน้าแรก" [ref=e35] [cursor=pointer]:
+        - /url: /
+        - img [ref=e36]
+        - generic [ref=e39]: หน้าแรก
+      - img [ref=e40]
+      - link "Physics" [ref=e42] [cursor=pointer]:
+        - /url: /?category=Physics
+      - img [ref=e43]
+      - generic [ref=e45]: Newton's law of cooling
+    - generic [ref=e47]:
+      - generic [ref=e48]:
+        - generic [ref=e49]:
+          - img [ref=e51]
+          - generic [ref=e55]: Physics
+        - heading "Newton's law of cooling" [level=1] [ref=e56]
+        - paragraph [ref=e57]: เรียนรู้เกี่ยวกับการระบายความร้อนของวัตถุตามกฎการเย็นตัวของนิวตัน วิเคราะห์อัตราการสูญเสียความร้อนสอดคล้องกับอุณหภูมิแวดล้อมจำลอง
+        - generic [ref=e58]:
+          - button "เริ่มทำการทดลองห้องแล็บ Newton's law of cooling" [ref=e59] [cursor=pointer]:
+            - img [ref=e60]
+            - generic [ref=e62]: เริ่มทดลอง
+          - link "กลับไปหน้ารายชื่อห้องแล็บ" [ref=e63] [cursor=pointer]:
+            - /url: /
+            - img [ref=e64]
+            - generic [ref=e66]: กลับไปหน้ารายชื่อห้องแล็บ
+      - img [ref=e68]:
+        - generic [ref=e84]:
+          - img [ref=e85]
+          - img [ref=e98]
+    - main [ref=e114]:
+      - generic [ref=e115]:
+        - generic [ref=e116]:
+          - generic [ref=e117]:
+            - generic [ref=e118]:
+              - generic [ref=e119]:
+                - img [ref=e121]
+                - heading "ภาพรวมการทดลอง" [level=2] [ref=e124]
+              - list [ref=e125]:
+                - listitem [ref=e126]:
+                  - generic [ref=e128]: ศึกษาการลดลงของอุณหภูมิของวัตถุร้อนในสภาพแวดล้อมควบคุมความเย็น
+                - listitem [ref=e129]:
+                  - generic [ref=e131]: เก็บข้อมูลอุณหภูมิของวัตถุตามช่วงเวลาเพื่อสังเกตแนวโน้ม
+                - listitem [ref=e132]:
+                  - generic [ref=e134]: วิเคราะห์และเปรียบเทียบผลลัพธ์กับสมการของกฎการเย็นตัวของนิวตัน
+            - generic [ref=e135]:
+              - generic [ref=e136]:
+                - img [ref=e138]
+                - heading "วัตถุประสงค์การเรียนรู้" [level=2] [ref=e142]
+              - list [ref=e143]:
+                - listitem [ref=e144]:
+                  - generic [ref=e146]: อธิบายหลักทฤษฎีกฎการเย็นตัวของนิวตันได้อย่างถูกต้อง
+                - listitem [ref=e147]:
+                  - generic [ref=e149]: รู้วิธีเก็บและบันทึกข้อมูลอุณหภูมิในระบบแล็บฟิสิกส์ได้อย่างแม่นยำ
+                - listitem [ref=e150]:
+                  - generic [ref=e152]: สามารถวิเคราะห์เส้นโค้งกราฟและตีความค่าคงที่อัตราการเย็นตัวได้
+          - generic [ref=e153]:
+            - generic [ref=e154]:
+              - generic [ref=e155]:
+                - img [ref=e157]
+                - generic [ref=e159]:
+                  - heading "อุปกรณ์ในห้องแล็บ" [level=2] [ref=e160]
+                  - paragraph [ref=e161]: รายการอุปกรณ์สำหรับการทดลอง Newton's law of cooling
+              - generic [ref=e162]:
+                - generic [ref=e163]: 5 รายการ
+                - button "ดูรายละเอียด" [ref=e164]:
+                  - generic [ref=e165]: ดูรายละเอียด
+                  - img [ref=e166]
+            - generic [ref=e168]:
+              - generic [ref=e176]:
+                - paragraph [ref=e177]: สรุปอุปกรณ์ 5 รายการ
+                - paragraph [ref=e178]: เทอร์โมมิเตอร์, บีกเกอร์, นาฬิกาจับเวลา และอีก 2 รายการ
+              - generic [ref=e179]: เปิดรายละเอียดเพื่อดูบทบาทและหน่วยของแต่ละอุปกรณ์
+          - generic [ref=e180]:
+            - heading "ขั้นตอนการทดลอง" [level=2] [ref=e181]:
+              - img [ref=e182]
+              - text: ขั้นตอนการทดลอง
+            - generic [ref=e185]:
+              - 'generic "ขั้นตอนที่ 1: เตรียมน้ำร้อน" [ref=e186]':
+                - generic [ref=e187]:
+                  - generic [ref=e188]: "1"
+                  - img [ref=e190]
+                - heading "เตรียมน้ำร้อน" [level=3] [ref=e192]
+                - paragraph [ref=e193]: เตรียมน้ำร้อนในบีกเกอร์ และวัดอุณหภูมิเริ่มต้น (T₀)
+              - img [ref=e195]
+              - 'generic "ขั้นตอนที่ 2: วางในสิ่งแวดล้อมควบคุม" [ref=e197]':
+                - generic [ref=e198]:
+                  - generic [ref=e199]: "2"
+                  - img [ref=e201]
+                - heading "วางในสิ่งแวดล้อมควบคุม" [level=3] [ref=e204]
+                - paragraph [ref=e205]: วางบีกเกอร์ในสภาพแวดล้อมที่อุณหภูมิคงที่ และเริ่มจับเวลา
+              - img [ref=e207]
+              - 'generic "ขั้นตอนที่ 3: บันทึกอุณหภูมิสม่ำเสมอ" [ref=e209]':
+                - generic [ref=e210]:
+                  - generic [ref=e211]: "3"
+                  - img [ref=e213]
+                - heading "บันทึกอุณหภูมิสม่ำเสมอ" [level=3] [ref=e216]
+                - paragraph [ref=e217]: บันทึกค่าอุณหภูมิทุกช่วงเวลาอย่างสม่ำเสมอ
+              - img [ref=e219]
+              - 'generic "ขั้นตอนที่ 4: วิเคราะห์สมการนิวตัน" [ref=e221]':
+                - generic [ref=e222]:
+                  - generic [ref=e223]: "4"
+                  - img [ref=e225]
+                - heading "วิเคราะห์สมการนิวตัน" [level=3] [ref=e228]
+                - paragraph [ref=e229]: สร้างกราฟและวิเคราะห์ข้อมูลเปรียบเทียบกับสมการ
+          - generic [ref=e230]:
+            - heading "ทฤษฎีที่เกี่ยวข้อง" [level=2] [ref=e231]:
+              - img [ref=e232]
+              - text: ทฤษฎีที่เกี่ยวข้อง
+            - generic [ref=e234]:
+              - generic [ref=e235]:
+                - paragraph [ref=e236]: กฎการเย็นตัวของนิวตัน (Newton's law of cooling) กล่าวว่า อัตราการเปลี่ยนแปลงของอุณหภูมิของวัตถุจะแปรผันตรงกับความแตกต่างของอุณหภูมิระหว่างตัววัตถุกับสภาพแวดล้อมโดยรอบ
+                - generic [ref=e237]:
+                  - generic [ref=e238]:
+                    - generic [ref=e239]: สมการความสัมพันธ์
+                    - generic [ref=e240]:
+                      - generic [ref=e241]:
+                        - generic [ref=e242]: dT
+                        - generic [ref=e244]: dt
+                      - generic [ref=e245]:
+                        - text: = -k(T - T
+                        - subscript [ref=e246]: s
+                        - text: )
+                  - generic [ref=e247]:
+                    - generic [ref=e248]:
+                      - generic [ref=e249]: T
+                      - generic [ref=e250]: = อุณหภูมิของวัตถุ (°C)
+                    - generic [ref=e251]:
+                      - generic [ref=e252]:
+                        - text: T
+                        - subscript [ref=e253]: s
+                      - generic [ref=e254]: = อุณหภูมิสิ่งแวดล้อม (°C)
+                    - generic [ref=e255]:
+                      - generic [ref=e256]: k
+                      - generic [ref=e257]:
+                        - text: = ค่าคงที่การเย็นตัว (s
+                        - superscript [ref=e258]: "-1"
+                        - text: )
+              - generic [ref=e259]:
+                - generic [ref=e260]: กราฟตัวอย่างการลดอุณหภูมิ
+                - img [ref=e262]:
+                  - generic [ref=e263]: "100"
+                  - generic [ref=e264]: "75"
+                  - generic [ref=e265]: "50"
+                  - generic [ref=e266]: "25"
+                  - generic [ref=e267]: Ts
+                  - generic [ref=e269]: "0"
+                  - generic [ref=e270]: "10"
+                  - generic [ref=e271]: "20"
+                  - generic [ref=e272]: "30"
+                  - generic [ref=e273]: "40"
+                  - generic [ref=e274]: เวลา (นาที)
+        - complementary [ref=e276]:
+          - generic [ref=e277]:
+            - heading "ข้อมูลห้องแล็บ" [level=3] [ref=e278]:
+              - img [ref=e279]
+              - text: ข้อมูลห้องแล็บ
+            - generic [ref=e281]:
+              - generic [ref=e282]:
+                - generic [ref=e283]:
+                  - img [ref=e284]
+                  - generic [ref=e285]: ระดับ
+                - generic [ref=e286]: ปานกลาง
+              - generic [ref=e287]:
+                - generic [ref=e288]:
+                  - img [ref=e289]
+                  - generic [ref=e292]: เวลา
+                - generic [ref=e293]: 20–30 นาที
+              - generic [ref=e294]:
+                - generic [ref=e295]:
+                  - img [ref=e296]
+                  - generic [ref=e299]: คะแนนที่ได้รับ
+                - generic [ref=e300]: +25 คะแนน
+              - generic [ref=e301]:
+                - generic [ref=e302]:
+                  - img [ref=e303]
+                  - generic [ref=e307]: ภาษา
+                - generic [ref=e308]: ไทย 🇹🇭
+          - generic [ref=e309]:
+            - generic [ref=e310]:
+              - heading "ความคืบหน้า" [level=3] [ref=e311]:
+                - img [ref=e312]
+                - text: ความคืบหน้า
+              - generic [ref=e315]: 0%
+            - generic [ref=e316]:
+              - progressbar "ความคืบหน้าการทำแล็บ" [ref=e317]
+              - paragraph [ref=e318]: ยังไม่ได้บันทึกผลทดลอง
+          - generic [ref=e319]:
+            - heading "คำแนะนำก่อนเริ่ม" [level=3] [ref=e320]:
+              - img [ref=e321]
+              - text: คำแนะนำก่อนเริ่ม
+            - list [ref=e323]:
+              - listitem [ref=e324]:
+                - paragraph [ref=e326]: ตรวจสอบอุปกรณ์ให้พร้อมและปลอดภัยก่อนกดเริ่มทำการทดลอง
+              - listitem [ref=e327]:
+                - paragraph [ref=e329]: บันทึกข้อมูลและค่าอุณหภูมิอย่างสม่ำเสมอเพื่อความแม่นยำของกราฟ
+              - listitem [ref=e330]:
+                - paragraph [ref=e332]: สังเกตและจดบันทึกสิ่งต่าง ๆ ที่เกิดขึ้นระหว่างการทดลองลงในสมุดบันทึก
+          - generic [ref=e333]:
+            - generic [ref=e335]:
+              - img [ref=e337]
+              - generic [ref=e340]:
+                - heading "ภารกิจนักวิทย์" [level=3] [ref=e341]
+                - paragraph [ref=e342]: ทำแล็บนี้ให้ครบและบันทึกผล
+            - generic [ref=e343]:
+              - progressbar "ความคืบหน้าภารกิจแล็บนี้" [ref=e344]
+              - generic [ref=e345]:
+                - generic [ref=e346]:
+                  - img [ref=e347]
+                  - text: สถานะ
+                - generic [ref=e349]: 0 / 1 ห้อง
+  - button "Open Next.js Dev Tools" [ref=e355] [cursor=pointer]:
+    - img [ref=e356]

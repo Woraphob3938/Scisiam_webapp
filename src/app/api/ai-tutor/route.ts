@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { labsById } from "@/data/labs";
+import {
+  createClient as createSupabaseServerClient,
+  isSupabaseConfigured,
+} from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 
@@ -11,6 +15,16 @@ type ChatMessage = {
 const DEFAULT_MODEL = "gemini-2.5-flash";
 const MAX_MESSAGES = 10;
 const MAX_MESSAGE_CHARS = 900;
+const REQUEST_TIMEOUT_MS = 15_000;
+const RATE_LIMIT_WINDOW_MS = 60_000;
+const RATE_LIMIT_MAX_REQUESTS = 12;
+
+const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
+type SupabaseServerClient = Awaited<ReturnType<typeof createSupabaseServerClient>>;
+type UsageContext = {
+  supabase: SupabaseServerClient | null;
+  userId: string | null;
+};
 
 function sanitizeMessages(value: unknown): ChatMessage[] {
   if (!Array.isArray(value)) return [];
@@ -47,7 +61,86 @@ function extractGeminiText(payload: unknown): string {
   return typeof text === "string" ? text.trim() : "";
 }
 
+function getClientId(request: NextRequest): string {
+  const forwardedFor = request.headers.get("x-forwarded-for");
+  if (forwardedFor) return forwardedFor.split(",")[0]?.trim() || "unknown";
+  return request.headers.get("x-real-ip") || "unknown";
+}
+
+function isRateLimited(clientId: string): boolean {
+  const now = Date.now();
+  const current = rateLimitStore.get(clientId);
+
+  if (!current || current.resetAt <= now) {
+    rateLimitStore.set(clientId, {
+      count: 1,
+      resetAt: now + RATE_LIMIT_WINDOW_MS,
+    });
+    return false;
+  }
+
+  if (current.count >= RATE_LIMIT_MAX_REQUESTS) return true;
+
+  current.count += 1;
+  return false;
+}
+
+async function createUsageContext(): Promise<UsageContext> {
+  if (!isSupabaseConfigured()) {
+    return { supabase: null, userId: null };
+  }
+
+  try {
+    const supabase = await createSupabaseServerClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    return {
+      supabase,
+      userId: user?.id || null,
+    };
+  } catch {
+    return { supabase: null, userId: null };
+  }
+}
+
+async function logAiUsage(
+  context: UsageContext,
+  input: {
+    labId: string | null;
+    model: string;
+    requestChars: number;
+    responseChars?: number;
+    latencyMs: number;
+    success: boolean;
+    errorCode?: string;
+  }
+) {
+  if (!context.supabase || !context.userId) return;
+
+  try {
+    await context.supabase
+      .from("ai_usage_events")
+      .insert({
+        user_id: context.userId,
+        lab_id: input.labId,
+        provider: "gemini",
+        model: input.model,
+        request_chars: input.requestChars,
+        response_chars: input.responseChars || 0,
+        latency_ms: input.latencyMs,
+        success: input.success,
+        error_code: input.errorCode || null,
+      })
+      .throwOnError();
+  } catch {
+    // AI responses should not fail just because analytics logging is unavailable.
+  }
+}
+
 export async function POST(request: NextRequest) {
+  const startedAt = Date.now();
   const apiKey = process.env.GEMINI_API_KEY;
   const model = process.env.GEMINI_MODEL || DEFAULT_MODEL;
 
@@ -59,6 +152,16 @@ export async function POST(request: NextRequest) {
     });
   }
 
+  if (isRateLimited(getClientId(request))) {
+    return NextResponse.json(
+      {
+        error:
+          "ส่งคำถามถี่เกินไป กรุณารอสักครู่แล้วลองถาม SciSiam AI Tutor ใหม่อีกครั้งครับ",
+      },
+      { status: 429 }
+    );
+  }
+
   const body = await request.json().catch(() => null);
   const messages = sanitizeMessages(body && typeof body === "object" ? (body as { messages?: unknown }).messages : null);
   const labId =
@@ -66,6 +169,8 @@ export async function POST(request: NextRequest) {
       ? (body as { labId: string }).labId
       : "";
   const lab = labsById[labId] || null;
+  const requestChars = messages.reduce((total, message) => total + message.content.length, 0);
+  const usageContext = await createUsageContext();
 
   if (messages.length === 0) {
     return NextResponse.json(
@@ -101,26 +206,54 @@ export async function POST(request: NextRequest) {
     parts: [{ text: m.content }],
   }));
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
-  const response = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      contents,
-      systemInstruction: {
-        parts: [{ text: instructions }],
-      },
-      generationConfig: {
-        maxOutputTokens: 1000,
-        temperature: 0.7,
-      },
-    }),
-  });
+  let response: Response;
+  let data: unknown;
 
-  const data = (await response.json().catch(() => null)) as unknown;
+  try {
+    response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-goog-api-key": apiKey,
+      },
+      signal: controller.signal,
+      body: JSON.stringify({
+        contents,
+        systemInstruction: {
+          parts: [{ text: instructions }],
+        },
+        generationConfig: {
+          maxOutputTokens: 1000,
+          temperature: 0.7,
+        },
+      }),
+    });
+    data = (await response.json().catch(() => null)) as unknown;
+  } catch (error) {
+    const isTimeout = error instanceof Error && error.name === "AbortError";
+    await logAiUsage(usageContext, {
+      labId: lab?.id || null,
+      model,
+      requestChars,
+      latencyMs: Date.now() - startedAt,
+      success: false,
+      errorCode: isTimeout ? "timeout" : "network_error",
+    });
+    return NextResponse.json(
+      {
+        error: isTimeout
+          ? "AI ใช้เวลาตอบนานเกินไป กรุณาลองถามใหม่อีกครั้งครับ"
+          : "เชื่อมต่อ Gemini API ไม่สำเร็จ กรุณาลองใหม่อีกครั้งครับ",
+      },
+      { status: isTimeout ? 504 : 502 }
+    );
+  } finally {
+    clearTimeout(timeout);
+  }
 
   if (!response.ok) {
     const errorObject = data && typeof data === "object" ? (data as { error?: { message?: string } }).error : null;
@@ -134,6 +267,15 @@ export async function POST(request: NextRequest) {
       errorMessage = `${errorMessage} (กรุณาตรวจสอบ API key หรือโควตาการใช้งาน)`;
     }
 
+    await logAiUsage(usageContext, {
+      labId: lab?.id || null,
+      model,
+      requestChars,
+      latencyMs: Date.now() - startedAt,
+      success: false,
+      errorCode: `provider_${response.status}`,
+    });
+
     return NextResponse.json(
       {
         error: errorMessage,
@@ -143,6 +285,14 @@ export async function POST(request: NextRequest) {
   }
 
   const answer = extractGeminiText(data);
+  await logAiUsage(usageContext, {
+    labId: lab?.id || null,
+    model,
+    requestChars,
+    responseChars: answer.length,
+    latencyMs: Date.now() - startedAt,
+    success: true,
+  });
 
   return NextResponse.json({
     answer:

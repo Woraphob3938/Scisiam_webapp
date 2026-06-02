@@ -14,6 +14,7 @@ import {
   Timer,
 } from "lucide-react";
 import SharedSimulationShell from "@/components/labs/simulation/SharedSimulationShell";
+import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";
 
 interface MitosisStage {
   name: string;
@@ -332,7 +333,7 @@ export default function MitosisCellCycleSimulation() {
     setPoints([]);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (points.length === 0) {
       alert("ยังไม่มีข้อมูล Mitosis สำหรับบันทึก กรุณาเริ่มจำลองหรือข้ามระยะก่อน");
       return;
@@ -348,10 +349,23 @@ export default function MitosisCellCycleSimulation() {
       dataPoints: points,
     };
 
-    localStorage.setItem("scisiam_saved_mitosis_experiment", JSON.stringify(experimentData));
-    const currentPoints = Number(localStorage.getItem("scisiam_points") || "120");
-    localStorage.setItem("scisiam_points", String(currentPoints + 25));
-    window.dispatchEvent(new Event("points-updated"));
+    await saveExperimentAndSync({
+      localStorageKey: "scisiam_saved_mitosis_experiment",
+      localPayload: experimentData,
+      labId: "mitosis-division",
+      title: "Mitosis & Cell Cycle",
+      variables: { spindleHealth, dnaIntegrity, speed },
+      liveValues: { cycleCount, cellCount, currentStage: currentStage.name, stageProgress, checkpoint },
+      graphPoints: points,
+      tableRows: points,
+      summary: {
+        totalProgress,
+        cycleCount,
+        cellCount,
+        dataPointCount: points.length,
+      },
+      score: checkpoint,
+    });
     alert("บันทึกผลการทดลอง Mitosis & Cell Cycle สำเร็จ");
   };
 
