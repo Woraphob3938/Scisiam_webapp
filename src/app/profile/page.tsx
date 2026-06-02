@@ -12,6 +12,8 @@ import {
   readLocalLearningSnapshot,
   type LearningRunSnapshot,
 } from "@/lib/supabase/learning-snapshot";
+import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
+import { SCISIAM_AUTH_EVENT } from "@/lib/supabase/auth-cache";
 import { 
   FlaskConical,
   ClipboardCheck,
@@ -44,6 +46,8 @@ interface SavedCoolingExperiment {
 
 export default function ProfilePage() {
   const { isCollapsed } = useSidebar();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true);
   const [username, setUsername] = useState("นักเรียน");
   const [isEditingName, setIsEditingName] = useState(false);
   const [tempName, setTempName] = useState("นักเรียน");
@@ -53,7 +57,7 @@ export default function ProfilePage() {
   // State to hold saved experiment from simulation (for student)
   const [savedExperiment, setSavedExperiment] = useState<SavedCoolingExperiment | null>(null);
 
-  const [points, setPoints] = useState(120);
+  const [points, setPoints] = useState(0);
   const [completedCount, setCompletedCount] = useState(0);
   const [recentRuns, setRecentRuns] = useState<LearningRunSnapshot[]>([]);
   const [activeStudentTab, setActiveStudentTab] = useState<"overview" | "rewards">("overview");
@@ -124,7 +128,7 @@ export default function ProfilePage() {
       setRecentRuns(snapshot.recentRuns);
     };
 
-    const timer = setTimeout(() => {
+    const loadProfileData = async () => {
       const storedName = localStorage.getItem("scisiam_user_name");
       const storedRole = localStorage.getItem("scisiam_user_role");
 
@@ -143,7 +147,7 @@ export default function ProfilePage() {
         setUsername(defaultName);
         setTempName(defaultName);
         setTeacherName(defaultName);
-          setTempTeacherName(defaultName);
+        setTempTeacherName(defaultName);
       }
 
       applyLearningSnapshot(readLocalLearningSnapshot());
@@ -157,21 +161,10 @@ export default function ProfilePage() {
         }
       }
 
-      // Dynamic tab selection via URL search parameters
-      const searchParams = new URLSearchParams(window.location.search);
-      const tabParam = searchParams.get("tab");
-      if (tabParam === "rewards") {
-        setActiveStudentTab("rewards");
-      } else if (tabParam === "overview") {
-        setActiveStudentTab("overview");
-      }
-
-      void loadSupabaseLearningSnapshot()
-        .then((snapshot) => {
-          if (!snapshot) return;
-
+      try {
+        const snapshot = await loadSupabaseLearningSnapshot();
+        if (snapshot) {
           applyLearningSnapshot(snapshot);
-
           if (snapshot.profile) {
             const displayName = snapshot.profile.displayName;
             setRole(snapshot.profile.role);
@@ -180,13 +173,54 @@ export default function ProfilePage() {
             setTeacherName(displayName);
             setTempTeacherName(displayName);
           }
-        })
-        .catch((error) => {
-          console.error("Failed to load Supabase profile progress", error);
-        });
-    }, 0);
+        }
+      } catch (error) {
+        console.error("Failed to load Supabase profile progress", error);
+      }
+    };
 
-    return () => clearTimeout(timer);
+    const checkAuthStatus = async () => {
+      let loggedIn = false;
+      if (isSupabaseConfigured()) {
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        loggedIn = !!user;
+      } else {
+        loggedIn = localStorage.getItem("scisiam_logged_in") === "true";
+      }
+
+      setIsLoggedIn(loggedIn);
+      
+      if (loggedIn) {
+        await loadProfileData();
+      } else {
+        // Clear all state values if not logged in
+        setPoints(0);
+        setCompletedCount(0);
+        setRecentRuns([]);
+        setSavedExperiment(null);
+      }
+      setCheckingAuth(false);
+    };
+
+    // Dynamic tab selection via URL search parameters
+    const searchParams = new URLSearchParams(window.location.search);
+    const tabParam = searchParams.get("tab");
+    if (tabParam === "rewards") {
+      setActiveStudentTab("rewards");
+    } else if (tabParam === "overview") {
+      setActiveStudentTab("overview");
+    }
+
+    void checkAuthStatus();
+
+    window.addEventListener(SCISIAM_AUTH_EVENT, checkAuthStatus);
+    window.addEventListener("storage", checkAuthStatus);
+
+    return () => {
+      window.removeEventListener(SCISIAM_AUTH_EVENT, checkAuthStatus);
+      window.removeEventListener("storage", checkAuthStatus);
+    };
   }, []);
 
   const handleSaveName = () => {
@@ -418,7 +452,31 @@ export default function ProfilePage() {
 
         {/* 4. Main Content Area */}
         <main className="w-full px-4 py-2 lg:px-8">
-          {role === "teacher" ? (
+          {checkingAuth ? (
+            <div className="flex flex-col items-center justify-center min-h-[400px] select-none">
+              <div className="w-12 h-12 rounded-full border-4 border-slate-200 border-t-indigo-600 animate-spin" />
+              <p className="text-xs font-bold text-slate-500 mt-4 leading-normal">กำลังตรวจสอบสิทธิ์...</p>
+            </div>
+          ) : !isLoggedIn ? (
+            <div className="max-w-md mx-auto my-12 bg-white/80 backdrop-blur-xl border border-slate-200/60 rounded-[32px] p-8 text-center shadow-xl hover:shadow-2xl transition-all duration-300 select-none">
+              <div className="w-20 h-20 rounded-3xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 mx-auto mb-6 shadow-sm animate-[pulse_2s_infinite]">
+                <Lock className="w-10 h-10" />
+              </div>
+              <h2 className="text-xl sm:text-2xl font-black text-slate-800 leading-normal mb-3" style={{ lineHeight: '1.4' }}>
+                โปรดเข้าสู่ระบบเพื่อเข้าใช้งานหน้าโปรไฟล์
+              </h2>
+              <p className="text-xs sm:text-sm font-bold text-slate-400 leading-relaxed mb-8">
+                บันทึกประวัติการทดลองจำลองแล็บ สะสมคะแนน XP และระดับเหรียญตราเกียรติยศ รวมถึงพูดคุยวิเคราะห์บทเรียนร่วมกับ SciSiam AI Tutor ได้เมื่อสร้างบัญชีผู้ใช้
+              </p>
+              <button
+                onClick={() => window.location.href = "/login"}
+                className="w-full py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-sm font-black rounded-2xl shadow-lg shadow-indigo-600/20 hover:shadow-indigo-600/30 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
+              >
+                <span>เข้าสู่ระบบตอนนี้</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+          ) : role === "teacher" ? (
             // ==========================================
             // TEACHER DASHBOARD (Teacher Control Panel)
             // ==========================================
