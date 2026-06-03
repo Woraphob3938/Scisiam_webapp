@@ -185,6 +185,49 @@ export type Database = {
         };
         Relationships: [];
       };
+      mission_definitions: {
+        Row: {
+          id: string;
+          title: string;
+          description: string;
+          mission_type: string;
+          target_count: number;
+          points_reward: number;
+          is_active: boolean;
+          sort_order: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
+      user_mission_progress: {
+        Row: {
+          id: string;
+          user_id: string;
+          mission_id: string;
+          progress_count: number;
+          completed_at: string | null;
+          claimed_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          user_id: string;
+          mission_id: string;
+          progress_count?: number;
+          completed_at?: string | null;
+          claimed_at?: string | null;
+        };
+        Update: {
+          progress_count?: number;
+          completed_at?: string | null;
+          claimed_at?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       ai_usage_events: {
         Row: {
           id: string;
@@ -213,6 +256,17 @@ export type Database = {
         Update: never;
         Relationships: [];
       };
+      ai_rate_limits: {
+        Row: {
+          client_key: string;
+          window_start: string;
+          request_count: number;
+          updated_at: string;
+        };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -231,6 +285,21 @@ export type Database = {
           p_duration_seconds?: number | null;
         };
         Returns: string;
+      };
+      claim_mission_reward: {
+        Args: {
+          p_mission_id: string;
+          p_progress_count?: number;
+        };
+        Returns: Json;
+      };
+      check_ai_rate_limit: {
+        Args: {
+          p_client_key: string;
+          p_window_seconds?: number;
+          p_max_requests?: number;
+        };
+        Returns: Json;
       };
     };
     Enums: {

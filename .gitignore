@@ -37,6 +37,12 @@ yarn-error.log*
 # generated app artifacts and local QA captures
 /dist/
 /qa-screenshots/
+/.playwright-cli/
+/File/
+
+# local agent/tooling workspaces
+/.agents/
+/.impeccable/
 
 # vercel
 .vercel

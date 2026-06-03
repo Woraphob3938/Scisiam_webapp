@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { Suspense, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { CheckCircle, Clock, HelpCircle, LayoutGrid } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
@@ -15,26 +15,26 @@ import { isLabReady } from "@/data/labReadiness";
 type AvailabilityFilter = "ready" | "all" | "inDevelopment";
 
 const INITIAL_VISIBLE_LABS = 12;
+const VALID_CATEGORIES: Category[] = ["All", "Physics", "Chemistry", "Biology"];
 
-export default function Home() {
+function getInitialCategory(searchParams: URLSearchParams): Category {
+  const param = searchParams.get("category");
+  if (param && VALID_CATEGORIES.includes(param as Category)) {
+    return param as Category;
+  }
+  return "All";
+}
+
+function HomeContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { isCollapsed } = useSidebar();
-  const [selectedCategory, setSelectedCategory] = useState<Category>("All");
+  const [selectedCategory, setSelectedCategory] = useState<Category>(
+    () => getInitialCategory(searchParams)
+  );
   const [availabilityFilter, setAvailabilityFilter] =
     useState<AvailabilityFilter>("ready");
   const [showAllLabs, setShowAllLabs] = useState(false);
-
-  useEffect(() => {
-    const category = new URLSearchParams(window.location.search).get("category");
-    const validCategories: Category[] = ["All", "Physics", "Chemistry", "Biology"];
-
-    if (category && validCategories.includes(category as Category)) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setSelectedCategory(category as Category);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setShowAllLabs(false);
-    }
-  }, []);
 
   const filteredLabs = useMemo(() => {
     return labsData.filter((lab) => {
@@ -239,5 +239,13 @@ export default function Home() {
         </section>
       </main>
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense>
+      <HomeContent />
+    </Suspense>
   );
 }

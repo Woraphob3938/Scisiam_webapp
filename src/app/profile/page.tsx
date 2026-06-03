@@ -19,7 +19,6 @@ import {
   ClipboardCheck,
   Award,
   Star,
-  CheckCircle,
   Lock,
   ArrowRight,
   Pencil,
@@ -62,12 +61,12 @@ export default function ProfilePage() {
   const [recentRuns, setRecentRuns] = useState<LearningRunSnapshot[]>([]);
   const [activeStudentTab, setActiveStudentTab] = useState<"overview" | "rewards">("overview");
 
-  // --- Teacher Dashboard States ---
+  // Teacher dashboard uses demo data until classroom management is connected to Supabase.
   const [teacherName, setTeacherName] = useState("ครูอรทัย");
   const [isEditingTeacherName, setIsEditingTeacherName] = useState(false);
   const [tempTeacherName, setTempTeacherName] = useState("ครูอรทัย");
 
-  // Classrooms list: ม.4/1, ม.4/2, ม.5/1, ม.5/2
+  // Demo classrooms for competition presentation mode.
   const [classrooms, setClassrooms] = useState([
     { id: 1, name: "ม.4/1", students: 36, files: 4, deadline: "อีก 2 วัน", status: "กำลังเรียน" },
     { id: 2, name: "ม.4/2", students: 34, files: 3, deadline: "อีก 4 วัน", status: "กำลังเรียน" },
@@ -75,7 +74,7 @@ export default function ProfilePage() {
     { id: 4, name: "ม.5/2", students: 38, files: 4, deadline: "อีก 7 วัน", status: "กำลังเรียน" },
   ]);
 
-  // Student Submissions Tracking
+  // Demo student submissions for teacher presentation mode.
   const [submissions, setSubmissions] = useState([
     { id: 1, name: "ด.ช. ณัฐพล มณีเนตร", room: "ม.4/1", lab: "Newton's Law of Cooling", status: "ส่งแล้ว", score: "10/10", time: "10 นาทีที่แล้ว" },
     { id: 2, name: "ด.ญ. อริศรา บุญส่ง", room: "ม.4/1", lab: "Hooke's Law of Elasticity", status: "กำลังทำ", time: "25 นาทีที่แล้ว" },
@@ -84,7 +83,7 @@ export default function ProfilePage() {
     { id: 5, name: "ด.ช. พีรพงษ์ แก้วมณี", room: "ม.5/2", lab: "Hooke's Law of Elasticity", status: "กำลังทำ", time: "3 ชั่วโมงที่แล้ว" },
   ]);
 
-  // Pending Reviews
+  // Demo pending reviews for teacher presentation mode.
   const [pendingReviews, setPendingReviews] = useState([
     { id: 101, name: "ด.ช. ศักดิ์สิทธิ์ มีชัย", room: "ม.4/1", lab: "Hooke's Law of Elasticity", time: "31 พ.ค. 13:10", data: { mass: "150g", elongation: "4.5cm", k: "32.6 N/m", conclusion: "ความยืดหยุ่นของสปริงเป็นไปตามกฎของฮุกอย่างชัดเจน ค่าคงตัวสปริงที่คำนวณได้มีความถูกต้อง" } },
     { id: 102, name: "ด.ญ. รุ่งนภา สมบูรณ์", room: "ม.4/2", lab: "Ohm's Law & DC Circuits", time: "31 พ.ค. 12:45", data: { voltage: "6.0V", current: "0.2A", resistance: "30.0Ω", conclusion: "กระแสไฟฟ้าที่ไหลผ่านตัวต้านทานแปรผันตรงกับความต่างศักย์ไฟฟ้าที่ป้อนเข้ามาตามทฤษฎี" } },
@@ -92,7 +91,7 @@ export default function ProfilePage() {
     { id: 104, name: "ด.ญ. วาสนา รุ่งเรือง", room: "ม.5/2", lab: "Ohm's Law & DC Circuits", time: "30 พ.ค. 16:30", data: { voltage: "12.0V", current: "0.4A", resistance: "30.0Ω", conclusion: "ความชันของกราฟความสัมพันธ์ระหว่าง V และ I คือค่าความต้านทานไฟฟ้าของวงจร" } },
   ]);
 
-  // Recent Teacher Activities Timeline
+  // Demo teacher activities timeline for teacher presentation mode.
   const [teacherActivities, setTeacherActivities] = useState([
     { id: 1, time: "13:00 น.", title: 'มอบหมายงาน "Hooke\'s Law of Elasticity" ให้ห้อง ม.4/1 และ ม.4/2', type: "assign" },
     { id: 2, time: "11:15 น.", title: 'ตรวจรายงานจำลองการทดลอง "Newton\'s Law of Cooling" ของ ม.5/1 (15 รายงาน)', type: "grade" },
@@ -207,9 +206,9 @@ export default function ProfilePage() {
     const searchParams = new URLSearchParams(window.location.search);
     const tabParam = searchParams.get("tab");
     if (tabParam === "rewards") {
-      setActiveStudentTab("rewards");
+      setTimeout(() => setActiveStudentTab("rewards"), 0);
     } else if (tabParam === "overview") {
-      setActiveStudentTab("overview");
+      setTimeout(() => setActiveStudentTab("overview"), 0);
     }
 
     void checkAuthStatus();
@@ -309,7 +308,7 @@ export default function ProfilePage() {
     }, 1500);
   };
 
-  // --- Student Dashboard Mock Data ---
+  // Student dashboard derives real progress from Supabase first, then local prototype cache.
   const studentStats = useMemo(() => {
     return [
       {
@@ -361,28 +360,6 @@ export default function ProfilePage() {
       icon: FlaskConical,
       iconColor: "text-blue-500 bg-blue-50/80 border border-blue-100/50"
     }));
-
-    // Default fallbacks if empty
-    if (list.length === 0) {
-      list.push({
-        id: "fallback-lab",
-        title: "เข้าเรียนรู้ห้องแล็บ การเคลื่อนที่แบบโปรเจกไตล์",
-        subtitle: "ได้รับ 10 คะแนน",
-        points: "+10",
-        time: "2 วันที่แล้ว",
-        icon: BookOpen,
-        iconColor: "text-blue-500 bg-blue-50/80 border border-blue-100/50"
-      });
-      list.push({
-        id: "fallback-mission",
-        title: "ทำภารกิจ นักวิทย์ตัวน้อย สำเร็จ",
-        subtitle: "ได้รับ 20 คะแนน",
-        points: "+20",
-        time: "3 วันที่แล้ว",
-        icon: CheckCircle,
-        iconColor: "text-emerald-500 bg-emerald-50/80 border border-emerald-100/50"
-      });
-    }
 
     return list;
   }, [recentRuns]);
@@ -548,8 +525,14 @@ export default function ProfilePage() {
                       )}
                     </div>
                     <p className="text-xs text-slate-500 font-bold mt-1 select-none">
-                      ไอดีผู้ใช้: <span className="text-slate-500">teacher_orathai_siam</span>
+                      ไอดีผู้ใช้: <span className="text-slate-500">teacher_demo_scisiam</span>
                     </p>
+                    <div className="mt-3 inline-flex max-w-full items-start gap-2 rounded-2xl border border-amber-200/70 bg-amber-50/80 px-3.5 py-2 text-left text-[11px] font-bold leading-relaxed text-amber-700 shadow-xs">
+                      <GraduationCap className="mt-0.5 h-4 w-4 shrink-0" />
+                      <span>
+                        โหมดสาธิตสำหรับแข่งขัน: ข้อมูลห้องเรียน การส่งงาน และงานรอตรวจเป็นตัวอย่าง UI ก่อนเชื่อมระบบห้องเรียนจริง
+                      </span>
+                    </div>
 
                     {/* Overall metrics pills block */}
                     <div className="mt-4 flex flex-wrap gap-2 justify-center sm:justify-start">
@@ -1266,7 +1249,18 @@ export default function ProfilePage() {
                     </div>
 
                     <div className="space-y-3.5">
-                      {studentActivities.map((act) => {
+                      {studentActivities.length === 0 ? (
+                        <div className="rounded-3xl border border-dashed border-slate-200 bg-slate-50/50 px-5 py-8 text-center">
+                          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-indigo-100 bg-indigo-50 text-indigo-500">
+                            <Activity className="h-5 w-5" />
+                          </div>
+                          <h4 className="mt-3 text-sm font-black text-slate-700">ยังไม่มีกิจกรรมล่าสุด</h4>
+                          <p className="mx-auto mt-1 max-w-sm text-xs font-bold leading-relaxed text-slate-500">
+                            เมื่อเริ่มทดลองและบันทึกผล ระบบจะแสดงประวัติกิจกรรมจริงของคุณที่นี่
+                          </p>
+                        </div>
+                      ) : (
+                        studentActivities.map((act) => {
                         const Icon = act.icon;
                         return (
                           <div 
@@ -1297,7 +1291,8 @@ export default function ProfilePage() {
                             </div>
                           </div>
                         );
-                      })}
+                        })
+                      )}
                     </div>
                   </section>
 

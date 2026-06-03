@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createHash } from "node:crypto";
 import { labsById } from "@/data/labs";
 import {
   createClient as createSupabaseServerClient,
@@ -24,6 +25,13 @@ type SupabaseServerClient = Awaited<ReturnType<typeof createSupabaseServerClient
 type UsageContext = {
   supabase: SupabaseServerClient | null;
   userId: string | null;
+};
+type RateLimitRpcResult = {
+  ok?: boolean;
+  allowed?: boolean;
+  resetAt?: string;
+  requestCount?: number;
+  maxRequests?: number;
 };
 
 function sanitizeMessages(value: unknown): ChatMessage[] {
@@ -67,7 +75,16 @@ function getClientId(request: NextRequest): string {
   return request.headers.get("x-real-ip") || "unknown";
 }
 
-function isRateLimited(clientId: string): boolean {
+function getRateLimitKey(request: NextRequest): string {
+  const rawClient = [
+    getClientId(request),
+    request.headers.get("user-agent") || "unknown-agent",
+  ].join(":");
+
+  return createHash("sha256").update(rawClient).digest("hex");
+}
+
+function isMemoryRateLimited(clientId: string): boolean {
   const now = Date.now();
   const current = rateLimitStore.get(clientId);
 
@@ -83,6 +100,27 @@ function isRateLimited(clientId: string): boolean {
 
   current.count += 1;
   return false;
+}
+
+async function isRateLimited(clientKey: string, context: UsageContext): Promise<boolean> {
+  if (context.supabase) {
+    try {
+      const { data, error } = await context.supabase.rpc("check_ai_rate_limit", {
+        p_client_key: clientKey,
+        p_window_seconds: Math.ceil(RATE_LIMIT_WINDOW_MS / 1000),
+        p_max_requests: RATE_LIMIT_MAX_REQUESTS,
+      });
+      const result = data as RateLimitRpcResult | null;
+
+      if (!error && result?.ok === true) {
+        return result.allowed === false;
+      }
+    } catch {
+      // Fall through to in-memory protection when Supabase is unavailable.
+    }
+  }
+
+  return isMemoryRateLimited(clientKey);
 }
 
 async function createUsageContext(): Promise<UsageContext> {
@@ -152,7 +190,9 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  if (isRateLimited(getClientId(request))) {
+  const usageContext = await createUsageContext();
+
+  if (await isRateLimited(getRateLimitKey(request), usageContext)) {
     return NextResponse.json(
       {
         error:
@@ -170,8 +210,6 @@ export async function POST(request: NextRequest) {
       : "";
   const lab = labsById[labId] || null;
   const requestChars = messages.reduce((total, message) => total + message.content.length, 0);
-  const usageContext = await createUsageContext();
-
   if (messages.length === 0) {
     return NextResponse.json(
       { error: "กรุณาพิมพ์คำถามก่อนส่งข้อความ" },

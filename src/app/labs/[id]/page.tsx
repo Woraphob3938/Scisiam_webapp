@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useMemo, useState, useEffect } from "react";
+import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Breadcrumb from "@/components/labs/Breadcrumb";
@@ -10,9 +11,11 @@ import EquipmentList from "@/components/labs/EquipmentList";
 import ExperimentSteps from "@/components/labs/ExperimentSteps";
 import TheoryCard from "@/components/labs/TheoryCard";
 import LabSidebar from "@/components/labs/LabSidebar";
-import { ClipboardList, Target, X, CheckCircle, Sliders, Thermometer, Sun, Zap, RefreshCw, Play } from "lucide-react";
+import type { LabData } from "@/components/LabCard";
+import { ClipboardList, Target, X, CheckCircle, Sliders, Thermometer, Sun, Zap, RefreshCw, Play, AlertTriangle, Home } from "lucide-react";
 
 import { labsById } from "@/data/labs";
+import { getLabDetails, type LabDetailData } from "@/data/labDetails";
 
 const DEFAULT_LAB_ID = "newtons-cooling";
 const SAVED_EXPERIMENT_KEYS: Record<string, string> = {
@@ -120,11 +123,59 @@ interface SavedExperiment {
 
 export default function LabDetailPage() {
   const params = useParams();
-  const router = useRouter();
   const labId = (params?.id as string) || DEFAULT_LAB_ID;
+  const lab = labsById[labId];
+  const details = getLabDetails(labId);
+
+  if (!lab || !details) {
+    return <InvalidLabDetail labId={labId} />;
+  }
+
+  return <LabDetailContent labId={labId} lab={lab} details={details} />;
+}
+
+function InvalidLabDetail({ labId }: { labId: string }) {
+  return (
+    <div className="flex min-h-screen flex-col bg-[#f8fafc]">
+      <Navbar />
+      <main className="flex flex-1 items-center justify-center px-4 py-12">
+        <section className="w-full max-w-lg rounded-3xl border border-slate-200 bg-white p-6 text-center shadow-sm sm:p-8">
+          <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border border-amber-100 bg-amber-50 text-amber-600">
+            <AlertTriangle className="h-8 w-8" />
+          </div>
+          <p className="mb-2 text-xs font-bold uppercase text-slate-400">
+            Lab not found
+          </p>
+          <h1 className="text-2xl font-black leading-relaxed text-slate-900">
+            ไม่พบห้องแล็บนี้ใน SciSiam
+          </h1>
+          <p className="mt-3 text-sm font-semibold leading-relaxed text-slate-500">
+            รหัสแล็บ <span className="font-mono text-slate-700">{labId}</span> ไม่มีอยู่ในรายการห้องแล็บของโปรเจกต์ จึงไม่แสดงเนื้อหาของห้องอื่นแทนเพื่อป้องกันข้อมูลผิดหัวข้อ
+          </p>
+          <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:justify-center">
+            <Link
+              href="/"
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-blue-700"
+            >
+              <Home className="h-4 w-4" />
+              กลับหน้ารายชื่อห้องแล็บ
+            </Link>
+          </div>
+        </section>
+      </main>
+    </div>
+  );
+}
+
+interface LabDetailContentProps {
+  labId: string;
+  lab: LabData;
+  details: LabDetailData;
+}
+
+function LabDetailContent({ labId, lab, details }: LabDetailContentProps) {
+  const router = useRouter();
   const isOhmsLaw = labId === "ohms-law";
-  const isHookesLaw = labId === "hookes-law";
-  const isAcidBase = labId === "acid-base-titration";
   const isBoylesLaw = labId === "boyles-law";
   const isCharlesLaw = labId === "charles-law";
   const isPhotosynthesis = labId === "photosynthesis-rate";
@@ -141,33 +192,51 @@ export default function LabDetailPage() {
   const isColligative = labId === "colligative-properties";
   const isSharedChemistryLab = isGalvanicCell || isChemicalKinetics || isSolubilityProduct || isAvogadrosLaw || isElectrolysis || isColligative;
 
-  // Fallback to Newton's Law of Cooling as primary demo
-  const lab = labsById[labId] || labsById[DEFAULT_LAB_ID];
-
   // Saved experiment history state
   const [savedData, setSavedData] = useState<SavedExperiment | null>(null);
 
   useEffect(() => {
-    const key = SAVED_EXPERIMENT_KEYS[labId] ?? SAVED_EXPERIMENT_KEYS[DEFAULT_LAB_ID];
+    let cancelled = false;
+    const commitSavedData = (value: SavedExperiment | null) => {
+      queueMicrotask(() => {
+        if (!cancelled) {
+          setSavedData(value);
+        }
+      });
+    };
+
+    const key = SAVED_EXPERIMENT_KEYS[labId];
+    if (!key) {
+      commitSavedData(null);
+      return () => {
+        cancelled = true;
+      };
+    }
+
     const raw = localStorage.getItem(key);
     if (raw) {
       try {
         const parsed = JSON.parse(raw) as SavedExperiment;
         if (parsed && parsed.labId === labId) {
-          // eslint-disable-next-line react-hooks/set-state-in-effect
-          setSavedData(parsed);
+          commitSavedData(parsed);
         }
       } catch (e) {
         console.error("Failed to parse saved experiment", e);
       }
     } else {
-      setSavedData(null);
+      commitSavedData(null);
     }
+
+    return () => {
+      cancelled = true;
+    };
   }, [labId]);
 
   const handleClearSavedData = () => {
     if (confirm("คุณต้องการลบประวัติผลการทดลองที่บันทึกไว้ล่าสุดหรือไม่?")) {
-      const key = SAVED_EXPERIMENT_KEYS[labId] ?? SAVED_EXPERIMENT_KEYS[DEFAULT_LAB_ID];
+      const key = SAVED_EXPERIMENT_KEYS[labId];
+      if (!key) return;
+
       localStorage.removeItem(key);
       setSavedData(null);
     }
@@ -370,134 +439,14 @@ export default function LabDetailPage() {
                 icon={ClipboardList}
                 iconBg="bg-blue-50"
                 iconColor="text-blue-600"
-                bullets={isMitosis ? [
-                  "ศึกษาลำดับระยะของวัฏจักรเซลล์และการแบ่งนิวเคลียสแบบไมโทซิส",
-                  "สังเกตการขดตัว การเรียงตัว และการแยกของโครโมโซมในแต่ละระยะ",
-                  "วิเคราะห์บทบาทของ checkpoint ที่ช่วยลดข้อผิดพลาดระหว่างการแบ่งเซลล์"
-                ] : isMendelian ? [
-                  "ศึกษาการถ่ายทอดลักษณะทางพันธุกรรมแบบยีนเดียวตามกฎของเมนเดล",
-                  "ใช้ตาราง Punnett คาดการณ์จีโนไทป์และฟีโนไทป์ของรุ่นลูก",
-                  "เปรียบเทียบสัดส่วนที่สุ่มได้กับสัดส่วนทางทฤษฎี เช่น 3:1 หรือ 1:2:1"
-                ] : isPhotosynthesis ? [
-                  "ศึกษาปัจจัยที่มีผลต่ออัตราการสังเคราะห์แสง ได้แก่ ความเข้มแสง CO₂ อุณหภูมิ และน้ำ",
-                  "ติดตามการเกิดออกซิเจนใน chamber พืชแบบปิดเพื่อประเมินอัตราปฏิกิริยา",
-                  "เปรียบเทียบกราฟ rate-time เพื่อระบุปัจจัยจำกัดของกระบวนการสังเคราะห์แสง"
-                ] : isCharlesLaw ? [
-                  "ศึกษาความสัมพันธ์เชิงเส้นระหว่างอุณหภูมิสัมบูรณ์ (T) และปริมาตร (V) ของแก๊สที่ความดันคงที่",
-                  "ปรับอุณหภูมิของอ่างน้ำควบคุมและสังเกตการขยายตัวของแก๊สในกระบอกลูกสูบ",
-                  "สร้างกราฟ V-T และตรวจสอบว่าอัตราส่วน V/T มีค่าใกล้คงที่ตามกฎของชาร์ล"
-                ] : isBoylesLaw ? [
-                  "ศึกษาความสัมพันธ์ผกผันระหว่างความดัน (P) และปริมาตร (V) ของแก๊สที่อุณหภูมิคงที่",
-                  "ปรับลูกสูบในกระบอกแก๊สเพื่อเปลี่ยนปริมาตรและสังเกตค่าความดันจากเกจ",
-                  "สร้างกราฟ P-V และตรวจสอบว่าผลคูณ PV มีค่าใกล้คงที่ตามกฎของบอยล์"
-                ] : isAcidBase ? [
-                  "ศึกษากระบวนการไทเทรตกรด-เบสด้วยบิวเรต ขวดรูปชมพู่ และอินดิเคเตอร์",
-                  "ติดตามค่า pH และการเปลี่ยนสีของสารละลายเมื่อหยดสารมาตรฐานลงทีละช่วง",
-                  "วิเคราะห์จุดสมมูลจากกราฟ pH-volume เพื่อหาความเข้มข้นของสารตัวอย่าง"
-                ] : isHookesLaw ? [
-                  "ศึกษาความสัมพันธ์ระหว่างแรงดึง (F) กับระยะยืดของสปริง (x)",
-                  "เพิ่มตุ้มน้ำหนักทีละขั้นและวัดระยะยืดของสปริงจากตำแหน่งสมดุล",
-                  "สร้างกราฟ F-x เพื่อหาค่าคงที่สปริง (k) จากความชันของเส้นกราฟ"
-                ] : isOhmsLaw ? [
-                  "ศึกษาความสัมพันธ์ของกระแสไฟฟ้า แรงดันไฟฟ้า และความต้านทานไฟฟ้า",
-                  "ปรับค่าแรงดันตกคร่อมตัวต้านทานและบันทึกกระแสไฟฟ้าที่ไหลผ่าน",
-                  "สร้างกราฟความสัมพันธ์ระหว่างแรงดันและกระแสเพื่อยืนยันกฎของโอห์ม"
-                ] : isGalvanicCell ? [
-                  "ศึกษาการสร้างแรงดันไฟฟ้าจากปฏิกิริยารีดอกซ์ในเซลล์กัลวานิก",
-                  "ประกอบครึ่งเซลล์ ขั้วไฟฟ้า และสะพานเกลือเพื่อควบคุมการไหลของอิเล็กตรอน",
-                  "เปรียบเทียบแรงดันเซลล์เมื่อเปลี่ยนความเข้มข้นของไอออนและสัดส่วน Q"
-                ] : isChemicalKinetics ? [
-                  "ศึกษาปัจจัยที่มีผลต่ออัตราการเกิดปฏิกิริยา เช่น ความเข้มข้นและอุณหภูมิ",
-                  "ติดตามการเปลี่ยนสีหรือความขุ่นตามเวลาเพื่อประมาณค่า reaction rate",
-                  "สร้างกราฟ rate-concentration เพื่อวิเคราะห์แนวโน้มของกฎอัตรา"
-                ] : isSolubilityProduct ? [
-                  "ศึกษาสมดุลการละลายของเกลือที่ละลายน้ำได้น้อยผ่านค่า Ksp",
-                  "ผสมสารละลายไอออนและสังเกตจุดเริ่มเกิดตะกอนเมื่อ Qsp เกิน Ksp",
-                  "คำนวณ ion product และเปรียบเทียบกับค่าคงที่ผลคูณการละลาย"
-                ] : isAvogadrosLaw ? [
-                  "ศึกษาปริมาตรโมลาร์ของแก๊สจากปริมาตรที่เก็บได้และจำนวนโมลของสารตั้งต้น",
-                  "ปรับเทียบอุณหภูมิและความดันเพื่อประเมินปริมาตรแก๊สที่สภาวะมาตรฐาน",
-                  "วิเคราะห์ความสัมพันธ์เชิงเส้นระหว่างจำนวนโมลและปริมาตรแก๊ส"
-                ] : isElectrolysis ? [
-                  "ศึกษาการใช้กระแสไฟฟ้าบังคับปฏิกิริยารีดอกซ์ในเซลล์อิเล็กโทรไลซิส",
-                  "สังเกตการเคลือบโลหะบนแคโทดเมื่อปรับกระแสและเวลาในการชุบ",
-                  "คำนวณมวลโลหะที่ชุบจากประจุไฟฟ้ารวมตามกฎของฟาราเดย์"
-                ] : isColligative ? [
-                  "ศึกษาสมบัติคอลลิเกทีฟของสารละลายจากจำนวนอนุภาคตัวละลาย",
-                  "ปรับ molality และ van't Hoff factor เพื่อดูผลต่อจุดเดือดและจุดเยือกแข็ง",
-                  "สร้างกราฟ ΔT-molality เพื่อสรุปผลของตัวละลายต่ออุณหภูมิเปลี่ยนเฟส"
-                ] : [
-                  "ศึกษาการลดลงของอุณหภูมิของวัตถุร้อนในสภาพแวดล้อมควบคุมความเย็น",
-                  "เก็บข้อมูลอุณหภูมิของวัตถุตามช่วงเวลาเพื่อสังเกตแนวโน้ม",
-                  "วิเคราะห์และเปรียบเทียบผลลัพธ์กับสมการของกฎการเย็นตัวของนิวตัน"
-                ]}
+                bullets={details.overviewBullets}
               />
               <InfoCard
                 title="วัตถุประสงค์การเรียนรู้"
                 icon={Target}
                 iconBg="bg-emerald-50"
                 iconColor="text-emerald-600"
-                bullets={isMitosis ? [
-                  "จำแนกระยะ Interphase, Prophase, Metaphase, Anaphase, Telophase และ Cytokinesis ได้",
-                  "อธิบายการแยกโครมาทิดและการเกิดเซลล์ลูกที่มีชุดโครโมโซมเหมือนเดิมได้",
-                  "เชื่อมโยง checkpoint กับความถูกต้องของการแบ่งเซลล์ได้"
-                ] : isMendelian ? [
-                  "อธิบายความแตกต่างของ genotype และ phenotype ได้อย่างถูกต้อง",
-                  "คำนวณและตีความผลจากตาราง Punnett สำหรับการผสมแบบ monohybrid ได้",
-                  "วิเคราะห์ความคลาดเคลื่อนระหว่างผลสุ่มกับค่าทฤษฎีเมื่อจำนวนตัวอย่างเปลี่ยนได้"
-                ] : isPhotosynthesis ? [
-                  "อธิบายสมการสังเคราะห์แสงและบทบาทของแสง CO₂ และน้ำได้",
-                  "อ่านค่าอัตราการเกิดออกซิเจนและตีความสภาวะที่เหมาะสมของพืชได้",
-                  "วิเคราะห์แนวคิดปัจจัยจำกัดเมื่อปรับตัวแปรแวดล้อมทีละตัวได้"
-                ] : isCharlesLaw ? [
-                  "อธิบายกฎของชาร์ล V₁/T₁ = V₂/T₂ ได้เมื่อความดันและจำนวนโมลคงที่",
-                  "อ่านค่าอุณหภูมิ ปริมาตร และแปลงอุณหภูมิเป็นหน่วยเคลวินได้ถูกต้อง",
-                  "วิเคราะห์กราฟเส้นตรง V-T และตรวจสอบค่า V/T จากข้อมูลทดลองได้"
-                ] : isBoylesLaw ? [
-                  "อธิบายกฎของบอยล์ P₁V₁ = P₂V₂ ได้เมื่ออุณหภูมิและจำนวนโมลคงที่",
-                  "อ่านค่าปริมาตรกระบอกแก๊สและความดันจากเกจเพื่อบันทึกข้อมูลได้",
-                  "วิเคราะห์กราฟความสัมพันธ์ผกผันและตรวจสอบค่า PV จากข้อมูลทดลองได้"
-                ] : isAcidBase ? [
-                  "อธิบายหลักสโตอิชิโอเมทรีของปฏิกิริยากรด-เบสที่จุดสมมูลได้",
-                  "อ่านค่า pH และปริมาตรสารมาตรฐานจากบิวเรตเพื่อคำนวณความเข้มข้นได้",
-                  "ตีความรูปทรงกราฟไทเทรชันและช่วงเปลี่ยนสีของอินดิเคเตอร์ได้อย่างถูกต้อง"
-                ] : isHookesLaw ? [
-                  "อธิบายหลักการของกฎของฮุค F = -kx ได้อย่างถูกต้อง",
-                  "รู้วิธีติดตั้งอุปกรณ์สปริง ตุ้มน้ำหนัก และวัดระยะยืดอย่างแม่นยำ",
-                  "สามารถคำนวณค่าคงที่สปริง (k) จากความชันของกราฟ F-x ได้"
-                ] : isOhmsLaw ? [
-                  "อธิบายความสัมพันธ์ตามกฎของโอห์ม V = I x R ได้อย่างถูกต้อง",
-                  "รู้วิธีต่อและใช้งานเครื่องจ่ายแรงดัน แอมมิเตอร์ และโวลต์มิเตอร์ในวงจรปิด",
-                  "สามารถคำนวณและวิเคราะห์ความต้านทานจากความชัน (Slope) ของกราฟได้"
-                ] : isGalvanicCell ? [
-                  "อธิบายบทบาทของแอโนด แคโทด สะพานเกลือ และโวลต์มิเตอร์ในเซลล์กัลวานิกได้",
-                  "คำนวณ Ecell จากศักย์รีดักชันมาตรฐานและอธิบายผลของความเข้มข้นได้",
-                  "เชื่อมโยงทิศทางการไหลของอิเล็กตรอนกับสมการออกซิเดชัน-รีดักชันได้"
-                ] : isChemicalKinetics ? [
-                  "อธิบายกฎอัตรา rate = k[A]^m[B]^n และความหมายของอันดับปฏิกิริยาได้",
-                  "วิเคราะห์ผลของอุณหภูมิและความเข้มข้นต่ออัตราปฏิกิริยาตามทฤษฎีการชนได้",
-                  "อ่านกราฟ rate-concentration เพื่อสรุปแนวโน้มของข้อมูลทดลองได้"
-                ] : isSolubilityProduct ? [
-                  "คำนวณ Qsp และ Ksp จากความเข้มข้นของไอออนในสารละลายได้",
-                  "ตัดสินได้ว่าสารละลายไม่อิ่มตัว อิ่มตัว หรือเกิดตะกอนจาก Qsp/Ksp",
-                  "อธิบายสมดุลการละลายของเกลือละลายน้ำได้น้อยได้อย่างถูกต้อง"
-                ] : isAvogadrosLaw ? [
-                  "คำนวณจำนวนโมลของแก๊สจากมวลสารตั้งต้นและสโตอิชิโอเมทรีได้",
-                  "ปรับเทียบปริมาตรแก๊สด้วยอุณหภูมิและความดันตามกฎแก๊สอุดมคติได้",
-                  "ประเมินค่า molar volume และเปรียบเทียบกับค่าประมาณ 22.4 L/mol ได้"
-                ] : isElectrolysis ? [
-                  "อธิบายการเคลื่อนที่ของไอออนและการเกิดโลหะเคลือบที่แคโทดได้",
-                  "คำนวณประจุไฟฟ้า Q = It และมวลโลหะตามกฎของฟาราเดย์ได้",
-                  "วิเคราะห์ผลของกระแสและเวลาในการชุบต่อปริมาณโลหะที่เกิดขึ้นได้"
-                ] : isColligative ? [
-                  "อธิบายการลดจุดเยือกแข็งและการเพิ่มจุดเดือดจากสมบัติคอลลิเกทีฟได้",
-                  "คำนวณ ΔT จาก i, K และ molality ของสารละลายได้",
-                  "เปรียบเทียบผลของตัวละลายแตกตัวและไม่แตกตัวผ่าน van't Hoff factor ได้"
-                ] : [
-                  "อธิบายหลักทฤษฎีกฎการเย็นตัวของนิวตันได้อย่างถูกต้อง",
-                  "รู้วิธีเก็บและบันทึกข้อมูลอุณหภูมิในระบบแล็บฟิสิกส์ได้อย่างแม่นยำ",
-                  "สามารถวิเคราะห์เส้นโค้งกราฟและตีความค่าคงที่อัตราการเย็นตัวได้"
-                ]}
+                bullets={details.learningObjectives}
               />
             </div>
 

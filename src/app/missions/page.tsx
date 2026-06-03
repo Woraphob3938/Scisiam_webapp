@@ -8,6 +8,7 @@ import DecorativeBackground from "@/components/labs/DecorativeBackground";
 import Sidebar from "@/components/Sidebar";
 import { useSidebar } from "@/context/SidebarContext";
 import { loadSupabaseLearningSnapshot, readLocalLearningSnapshot } from "@/lib/supabase/learning-snapshot";
+import { claimMissionReward, loadClaimedMissionIds } from "@/lib/supabase/missions";
 import { 
   Star,
   ArrowRight,
@@ -33,6 +34,7 @@ export default function MissionsPage() {
   const [points, setPoints] = useState(120);
   const [completedCount, setCompletedCount] = useState(0);
   const [claimedMissions, setClaimedMissions] = useState<Record<string, boolean>>({});
+  const [claimingMissionId, setClaimingMissionId] = useState<string | null>(null);
   
   // Labs status checked dynamically
   const [hasOhms, setHasOhms] = useState(false);
@@ -41,9 +43,9 @@ export default function MissionsPage() {
   const [hasHess, setHasHess] = useState(false);
 
   // Toast feedback state
-  const [toast, setToast] = useState<{ message: string; type: "success" | "info" } | null>(null);
+  const [toast, setToast] = useState<{ message: string; type: "success" | "info" | "error" } | null>(null);
 
-  const showToast = (message: string, type: "success" | "info" = "success") => {
+  const showToast = (message: string, type: "success" | "info" | "error" = "success") => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3500);
   };
@@ -62,31 +64,16 @@ export default function MissionsPage() {
     const loadData = () => {
       applyLearningSnapshot(readLocalLearningSnapshot());
 
-      // Load claimed missions state
-      const claimed: Record<string, boolean> = {};
-      const missionIds = [
-        "daily-login", 
-        "daily-science-1", 
-        "daily-science-3", 
-        "ach-first-lab", 
-        "ach-five-labs", 
-        "ach-point-collector", 
-        "quest-ohms", 
-        "quest-cooling", 
-        "quest-equilibrium", 
-        "quest-hesss"
-      ];
-      
-      missionIds.forEach(id => {
-        claimed[id] = localStorage.getItem(`scisiam_claimed_mission_${id}`) === "true";
-      });
-      setClaimedMissions(claimed);
-
       void loadSupabaseLearningSnapshot()
-        .then((snapshot) => {
+        .then(async (snapshot) => {
           if (snapshot) {
             applyLearningSnapshot(snapshot);
           }
+
+          const claimedIds = await loadClaimedMissionIds();
+          setClaimedMissions(
+            Object.fromEntries(claimedIds.map((id) => [id, true]))
+          );
         })
         .catch((error) => {
           console.error("Failed to load Supabase mission progress", error);
@@ -224,25 +211,42 @@ export default function MissionsPage() {
   const achievements = useMemo(() => missionsList.filter(m => m.type === "achievement"), [missionsList]);
 
   // Claim handler
-  const handleClaimReward = (id: string, rewardPoints: number, title: string) => {
-    if (claimedMissions[id] || !missionsList.find(m => m.id === id)?.isCompleted) return;
+  const handleClaimReward = async (id: string, title: string) => {
+    const mission = missionsList.find((item) => item.id === id);
+    if (claimingMissionId || claimedMissions[id] || !mission?.isCompleted) return;
 
-    // Update state
-    const nextPoints = points + rewardPoints;
-    setPoints(nextPoints);
+    setClaimingMissionId(id);
 
-    const nextClaimed = { ...claimedMissions, [id]: true };
-    setClaimedMissions(nextClaimed);
+    try {
+      const result = await claimMissionReward({
+        missionId: id,
+        progressCount: mission.progress,
+      });
 
-    // Save to localStorage
-    localStorage.setItem("scisiam_points", String(nextPoints));
-    localStorage.setItem(`scisiam_claimed_mission_${id}`, "true");
+      if (result.ok) {
+        setPoints(result.totalPoints);
+        setClaimedMissions((current) => ({ ...current, [id]: true }));
+        const message = result.alreadyClaimed
+          ? `ภารกิจ "${title}" รับรางวัลไปแล้ว`
+          : `รับรางวัลสำเร็จ! +${result.pointsAwarded} XP จากภารกิจ "${title}"`;
+        showToast(message, "success");
+        return;
+      }
 
-    // Trigger auth-update event for header syncing
-    window.dispatchEvent(new Event("scisiam-auth-update"));
+      if (result.reason === "signed_out" || result.reason === "not_configured") {
+        showToast("เข้าสู่ระบบก่อนรับรางวัล เพื่อบันทึกคะแนนจริงลงบัญชี SciSiam", "info");
+        return;
+      }
 
-    // Toast message
-    showToast(`รับรางวัลสำเร็จ! +${rewardPoints} XP จากภารกิจ "${title}" 🎉`);
+      if (result.reason === "not_completed") {
+        showToast("ภารกิจนี้ยังไม่ครบเงื่อนไข ลองทำแล็บและบันทึกผลเพิ่มอีกนิดครับ", "info");
+        return;
+      }
+
+      showToast(result.message || "รับรางวัลไม่สำเร็จ กรุณาลองใหม่อีกครั้ง", "error");
+    } finally {
+      setClaimingMissionId(null);
+    }
   };
 
   return (
@@ -396,14 +400,16 @@ export default function MissionsPage() {
                             <span className="px-4 py-2.5 inline-block text-xs font-black text-slate-400 bg-slate-100 rounded-xl select-none cursor-default">
                               รับแล้ว ✓
                             </span>
-                          ) : mission.isCompleted ? (
-                            <button
-                              onClick={() => handleClaimReward(mission.id, mission.rewardPoints, mission.title)}
-                              className="px-4 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-xs font-black rounded-xl shadow-md shadow-orange-500/10 hover:scale-[1.03] active:scale-[0.97] transition-all cursor-pointer flex items-center gap-1.5"
-                            >
-                              <Gift className="w-3.5 h-3.5" />
-                              <span>รับรางวัล +{mission.rewardPoints} XP</span>
-                            </button>
+                              ) : mission.isCompleted ? (
+                                <button
+                                  type="button"
+                                  disabled={claimingMissionId === mission.id}
+                                  onClick={() => handleClaimReward(mission.id, mission.title)}
+                                  className="px-4 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-xs font-black rounded-xl shadow-md shadow-orange-500/10 hover:scale-[1.03] active:scale-[0.97] transition-all cursor-pointer flex items-center gap-1.5 disabled:cursor-wait disabled:opacity-70"
+                                >
+                                  <Gift className="w-3.5 h-3.5" />
+                                  <span>{claimingMissionId === mission.id ? "กำลังบันทึก..." : `รับรางวัล +${mission.rewardPoints} XP`}</span>
+                                </button>
                           ) : (
                             <span className="px-4 py-2.5 inline-block text-xs font-bold text-slate-400 bg-slate-100/60 rounded-xl select-none cursor-default">
                               กำลังทำ...
@@ -475,14 +481,16 @@ export default function MissionsPage() {
                             <span className="px-4 py-2.5 inline-block text-xs font-black text-slate-400 bg-slate-100 rounded-xl select-none cursor-default">
                               รับแล้ว ✓
                             </span>
-                          ) : mission.isCompleted ? (
-                            <button
-                              onClick={() => handleClaimReward(mission.id, mission.rewardPoints, mission.title)}
-                              className="px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-black rounded-xl shadow-md shadow-blue-600/10 hover:scale-[1.03] active:scale-[0.97] transition-all cursor-pointer flex items-center gap-1.5"
-                            >
-                              <Gift className="w-3.5 h-3.5" />
-                              <span>รับรางวัล +{mission.rewardPoints} XP</span>
-                            </button>
+                              ) : mission.isCompleted ? (
+                                <button
+                                  type="button"
+                                  disabled={claimingMissionId === mission.id}
+                                  onClick={() => handleClaimReward(mission.id, mission.title)}
+                                  className="px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-black rounded-xl shadow-md shadow-blue-600/10 hover:scale-[1.03] active:scale-[0.97] transition-all cursor-pointer flex items-center gap-1.5 disabled:cursor-wait disabled:opacity-70"
+                                >
+                                  <Gift className="w-3.5 h-3.5" />
+                                  <span>{claimingMissionId === mission.id ? "กำลังบันทึก..." : `รับรางวัล +${mission.rewardPoints} XP`}</span>
+                                </button>
                           ) : (
                             <span className="px-4 py-2.5 inline-block text-xs font-bold text-slate-400 bg-slate-100/60 rounded-xl select-none cursor-default">
                               กำลังทำ...

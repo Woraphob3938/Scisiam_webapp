@@ -14,6 +14,14 @@ const eslintConfig = defineConfig([
     "dist/**",
     "main.js",
     "next-env.d.ts",
+
+    // Local agent/tooling workspaces and generated QA artifacts are not app source.
+    ".claude/**",
+    ".agents/**",
+    ".impeccable/**",
+    ".obsidian/**",
+    ".playwright-cli/**",
+    "qa-screenshots/**",
   ]),
 ]);
 

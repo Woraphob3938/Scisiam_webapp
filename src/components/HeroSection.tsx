@@ -2,9 +2,9 @@
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Atom, Beaker, CheckCircle2, Leaf, Search, X } from "lucide-react";
+import { ArrowRight, Atom, Beaker, Leaf, Search, X } from "lucide-react";
 import { labsData } from "@/data/labs";
-import { getLabReadiness, readyLabCount } from "@/data/labReadiness";
+import { getLabReadiness } from "@/data/labReadiness";
 
 const categoryMeta = {
   Physics: {
@@ -23,53 +23,6 @@ const categoryMeta = {
     iconColor: "text-green-600",
   },
 } as const;
-
-const LabBenchIllustration = () => (
-  <svg
-    className="h-full w-full"
-    viewBox="0 0 320 220"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    aria-hidden="true"
-  >
-    <rect x="28" y="154" width="264" height="18" rx="9" fill="#e2e8f0" />
-    <rect x="52" y="172" width="216" height="9" rx="4.5" fill="#cbd5e1" />
-
-    <g transform="translate(55 62)">
-      <path d="M24 0h28v55l21 35a13 13 0 0 1-11 20H14A13 13 0 0 1 3 90l21-35V0Z" fill="#fff" stroke="#94a3b8" strokeWidth="4" />
-      <path d="M17 82h44l10 18a9 9 0 0 1-8 14H15a9 9 0 0 1-8-14l10-18Z" fill="#a855f7" opacity=".78" />
-      <path d="M26 21h24" stroke="#cbd5e1" strokeWidth="4" strokeLinecap="round" />
-      <circle cx="31" cy="96" r="4" fill="#f8fafc" opacity=".85" />
-      <circle cx="49" cy="92" r="3" fill="#f8fafc" opacity=".7" />
-    </g>
-
-    <g transform="translate(165 38)">
-      <rect x="26" y="5" width="14" height="102" rx="7" fill="#fff" stroke="#cbd5e1" strokeWidth="4" />
-      <circle cx="33" cy="107" r="19" fill="#ef4444" stroke="#cbd5e1" strokeWidth="4" />
-      <rect x="30" y="64" width="6" height="41" fill="#ef4444" />
-      <path d="M42 25h10M42 45h8M42 65h10" stroke="#94a3b8" strokeWidth="3" strokeLinecap="round" />
-      <path d="M45 20h8" stroke="#ef4444" strokeWidth="3" strokeLinecap="round" />
-    </g>
-
-    <g transform="translate(132 82)">
-      <path d="M28 44 4 31V58l24 14 24-14V31L28 44Z" fill="#60a5fa" />
-      <path d="M28 44 4 31l24-14 24 14-24 13Z" fill="#bfdbfe" />
-      <path d="M28 44v28" stroke="#93c5fd" strokeWidth="3" />
-    </g>
-
-    <g transform="translate(198 122)">
-      <rect x="0" y="22" width="68" height="12" rx="3" fill="#2563eb" />
-      <rect x="10" y="10" width="68" height="12" rx="3" fill="#9333ea" />
-      <rect x="20" y="-2" width="68" height="12" rx="3" fill="#22c55e" />
-      <path d="M18 4h72" stroke="#fff" strokeOpacity=".45" strokeWidth="2" />
-    </g>
-
-    <path d="M75 45c16-18 45-18 61 0M210 24c24 8 40 30 40 56" stroke="#93c5fd" strokeWidth="3" strokeLinecap="round" strokeDasharray="6 8" />
-    <circle cx="250" cy="52" r="5" fill="#38bdf8" />
-    <circle cx="96" cy="42" r="6" fill="#22c55e" />
-    <circle cx="142" cy="30" r="5" fill="#ef4444" />
-  </svg>
-);
 
 export default function HeroSection() {
   const router = useRouter();
