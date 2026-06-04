@@ -1156,6 +1156,11 @@ export default function LabCard({
           type="button"
           disabled={!readiness.isReady}
           onClick={() => onViewDetails?.(lab.id)}
+          aria-label={
+            readiness.isReady
+              ? `ดูรายละเอียด ${lab.title}`
+              : `${lab.title} ยังอยู่ระหว่างจัดทำ`
+          }
           className={`
             flex min-h-11 select-none items-center justify-center gap-1.5 rounded-xl border px-3 py-2.5 text-xs font-bold
             transition-all duration-200 active:scale-[0.98] focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100
@@ -1175,6 +1180,11 @@ export default function LabCard({
           disabled={!readiness.isReady}
           onClick={() => onEnterRoom?.(lab.id)}
           title={readiness.description}
+          aria-label={
+            readiness.isReady
+              ? `เข้าห้องทดลอง ${lab.title}`
+              : `ห้องทดลอง ${lab.title} ยังไม่พร้อมใช้งาน`
+          }
           className={`
             flex min-h-11 select-none items-center justify-center gap-1.5 rounded-xl px-3 py-2.5 text-xs font-bold
             transition-all duration-200 active:scale-[0.98] focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100

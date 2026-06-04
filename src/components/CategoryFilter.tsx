@@ -16,9 +16,9 @@ export default function CategoryFilter({
 }: CategoryFilterProps) {
   const categoriesList = [
     { id: "All" as Category, name: "ทั้งหมด", icon: LayoutGrid, color: "blue" },
-    { id: "Physics" as Category, name: "Physics", icon: Atom, color: "indigo" },
-    { id: "Chemistry" as Category, name: "Chemistry", icon: Beaker, color: "purple" },
-    { id: "Biology" as Category, name: "Biology", icon: Leaf, color: "green" },
+    { id: "Physics" as Category, name: "ฟิสิกส์", icon: Atom, color: "indigo" },
+    { id: "Chemistry" as Category, name: "เคมี", icon: Beaker, color: "purple" },
+    { id: "Biology" as Category, name: "ชีววิทยา", icon: Leaf, color: "green" },
   ];
 
   const activeColorClasses: Record<string, string> = {

@@ -476,6 +476,33 @@ export default function AuthForm({ initialMode }: AuthFormProps) {
                 )}
               </button>
             </div>
+
+            {/* Divider */}
+            <div className="flex items-center gap-3 my-2 select-none">
+              <div className="h-px bg-slate-100 flex-1" />
+              <span className="text-[10px] font-bold text-slate-400">หรือสำหรับทดลองใช้งาน</span>
+              <div className="h-px bg-slate-100 flex-1" />
+            </div>
+
+            {/* Quick Demo Access */}
+            <button
+              type="button"
+              onClick={() => {
+                localStorage.setItem("scisiam_demo_mode", "true");
+                cacheSciSiamAuth({
+                  role: "teacher",
+                  displayName: "ครูอรทัย",
+                  email: "teacher.demo@scisiam.com",
+                  totalPoints: 0
+                });
+                router.push("/profile");
+                router.refresh();
+              }}
+              className="w-full py-3 border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-extrabold rounded-xl flex items-center justify-center gap-2 shadow-xs active:scale-[0.98] transition-all cursor-pointer leading-normal"
+            >
+              <span>เข้าใช้งานในบทบาทคุณครู (Demo Mode)</span>
+              <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
+            </button>
             
           </div>
         </form>

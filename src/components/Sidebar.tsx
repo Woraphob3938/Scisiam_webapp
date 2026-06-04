@@ -24,7 +24,7 @@ export default function Sidebar({ activeMenu, forceCollapsed = false }: SidebarP
 
   const sidebarMenu = [
     { name: "หน้าหลัก", icon: Home, href: "/" },
-    { name: "ห้องแล็บของฉัน", icon: FlaskConical, href: "/#labs" },
+    { name: "ห้องแล็บของฉัน", icon: FlaskConical, href: "/?view=labs" },
     { name: "ภารกิจนักวิทย์", icon: ClipboardCheck, href: "/missions" },
     { name: "คะแนนและรางวัล", icon: Award, href: "/profile?tab=rewards" },
     { name: "ประวัติการเรียนรู้", icon: History, href: "/profile?tab=overview" },

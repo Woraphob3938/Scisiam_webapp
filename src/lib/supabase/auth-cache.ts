@@ -42,6 +42,7 @@ export function clearSciSiamAuthCache(options: { emit?: boolean } = {}) {
   localStorage.removeItem("scisiam_user_name");
   localStorage.removeItem("scisiam_user_email");
   localStorage.removeItem("scisiam_points");
+  localStorage.removeItem("scisiam_demo_mode");
   if (options.emit ?? true) {
     window.dispatchEvent(new Event(SCISIAM_AUTH_EVENT));
     window.dispatchEvent(new Event(SCISIAM_POINTS_EVENT));

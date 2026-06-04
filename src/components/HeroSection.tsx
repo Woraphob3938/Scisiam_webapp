@@ -6,6 +6,11 @@ import { ArrowRight, Atom, Beaker, Leaf, Search, X } from "lucide-react";
 import { labsData } from "@/data/labs";
 import { getLabReadiness } from "@/data/labReadiness";
 
+interface HeroSectionProps {
+  searchQuery?: string;
+  onSearchQueryChange?: (query: string) => void;
+}
+
 const categoryMeta = {
   Physics: {
     icon: Atom,
@@ -24,9 +29,11 @@ const categoryMeta = {
   },
 } as const;
 
-export default function HeroSection() {
+export default function HeroSection({
+  searchQuery = "",
+  onSearchQueryChange = () => {},
+}: HeroSectionProps = {}) {
   const router = useRouter();
-  const [searchQuery, setSearchQuery] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -64,17 +71,17 @@ export default function HeroSection() {
   const showDropdown = isFocused && searchQuery.trim().length > 0;
 
   return (
-    <section className="relative w-full overflow-visible border-b border-slate-200/70 bg-[linear-gradient(180deg,#eff6ff_0%,#ffffff_62%,#f8fafc_100%)] px-4 py-5 sm:px-8 lg:px-10 lg:py-7">
+    <section className="relative w-full overflow-visible border-b border-slate-200/70 bg-[linear-gradient(180deg,#eff6ff_0%,#ffffff_62%,#f8fafc_100%)] px-4 py-4 sm:px-8 lg:px-10 lg:py-6">
       <div className="mx-auto flex w-full max-w-2xl flex-col items-center text-center">
         <div className="flex min-w-0 w-full flex-col items-center text-center">
-          <h1 className="text-3xl font-extrabold leading-[1.25] tracking-normal text-slate-900 sm:text-4xl lg:text-5xl">
+          <h1 className="text-2xl font-extrabold leading-[1.25] tracking-normal text-slate-900 sm:text-4xl lg:text-5xl">
             รายชื่อห้องแล็บ
           </h1>
-          <p className="mt-2 max-w-2xl text-sm font-semibold leading-relaxed text-slate-500 sm:text-base">
+          <p className="mt-1.5 max-w-2xl text-sm font-semibold leading-relaxed text-slate-500 sm:text-base">
             ค้นหา เลือกหมวด แล้วเริ่มจากห้องที่พร้อมทดลองได้ทันที
           </p>
 
-          <div className="relative mt-6 w-full">
+          <div className="relative mt-4 w-full sm:mt-5">
             <div
               className={`flex items-center rounded-2xl border bg-white px-4 py-3 shadow-sm transition-all duration-200 ${
                 isFocused
@@ -91,7 +98,7 @@ export default function HeroSection() {
                 ref={inputRef}
                 type="text"
                 value={searchQuery}
-                onChange={(event) => setSearchQuery(event.target.value)}
+                onChange={(event) => onSearchQueryChange(event.target.value)}
                 onFocus={() => setIsFocused(true)}
                 placeholder="ค้นหาห้องแล็บ เช่น Newton, Osmosis, Titration..."
                 className="ml-3 min-w-0 flex-1 bg-transparent text-sm font-semibold leading-[1.5] text-slate-700 outline-none placeholder:text-slate-400"
@@ -101,7 +108,7 @@ export default function HeroSection() {
                 <button
                   type="button"
                   onClick={() => {
-                    setSearchQuery("");
+                    onSearchQueryChange("");
                     inputRef.current?.focus();
                   }}
                   className="rounded-full p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
@@ -132,7 +139,7 @@ export default function HeroSection() {
                           onClick={() => {
                             if (!readiness.isReady) return;
                             router.push(`/labs/${lab.id}`);
-                            setSearchQuery("");
+                            onSearchQueryChange("");
                             setIsFocused(false);
                           }}
                           className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors enabled:hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-75"

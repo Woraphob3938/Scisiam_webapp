@@ -43,7 +43,8 @@ export default function Navbar() {
     };
 
     const loadAuthState = async () => {
-      if (!isSupabaseConfigured()) {
+      const isDemo = localStorage.getItem("scisiam_demo_mode") === "true";
+      if (isDemo || !isSupabaseConfigured()) {
         loadAuthStateFromCache();
         return;
       }

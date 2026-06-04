@@ -148,7 +148,7 @@ export default function AIChatButton() {
   }
 
   return (
-    <div className="fixed bottom-3 right-3 z-50 flex flex-col items-end gap-3 select-none sm:bottom-6 sm:right-6">
+    <div className="fixed bottom-[calc(5.75rem+env(safe-area-inset-bottom))] right-3 z-50 flex flex-col items-end gap-3 select-none sm:right-6 lg:bottom-6">
       {isOpen && (
         <div className="w-[min(380px,calc(100vw-32px))] h-[min(560px,calc(100vh-100px))] flex flex-col overflow-hidden rounded-[24px] border border-slate-200/80 bg-white text-left shadow-2xl shadow-slate-300/40 animate-in slide-in-from-bottom-5 fade-in duration-300">
           <div className="border-b border-slate-100 bg-slate-50/70 px-4 py-3">

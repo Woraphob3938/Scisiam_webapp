@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { SidebarProvider } from "@/context/SidebarContext";
 import AIChatButton from "@/components/AIChatButton";
+import MobileTabBar from "@/components/MobileTabBar";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -18,8 +20,11 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-slate-50 text-slate-900">
         <SidebarProvider>
           {children}
-                  <AIChatButton />
-</SidebarProvider>
+          <AIChatButton />
+          <Suspense fallback={null}>
+            <MobileTabBar />
+          </Suspense>
+        </SidebarProvider>
       </body>
     </html>
   );
