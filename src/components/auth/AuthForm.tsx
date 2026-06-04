@@ -1,20 +1,21 @@
 "use client";
 
 import React, { useState } from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { 
-  User, 
-  Mail, 
-  Lock, 
-  Eye, 
-  EyeOff, 
-  ArrowRight, 
-  GraduationCap, 
-  Check, 
-  Sparkles,
+import {
+  ArrowRight,
+  Atom,
+  Beaker,
+  Check,
+  Compass,
+  Eye,
+  EyeOff,
+  FlaskConical,
+  Leaf,
+  Lock,
+  Mail,
   ShieldAlert,
-  Compass
+  User,
 } from "lucide-react";
 import { cacheSciSiamAuth } from "@/lib/supabase/auth-cache";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
@@ -24,36 +25,65 @@ interface AuthFormProps {
   initialMode: "login" | "register";
 }
 
+type AuthMode = "login" | "register";
+type AuthRole = "student" | "teacher";
+
+const roleOptions: Array<{
+  id: AuthRole;
+  title: string;
+  description: string;
+}> = [
+  { id: "student", title: "นักเรียน", description: "เริ่มบททดลอง" },
+  { id: "teacher", title: "คุณครู", description: "จัดการชั้นเรียน" },
+];
+
+const subjectBooks = [
+  {
+    title: "Physics",
+    label: "วิชา 01",
+    tone: "border-t-blue-500 bg-blue-50/70 text-blue-700",
+    icon: Atom,
+  },
+  {
+    title: "Chemistry",
+    label: "วิชา 02",
+    tone: "border-t-purple-500 bg-purple-50/70 text-purple-700",
+    icon: Beaker,
+  },
+  {
+    title: "Biology",
+    label: "วิชา 03",
+    tone: "border-t-emerald-500 bg-emerald-50/70 text-emerald-700",
+    icon: Leaf,
+  },
+];
+
 export default function AuthForm({ initialMode }: AuthFormProps) {
   const router = useRouter();
-  const [mode, setMode] = useState<"login" | "register">(initialMode);
-  
-  // Form fields states
+  const [mode, setMode] = useState<AuthMode>(initialMode);
+
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [role, setRole] = useState<"student" | "teacher">("student");
+  const [role, setRole] = useState<AuthRole>("student");
   const [acceptTerms, setAcceptTerms] = useState(false);
-  
-  // UI states
+  const [rememberMe, setRememberMe] = useState(false);
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Live password validation checks
+  const isRegister = mode === "register";
   const isMinLength = password.length >= 8;
   const hasUpperOrNum = /[A-Z]/.test(password) || /[0-9]/.test(password);
-
-
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
-    // Basic Validations
     if (!email.trim() || !password.trim()) {
       setError("กรุณากรอกอีเมลและรหัสผ่านให้ครบถ้วน");
       setLoading(false);
@@ -181,333 +211,527 @@ export default function AuthForm({ initialMode }: AuthFormProps) {
     }
   };
 
-  const toggleMode = () => {
+  const setAuthMode = (nextMode: AuthMode) => {
     setError("");
-    setMode(mode === "login" ? "register" : "login");
+    setMode(nextMode);
+  };
+
+  const handleDemoTeacherLogin = () => {
+    localStorage.setItem("scisiam_demo_mode", "true");
+    cacheSciSiamAuth({
+      role: "teacher",
+      displayName: "ครูอรทัย",
+      email: "teacher.demo@scisiam.com",
+      totalPoints: 0,
+    });
+    router.push("/profile");
+    router.refresh();
   };
 
   return (
-    <div className="flex w-full max-w-5xl flex-col lg:flex-row items-stretch justify-center gap-8 px-4 py-8 lg:py-12 select-none">
-      
-      {/* LEFT COLUMN: Features Card */}
-      <div className="flex-1 rounded-[32px] border border-blue-100/50 bg-gradient-to-br from-blue-50/80 via-white/80 to-indigo-50/40 backdrop-blur-xl p-8 sm:p-10 shadow-xl relative overflow-hidden flex flex-col justify-between min-h-[500px]">
-        
-        {/* Animated Orbits Backdrop */}
-        <div className="absolute inset-0 pointer-events-none opacity-20 z-0">
-          <div className="absolute top-1/2 left-1/2 w-[350px] h-[350px] border border-dashed border-indigo-400 rounded-full -translate-x-1/2 -translate-y-1/2 animate-spin-slow" />
-          <div className="absolute top-1/2 left-1/2 w-[500px] h-[500px] border border-dashed border-blue-400 rounded-full -translate-x-1/2 -translate-y-1/2 animate-spin-slow duration-[35s] reverse" />
-          {/* Floating Dots */}
-          <span className="absolute top-10 left-[20%] w-2.5 h-2.5 bg-blue-500 rounded-full animate-float-slow" />
-          <span className="absolute top-[30%] right-[15%] w-3.5 h-3.5 bg-indigo-500 rounded-full animate-float-medium" />
-          <span className="absolute bottom-[20%] left-[10%] w-2 h-2 bg-violet-400 rounded-full animate-float-fast" />
-        </div>
+    <section
+      className="mx-auto grid w-full max-w-[1180px] grid-cols-1 gap-5 px-4 py-5 sm:px-6 lg:min-h-[660px] lg:grid-cols-[minmax(0,1.05fr)_minmax(430px,0.95fr)] lg:items-stretch lg:gap-10 lg:px-8 lg:py-4"
+      aria-label={isRegister ? "หน้าสมัครสมาชิก SciSiam" : "หน้าเข้าสู่ระบบ SciSiam"}
+    >
+      <ScienceIntro mode={mode} />
 
-        {/* Top Text Content */}
-        <div className="relative z-10 space-y-4">
-          <div className="flex items-center gap-2 text-blue-600">
-            <Sparkles className="w-5 h-5 animate-pulse" />
-            <span className="text-xs font-extrabold tracking-wider uppercase">SciSiam</span>
-          </div>
+      <div className="flex min-w-0 items-center justify-center">
+        <div className="grid w-full max-w-[500px] gap-4">
+          <MobileIntro mode={mode} />
 
-          <h2 className="text-3xl font-extrabold leading-[1.3] text-slate-800 tracking-tight">
-            เริ่มต้นกับ <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 bg-clip-text text-transparent">SciSiam</span>
-          </h2>
-          
-          <p className="text-sm font-medium text-slate-500 leading-[1.55] max-w-md">
-            สมัครสมาชิกเพื่อเข้าสู่โลกแห่งการทดลอง วิทยาศาสตร์เสมือนจริง เรียนรู้ สนุก และเข้าใจง่ายในที่เดียว
-          </p>
-
-          {/* Highlight Badge */}
-          <div className="inline-flex items-center gap-3.5 rounded-2xl border border-purple-100 bg-purple-50/50 hover:bg-purple-50 px-4.5 py-3 shadow-xs max-w-sm transition-all duration-300">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-500 to-indigo-500 flex items-center justify-center text-white shrink-0 shadow-md shadow-purple-500/10">
-              <Compass className="w-4.5 h-4.5 animate-spin-slow" />
-            </div>
-            <p className="text-[11px] font-semibold text-purple-950 leading-[1.5] flex-1">
-              แพลตฟอร์มที่เป็นมิตร สนุก เข้าใจง่าย และเหมาะสำหรับนักเรียนทุกระดับชั้น
-            </p>
-          </div>
-        </div>
-
-        {/* User-provided Science Illustration Banner */}
-        <div className="relative z-10 w-full flex justify-center items-center mt-6 lg:mt-0 select-none">
-          <div className="relative w-[340px] h-[220px] sm:w-[400px] sm:h-[260px] transform hover:scale-[1.03] transition-transform duration-500 ease-out drop-shadow-2xl animate-float-medium">
-            <Image 
-              src="/ChatGPT_Image_31_พ.ค._2569_13_08_41-removebg-preview.png" 
-              alt="SciSiam Science Banner" 
-              fill
-              sizes="(max-w-768px) 340px, 400px"
-              priority
-              className="object-contain"
-            />
-          </div>
-        </div>
-
-      </div>
-
-      {/* RIGHT COLUMN: Form Card */}
-      <div className="flex-1 flex justify-center items-center">
-        <form 
-          onSubmit={handleSubmit}
-          className="bg-white rounded-[32px] p-8 shadow-xl border border-slate-100/80 flex flex-col justify-between min-h-[500px] w-full max-w-md relative z-10"
-        >
-          {/* Header section of the Form */}
-          <div className="flex flex-col items-center text-center space-y-4">
-            
-            {/* Top Avatar Shield with science orbits */}
-            <div className="relative flex items-center justify-center w-18 h-18 bg-blue-50/70 border border-blue-100/50 rounded-full shadow-inner shadow-blue-50">
-              {/* Spinning decorative orbit */}
-              <div className="absolute inset-[-6px] border border-dashed border-blue-400/40 rounded-full animate-spin-slow pointer-events-none" />
-              <div className="absolute inset-[-12px] border border-dashed border-indigo-400/20 rounded-full animate-spin-slow duration-[30s] pointer-events-none" />
-              
-              <div className="w-13 h-13 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white shadow-lg shadow-blue-500/25">
-                <User className="w-6.5 h-6.5" />
-              </div>
-            </div>
-
-            {/* Form Title & Subtitle */}
-            <div className="space-y-1">
-              <h1 className="text-2xl font-bold text-slate-800 tracking-tight leading-[1.3] font-sans">
-                {mode === "register" ? "สมัครสมาชิก" : "เข้าสู่ระบบ"}
-              </h1>
-              <p className="text-xs font-semibold text-slate-400 leading-normal max-w-[260px] mx-auto">
-                {mode === "register" 
-                  ? "สร้างบัญชีเพื่อเริ่มเรียนรู้และทดลองกับ SciSiam" 
-                  : "ลงชื่อเข้าใช้งานเพื่อเริ่มเรียนรู้และทดลองกับ SciSiam"
-                }
-              </p>
-            </div>
-          </div>
-
-          {/* Form Fields Section */}
-          <div className="my-6 space-y-3.5">
-            
-            {/* Error Message */}
-            {error && (
-              <div className="flex items-center gap-2 rounded-xl border border-rose-100 bg-rose-50 px-3.5 py-2.5 text-xs font-semibold text-rose-600 animate-shake">
-                <ShieldAlert className="w-4 h-4 shrink-0" />
-                <span className="leading-relaxed">{error}</span>
-              </div>
-            )}
-
-            {/* Fullname input (Register Only) */}
-            {mode === "register" && (
-              <div className="relative w-full group">
-                <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50/50 focus-within:bg-white focus-within:border-blue-500 focus-within:ring-3 focus-within:ring-blue-100 px-4 py-3 transition-all duration-200">
-                  <User className="w-5 h-5 text-slate-400 shrink-0 group-focus-within:text-blue-500 transition-colors" />
-                  <input
-                    type="text"
-                    required
-                    placeholder="ชื่อ-นามสกุล"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    className="w-full bg-transparent text-sm font-semibold text-slate-700 outline-none placeholder:text-slate-400 leading-normal"
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* Email input */}
-            <div className="relative w-full group">
-              <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50/50 focus-within:bg-white focus-within:border-blue-500 focus-within:ring-3 focus-within:ring-blue-100 px-4 py-3 transition-all duration-200">
-                <Mail className="w-5 h-5 text-slate-400 shrink-0 group-focus-within:text-blue-500 transition-colors" />
-                <input
-                  type="email"
-                  required
-                  placeholder={mode === "register" 
-                    ? (role === "student" ? "อีเมลนักเรียน" : "อีเมลคุณครู")
-                    : "อีเมล"
-                  }
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-transparent text-sm font-semibold text-slate-700 outline-none placeholder:text-slate-400 leading-normal"
-                />
-              </div>
-            </div>
-
-            {/* Password input */}
-            <div className="relative w-full group">
-              <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50/50 focus-within:bg-white focus-within:border-blue-500 focus-within:ring-3 focus-within:ring-blue-100 px-4 py-3 transition-all duration-200">
-                <Lock className="w-5 h-5 text-slate-400 shrink-0 group-focus-within:text-blue-500 transition-colors" />
-                <input
-                  type={showPassword ? "text" : "password"}
-                  required
-                  placeholder="รหัสผ่าน"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-transparent text-sm font-semibold text-slate-700 outline-none placeholder:text-slate-400 leading-normal"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="text-slate-400 hover:text-slate-600 focus:outline-none shrink-0"
-                >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
-            </div>
-
-            {/* Confirm Password input (Register Only) */}
-            {mode === "register" && (
-              <div className="relative w-full group">
-                <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50/50 focus-within:bg-white focus-within:border-blue-500 focus-within:ring-3 focus-within:ring-blue-100 px-4 py-3 transition-all duration-200">
-                  <Lock className="w-5 h-5 text-slate-400 shrink-0 group-focus-within:text-blue-500 transition-colors" />
-                  <input
-                    type={showConfirmPassword ? "text" : "password"}
-                    required
-                    placeholder="ยืนยันรหัสผ่าน"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full bg-transparent text-sm font-semibold text-slate-700 outline-none placeholder:text-slate-400 leading-normal"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="text-slate-400 hover:text-slate-600 focus:outline-none shrink-0"
-                  >
-                    {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Password Validation checklist (Register Only) */}
-            {mode === "register" && (
-              <div className="grid grid-cols-2 gap-2 px-1 select-none">
-                {/* Min 8 char */}
-                <div className="flex items-center gap-1.5">
-                  <div className={`w-4 h-4 rounded-full border flex items-center justify-center transition-all ${
-                    isMinLength 
-                      ? "border-emerald-500 bg-emerald-50 text-emerald-600" 
-                      : "border-slate-200 bg-slate-50 text-slate-400"
-                  }`}>
-                    {isMinLength && <Check className="w-2.5 h-2.5 stroke-[3]" />}
-                  </div>
-                  <span className={`text-[10px] font-bold transition-colors ${
-                    isMinLength ? "text-emerald-600" : "text-slate-400"
-                  }`}>
-                    อย่างน้อย 8 ตัวอักษร
-                  </span>
-                </div>
-                {/* Uppercase/Num check */}
-                <div className="flex items-center gap-1.5">
-                  <div className={`w-4 h-4 rounded-full border flex items-center justify-center transition-all ${
-                    hasUpperOrNum 
-                      ? "border-emerald-500 bg-emerald-50 text-emerald-600" 
-                      : "border-slate-200 bg-slate-50 text-slate-400"
-                  }`}>
-                    {hasUpperOrNum && <Check className="w-2.5 h-2.5 stroke-[3]" />}
-                  </div>
-                  <span className={`text-[10px] font-bold transition-colors ${
-                    hasUpperOrNum ? "text-emerald-600" : "text-slate-400"
-                  }`}>
-                    มีตัวพิมพ์ใหญ่/ตัวเลข
-                  </span>
-                </div>
-              </div>
-            )}
-
-            {/* Role selection dropdown */}
-            <div className="relative w-full">
-              <div className="flex items-center justify-between w-full rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-slate-50 px-4 py-3 text-slate-700 text-sm font-semibold transition-all focus-within:border-blue-500 focus-within:ring-3 focus-within:ring-blue-100">
-                <div className="flex items-center gap-2.5 text-slate-500">
-                  <GraduationCap className="w-5 h-5 text-slate-400 shrink-0" />
-                  <span className="text-slate-500 text-xs font-bold leading-normal">ระดับชั้น / บทบาท</span>
-                </div>
-                
-                <select
-                  value={role}
-                  onChange={(e) => setRole(e.target.value as "student" | "teacher")}
-                  className="bg-transparent border-none outline-none font-semibold text-slate-700 cursor-pointer pr-1 text-xs text-right"
-                >
-                  <option value="student">นักเรียน</option>
-                  <option value="teacher">คุณครู</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Terms and conditions Checkbox (Register Only) */}
-            {mode === "register" && (
-              <label className="flex items-start gap-2.5 px-1 py-1.5 cursor-pointer group">
-                <input
-                  type="checkbox"
-                  required
-                  checked={acceptTerms}
-                  onChange={(e) => setAcceptTerms(e.target.checked)}
-                  className="mt-0.5 w-4 h-4 rounded border-slate-200 text-blue-600 focus:ring-blue-500 cursor-pointer"
-                />
-                <span className="text-[10px] font-bold leading-[1.4] text-slate-400 group-hover:text-slate-500 transition-colors select-none">
-                  ฉันยอมรับเงื่อนไขการใช้งานและนโยบายความเป็นส่วนตัว
-                </span>
-              </label>
-            )}
-
-          </div>
-
-          {/* Action button & Toggle */}
-          <div className="space-y-4">
-            
-            {/* Primary Submit Button */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-bold py-3.5 px-6 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20 active:scale-98 transition-all select-none cursor-pointer text-sm"
-            >
-              {loading ? (
-                <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : (
-                <>
-                  <span>{mode === "register" ? "สมัครสมาชิก" : "เข้าสู่ระบบ"}</span>
-                  <ArrowRight className="w-4.5 h-4.5 animate-pulse" />
-                </>
-              )}
-            </button>
-
-            {/* Mode Toggle Link */}
-            <div className="text-center">
+          <form
+            onSubmit={handleSubmit}
+            className="w-full rounded-[24px] border border-slate-200 bg-white p-4 shadow-xl shadow-slate-200/60 sm:p-6 lg:p-7"
+          >
+            <div className={`grid ${isRegister ? "gap-4" : "gap-5"}`}>
+            <div className="grid grid-cols-2 gap-1 rounded-[14px] border border-slate-200 bg-slate-50 p-1">
               <button
                 type="button"
-                onClick={toggleMode}
-                className="text-xs font-bold text-slate-450 hover:text-blue-600 transition-colors select-none focus:outline-none"
+                onClick={() => setAuthMode("login")}
+                aria-pressed={!isRegister}
+                className={`min-h-11 rounded-[10px] text-sm font-extrabold leading-[1.45] transition-all focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100 ${
+                  !isRegister
+                    ? "bg-white text-slate-950 shadow-md shadow-slate-200/70"
+                    : "text-slate-500 hover:text-slate-900"
+                }`}
               >
-                {mode === "register" ? (
-                  <>มีบัญชีอยู่แล้ว? <span className="text-blue-600 underline">เข้าสู่ระบบ</span></>
-                ) : (
-                  <>ยังไม่มีบัญชี? <span className="text-blue-600 underline">สมัครสมาชิก</span></>
-                )}
+                เข้าสู่ระบบ
+              </button>
+              <button
+                type="button"
+                onClick={() => setAuthMode("register")}
+                aria-pressed={isRegister}
+                className={`min-h-11 rounded-[10px] text-sm font-extrabold leading-[1.45] transition-all focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100 ${
+                  isRegister
+                    ? "bg-white text-slate-950 shadow-md shadow-slate-200/70"
+                    : "text-slate-500 hover:text-slate-900"
+                }`}
+              >
+                สมัครสมาชิก
               </button>
             </div>
 
-            {/* Divider */}
-            <div className="flex items-center gap-3 my-2 select-none">
-              <div className="h-px bg-slate-100 flex-1" />
-              <span className="text-[10px] font-bold text-slate-400">หรือสำหรับทดลองใช้งาน</span>
-              <div className="h-px bg-slate-100 flex-1" />
+            <div className="grid gap-2">
+              <h1 className="text-2xl font-extrabold leading-[1.3] tracking-normal text-slate-950 sm:text-3xl">
+                {isRegister ? "สมัครสมาชิก" : "เข้าสู่ระบบ"}
+              </h1>
+              <p className="text-sm font-semibold leading-relaxed text-slate-500">
+                {isRegister
+                  ? "สร้างบัญชีสำหรับเข้าใช้ SciSiam Virtual Lab ในฐานะนักเรียนหรือคุณครู"
+                  : "ใช้บัญชี SciSiam เพื่อเข้าเรียนหรือจัดการห้องเรียนวิทยาศาสตร์ของคุณ"}
+              </p>
             </div>
 
-            {/* Quick Demo Access */}
-            <button
-              type="button"
-              onClick={() => {
-                localStorage.setItem("scisiam_demo_mode", "true");
-                cacheSciSiamAuth({
-                  role: "teacher",
-                  displayName: "ครูอรทัย",
-                  email: "teacher.demo@scisiam.com",
-                  totalPoints: 0
-                });
-                router.push("/profile");
-                router.refresh();
-              }}
-              className="w-full py-3 border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-extrabold rounded-xl flex items-center justify-center gap-2 shadow-xs active:scale-[0.98] transition-all cursor-pointer leading-normal"
-            >
-              <span>เข้าใช้งานในบทบาทคุณครู (Demo Mode)</span>
-              <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
-            </button>
-            
-          </div>
-        </form>
+            {error && (
+              <div className="flex items-start gap-2.5 rounded-xl border border-rose-100 bg-rose-50 px-3.5 py-3 text-xs font-bold leading-relaxed text-rose-700">
+                <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" />
+                <span>{error}</span>
+              </div>
+            )}
+
+            <div className={`grid ${isRegister ? "gap-3" : "gap-3.5"}`}>
+              {isRegister && (
+                <AuthField
+                  id="auth-full-name"
+                  label="ชื่อ-นามสกุล"
+                  helper=""
+                  icon={User}
+                >
+                  <input
+                    id="auth-full-name"
+                    type="text"
+                    required
+                    autoComplete="name"
+                    placeholder="เช่น พิมพ์ชนก ใจดี"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    className={inputClassName}
+                  />
+                </AuthField>
+              )}
+
+              <AuthField
+                id="auth-email"
+                label="อีเมล"
+                helper=""
+                icon={Mail}
+              >
+                <input
+                  id="auth-email"
+                  type="email"
+                  required
+                  autoComplete="email"
+                  placeholder="name@school.ac.th"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className={inputClassName}
+                />
+              </AuthField>
+
+              <AuthField
+                id="auth-password"
+                label="รหัสผ่าน"
+                helper=""
+                icon={Lock}
+                action={
+                  !isRegister ? (
+                    <button
+                      type="button"
+                      onClick={() => setError("ระบบกู้คืนรหัสผ่านจะเปิดให้ใช้งานในเวอร์ชันถัดไป")}
+                      className="min-h-8 text-xs font-extrabold leading-[1.45] text-slate-500 transition-colors hover:text-blue-600 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
+                    >
+                      ลืมรหัสผ่าน?
+                    </button>
+                  ) : null
+                }
+              >
+                <div className="relative">
+                  <input
+                    id="auth-password"
+                    type={showPassword ? "text" : "password"}
+                    required
+                    autoComplete={isRegister ? "new-password" : "current-password"}
+                    placeholder={isRegister ? "ตั้งรหัสผ่าน" : "กรอกรหัสผ่าน"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className={`${inputClassName} pr-14`}
+                  />
+                  <PasswordToggle
+                    isVisible={showPassword}
+                    onToggle={() => setShowPassword((current) => !current)}
+                    label="รหัสผ่าน"
+                  />
+                </div>
+              </AuthField>
+
+              {isRegister && (
+                <>
+                  <AuthField
+                    id="auth-confirm-password"
+                    label="ยืนยันรหัสผ่าน"
+                    helper=""
+                    icon={Lock}
+                  >
+                    <div className="relative">
+                      <input
+                        id="auth-confirm-password"
+                        type={showConfirmPassword ? "text" : "password"}
+                        required
+                        autoComplete="new-password"
+                        placeholder="กรอกรหัสผ่านอีกครั้ง"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        className={`${inputClassName} pr-14`}
+                      />
+                      <PasswordToggle
+                        isVisible={showConfirmPassword}
+                        onToggle={() => setShowConfirmPassword((current) => !current)}
+                        label="ยืนยันรหัสผ่าน"
+                      />
+                    </div>
+                  </AuthField>
+
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                    <ValidationItem valid={isMinLength} label="อย่างน้อย 8 ตัวอักษร" />
+                    <ValidationItem valid={hasUpperOrNum} label="มีตัวพิมพ์ใหญ่/ตัวเลข" />
+                  </div>
+                </>
+              )}
+
+              <div className="grid gap-2">
+                <span className="text-sm font-extrabold leading-[1.45] text-slate-900">
+                  บทบาท
+                </span>
+                <div className="grid grid-cols-2 gap-3" role="group" aria-label="เลือกบทบาท">
+                  {roleOptions.map((option) => {
+                    const isSelected = role === option.id;
+                    return (
+                      <button
+                        key={option.id}
+                        type="button"
+                        onClick={() => setRole(option.id)}
+                        aria-pressed={isSelected}
+                      className={`min-h-11 rounded-[14px] border px-3 py-2.5 text-left transition-all focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100 sm:min-h-12 ${
+                          isSelected
+                            ? "border-slate-900 bg-slate-50 text-slate-950 shadow-[0_0_0_3px_rgba(15,23,42,0.06)]"
+                            : "border-slate-200 bg-white text-slate-600 hover:border-blue-200 hover:bg-blue-50/40"
+                        }`}
+                      >
+                        <span className="block text-sm font-extrabold leading-[1.45]">
+                          {option.title}
+                        </span>
+                        <span className="hidden text-xs font-semibold leading-relaxed text-slate-500 sm:block">
+                          {option.description}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {!isRegister && (
+                <label className="flex min-h-11 cursor-pointer items-center gap-2 text-sm font-bold leading-[1.45] text-slate-700">
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  จำฉันไว้
+                </label>
+              )}
+
+              {isRegister && (
+                <label className="flex cursor-pointer items-start gap-2.5 rounded-xl border border-slate-200 bg-slate-50/60 px-3 py-2.5 text-xs font-semibold leading-relaxed text-slate-500">
+                  <input
+                    type="checkbox"
+                    required
+                    checked={acceptTerms}
+                    onChange={(e) => setAcceptTerms(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  <span>ฉันยอมรับเงื่อนไขการใช้งานและนโยบายความเป็นส่วนตัว</span>
+                </label>
+              )}
+            </div>
+
+            <div className="grid gap-3">
+              <button
+                type="submit"
+                disabled={loading}
+                className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border border-blue-600 bg-blue-600 px-5 py-3 text-sm font-extrabold leading-[1.45] text-white shadow-lg shadow-blue-500/20 transition-all hover:bg-blue-700 disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-200 disabled:text-slate-500 focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-100"
+              >
+                {loading ? (
+                  <span className="h-5 w-5 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+                ) : (
+                  <>
+                    <span>{isRegister ? "สร้างบัญชี SciSiam" : "เข้าสู่ระบบ SciSiam"}</span>
+                    <ArrowRight className="h-4.5 w-4.5" />
+                  </>
+                )}
+              </button>
+
+              <p className="text-center text-sm font-semibold leading-relaxed text-slate-500">
+                {isRegister ? "มีบัญชีอยู่แล้ว?" : "ยังไม่มีบัญชี?"}{" "}
+                <button
+                  type="button"
+                  onClick={() => setAuthMode(isRegister ? "login" : "register")}
+                  className="font-extrabold text-blue-600 underline-offset-4 hover:underline focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
+                >
+                  {isRegister ? "เข้าสู่ระบบ" : "สมัครสมาชิก"}
+                </button>
+              </p>
+
+              {isRegister ? (
+                <button
+                  type="button"
+                  onClick={handleDemoTeacherLogin}
+                  className="mx-auto inline-flex min-h-8 items-center justify-center gap-1.5 rounded-lg px-2 text-xs font-extrabold leading-[1.45] text-slate-500 transition-colors hover:text-blue-600 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
+                >
+                  <span>ทดลองในบทบาทคุณครู</span>
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </button>
+              ) : (
+                <>
+                  <div className="flex items-center gap-3">
+                    <span className="h-px flex-1 bg-slate-100" />
+                    <span className="text-[11px] font-bold leading-[1.45] text-slate-400">
+                      สำหรับทดลองใช้งาน
+                    </span>
+                    <span className="h-px flex-1 bg-slate-100" />
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleDemoTeacherLogin}
+                    className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-3 text-xs font-extrabold leading-[1.45] text-slate-700 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-50 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
+                  >
+                    <span>เข้าใช้งานในบทบาทคุณครู</span>
+                    <ArrowRight className="h-3.5 w-3.5 text-slate-400" />
+                  </button>
+                </>
+              )}
+            </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+const inputClassName =
+  "min-h-11 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-semibold leading-[1.45] text-slate-800 outline-none transition-all placeholder:text-slate-400 hover:border-blue-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100";
+
+function ScienceIntro({ mode }: { mode: AuthMode }) {
+  const isRegister = mode === "register";
+
+  return (
+    <aside className="hidden min-w-0 content-start gap-5 rounded-[28px] border border-slate-200 bg-white/80 p-5 shadow-sm shadow-slate-200/50 sm:p-7 lg:grid lg:content-between lg:p-7">
+      <div className="flex items-center gap-3">
+        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-[14px] bg-blue-600 text-white shadow-md shadow-blue-500/20">
+          <Compass className="h-5.5 w-5.5" />
+        </span>
+        <span className="grid gap-0.5">
+          <strong className="text-lg font-extrabold leading-[1.1] text-blue-600">
+            SciSiam
+          </strong>
+          <span className="text-xs font-bold uppercase leading-[1.2] text-slate-400">
+            Virtual Lab
+          </span>
+        </span>
       </div>
 
+      <div className="grid gap-4">
+        <p className="text-xs font-bold uppercase leading-[1.45] tracking-[0.08em] text-slate-400">
+          {isRegister ? "สมัครบัญชี · พร้อมใช้ในชั้นเรียน" : "ห้องเรียนวิทย์ · ภาษาไทยเป็นหลัก"}
+        </p>
+        <h2 className="max-w-2xl text-3xl font-extrabold leading-[1.25] tracking-normal text-slate-950 sm:text-4xl lg:text-[42px]">
+          {isRegister
+            ? "สมัครใช้งานเพื่อเริ่มเรียนและสอนแล็บเสมือนจริง"
+            : "เข้าสู่ห้องทดลองวิทยาศาสตร์ที่นักเรียนใช้ได้ทุกวัน"}
+        </h2>
+        <p className="max-w-xl text-sm font-semibold leading-[1.75] text-slate-500 sm:text-base">
+          {isRegister
+            ? "โฟลว์สมัครสมาชิกเก็บเฉพาะข้อมูลที่จำเป็น พร้อมบทบาทนักเรียนหรือคุณครู โดยยังไม่เพิ่มฟิลด์ตามบทบาท"
+            : "ออกแบบให้ครูและนักเรียนไทยเริ่มบททดลองได้เร็ว เห็นบริบทชัด และไม่ถูกรบกวนด้วยองค์ประกอบที่ไม่จำเป็น"}
+        </p>
+      </div>
+
+      <div className="grid gap-5 rounded-[24px] border border-slate-200 bg-[linear-gradient(135deg,#eff6ff_0%,#ffffff_44%,#f5f3ff_100%)] p-4 sm:p-5">
+        <div className="grid grid-cols-3 items-end gap-3">
+          {subjectBooks.map((subject, index) => {
+            const Icon = subject.icon;
+            return (
+              <div
+                key={subject.title}
+                className={`grid min-h-[124px] content-between rounded-2xl border border-slate-200 border-t-4 p-3 shadow-lg shadow-slate-200/50 sm:min-h-[148px] ${
+                  index === 1 ? "sm:min-h-[168px]" : ""
+                } ${subject.tone}`}
+              >
+                <span className="text-[10px] font-extrabold uppercase leading-[1.3] text-slate-400">
+                  {subject.label}
+                </span>
+                <Icon className="h-5 w-5" />
+                <span className="break-words text-sm font-extrabold leading-[1.2] sm:text-lg">
+                  {subject.title}
+                </span>
+                <span className="h-1.5 rounded-full bg-white/80" />
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="grid grid-cols-[38px_1fr] gap-3">
+          <span className="grid h-9 w-9 place-items-center rounded-xl border border-slate-200 bg-white text-slate-500">
+            <FlaskConical className="h-4.5 w-4.5" />
+          </span>
+          <p className="text-xs font-semibold leading-relaxed text-slate-500 sm:text-sm">
+            ใช้สีรายวิชาเฉพาะในภาพประกอบและสถานะ เพื่อให้ฟอร์มยังเป็นจุดโฟกัสหลักของหน้า
+          </p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-3 gap-3">
+        <TrustItem title="บัญชี SciSiam" text="เส้นทางใช้งานตรงไปตรงมา" />
+        <TrustItem title="48px+" text="ขนาดแตะเหมาะกับมือถือ" />
+        <TrustItem title="Thai-first" text="line-height อ่านสบาย" />
+      </div>
+    </aside>
+  );
+}
+
+function MobileIntro({ mode }: { mode: AuthMode }) {
+  const isRegister = mode === "register";
+
+  return (
+    <div className="grid gap-3 rounded-[22px] border border-slate-200 bg-white/85 p-3 shadow-sm shadow-slate-200/50 lg:hidden">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-3">
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[13px] bg-blue-600 text-white shadow-md shadow-blue-500/20">
+            <Compass className="h-4.5 w-4.5" />
+          </span>
+          <span className="grid min-w-0 gap-0.5">
+            <strong className="text-lg font-extrabold leading-[1.1] text-blue-600">
+              SciSiam
+            </strong>
+            <span className="text-xs font-bold uppercase leading-[1.2] text-slate-400">
+              Virtual Lab
+            </span>
+          </span>
+        </div>
+        <span className="rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-[11px] font-extrabold leading-[1.45] text-blue-600">
+          {isRegister ? "Register" : "Login"}
+        </span>
+      </div>
+
+      <div className="grid grid-cols-3 gap-2">
+        {subjectBooks.map((subject) => {
+          const Icon = subject.icon;
+          return (
+            <div
+              key={subject.title}
+              className={`grid min-h-14 content-between rounded-xl border border-slate-200 border-t-4 p-2 ${subject.tone}`}
+            >
+              <Icon className="h-3.5 w-3.5" />
+              <span className="break-words text-[10px] font-extrabold leading-[1.15]">
+                {subject.title}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function AuthField({
+  id,
+  label,
+  helper,
+  icon: Icon,
+  action,
+  children,
+}: {
+  id: string;
+  label: string;
+  helper: string;
+  icon: React.ComponentType<{ className?: string }>;
+  action?: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="grid gap-1.5">
+      <div className="flex items-center justify-between gap-3">
+        <label htmlFor={id} className="inline-flex items-center gap-2 text-sm font-extrabold leading-[1.45] text-slate-900">
+          <Icon className="h-4 w-4 text-slate-400" />
+          {label}
+        </label>
+        {action}
+      </div>
+      {children}
+      {helper && (
+        <p className="text-xs font-semibold leading-relaxed text-slate-400">
+          {helper}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function PasswordToggle({
+  isVisible,
+  onToggle,
+  label,
+}: {
+  isVisible: boolean;
+  onToggle: () => void;
+  label: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      className="absolute right-2 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-lg text-slate-400 transition-colors hover:bg-slate-50 hover:text-slate-700 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
+      aria-label={`${isVisible ? "ซ่อน" : "แสดง"}${label}`}
+    >
+      {isVisible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+    </button>
+  );
+}
+
+function ValidationItem({ valid, label }: { valid: boolean; label: string }) {
+  return (
+    <div className="flex items-center gap-2 rounded-xl border border-slate-100 bg-slate-50 px-3 py-2">
+      <span
+        className={`grid h-5 w-5 shrink-0 place-items-center rounded-full border ${
+          valid
+            ? "border-emerald-500 bg-emerald-50 text-emerald-600"
+            : "border-slate-200 bg-white text-transparent"
+        }`}
+      >
+        <Check className="h-3 w-3 stroke-[3]" />
+      </span>
+      <span
+        className={`text-xs font-bold leading-[1.45] ${
+          valid ? "text-emerald-700" : "text-slate-400"
+        }`}
+      >
+        {label}
+      </span>
+    </div>
+  );
+}
+
+function TrustItem({ title, text }: { title: string; text: string }) {
+  return (
+    <div className="grid gap-1 border-t border-slate-200 pt-3">
+      <strong className="text-xs font-extrabold leading-[1.45] text-slate-900 sm:text-sm">
+        {title}
+      </strong>
+      <span className="text-[11px] font-semibold leading-relaxed text-slate-400">
+        {text}
+      </span>
     </div>
   );
 }

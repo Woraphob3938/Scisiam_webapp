@@ -13,7 +13,7 @@ import {
 
 const navItems = [
   { name: "หน้าหลัก", href: "/", icon: Home },
-  { name: "ห้องแล็บ", href: "/?view=labs", icon: FlaskConical },
+  { name: "ห้องแล็บ", href: "/labs", icon: FlaskConical },
   { name: "ภารกิจ", href: "/missions", icon: ClipboardCheck },
   { name: "รางวัล", href: "/profile?tab=rewards", icon: Award },
   { name: "โปรไฟล์", href: "/profile", icon: User },
@@ -26,9 +26,6 @@ function getActiveItem(pathname: string, searchParams: URLSearchParams) {
     return "รางวัล";
   }
   if (pathname === "/profile") return "โปรไฟล์";
-  if (pathname === "/" && searchParams.get("view") === "labs") {
-    return "ห้องแล็บ";
-  }
   return "หน้าหลัก";
 }
 

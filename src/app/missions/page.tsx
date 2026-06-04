@@ -517,7 +517,7 @@ export default function MissionsPage() {
                   </h4>
                 </div>
                 <h3 className="text-base font-black text-slate-800 mt-4 leading-normal">
-                  ทําแล็บจำลองและสอบถาม AI Tutor อย่างสม่ำเสมอ
+                  ทําแล็บจำลองและสอบถาม AI ไออุ่นอย่างสม่ำเสมอ
                 </h3>
                 <p className="text-xs text-slate-500 mt-2 leading-relaxed">
                   ทุกๆ การทดลองจำลองที่บันทึกผลการประเมินลงในคลาวด์จะนำมาคิดระดับความก้าวหน้า +25 XP โดยอัตโนมัติ และคุณสามารถปลดล็อกเหรียญตราเกียรติยศต่างๆ ในหน้าโปรไฟล์เพื่อแสดงประวัติการทดลองอันน่าภาคภูมิใจ

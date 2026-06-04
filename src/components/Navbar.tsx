@@ -178,9 +178,9 @@ export default function Navbar() {
   const displayedNotifications = isLoggedIn ? notifications : [];
 
   return (
-    <nav className="sticky top-0 z-50 w-full bg-white/85 backdrop-blur-md border-b border-slate-100 shadow-xs px-4 sm:px-8 py-3.5 flex items-center justify-between transition-all duration-300">
+    <nav className="sticky top-0 z-50 flex min-h-[64px] w-full items-center justify-between border-b border-slate-100 bg-white/85 px-3 py-2 shadow-xs backdrop-blur-md transition-all duration-300 sm:px-8 sm:py-3.5">
       {/* Logo Section */}
-      <div className="flex items-center gap-3 select-none">
+      <div className="flex min-w-0 items-center gap-2 select-none sm:gap-3">
         <button
           onClick={toggleSidebar}
           className="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-all duration-200 hidden lg:block cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -189,22 +189,22 @@ export default function Navbar() {
           <Menu className="w-5 h-5" />
         </button>
 
-        <Link href="/" className="flex items-center gap-2.5 group cursor-pointer select-none">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-blue-500/20 group-hover:scale-105 transition-all duration-300">
-            <Compass className="w-5.5 h-5.5 animate-spin-slow" />
+        <Link href="/" className="group flex min-w-0 cursor-pointer items-center gap-2 select-none sm:gap-2.5">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 text-white shadow-md shadow-blue-500/20 transition-all duration-300 group-hover:scale-105">
+            <Compass className="h-5 w-5 animate-spin-slow sm:h-5.5 sm:w-5.5" />
           </div>
-          <span className="text-xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 bg-clip-text text-transparent tracking-tight select-none">
+          <span className="truncate whitespace-nowrap bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 bg-clip-text text-lg font-bold tracking-tight text-transparent select-none sm:text-xl">
             SciSiam
           </span>
         </Link>
       </div>
 
       {/* Right Navigation Controls */}
-      <div className="flex items-center gap-3 sm:gap-5">
+      <div className="flex shrink-0 items-center gap-1.5 sm:gap-5">
         {/* Points/Stars Counter */}
-        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 hover:bg-amber-100/70 border border-amber-200/50 text-amber-700 rounded-full shadow-xs cursor-pointer select-none transition-all duration-300 hover:scale-105 active:scale-95">
-          <Sparkles className="w-4 h-4 text-amber-500 fill-amber-400 animate-pulse" />
-          <span className="text-xs sm:text-sm font-bold">{displayedPoints} แต้ม</span>
+        <div className="flex min-h-10 shrink-0 cursor-pointer select-none items-center gap-1.5 rounded-full border border-amber-200/50 bg-amber-50 px-2.5 py-1.5 text-amber-700 shadow-xs transition-all duration-300 hover:scale-105 hover:bg-amber-100/70 active:scale-95 sm:px-3">
+          <Sparkles className="h-4 w-4 shrink-0 animate-pulse fill-amber-400 text-amber-500" />
+          <span className="whitespace-nowrap text-xs font-bold sm:text-sm">{displayedPoints} แต้ม</span>
         </div>
 
 
@@ -212,7 +212,7 @@ export default function Navbar() {
         <div className="relative">
           <button
             onClick={() => setShowNotification(!showNotification)}
-            className="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-xl relative transition-all duration-200"
+            className="relative rounded-xl p-1.5 text-slate-500 transition-all duration-200 hover:bg-slate-100 hover:text-slate-700 sm:p-2"
             aria-label="การแจ้งเตือน"
           >
             <Bell className="w-5 h-5" />
@@ -255,7 +255,7 @@ export default function Navbar() {
         </div>
 
         {/* Divider */}
-        <span className="h-6 w-px bg-slate-200" />
+        <span className="hidden h-6 w-px bg-slate-200 sm:block" />
 
         {/* User Profile Avatar / Login Button */}
         <div className="relative">
@@ -307,10 +307,10 @@ export default function Navbar() {
           ) : (
             <Link
               href="/login"
-              className="border border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50 text-slate-700 px-4 py-2 rounded-xl flex items-center gap-2 text-sm font-semibold transition-all duration-200 cursor-pointer shadow-xs hover:scale-102 active:scale-98 select-none leading-normal"
+              className="flex min-h-10 shrink-0 cursor-pointer select-none items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-extrabold leading-none text-slate-700 shadow-xs transition-all duration-200 hover:scale-102 hover:border-slate-300 hover:bg-slate-50 active:scale-98 sm:gap-2 sm:px-4 sm:text-sm sm:font-semibold"
             >
-              <User className="w-4 h-4 text-slate-500" />
-              <span>เข้าสู่ระบบ</span>
+              <User className="hidden h-4 w-4 text-slate-500 min-[430px]:block" />
+              <span className="whitespace-nowrap">เข้าสู่ระบบ</span>
             </Link>
           )}
         </div>

@@ -75,16 +75,23 @@ export default function AIChatButton() {
       id: "welcome",
       role: "assistant",
       content:
-        "สวัสดีครับ ผมคือ SciSiam AI Tutor ถามเรื่องแนวคิด สูตร วิธีทดลอง หรือการอ่านกราฟของห้องแล็บนี้ได้เลย",
+        "สวัสดีครับ ผมคือ AI ไออุ่น ถามเรื่องแนวคิด สูตร วิธีทดลอง หรือการอ่านกราฟของห้องแล็บนี้ได้เลย",
     },
   ]);
+
+  useEffect(() => {
+    const handleOpenAi = () => setIsOpen(true);
+
+    window.addEventListener("scisiam-ai-open", handleOpenAi);
+    return () => window.removeEventListener("scisiam-ai-open", handleOpenAi);
+  }, []);
 
   const currentLab = useMemo(() => {
     const labId = getLabIdFromPath(pathname);
     return labId ? labsById[labId] : null;
   }, [pathname]);
 
-  const visibleTitle = currentLab?.title || "Science Tutor";
+  const visibleTitle = currentLab?.title || "ผู้ช่วยวิทยาศาสตร์";
 
   const handleSubmit = async (event?: React.FormEvent<HTMLFormElement>) => {
     event?.preventDefault();
@@ -135,7 +142,7 @@ export default function AIChatButton() {
           id: createId(),
           role: "assistant",
           content:
-            "เชื่อมต่อ AI Tutor ไม่สำเร็จ กรุณาตรวจสอบ API route หรือการตั้งค่า GEMINI_API_KEY ฝั่ง server",
+            "เชื่อมต่อ AI ไออุ่นไม่สำเร็จ กรุณาตรวจสอบ API route หรือการตั้งค่า GEMINI_API_KEY ฝั่ง server",
         },
       ]);
     } finally {
@@ -157,11 +164,11 @@ export default function AIChatButton() {
                 <div className="flex items-center gap-2">
                   <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-white">
                     <Sparkles className="h-4 w-4" />
-                  </span>
-                  <div className="min-w-0">
-                    <p className="text-sm font-extrabold leading-[1.5] text-slate-900">
-                      SciSiam AI Tutor
-                    </p>
+                    </span>
+                    <div className="min-w-0">
+                      <p className="text-sm font-extrabold leading-[1.5] text-slate-900">
+                      AI ไออุ่น
+                      </p>
                     <p className="truncate text-[11px] font-semibold leading-relaxed text-slate-500">
                       {visibleTitle}
                     </p>
@@ -172,7 +179,7 @@ export default function AIChatButton() {
                 type="button"
                 onClick={() => setIsOpen(false)}
                 className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-white hover:text-slate-700 cursor-pointer"
-                aria-label="ปิดหน้าต่าง AI Tutor"
+                aria-label="ปิดหน้าต่าง AI ไออุ่น"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -235,7 +242,7 @@ export default function AIChatButton() {
                 type="submit"
                 disabled={!input.trim() || isSending}
                 className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-300 cursor-pointer"
-                aria-label="ส่งคำถามถึง AI Tutor"
+                aria-label="ส่งคำถามถึง AI ไออุ่น"
               >
                 {isSending ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -256,7 +263,7 @@ export default function AIChatButton() {
         type="button"
         onClick={() => setIsOpen((current) => !current)}
         className="relative flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 text-white shadow-xl shadow-blue-500/25 transition-all duration-300 hover:bg-blue-700 hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-blue-100 cursor-pointer sm:h-14 sm:w-14"
-        aria-label="เปิด SciSiam AI Tutor"
+        aria-label="เปิด AI ไออุ่น"
         aria-expanded={isOpen}
       >
         {isOpen ? <X className="h-5.5 w-5.5 sm:h-6.5 sm:w-6.5" /> : <Bot className="h-5.5 w-5.5 sm:h-6.5 sm:w-6.5" />}
