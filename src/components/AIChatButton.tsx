@@ -11,6 +11,7 @@ import {
   X,
 } from "lucide-react";
 import { labsById } from "@/data/labs";
+import { getSciSiamAiSettings } from "@/components/SettingsModal";
 import { SCISIAM_AUTH_EVENT } from "@/lib/supabase/auth-cache";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 
@@ -110,11 +111,14 @@ export default function AIChatButton() {
     setIsSending(true);
 
     try {
+      const aiSettings = getSciSiamAiSettings();
       const response = await fetch("/api/ai-tutor", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           labId: currentLab?.id || "",
+          aiStyle: aiSettings.aiStyle,
+          aiDetail: aiSettings.aiDetail,
           messages: nextMessages.map(({ role, content }) => ({ role, content })),
         }),
       });

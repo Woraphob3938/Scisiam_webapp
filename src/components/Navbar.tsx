@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Bell, Sparkles, ChevronDown, Compass, Award, Menu, User } from "lucide-react";
 import { useSidebar } from "@/context/SidebarContext";
+import SettingsModal from "@/components/SettingsModal";
 import {
   cacheSciSiamAuth,
   clearSciSiamAuthCache,
@@ -17,6 +18,7 @@ export default function Navbar() {
   const { toggleSidebar } = useSidebar();
   const [showNotification, setShowNotification] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [points, setPoints] = useState(0);
   
   // Auth state variables
@@ -178,6 +180,7 @@ export default function Navbar() {
   const displayedNotifications = isLoggedIn ? notifications : [];
 
   return (
+    <>
     <nav className="sticky top-0 z-50 flex min-h-[64px] w-full items-center justify-between border-b border-slate-100 bg-white/85 px-3 py-2 shadow-xs backdrop-blur-md transition-all duration-300 sm:px-8 sm:py-3.5">
       {/* Logo Section */}
       <div className="flex min-w-0 items-center gap-2 select-none sm:gap-3">
@@ -287,13 +290,17 @@ export default function Navbar() {
                   >
                     โปรไฟล์ของฉัน
                   </Link>
-                  <a
-                    href="#settings"
-                    onClick={() => setShowProfileMenu(false)}
-                    className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-indigo-600 transition-colors font-medium leading-normal"
+                  <button
+                    type="button"
+                    aria-label="Open SciSiam settings"
+                    onClick={() => {
+                      setShowProfileMenu(false);
+                      setShowSettingsModal(true);
+                    }}
+                    className="block w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50 hover:text-indigo-600 transition-colors font-medium leading-normal"
                   >
                     ตั้งค่าบัญชี
-                  </a>
+                  </button>
                   <hr className="my-1 border-slate-50" />
                   <button
                     onClick={() => void handleSignOut()}
@@ -316,5 +323,10 @@ export default function Navbar() {
         </div>
       </div>
     </nav>
+    <SettingsModal
+      isOpen={showSettingsModal}
+      onClose={() => setShowSettingsModal(false)}
+    />
+    </>
   );
 }

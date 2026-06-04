@@ -35,6 +35,23 @@ body {
   overflow-x: hidden;
 }
 
+html[data-scisiam-text-size="large"] {
+  font-size: 17px;
+}
+
+html[data-scisiam-reduce-motion="true"],
+html[data-scisiam-reduce-motion="true"] * {
+  scroll-behavior: auto !important;
+}
+
+html[data-scisiam-reduce-motion="true"] *,
+html[data-scisiam-reduce-motion="true"] *::before,
+html[data-scisiam-reduce-motion="true"] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+}
+
 /* Custom Scrollbar for better aesthetics */
 ::-webkit-scrollbar {
   width: 8px;

@@ -13,6 +13,9 @@ type ChatMessage = {
   content: string;
 };
 
+type AiStyle = "simple" | "hint" | "guided";
+type AiDetail = "short" | "normal" | "detailed";
+
 const DEFAULT_MODEL = "gemini-2.5-flash";
 const MAX_MESSAGES = 10;
 const MAX_MESSAGE_CHARS = 900;
@@ -52,6 +55,40 @@ function sanitizeMessages(value: unknown): ChatMessage[] {
       role: message.role,
       content: message.content.trim().slice(0, MAX_MESSAGE_CHARS),
     }));
+}
+
+function sanitizeAiStyle(value: unknown): AiStyle {
+  return value === "hint" || value === "guided" || value === "simple" ? value : "simple";
+}
+
+function sanitizeAiDetail(value: unknown): AiDetail {
+  return value === "short" || value === "detailed" || value === "normal" ? value : "normal";
+}
+
+function getAiInstruction(style: AiStyle, detail: AiDetail) {
+  const styleInstruction: Record<AiStyle, string> = {
+    simple:
+      "รูปแบบคำตอบ: อธิบายง่าย ใช้ภาษานักเรียน ตัวอย่างใกล้ตัว และหลีกเลี่ยงศัพท์ยากถ้าไม่จำเป็น",
+    hint:
+      "รูปแบบคำตอบ: ช่วยใบ้ก่อน เริ่มด้วยแนวคิดหรือคำถามนำ แล้วค่อยสรุปคำตอบเพื่อไม่เฉลยเร็วเกินไป",
+    guided:
+      "รูปแบบคำตอบ: ถามนำเป็นขั้น แบ่งเหตุผลเป็นลำดับสั้น ๆ และชวนผู้เรียนตรวจคำตอบของตนเอง",
+  };
+
+  const detailInstruction: Record<AiDetail, string> = {
+    short: "ความละเอียด: ตอบสั้น กระชับ ไม่เกิน 4-5 บรรทัด เว้นแต่ผู้ใช้ขอวิธีทำ",
+    normal: "ความละเอียด: ตอบพอดี มีหัวข้อหรือขั้นตอนเท่าที่จำเป็น",
+    detailed:
+      "ความละเอียด: ตอบละเอียดขึ้น แสดงเหตุผล สูตร หน่วย และข้อควรระวังเมื่อเกี่ยวข้อง",
+  };
+
+  return `${styleInstruction[style]}\n${detailInstruction[detail]}`;
+}
+
+function getMaxOutputTokens(detail: AiDetail) {
+  if (detail === "short") return 520;
+  if (detail === "detailed") return 1400;
+  return 1000;
 }
 
 function extractGeminiText(payload: unknown): string {
@@ -208,6 +245,12 @@ export async function POST(request: NextRequest) {
     body && typeof body === "object" && typeof (body as { labId?: unknown }).labId === "string"
       ? (body as { labId: string }).labId
       : "";
+  const aiStyle = sanitizeAiStyle(
+    body && typeof body === "object" ? (body as { aiStyle?: unknown }).aiStyle : null
+  );
+  const aiDetail = sanitizeAiDetail(
+    body && typeof body === "object" ? (body as { aiDetail?: unknown }).aiDetail : null
+  );
   const lab = labsById[labId] || null;
   const requestChars = messages.reduce((total, message) => total + message.content.length, 0);
   if (messages.length === 0) {
@@ -235,6 +278,7 @@ export async function POST(request: NextRequest) {
     "ถ้าถามคำนวณ ให้แสดงสูตร ตัวแปร หน่วย และวิธีคิดสั้น ๆ",
     "ถ้าคำถามไม่เกี่ยวกับวิทยาศาสตร์ ให้ชวนกลับมาที่การทดลองหรือแนวคิดวิทยาศาสตร์อย่างสุภาพ",
     "อย่าอ้างว่ามีข้อมูลการทดลองจริงนอกจากสิ่งที่ผู้ใช้หรือบริบทห้องแล็บให้มา",
+    getAiInstruction(aiStyle, aiDetail),
     labContext,
   ].join("\n");
 
@@ -265,7 +309,7 @@ export async function POST(request: NextRequest) {
           parts: [{ text: instructions }],
         },
         generationConfig: {
-          maxOutputTokens: 1000,
+          maxOutputTokens: getMaxOutputTokens(aiDetail),
           temperature: 0.7,
         },
       }),
