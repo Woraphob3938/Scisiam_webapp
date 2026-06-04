@@ -39,19 +39,19 @@ const roleOptions: Array<{
 
 const subjectBooks = [
   {
-    title: "Physics",
+    title: "ฟิสิกส์",
     label: "วิชา 01",
     tone: "border-t-blue-500 bg-blue-50/70 text-blue-700",
     icon: Atom,
   },
   {
-    title: "Chemistry",
+    title: "เคมี",
     label: "วิชา 02",
     tone: "border-t-purple-500 bg-purple-50/70 text-purple-700",
     icon: Beaker,
   },
   {
-    title: "Biology",
+    title: "ชีววิทยา",
     label: "วิชา 03",
     tone: "border-t-emerald-500 bg-emerald-50/70 text-emerald-700",
     icon: Leaf,
@@ -277,7 +277,7 @@ export default function AuthForm({ initialMode }: AuthFormProps) {
               </h1>
               <p className="text-sm font-semibold leading-relaxed text-slate-500">
                 {isRegister
-                  ? "สร้างบัญชีสำหรับเข้าใช้ SciSiam Virtual Lab ในฐานะนักเรียนหรือคุณครู"
+                  ? "สร้างบัญชีเพื่อเรียน ทดลอง และติดตามความคืบหน้าใน SciSiam"
                   : "ใช้บัญชี SciSiam เพื่อเข้าเรียนหรือจัดการห้องเรียนวิทยาศาสตร์ของคุณ"}
               </p>
             </div>
@@ -536,25 +536,22 @@ function ScienceIntro({ mode }: { mode: AuthMode }) {
           <strong className="text-lg font-extrabold leading-[1.1] text-blue-600">
             SciSiam
           </strong>
-          <span className="text-xs font-bold uppercase leading-[1.2] text-slate-400">
-            Virtual Lab
-          </span>
         </span>
       </div>
 
       <div className="grid gap-4">
-        <p className="text-xs font-bold uppercase leading-[1.45] tracking-[0.08em] text-slate-400">
-          {isRegister ? "สมัครบัญชี · พร้อมใช้ในชั้นเรียน" : "ห้องเรียนวิทย์ · ภาษาไทยเป็นหลัก"}
+        <p className="text-xs font-bold leading-[1.45] tracking-normal text-slate-400">
+          {isRegister ? "สร้างบัญชีสำหรับชั้นเรียนวิทย์" : "SciSiam สำหรับการทดลองวิทยาศาสตร์"}
         </p>
         <h2 className="max-w-2xl text-3xl font-extrabold leading-[1.25] tracking-normal text-slate-950 sm:text-4xl lg:text-[42px]">
           {isRegister
-            ? "สมัครใช้งานเพื่อเริ่มเรียนและสอนแล็บเสมือนจริง"
-            : "เข้าสู่ห้องทดลองวิทยาศาสตร์ที่นักเรียนใช้ได้ทุกวัน"}
+            ? "สร้างบัญชี SciSiam เพื่อเรียนและจัดการห้องแล็บ"
+            : "เข้าสู่ SciSiam แล้วเริ่มทดลองได้ทันที"}
         </h2>
         <p className="max-w-xl text-sm font-semibold leading-[1.75] text-slate-500 sm:text-base">
           {isRegister
-            ? "โฟลว์สมัครสมาชิกเก็บเฉพาะข้อมูลที่จำเป็น พร้อมบทบาทนักเรียนหรือคุณครู โดยยังไม่เพิ่มฟิลด์ตามบทบาท"
-            : "ออกแบบให้ครูและนักเรียนไทยเริ่มบททดลองได้เร็ว เห็นบริบทชัด และไม่ถูกรบกวนด้วยองค์ประกอบที่ไม่จำเป็น"}
+            ? "เลือกบทบาทนักเรียนหรือคุณครู เพื่อใช้แล็บ บันทึกความคืบหน้า และดูภาพรวมการเรียนรู้ให้ตรงกับการใช้งานของคุณ"
+            : "ค้นหาแล็บ ทดลอง บันทึกผล และให้ AI ไออุ่นช่วยอธิบายแนวคิดวิทยาศาสตร์ในที่เดียว"}
         </p>
       </div>
 
@@ -587,15 +584,15 @@ function ScienceIntro({ mode }: { mode: AuthMode }) {
             <FlaskConical className="h-4.5 w-4.5" />
           </span>
           <p className="text-xs font-semibold leading-relaxed text-slate-500 sm:text-sm">
-            ใช้สีรายวิชาเฉพาะในภาพประกอบและสถานะ เพื่อให้ฟอร์มยังเป็นจุดโฟกัสหลักของหน้า
+            แบ่งแล็บตามรายวิชาและสถานะการเรียนรู้ ช่วยให้เลือกบททดลองต่อไปได้เร็วขึ้น
           </p>
         </div>
       </div>
 
       <div className="grid grid-cols-3 gap-3">
-        <TrustItem title="บัญชี SciSiam" text="เส้นทางใช้งานตรงไปตรงมา" />
-        <TrustItem title="48px+" text="ขนาดแตะเหมาะกับมือถือ" />
-        <TrustItem title="Thai-first" text="line-height อ่านสบาย" />
+        <TrustItem title="36 แล็บ" text="ครบฟิสิกส์ เคมี ชีวะ" />
+        <TrustItem title="AI ไออุ่น" text="ช่วยทบทวนแนวคิด" />
+        <TrustItem title="ครู/นักเรียน" text="บทบาทพร้อมใช้งาน" />
       </div>
     </aside>
   );
@@ -615,9 +612,6 @@ function MobileIntro({ mode }: { mode: AuthMode }) {
             <strong className="text-lg font-extrabold leading-[1.1] text-blue-600">
               SciSiam
             </strong>
-            <span className="text-xs font-bold uppercase leading-[1.2] text-slate-400">
-              Virtual Lab
-            </span>
           </span>
         </div>
         <span className="rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-[11px] font-extrabold leading-[1.45] text-blue-600">
