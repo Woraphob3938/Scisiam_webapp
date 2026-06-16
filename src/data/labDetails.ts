@@ -204,9 +204,9 @@ const snellsLawDetails: LabDetailData = {
     "ประเมินและวิเคราะห์เหตุการณ์สะท้อนกลับหมดเมื่อมุมตกกระทบเกินมุมวิกฤตได้"
   ],
   equipments: [
-    { id: "laser-source", name: "แหล่งกำเนิดแสงเลเซอร์", role: "ฉายลำแสงเส้นตรงข้ามตัวกลางสำหรับสังเกตมุมตกกระทบ", note: "ห้ามฉายแสงเลเซอร์เข้าตาผู้ร่วมการทดลองโดยเด็ดขาด", unit: "nm", tone: "rose", visualKey: "GrowLightVisual" },
-    { id: "acrylic-block", name: "แท่งอะคริลิกครึ่งวงกลม (Semicircular Block)", role: "เป็นตัวกลางหักเหแสงที่มีดัชนีหักเหคงที่ค่าหนึ่ง", note: "จัดให้จุดศูนย์กลางตรงกึ่งกลางจานวัดมุมพอดีเพื่อความเที่ยงตรง", unit: "n2", tone: "blue", visualKey: "CuvetteVisual" },
-    { id: "protractor-disk", name: "จานวัดพิกัดมุมตกกระทบและหักเห", role: "บอกพิกัดเป็นองศารอบจุดหมุนตั้งแต่ 0 ถึง 90 องศา", note: "อ่านค่าวัดมุมทั้งสองฝั่งโดยเทียบจากเส้นแนวฉาก (Normal Line)", unit: "deg", tone: "amber", visualKey: "RulerVisual" }
+    { id: "laser-source", name: "แหล่งกำเนิดแสงเลเซอร์", role: "ฉายลำแสงเส้นตรงข้ามตัวกลางสำหรับสังเกตมุมตกกระทบ", note: "ห้ามฉายแสงเลเซอร์เข้าตาผู้ร่วมการทดลองโดยเด็ดขาด", unit: "nm", tone: "rose", visualKey: "LaserSourceVisual" },
+    { id: "acrylic-block", name: "แท่งอะคริลิกครึ่งวงกลม (Semicircular Block)", role: "เป็นตัวกลางหักเหแสงที่มีดัชนีหักเหคงที่ค่าหนึ่ง", note: "จัดให้จุดศูนย์กลางตรงกึ่งกลางจานวัดมุมพอดีเพื่อความเที่ยงตรง", unit: "n2", tone: "blue", visualKey: "AcrylicBlockVisual" },
+    { id: "protractor-disk", name: "จานวัดพิกัดมุมตกกระทบและหักเห", role: "บอกพิกัดเป็นองศารอบจุดหมุนตั้งแต่ 0 ถึง 90 องศา", note: "อ่านค่าวัดมุมทั้งสองฝั่งโดยเทียบจากเส้นแนวฉาก (Normal Line)", unit: "deg", tone: "amber", visualKey: "ProtractorVisual" }
   ],
   steps: [
     { num: 1, title: "ตั้งค่าดัชนีหักเหตัวกลาง", desc: "กำหนดดัชนีหักเหตัวกลางที่ 1 (n₁) และ 2 (n₂)", iconKey: "Sliders", color: "text-blue-500", bg: "bg-blue-50" },

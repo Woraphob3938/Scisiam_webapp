@@ -3,12 +3,12 @@
 import React from "react";
 import Link from "next/link";
 import { Atom, CircuitBoard, FlaskConical, Gauge, Play, ArrowLeft, Snowflake, Thermometer, Leaf, Dna, Microscope, Weight, Sliders, Zap, Sun } from "lucide-react";
+import { getLabReadiness } from "@/data/labReadiness";
 
 interface LabHeroProps {
-  labId?: string;
+  labId: string;
   title: string;
   category: string;
-  status: string;
   description: string;
   onStartExperiment?: () => void;
 }
@@ -768,10 +768,9 @@ const ChemistryConceptHeroIllustration = ({ variant }: { variant: ChemistryHeroV
 
 
 export default function LabHero({
-  labId = "newtons-cooling",
+  labId,
   title,
   category,
-  status,
   description,
   onStartExperiment,
 }: LabHeroProps) {
@@ -825,19 +824,20 @@ export default function LabHero({
     : Atom;
 
   const chemistryTone = isAcidBase || isBoylesLaw || isCharlesLaw || isIdealGas || isLeChateliers || isBeerLambert || isHesssLaw || isGalvanicCell || isChemicalKinetics || isSolubilityProduct || isAvogadrosLaw || isElectrolysis || isColligative;
-  const iconClass = isBiology ? "bg-emerald-600 shadow-emerald-500/20" : chemistryTone ? "bg-cyan-600 shadow-cyan-500/20" : "bg-blue-600 shadow-blue-500/20";
-  const badgeClass = isBiology ? "bg-emerald-50 text-emerald-700 border-emerald-100" : chemistryTone ? "bg-cyan-50 text-cyan-700 border-cyan-100" : "bg-blue-50 text-blue-700 border-blue-100";
+  const readiness = getLabReadiness(labId);
+  const iconClass = isBiology ? "bg-emerald-600 shadow-emerald-500/20" : chemistryTone ? "bg-violet-600 shadow-violet-500/20" : "bg-blue-600 shadow-blue-500/20";
+  const badgeClass = isBiology ? "bg-emerald-50 text-emerald-700 border-emerald-100" : chemistryTone ? "bg-violet-50 text-violet-700 border-violet-100" : "bg-blue-50 text-blue-700 border-blue-100";
 
   return (
     <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-12 md:px-20 py-3 select-none">
-      <div className="relative overflow-hidden bg-white border border-slate-200/70 rounded-2xl p-5 sm:p-6 md:p-7 flex flex-col lg:flex-row items-center justify-between gap-5 md:gap-8">
+      <div className="relative overflow-hidden bg-white border border-slate-200/70 rounded-2xl p-4 sm:p-6 md:p-7 flex flex-col lg:flex-row items-center justify-between gap-3 sm:gap-5 md:gap-8">
 
         {/* Left Side: Content & Actions */}
         <div className="flex-1 flex flex-col items-start text-left z-10 w-full">
           {/* Header row with Atom indicator box and Subject Tags */}
-          <div className="flex flex-wrap items-center gap-2.5 mb-3">
+          <div className="flex flex-wrap items-center gap-2.5 mb-2.5 sm:mb-3">
             {/* Physics Logo Icon */}
-            <div className={`w-10 h-10 rounded-2xl text-white flex items-center justify-center shadow-sm ${iconClass}`}>
+            <div className={`w-9 h-9 rounded-xl text-white flex items-center justify-center shadow-sm sm:h-10 sm:w-10 sm:rounded-2xl ${iconClass}`}>
               <HeroIcon className="w-5 h-5" />
             </div>
 
@@ -846,30 +846,30 @@ export default function LabHero({
               {category}
             </span>
 
-            {/* Status badge */}
-            {status === "ว่าง" && (
-              <span className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs font-semibold rounded-full">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                </span>
-                ว่าง
-              </span>
-            )}
+            <span
+              className={`flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${
+                readiness.isReady
+                  ? "border-emerald-100 bg-emerald-50 text-emerald-700"
+                  : "border-amber-100 bg-amber-50 text-amber-700"
+              }`}
+            >
+              <span className={`h-2 w-2 rounded-full ${readiness.isReady ? "bg-emerald-500" : "bg-amber-500"}`} />
+              {readiness.label}
+            </span>
           </div>
 
           {/* Main Title */}
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 mb-3 leading-[1.18] tracking-normal">
+          <h1 className="break-words text-[1.45rem] sm:text-3xl md:text-4xl font-extrabold text-slate-900 mb-2.5 sm:mb-3 leading-[1.18] tracking-normal">
             {title}
           </h1>
 
           {/* Description */}
-          <p className="text-sm sm:text-base text-slate-600 font-medium leading-relaxed max-w-2xl mb-5">
+          <p className="max-w-2xl break-words text-sm sm:text-base text-slate-600 font-medium leading-[1.6] sm:leading-relaxed mb-4 sm:mb-5">
             {description}
           </p>
 
           {/* Buttons Row */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 w-full sm:w-auto">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3.5 w-full sm:w-auto">
             {/* Start Lab Button */}
             <button
               onClick={onStartExperiment}
@@ -882,8 +882,8 @@ export default function LabHero({
 
             {/* Back Button */}
             <Link
-              href="/"
-              className="flex items-center justify-center gap-1.5 py-3 px-3 text-xs font-bold text-slate-500 hover:text-slate-700 transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-blue-500 rounded-xl focus:outline-none"
+              href="/labs"
+              className="flex items-center justify-center gap-1.5 py-2 px-3 text-xs font-bold text-slate-500 hover:text-slate-700 transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-blue-500 rounded-xl focus:outline-none sm:py-3"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>กลับไปหน้ารายชื่อห้องแล็บ</span>
@@ -892,7 +892,7 @@ export default function LabHero({
         </div>
 
         {/* Right Side: High-Fidelity SVG Experiment Illustration */}
-        <div className="relative shrink-0 w-44 h-44 sm:w-56 sm:h-56 select-none flex items-center justify-center opacity-95">
+        <div className="relative -mt-1 flex h-28 w-28 shrink-0 select-none items-center justify-center opacity-95 sm:mt-0 sm:h-52 sm:w-52 lg:h-56 lg:w-56">
           {isOhmsLaw ? (
             <OhmsHeroIllustration />
           ) : isHookesLaw ? (

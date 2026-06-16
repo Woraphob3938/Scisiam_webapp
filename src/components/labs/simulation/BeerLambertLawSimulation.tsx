@@ -504,10 +504,7 @@ export default function BeerLambertLawSimulation() {
           if (nextProg >= 12 && !questSuccessRef.current) {
             setQuestSuccess(true);
             questSuccessRef.current = true;
-            const pts = Number(localStorage.getItem("scisiam_points") || "120");
-            localStorage.setItem("scisiam_points", String(pts + 25));
-            window.dispatchEvent(new Event("points-updated"));
-            alert("🎉 ยินดีด้วย! คุณปรับแต่งสเปกโทรจนได้ค่าการดูดกลืนแสงจุนสี 0.8 - 1.2 เป็นเวลา 12 วินาทีต่อเนื่องสำเร็จ! รับ +25 แต้ม 💎");
+            alert("🎉 ยินดีด้วย! คุณปรับแต่งสเปกโทรจนได้ค่าการดูดกลืนแสงจุนสี 0.8 - 1.2 เป็นเวลา 12 วินาทีต่อเนื่องสำเร็จ บันทึกผลเพื่อเก็บความคืบหน้า");
           }
         } else {
           setQuestProgress(0);

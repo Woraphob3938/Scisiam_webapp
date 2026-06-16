@@ -19,9 +19,11 @@ type AiDetail = "short" | "normal" | "detailed";
 const DEFAULT_MODEL = "gemini-2.5-flash";
 const MAX_MESSAGES = 10;
 const MAX_MESSAGE_CHARS = 900;
+const MAX_REQUEST_BYTES = 16_384;
 const REQUEST_TIMEOUT_MS = 15_000;
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX_REQUESTS = 12;
+const MAX_MEMORY_RATE_LIMIT_ENTRIES = 5_000;
 
 const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
 type SupabaseServerClient = Awaited<ReturnType<typeof createSupabaseServerClient>>;
@@ -121,8 +123,25 @@ function getRateLimitKey(request: NextRequest): string {
   return createHash("sha256").update(rawClient).digest("hex");
 }
 
+function pruneMemoryRateLimitStore(now: number) {
+  for (const [key, entry] of rateLimitStore) {
+    if (entry.resetAt <= now) {
+      rateLimitStore.delete(key);
+    }
+  }
+
+  if (rateLimitStore.size <= MAX_MEMORY_RATE_LIMIT_ENTRIES) return;
+
+  const oldestEntries = [...rateLimitStore.entries()]
+    .sort(([, left], [, right]) => left.resetAt - right.resetAt)
+    .slice(0, rateLimitStore.size - MAX_MEMORY_RATE_LIMIT_ENTRIES);
+
+  oldestEntries.forEach(([key]) => rateLimitStore.delete(key));
+}
+
 function isMemoryRateLimited(clientId: string): boolean {
   const now = Date.now();
+  pruneMemoryRateLimitStore(now);
   const current = rateLimitStore.get(clientId);
 
   if (!current || current.resetAt <= now) {
@@ -218,16 +237,33 @@ export async function POST(request: NextRequest) {
   const startedAt = Date.now();
   const apiKey = process.env.GEMINI_API_KEY;
   const model = process.env.GEMINI_MODEL || DEFAULT_MODEL;
+  const contentLength = Number(request.headers.get("content-length") || "0");
 
-  if (!apiKey) {
-    return NextResponse.json({
-      error:
-        "ยังไม่ได้ตั้งค่า GEMINI_API_KEY ใน .env.local กรุณาเพิ่ม key และ restart dev server",
-      needsConfiguration: true,
-    });
+  if (Number.isFinite(contentLength) && contentLength > MAX_REQUEST_BYTES) {
+    return NextResponse.json(
+      { error: "ข้อความยาวเกินขนาดที่ระบบรองรับ กรุณาลดประวัติแชตแล้วลองใหม่" },
+      { status: 413 }
+    );
   }
 
   const usageContext = await createUsageContext();
+
+  if (isSupabaseConfigured() && !usageContext.userId) {
+    return NextResponse.json(
+      { error: "กรุณาเข้าสู่ระบบ SciSiam ก่อนใช้งาน AI ไออุ่น" },
+      { status: 401 }
+    );
+  }
+
+  if (!apiKey) {
+    return NextResponse.json(
+      {
+        error: "AI ไออุ่นยังไม่พร้อมใช้งาน กรุณาติดต่อผู้ดูแลระบบ",
+        needsConfiguration: true,
+      },
+      { status: 503 }
+    );
+  }
 
   if (await isRateLimited(getRateLimitKey(request), usageContext)) {
     return NextResponse.json(
@@ -240,10 +276,17 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json().catch(() => null);
+  if (!body || typeof body !== "object") {
+    return NextResponse.json(
+      { error: "รูปแบบคำขอไม่ถูกต้อง" },
+      { status: 400 }
+    );
+  }
+
   const messages = sanitizeMessages(body && typeof body === "object" ? (body as { messages?: unknown }).messages : null);
   const labId =
     body && typeof body === "object" && typeof (body as { labId?: unknown }).labId === "string"
-      ? (body as { labId: string }).labId
+      ? (body as { labId: string }).labId.trim().slice(0, 80)
       : "";
   const aiStyle = sanitizeAiStyle(
     body && typeof body === "object" ? (body as { aiStyle?: unknown }).aiStyle : null
@@ -252,6 +295,13 @@ export async function POST(request: NextRequest) {
     body && typeof body === "object" ? (body as { aiDetail?: unknown }).aiDetail : null
   );
   const lab = labsById[labId] || null;
+  if (labId && !lab) {
+    return NextResponse.json(
+      { error: "ไม่พบห้องแล็บที่ระบุ" },
+      { status: 400 }
+    );
+  }
+
   const requestChars = messages.reduce((total, message) => total + message.content.length, 0);
   if (messages.length === 0) {
     return NextResponse.json(
@@ -338,15 +388,12 @@ export async function POST(request: NextRequest) {
   }
 
   if (!response.ok) {
-    const errorObject = data && typeof data === "object" ? (data as { error?: { message?: string } }).error : null;
-    let errorMessage = errorObject?.message || "เรียก Gemini API ไม่สำเร็จ";
+    let errorMessage = "AI ไออุ่นตอบกลับไม่สำเร็จ กรุณาลองใหม่อีกครั้ง";
 
     if (response.status === 503) {
       errorMessage = "ระบบ AI ของ Google กำลังมีผู้ใช้งานหนาแน่นชั่วคราว (Service Unavailable) กรุณากดส่งข้อความใหม่อีกครั้งครับ";
     } else if (response.status === 429) {
       errorMessage = "ความเร็วในการส่งคำถามเกินโควตาฟรีชั่วคราว (Rate Limit Exceeded) กรุณาเว้นระยะห่าง 10-15 วินาทีก่อนถามใหม่อีกครั้งครับ";
-    } else {
-      errorMessage = `${errorMessage} (กรุณาตรวจสอบ API key หรือโควตาการใช้งาน)`;
     }
 
     await logAiUsage(usageContext, {

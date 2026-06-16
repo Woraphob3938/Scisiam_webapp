@@ -388,6 +388,8 @@ function CoolingFormulaCard() {
 }
 
 // --- MAIN EXPORTED COMPONENT ---
+const MAX_COOLING_DATA_POINTS = 500;
+
 export default function NewtonsCoolingSimulation() {
   const router = useRouter();
   const labId = "newtons-cooling";
@@ -486,13 +488,7 @@ export default function NewtonsCoolingSimulation() {
           if (nextQuestProg >= 20 && !questSuccessRef.current) {
             setQuestSuccess(true);
             questSuccessRef.current = true;
-            
-            // Reward 25 points!
-            const currentPoints = Number(localStorage.getItem("scisiam_points") || "120");
-            const newPoints = currentPoints + 25;
-            localStorage.setItem("scisiam_points", String(newPoints));
-            window.dispatchEvent(new Event("points-updated"));
-            alert("🎉 ยินดีด้วย! คุณผ่านภารกิจควบคุมอุณหภูมิน้ำให้อยู่ในช่วง 50°C - 60°C ต่อเนื่องเป็นเวลา 20 วินาทีสำเร็จ! รับ +25 แต้ม 💎");
+            alert("🎉 ยินดีด้วย! คุณควบคุมอุณหภูมิน้ำให้อยู่ในช่วง 50°C - 60°C ต่อเนื่องเป็นเวลา 20 วินาทีสำเร็จ บันทึกผลเพื่อเก็บความคืบหน้า");
           }
         } else {
           setQuestProgress(0);
@@ -502,10 +498,12 @@ export default function NewtonsCoolingSimulation() {
         // Check if log interval threshold is crossed to auto log a data point
         const mins = nextSeconds / 60;
         if (nextSeconds - lastLoggedTimeRef.current >= logIntervalRef.current) {
-          setDataPoints((prev) => [
-            ...prev,
-            { time: mins, temp: nextTemp, ambient: ambientTempRef.current },
-          ]);
+          setDataPoints((prev) =>
+            [
+              ...prev,
+              { time: mins, temp: nextTemp, ambient: ambientTempRef.current },
+            ].slice(-MAX_COOLING_DATA_POINTS),
+          );
           setLastLoggedTime(nextSeconds);
           lastLoggedTimeRef.current = nextSeconds;
         }
@@ -569,10 +567,12 @@ export default function NewtonsCoolingSimulation() {
     const mins = elapsedSeconds / 60;
     if (dataPoints.some(p => p.time === mins)) return;
 
-    setDataPoints((prev) => [
-      ...prev,
-      { time: mins, temp: currentTemp, ambient: ambientTemp },
-    ]);
+    setDataPoints((prev) =>
+      [
+        ...prev,
+        { time: mins, temp: currentTemp, ambient: ambientTemp },
+      ].slice(-MAX_COOLING_DATA_POINTS),
+    );
   };
 
   // Clear single point from table

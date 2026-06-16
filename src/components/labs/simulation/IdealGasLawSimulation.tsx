@@ -400,12 +400,7 @@ export default function IdealGasLawSimulation() {
         if (nextQuestProg >= 10 && !questSuccessRef.current) {
           setQuestSuccess(true);
           questSuccessRef.current = true;
-
-          // Award 25 points
-          const currentPoints = Number(localStorage.getItem("scisiam_points") || "120");
-          localStorage.setItem("scisiam_points", String(currentPoints + 25));
-          window.dispatchEvent(new Event("points-updated"));
-          alert("🎉 ยินดีด้วย! คุณผ่านภารกิจรักษาสมดุลความดันแก๊สให้อยู่ในช่วง 300 kPa - 400 kPa สำเร็จ! รับ +25 แต้ม 💎");
+          alert("🎉 ยินดีด้วย! คุณผ่านภารกิจรักษาสมดุลความดันแก๊สให้อยู่ในช่วง 300 kPa - 400 kPa บันทึกผลเพื่อเก็บความคืบหน้า");
         }
       } else {
         setQuestProgress(0);

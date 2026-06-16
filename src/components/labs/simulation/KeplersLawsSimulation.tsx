@@ -435,12 +435,7 @@ export default function KeplersLawsSimulation() {
     if (Math.abs(semiMajorAxis - 4.0) < 0.01 && !questSuccess) {
       const timer = setTimeout(() => {
         setQuestSuccess(true);
-
-        // Award points (+25)
-        const currentPoints = Number(localStorage.getItem("scisiam_points") || "120");
-        localStorage.setItem("scisiam_points", String(currentPoints + 25));
-        window.dispatchEvent(new Event("points-updated"));
-        alert("🎉 ภารกิจสำเร็จ! คุณตั้งระยะกึ่งแกนเอกเป็น 4.00 AU ทำให้คาบการโคจรเท่ากับ 8.00 ปีพอดิบพอดี ซึ่งยืนยันความถูกต้องของกฎข้อที่ 3 ของเคปเลอร์ (T²/a³ = 1.0) รับ +25 คะแนน 💎");
+        alert("🎉 ภารกิจสำเร็จ! คุณตั้งระยะกึ่งแกนเอกเป็น 4.00 AU ทำให้คาบการโคจรเท่ากับ 8.00 ปี และยืนยันกฎข้อที่ 3 ของเคปเลอร์ บันทึกผลเพื่อเก็บความคืบหน้า");
       }, 0);
       return () => clearTimeout(timer);
     }

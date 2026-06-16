@@ -19,7 +19,6 @@ import {
 } from "lucide-react";
 import { cacheSciSiamAuth } from "@/lib/supabase/auth-cache";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
-import type { ScisiamUserRole } from "@/lib/supabase/database.types";
 
 interface AuthFormProps {
   initialMode: "login" | "register";
@@ -27,6 +26,9 @@ interface AuthFormProps {
 
 type AuthMode = "login" | "register";
 type AuthRole = "student" | "teacher";
+
+const isDemoModeEnabled =
+  process.env.NEXT_PUBLIC_ENABLE_DEMO_MODE === "true";
 
 const roleOptions: Array<{
   id: AuthRole;
@@ -130,7 +132,7 @@ export default function AuthForm({ initialMode }: AuthFormProps) {
           options: {
             data: {
               display_name: fullName.trim(),
-              role,
+              requested_role: role,
             },
           },
         });
@@ -153,16 +155,14 @@ export default function AuthForm({ initialMode }: AuthFormProps) {
           return;
         }
 
-        await ensureProfile({
+        const profile = await ensureProfile({
           userId: data.user.id,
-          email: normalizedEmail,
           displayName: fullName.trim(),
-          role,
         });
 
         cacheSciSiamAuth({
           email: normalizedEmail,
-          role,
+          role: profile.role,
           displayName: fullName.trim(),
           totalPoints: 0,
         });
@@ -180,18 +180,10 @@ export default function AuthForm({ initialMode }: AuthFormProps) {
 
         const profile = await ensureProfile({
           userId: data.user.id,
-          email: normalizedEmail,
           displayName:
             typeof data.user.user_metadata?.display_name === "string"
               ? data.user.user_metadata.display_name
-              : role === "teacher"
-                ? "คุณครูผู้จัดการ"
-                : "นักเรียน",
-          role:
-            data.user.user_metadata?.role === "teacher" ||
-            data.user.user_metadata?.role === "student"
-              ? data.user.user_metadata.role
-              : role,
+              : "นักเรียน",
         });
 
         cacheSciSiamAuth({
@@ -217,6 +209,8 @@ export default function AuthForm({ initialMode }: AuthFormProps) {
   };
 
   const handleDemoTeacherLogin = () => {
+    if (!isDemoModeEnabled) return;
+
     localStorage.setItem("scisiam_demo_mode", "true");
     cacheSciSiamAuth({
       role: "teacher",
@@ -482,35 +476,37 @@ export default function AuthForm({ initialMode }: AuthFormProps) {
                 </button>
               </p>
 
-              {isRegister ? (
-                <button
-                  type="button"
-                  onClick={handleDemoTeacherLogin}
-                  className="mx-auto inline-flex min-h-8 items-center justify-center gap-1.5 rounded-lg px-2 text-xs font-extrabold leading-[1.45] text-slate-500 transition-colors hover:text-blue-600 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
-                >
-                  <span>ทดลองในบทบาทคุณครู</span>
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </button>
-              ) : (
-                <>
-                  <div className="flex items-center gap-3">
-                    <span className="h-px flex-1 bg-slate-100" />
-                    <span className="text-[11px] font-bold leading-[1.45] text-slate-400">
-                      สำหรับทดลองใช้งาน
-                    </span>
-                    <span className="h-px flex-1 bg-slate-100" />
-                  </div>
-
+              {isDemoModeEnabled ? (
+                isRegister ? (
                   <button
                     type="button"
                     onClick={handleDemoTeacherLogin}
-                    className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-3 text-xs font-extrabold leading-[1.45] text-slate-700 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-50 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
+                    className="mx-auto inline-flex min-h-8 items-center justify-center gap-1.5 rounded-lg px-2 text-xs font-extrabold leading-[1.45] text-slate-500 transition-colors hover:text-blue-600 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
                   >
-                    <span>เข้าใช้งานในบทบาทคุณครู</span>
-                    <ArrowRight className="h-3.5 w-3.5 text-slate-400" />
+                    <span>ทดลองในบทบาทคุณครู</span>
+                    <ArrowRight className="h-3.5 w-3.5" />
                   </button>
-                </>
-              )}
+                ) : (
+                  <>
+                    <div className="flex items-center gap-3">
+                      <span className="h-px flex-1 bg-slate-100" />
+                      <span className="text-[11px] font-bold leading-[1.45] text-slate-400">
+                        สำหรับทดลองใช้งาน
+                      </span>
+                      <span className="h-px flex-1 bg-slate-100" />
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={handleDemoTeacherLogin}
+                      className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-3 text-xs font-extrabold leading-[1.45] text-slate-700 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-50 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
+                    >
+                      <span>เข้าใช้งานในบทบาทคุณครู</span>
+                      <ArrowRight className="h-3.5 w-3.5 text-slate-400" />
+                    </button>
+                  </>
+                )
+              ) : null}
             </div>
             </div>
           </form>
@@ -754,9 +750,7 @@ function toThaiAuthError(message: string) {
 
 async function ensureProfile(input: {
   userId: string;
-  email: string;
   displayName: string;
-  role: "student" | "teacher";
 }) {
   const supabase = createClient();
   const { data: existing } = await supabase
@@ -771,16 +765,9 @@ async function ensureProfile(input: {
 
   const fallbackProfile = {
     display_name: input.displayName,
-    role: input.role as ScisiamUserRole,
+    role: "student" as const,
     total_points: 0,
   };
-
-  await supabase.from("profiles").upsert({
-    id: input.userId,
-    email: input.email,
-    display_name: input.displayName,
-    role: input.role,
-  });
 
   return fallbackProfile;
 }

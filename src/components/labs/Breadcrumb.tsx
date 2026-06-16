@@ -11,8 +11,8 @@ interface BreadcrumbProps {
 
 export default function Breadcrumb({ category, title }: BreadcrumbProps) {
   const categoryHref = ["Physics", "Chemistry", "Biology"].includes(category)
-    ? `/?category=${encodeURIComponent(category)}`
-    : "/";
+    ? `/labs?category=${encodeURIComponent(category)}`
+    : "/labs";
 
   return (
       <nav className="flex min-w-0 items-center gap-1.5 text-xs sm:text-sm font-semibold select-none">

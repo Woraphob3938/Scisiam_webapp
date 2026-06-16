@@ -13,7 +13,7 @@ export function getLabReadiness(labId: string) {
     isReady,
     label: isReady ? "พร้อมทดลอง" : "กำลังเตรียม",
     description: isReady
-      ? "เปิด simulation ได้ทันที"
-      : "กำลังจัดเนื้อหาและ simulation ให้ตรงหัวข้อ",
+      ? "เปิดห้องทดลองจำลองได้ทันที"
+      : "กำลังจัดเนื้อหาและห้องทดลองจำลองให้ตรงหัวข้อ",
   };
 }

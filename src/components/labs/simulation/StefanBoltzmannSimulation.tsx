@@ -383,12 +383,7 @@ export default function StefanBoltzmannSimulation() {
             const nextTime = Number((prev + 0.1).toFixed(1));
             if (nextTime >= 5.0) {
               setQuestSuccess(true);
-              
-              // Award points (+25)
-              const currentPoints = Number(localStorage.getItem("scisiam_points") || "120");
-              localStorage.setItem("scisiam_points", String(currentPoints + 25));
-              window.dispatchEvent(new Event("points-updated"));
-              alert("🎉 ภารกิจสำเร็จ! คุณควบคุมความเข้มของการแผ่รังสีให้อยู่ในช่วง 5.0e7 - 6.0e7 W/m² (อุณหภูมิประมาณ 5446 K - 5702 K) ต่อเนื่องเป็นเวลา 5 วินาทีได้สำเร็จ! รับ +25 คะแนน 💎");
+              alert("🎉 ภารกิจสำเร็จ! คุณควบคุมความเข้มของการแผ่รังสีให้อยู่ในช่วง 5.0e7 - 6.0e7 W/m² ต่อเนื่องเป็นเวลา 5 วินาที บันทึกผลเพื่อเก็บความคืบหน้า");
               return 5.0;
             }
             return nextTime;

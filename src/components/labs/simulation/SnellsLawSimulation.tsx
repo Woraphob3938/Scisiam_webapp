@@ -322,12 +322,7 @@ export default function SnellsLawSimulation() {
         if (nextQuestProg >= 5 && !questSuccessRef.current) {
           setQuestSuccess(true);
           questSuccessRef.current = true;
-
-          // Award 25 points
-          const currentPoints = Number(localStorage.getItem("scisiam_points") || "120");
-          localStorage.setItem("scisiam_points", String(currentPoints + 25));
-          window.dispatchEvent(new Event("points-updated"));
-          alert("🎉 ยินดีด้วย! คุณผ่านภารกิจค้นหามุมวิกฤตของน้ำไปสู่อากาศสำเร็จ! และเรียนรู้คุณสมบัติสะท้อนกลับหมด ได้รับ +25 แต้ม 💎");
+          alert("🎉 ยินดีด้วย! คุณค้นหามุมวิกฤตของน้ำไปสู่อากาศและสังเกตการสะท้อนกลับหมดได้สำเร็จ บันทึกผลเพื่อเก็บความคืบหน้า");
         }
       } else {
         setQuestProgress(0);

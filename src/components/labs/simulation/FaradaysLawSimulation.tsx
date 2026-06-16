@@ -123,10 +123,7 @@ export default function FaradaysLawSimulation() {
       if (nextCount >= 5 && !questSuccessRef.current) {
         setQuestSuccess(true);
         questSuccessRef.current = true;
-        const currentPoints = Number(localStorage.getItem("scisiam_points") || "120");
-        localStorage.setItem("scisiam_points", String(currentPoints + 25));
-        window.dispatchEvent(new Event("points-updated"));
-        alert("🎉 ภารกิจสำเร็จ! เหนี่ยวนำแรงดันไฟฟ้าสูงสุด >= 8.0 V ครบ 5 ครั้งสำเร็จ! ได้รับ +25 แต้ม 💎");
+        alert("🎉 ภารกิจสำเร็จ! เหนี่ยวนำแรงดันไฟฟ้าสูงสุด >= 8.0 V ครบ 5 ครั้ง บันทึกผลเพื่อเก็บความคืบหน้า");
       }
     }
 

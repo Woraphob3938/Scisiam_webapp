@@ -484,11 +484,8 @@ export default function HesssLawSimulation() {
             if (error < 5.0) {
               setQuestSuccess(true);
               questSuccessRef.current = true;
-              const pts = Number(localStorage.getItem("scisiam_points") || "120");
-              localStorage.setItem("scisiam_points", String(pts + 25));
-              window.dispatchEvent(new Event("points-updated"));
               setTimeout(() => {
-                alert("🎉 สุดยอดมาก! คุณพิสูจน์กฎของเฮสส์ได้ถูกต้องโดยมีความคลาดเคลื่อนสะสมไม่ถึง 5.0% สำเร็จ! รับ +25 แต้ม 💎");
+                alert("🎉 สุดยอดมาก! คุณพิสูจน์กฎของเฮสส์ได้ถูกต้องโดยมีความคลาดเคลื่อนสะสมไม่ถึง 5.0% บันทึกผลเพื่อเก็บความคืบหน้า");
               }, 150);
             }
           }

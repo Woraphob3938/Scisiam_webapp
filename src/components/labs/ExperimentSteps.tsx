@@ -50,10 +50,10 @@ const iconMap: Record<string, LucideIcon> = {
 };
 
 interface ExperimentStepsProps {
-  labId?: string;
+  labId: string;
 }
 
-export default function ExperimentSteps({ labId = "newtons-cooling" }: ExperimentStepsProps) {
+export default function ExperimentSteps({ labId }: ExperimentStepsProps) {
   const details = getLabDetails(labId);
   if (!details) return null;
 

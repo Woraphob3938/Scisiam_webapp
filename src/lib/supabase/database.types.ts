@@ -289,7 +289,6 @@ export type Database = {
       claim_mission_reward: {
         Args: {
           p_mission_id: string;
-          p_progress_count?: number;
         };
         Returns: Json;
       };

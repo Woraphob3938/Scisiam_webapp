@@ -1,4 +1,5 @@
-import { labsById } from "@/data/labs";
+import { LAB_SAVED_EXPERIMENT_KEYS } from "@/data/labSavedExperiments";
+import { labsById, labsData } from "@/data/labs";
 
 import { cacheSciSiamAuth } from "./auth-cache";
 import { createClient, isSupabaseConfigured } from "./client";
@@ -33,35 +34,23 @@ export type LearningSnapshot = {
   };
 };
 
-export const LOCAL_EXPERIMENTS: LocalExperimentDefinition[] = [
-  { labId: "newtons-cooling", title: "Newton's law of cooling", storageKeys: ["scisiam_saved_cooling_experiment"] },
-  { labId: "ohms-law", title: "Ohm's Law & DC Circuits", storageKeys: ["scisiam_saved_ohms_experiment"] },
-  { labId: "hookes-law", title: "Hooke's Law of Elasticity", storageKeys: ["scisiam_saved_hookes_experiment"] },
-  { labId: "acid-base-titration", title: "Acid-Base Titration Lab", storageKeys: ["scisiam_saved_titration_experiment"] },
-  { labId: "boyles-law", title: "Boyle's Gas Law Lab", storageKeys: ["scisiam_saved_boyle_experiment"] },
-  { labId: "charles-law", title: "Charles's Temperature-Volume Lab", storageKeys: ["scisiam_saved_charles_experiment"] },
-  { labId: "photosynthesis-rate", title: "Photosynthesis Rate Chamber", storageKeys: ["scisiam_saved_photosynthesis_experiment"] },
-  { labId: "mendels-inheritance", title: "Mendelian Genetics Lab", storageKeys: ["scisiam_saved_mendelian_experiment"] },
-  { labId: "mitosis-division", title: "Mitosis & Cell Cycle", storageKeys: ["scisiam_saved_mitosis_experiment"] },
-  { labId: "snells-law", title: "Snell's Law of Refraction", storageKeys: ["scisiam_saved_snells_experiment", "scisiam_saved_snell_experiment"] },
-  { labId: "ideal-gas-law", title: "Ideal Gas Law Simulation", storageKeys: ["scisiam_saved_ideal_gas_experiment", "scisiam_saved_gas_experiment"] },
-  { labId: "newtons-second-law", title: "Newton's Second Law of Motion", storageKeys: ["scisiam_saved_newtons_second_experiment", "scisiam_saved_second_law_experiment"] },
-  { labId: "momentum-conservation", title: "Conservation of Linear Momentum", storageKeys: ["scisiam_saved_momentum_experiment"] },
-  { labId: "faradays-law", title: "Faraday's Electromagnetic Induction", storageKeys: ["scisiam_saved_faradays_experiment"] },
-  { labId: "bernoullis-principle", title: "Bernoulli's Principle & Fluid Dynamics", storageKeys: ["scisiam_saved_bernoulli_experiment"] },
-  { labId: "photoelectric-effect", title: "Einstein's Photoelectric Effect", storageKeys: ["scisiam_saved_photoelectric_experiment"] },
-  { labId: "keplers-laws", title: "Kepler's Third Law of Planetary Motion", storageKeys: ["scisiam_saved_kepler_experiment"] },
-  { labId: "stefan-boltzmann", title: "Stefan-Boltzmann Law of Blackbody Radiation", storageKeys: ["scisiam_saved_stefan_boltzmann_experiment", "scisiam_saved_stefan_experiment"] },
-  { labId: "le-chateliers-principle", title: "Chemical Equilibrium Shift", storageKeys: ["scisiam_saved_le_chateliers_experiment"] },
-  { labId: "beer-lambert-law", title: "Spectrophotometry & Concentration", storageKeys: ["scisiam_saved_beer_lambert_experiment"] },
-  { labId: "hesss-law", title: "Hess's Law & Calorimetry", storageKeys: ["scisiam_saved_hesss_experiment"] },
-  { labId: "galvanic-cell", title: "Galvanic Cells & Voltage", storageKeys: ["scisiam_saved_galvanic_experiment"] },
-  { labId: "chemical-kinetics", title: "Chemical Reaction Rates", storageKeys: ["scisiam_saved_kinetics_experiment"] },
-  { labId: "solubility-product", title: "Solubility Product Constant", storageKeys: ["scisiam_saved_ksp_experiment"] },
-  { labId: "avogadros-law", title: "Avogadro's Molar Volume", storageKeys: ["scisiam_saved_avogadro_experiment"] },
-  { labId: "electrolysis-lab", title: "Electrolysis & Metal Plating", storageKeys: ["scisiam_saved_electrolysis_experiment"] },
-  { labId: "colligative-properties", title: "Colligative Properties Lab", storageKeys: ["scisiam_saved_colligative_experiment"] },
-];
+const LEGACY_EXPERIMENT_KEYS: Partial<Record<string, string[]>> = {
+  "snells-law": ["scisiam_saved_snell_experiment"],
+  "ideal-gas-law": ["scisiam_saved_gas_experiment"],
+  "newtons-second-law": ["scisiam_saved_second_law_experiment"],
+  "stefan-boltzmann": ["scisiam_saved_stefan_experiment"],
+};
+
+export const LOCAL_EXPERIMENTS: LocalExperimentDefinition[] = labsData.flatMap((lab) => {
+  const primaryKey = LAB_SAVED_EXPERIMENT_KEYS[lab.id];
+  if (!primaryKey) return [];
+
+  return [{
+    labId: lab.id,
+    title: lab.title,
+    storageKeys: [primaryKey, ...(LEGACY_EXPERIMENT_KEYS[lab.id] ?? [])],
+  }];
+});
 
 const getTitle = (labId: string, fallback?: string | null) =>
   fallback || labsById[labId]?.title || labId;
@@ -154,7 +143,6 @@ export async function loadSupabaseLearningSnapshot(): Promise<LearningSnapshot |
 
   const recentRuns =
     runsResult.data?.map((run) => {
-      completedIds.add(run.lab_id);
       return {
         id: run.id,
         labId: run.lab_id,

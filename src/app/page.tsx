@@ -23,6 +23,10 @@ import { useSidebar } from "@/context/SidebarContext";
 import { labsById, labsData } from "@/data/labs";
 import { readyLabCount } from "@/data/labReadiness";
 import { SCISIAM_AUTH_EVENT, SCISIAM_POINTS_EVENT } from "@/lib/supabase/auth-cache";
+import {
+  loadSupabaseLearningSnapshot,
+  readLocalLearningSnapshot,
+} from "@/lib/supabase/learning-snapshot";
 
 type HomeSnapshot = {
   completedLabs: number;
@@ -70,20 +74,13 @@ const categoryMeta = [
 function readHomeSnapshot(): HomeSnapshot {
   if (typeof window === "undefined") return initialSnapshot;
 
-  let completedLabs = 0;
-  for (let index = 0; index < localStorage.length; index += 1) {
-    const key = localStorage.key(index);
-    if (key?.startsWith("scisiam_saved_")) {
-      completedLabs += 1;
-    }
-  }
-
+  const learningSnapshot = readLocalLearningSnapshot();
   const role = localStorage.getItem("scisiam_user_role") === "teacher" ? "teacher" : "student";
 
   return {
-    completedLabs,
+    completedLabs: learningSnapshot.completedCount,
     isLoggedIn: localStorage.getItem("scisiam_logged_in") === "true",
-    points: Number(localStorage.getItem("scisiam_points") || "0"),
+    points: learningSnapshot.points,
     role,
     userName: localStorage.getItem("scisiam_user_name") || (role === "teacher" ? "คุณครู" : "นักเรียน"),
   };
@@ -95,7 +92,33 @@ export default function Home() {
   const [snapshot, setSnapshot] = useState<HomeSnapshot>(initialSnapshot);
 
   useEffect(() => {
-    const syncSnapshot = () => setSnapshot(readHomeSnapshot());
+    const syncSnapshot = () => {
+      const localSnapshot = readHomeSnapshot();
+      setSnapshot(localSnapshot);
+
+      void loadSupabaseLearningSnapshot()
+        .then((cloudSnapshot) => {
+          if (!cloudSnapshot) return;
+
+          const cloudRole =
+            cloudSnapshot.profile?.role === "teacher" ||
+            cloudSnapshot.profile?.role === "admin"
+              ? "teacher"
+              : "student";
+
+          setSnapshot({
+            completedLabs: cloudSnapshot.completedCount,
+            isLoggedIn: true,
+            points: cloudSnapshot.points,
+            role: cloudSnapshot.profile ? cloudRole : localSnapshot.role,
+            userName:
+              cloudSnapshot.profile?.displayName ?? localSnapshot.userName,
+          });
+        })
+        .catch((error) => {
+          console.error("Failed to load home learning progress", error);
+        });
+    };
 
     syncSnapshot();
     window.addEventListener("storage", syncSnapshot);

@@ -58,7 +58,6 @@ export async function loadClaimedMissionIds() {
 
 export async function claimMissionReward(input: {
   missionId: string;
-  progressCount: number;
 }): Promise<ClaimMissionResult> {
   if (!isSupabaseConfigured()) {
     return { ok: false, reason: "not_configured" };
@@ -75,7 +74,6 @@ export async function claimMissionReward(input: {
 
   const { data, error } = await supabase.rpc("claim_mission_reward", {
     p_mission_id: input.missionId,
-    p_progress_count: input.progressCount,
   });
 
   if (error) {

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import {
   Bot,
@@ -36,6 +36,8 @@ export default function AIChatButton() {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState("");
   const [isSending, setIsSending] = useState(false);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   
   // Conditionally hide AI Chat Button based on login status and page route
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -86,6 +88,21 @@ export default function AIChatButton() {
     window.addEventListener("scisiam-ai-open", handleOpenAi);
     return () => window.removeEventListener("scisiam-ai-open", handleOpenAi);
   }, []);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    inputRef.current?.focus();
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsOpen(false);
+        requestAnimationFrame(() => triggerRef.current?.focus());
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen]);
 
   const currentLab = useMemo(() => {
     const labId = getLabIdFromPath(pathname);
@@ -161,7 +178,12 @@ export default function AIChatButton() {
   return (
     <div className="fixed bottom-[calc(5.75rem+env(safe-area-inset-bottom))] right-3 z-50 flex flex-col items-end gap-3 select-none sm:right-6 lg:bottom-6">
       {isOpen && (
-        <div className="w-[min(380px,calc(100vw-32px))] h-[min(560px,calc(100vh-100px))] flex flex-col overflow-hidden rounded-[24px] border border-slate-200/80 bg-white text-left shadow-2xl shadow-slate-300/40 animate-in slide-in-from-bottom-5 fade-in duration-300">
+        <div
+          id="ai-tutor-dialog"
+          role="dialog"
+          aria-labelledby="ai-tutor-title"
+          className="w-[min(380px,calc(100vw-32px))] h-[min(560px,calc(100vh-100px))] flex flex-col overflow-hidden rounded-[24px] border border-slate-200/80 bg-white text-left shadow-2xl shadow-slate-300/40 animate-in slide-in-from-bottom-5 fade-in duration-300"
+        >
           <div className="border-b border-slate-100 bg-slate-50/70 px-4 py-3">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
@@ -170,7 +192,10 @@ export default function AIChatButton() {
                     <Sparkles className="h-4 w-4" />
                     </span>
                     <div className="min-w-0">
-                      <p className="text-sm font-extrabold leading-[1.5] text-slate-900">
+                      <p
+                        id="ai-tutor-title"
+                        className="text-sm font-extrabold leading-[1.5] text-slate-900"
+                      >
                       AI ไออุ่น
                       </p>
                     <p className="truncate text-[11px] font-semibold leading-relaxed text-slate-500">
@@ -181,7 +206,10 @@ export default function AIChatButton() {
               </div>
               <button
                 type="button"
-                onClick={() => setIsOpen(false)}
+                onClick={() => {
+                  setIsOpen(false);
+                  requestAnimationFrame(() => triggerRef.current?.focus());
+                }}
                 className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-white hover:text-slate-700 cursor-pointer"
                 aria-label="ปิดหน้าต่าง AI ไออุ่น"
               >
@@ -190,7 +218,11 @@ export default function AIChatButton() {
             </div>
           </div>
 
-          <div className="flex-1 space-y-3 overflow-y-auto px-4 py-4">
+          <div
+            className="flex-1 space-y-3 overflow-y-auto px-4 py-4"
+            aria-live="polite"
+            aria-busy={isSending}
+          >
             {currentLab && (
               <div className="flex items-start gap-2 rounded-xl border border-blue-100 bg-blue-50/60 px-3 py-2.5">
                 <FlaskConical className="mt-0.5 h-4 w-4 shrink-0 text-blue-600" />
@@ -230,6 +262,7 @@ export default function AIChatButton() {
           <form onSubmit={handleSubmit} className="border-t border-slate-100 bg-white p-3">
             <div className="flex items-end gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 focus-within:border-blue-300 focus-within:bg-white">
               <textarea
+                ref={inputRef}
                 value={input}
                 onChange={(event) => setInput(event.target.value)}
                 onKeyDown={(event) => {
@@ -239,6 +272,7 @@ export default function AIChatButton() {
                   }
                 }}
                 rows={1}
+                aria-label="พิมพ์คำถามถึง AI ไออุ่น"
                 placeholder="ถามเรื่องสูตร กราฟ หรือขั้นตอนทดลอง..."
                 className="max-h-24 min-h-8 flex-1 resize-none bg-transparent text-xs font-semibold leading-relaxed text-slate-700 outline-none placeholder:text-slate-400"
               />
@@ -264,11 +298,20 @@ export default function AIChatButton() {
 
       {/* Floating Action Button */}
       <button
+        ref={triggerRef}
         type="button"
-        onClick={() => setIsOpen((current) => !current)}
+        onClick={() => {
+          if (isOpen) {
+            setIsOpen(false);
+          } else {
+            setIsOpen(true);
+          }
+        }}
         className="relative flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 text-white shadow-xl shadow-blue-500/25 transition-all duration-300 hover:bg-blue-700 hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-blue-100 cursor-pointer sm:h-14 sm:w-14"
         aria-label="เปิด AI ไออุ่น"
         aria-expanded={isOpen}
+        aria-haspopup="dialog"
+        aria-controls="ai-tutor-dialog"
       >
         {isOpen ? <X className="h-5.5 w-5.5 sm:h-6.5 sm:w-6.5" /> : <Bot className="h-5.5 w-5.5 sm:h-6.5 sm:w-6.5" />}
         {!isOpen && (

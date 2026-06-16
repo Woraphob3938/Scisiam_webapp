@@ -1,160 +1,227 @@
 "use client";
 
 import React from "react";
-import { BarChart2, Clock, Sparkles, Languages, CheckSquare, Info, ShieldAlert, Award, Beaker } from "lucide-react";
+import {
+  Award,
+  BookOpen,
+  CheckSquare,
+  ClipboardList,
+  Info,
+  LineChart,
+  ShieldCheck,
+  Sparkles,
+} from "lucide-react";
+
+import { getLabDetails } from "@/data/labDetails";
+import { getLabReadiness } from "@/data/labReadiness";
+import { labsById } from "@/data/labs";
 
 interface LabSidebarProps {
-  labId?: string;
+  labId: string;
   hasSavedResult?: boolean;
 }
 
+type InfoRow = {
+  label: string;
+  value: string;
+  helper: string;
+  icon: typeof BookOpen;
+  iconClass: string;
+};
+
+function buildAdviceList(labId: string) {
+  const details = getLabDetails(labId);
+  const primaryEquipment = details?.equipments[0];
+  const firstStep = details?.steps[0];
+  const finalStep = details?.steps.at(-1);
+
+  if (!details || !primaryEquipment || !firstStep || !finalStep) {
+    return [
+      "อ่านวัตถุประสงค์และทฤษฎีของแล็บนี้ก่อนเริ่มทดลอง",
+      "ปรับตัวแปรทีละค่าเพื่อให้เห็นผลลัพธ์ที่ชัดเจน",
+      "บันทึกผลหลังทดลองเพื่อเก็บความคืบหน้าของห้องแล็บนี้",
+    ];
+  }
+
+  return [
+    `ตรวจ ${primaryEquipment.name} ให้พร้อม: ${primaryEquipment.note}`,
+    `เริ่มจาก "${firstStep.title}" แล้วทำตามลำดับขั้นตอนของแล็บนี้`,
+    `เมื่อถึง "${finalStep.title}" ให้บันทึกผลและเทียบกับทฤษฎีที่แสดงไว้`,
+  ];
+}
+
 export default function LabSidebar({
-  labId = "newtons-cooling",
+  labId,
   hasSavedResult = false,
 }: LabSidebarProps) {
-  const isOhmsLaw = labId === "ohms-law";
-  const isHookesLaw = labId === "hookes-law";
-  const isAcidBase = labId === "acid-base-titration";
-  const isBoylesLaw = labId === "boyles-law";
-  const isCharlesLaw = labId === "charles-law";
-  const isPhotosynthesis = labId === "photosynthesis-rate";
-  const isMendelian = labId === "mendels-inheritance";
-  const isMitosis = labId === "mitosis-division";
-
+  const lab = labsById[labId];
+  const details = getLabDetails(labId);
+  const readiness = getLabReadiness(labId);
   const labProgress = hasSavedResult ? 100 : 0;
   const labProgressLabel = hasSavedResult
     ? "บันทึกผลทดลองล่าสุดแล้ว"
     : "ยังไม่ได้บันทึกผลทดลอง";
-  const missionProgressLabel = hasSavedResult ? "1 / 1 ห้อง" : "0 / 1 ห้อง";
+  const missionProgressLabel = hasSavedResult ? "สำเร็จแล้ว" : "รอการบันทึก";
+  const stepCount = details?.steps.length ?? 0;
+  const firstStep = details?.steps[0];
+  const finalStep = details?.steps.at(-1);
+  const primaryEquation = details?.equationLabels[0];
+  const adviceList = buildAdviceList(labId);
 
-  // 1. Lab details rows
-  const labInfoRows = [
-    { label: "ระดับ", value: "ปานกลาง", icon: BarChart2, color: "text-amber-500", valColor: "text-amber-600 font-bold" },
-    { label: "เวลา", value: "20–30 นาที", icon: Clock, color: "text-blue-500", valColor: "text-slate-700 font-bold" },
-    { label: "คะแนนที่ได้รับ", value: "+25 คะแนน", icon: Sparkles, color: "text-amber-500", valColor: "text-amber-600 font-bold" },
-    { label: "ภาษา", value: "ไทย 🇹🇭", icon: Languages, color: "text-indigo-500", valColor: "text-slate-700 font-semibold" },
-  ];
-
-  const adviceList = [
-    "ตรวจสอบอุปกรณ์ให้พร้อมและปลอดภัยก่อนกดเริ่มทำการทดลอง",
-    isMitosis
-      ? "สังเกตตำแหน่งโครโมโซมในแต่ละระยะและอย่าข้าม checkpoint ก่อนเปรียบเทียบผล"
-      : isMendelian
-      ? "เริ่มจากการอ่าน genotype ของพ่อแม่ แล้วใช้ตาราง Punnett ตรวจสัดส่วนก่อนสุ่มตัวอย่าง"
-      : isPhotosynthesis
-      ? "ปรับทีละปัจจัย เช่น แสงหรือ CO₂ เพื่อดูปัจจัยจำกัดของอัตราการสังเคราะห์แสงอย่างชัดเจน"
-      : isCharlesLaw
-      ? "ใช้อุณหภูมิหน่วยเคลวินในการตรวจสอบอัตราส่วน V/T และรอให้ลูกสูบนิ่งก่อนบันทึกปริมาตร"
-      : isBoylesLaw
-      ? "ปรับลูกสูบทีละช่วงและรอให้ความดันนิ่งก่อนบันทึกค่าเพื่อให้กราฟ P-V แม่นยำ"
-      : isAcidBase
-      ? "อ่านค่าปริมาตรจากบิวเรตที่ระดับสายตาและหยดสารช้าลงเมื่อ pH เปลี่ยนเร็ว"
-      : isHookesLaw
-      ? "ค่อย ๆ เพิ่มตุ้มน้ำหนักทีละก้อนเพื่อให้ระบบอยู่ในสมดุลก่อนอ่านค่าระยะยืด"
-      : isOhmsLaw 
-      ? "บันทึกข้อมูลค่ากระแสไฟฟ้าและแรงดันไฟฟ้าอย่างสม่ำเสมอเพื่อความแม่นยำของกราฟ" 
-      : "บันทึกข้อมูลและค่าอุณหภูมิอย่างสม่ำเสมอเพื่อความแม่นยำของกราฟ",
-    "สังเกตและจดบันทึกสิ่งต่าง ๆ ที่เกิดขึ้นระหว่างการทดลองลงในสมุดบันทึก",
+  const labInfoRows: InfoRow[] = [
+    {
+      label: "ทฤษฎีหลัก",
+      value: primaryEquation?.label ?? details?.graph.title ?? "แนวคิดสำคัญ",
+      helper: primaryEquation?.desc ?? "อ่านสมการและคำอธิบายก่อนเริ่มปรับตัวแปร",
+      icon: BookOpen,
+      iconClass: "text-blue-500",
+    },
+    {
+      label: "ลำดับงาน",
+      value: `${stepCount} ขั้นตอน`,
+      helper: firstStep && finalStep ? `${firstStep.title} → ${finalStep.title}` : "ทำตามขั้นตอนจากบนลงล่าง",
+      icon: ClipboardList,
+      iconClass: "text-emerald-500",
+    },
+    {
+      label: "ผลที่ต้องดู",
+      value: details?.graph.yTitle ?? "ผลการทดลอง",
+      helper: details?.graph.title ?? "เทียบผลที่บันทึกกับกราฟหรือสมการ",
+      icon: LineChart,
+      iconClass: "text-violet-500",
+    },
   ];
 
   return (
-    <aside className="w-full flex flex-col gap-4 select-none lg:sticky lg:top-24 self-start">
-      
-      {/* CARD 1: ข้อมูลห้องแล็บ */}
-      <div className="bg-white rounded-2xl border border-slate-200/70 p-5">
-        <h3 className="text-sm sm:text-base font-bold text-slate-900 mb-3 flex items-center gap-2 border-b border-slate-100 pb-2.5">
-          <Info className="w-4.5 h-4.5 text-blue-500" />
-          ข้อมูลห้องแล็บ
-        </h3>
-        <div className="divide-y divide-slate-100">
-          {labInfoRows.map((row, idx) => {
+    <aside className="flex w-full select-none flex-col gap-4 self-start lg:sticky lg:top-24">
+      <section className="rounded-2xl border border-slate-200/70 bg-white p-5">
+        <div className="mb-3 flex items-start justify-between gap-3 border-b border-slate-100 pb-3">
+          <div>
+            <h3 className="flex items-center gap-2 text-sm font-bold text-slate-900 sm:text-base">
+              <Info className="h-4.5 w-4.5 text-blue-500" />
+              โฟกัสก่อนทดลอง
+            </h3>
+            <p className="mt-1 line-clamp-2 text-[11px] font-semibold leading-relaxed text-slate-500">
+              {lab?.title ?? "ห้องแล็บ SciSiam"}
+            </p>
+          </div>
+          <span
+            className={`shrink-0 rounded-full border px-2.5 py-1 text-[11px] font-bold ${
+              readiness.isReady
+                ? "border-emerald-100 bg-emerald-50 text-emerald-700"
+                : "border-amber-100 bg-amber-50 text-amber-700"
+            }`}
+          >
+            {readiness.label}
+          </span>
+        </div>
+
+        <div className="space-y-3">
+          {labInfoRows.map((row) => {
             const Icon = row.icon;
             return (
-              <div key={idx} className="flex items-center justify-between py-3 text-xs sm:text-sm">
-                <div className="flex items-center gap-2.5 text-slate-500 font-semibold">
-                  <Icon className={`w-4.5 h-4.5 ${row.color}`} />
-                  <span>{row.label}</span>
+              <div key={row.label} className="rounded-xl border border-slate-100 bg-slate-50/70 p-3 text-left">
+                <div className="flex min-w-0 items-center gap-2.5">
+                  <Icon className={`h-4.5 w-4.5 shrink-0 ${row.iconClass}`} />
+                  <span className="text-[11px] font-bold text-slate-500">{row.label}</span>
                 </div>
-                <span className={row.valColor}>{row.value}</span>
+                <p className="mt-1 break-words text-sm font-extrabold leading-snug text-slate-900">
+                  {row.value}
+                </p>
+                <p className="mt-1 break-words text-[11px] font-semibold leading-relaxed text-slate-500">
+                  {row.helper}
+                </p>
               </div>
             );
           })}
         </div>
-      </div>
+      </section>
 
-      {/* CARD 2: ความคืบหน้า */}
-      <div className="bg-white rounded-2xl border border-slate-200/70 p-5">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm sm:text-base font-bold text-slate-900 flex items-center gap-2">
-            <CheckSquare className="w-4.5 h-4.5 text-emerald-500" />
+      <section className="rounded-2xl border border-slate-200/70 bg-white p-5">
+        <div className="mb-3 flex items-center justify-between">
+          <h3 className="flex items-center gap-2 text-sm font-bold text-slate-900 sm:text-base">
+            <CheckSquare className="h-4.5 w-4.5 text-emerald-500" />
             ความคืบหน้า
           </h3>
-          <span className="text-xs font-extrabold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">
+          <span className="rounded-md bg-emerald-50 px-2 py-0.5 text-xs font-extrabold text-emerald-600">
             {labProgress}%
           </span>
         </div>
 
-        {/* Progress Bar Container */}
         <div className="space-y-2">
-          <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden" role="progressbar" aria-valuenow={labProgress} aria-valuemin={0} aria-valuemax={100} aria-label="ความคืบหน้าการทำแล็บ">
-            <div className="h-full bg-emerald-500 rounded-full transition-all duration-500" style={{ width: `${labProgress}%` }} />
+          <div
+            className="h-2.5 w-full overflow-hidden rounded-full bg-slate-100"
+            role="progressbar"
+            aria-valuenow={labProgress}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label="ความคืบหน้าการทำแล็บ"
+          >
+            <div
+              className="h-full rounded-full bg-emerald-500 transition-all duration-500"
+              style={{ width: `${labProgress}%` }}
+            />
           </div>
-          <p className="text-[11px] text-slate-500 font-semibold text-left">
+          <p className="text-left text-[11px] font-semibold leading-relaxed text-slate-500">
             {labProgressLabel}
           </p>
         </div>
-      </div>
+      </section>
 
-      {/* CARD 3: คำแนะนำก่อนเริ่ม */}
-      <div className="bg-white rounded-2xl border border-slate-200/70 p-5">
-        <h3 className="text-sm sm:text-base font-bold text-slate-900 mb-3.5 flex items-center gap-2">
-          <ShieldAlert className="w-4.5 h-4.5 text-amber-500" />
+      <section className="rounded-2xl border border-slate-200/70 bg-white p-5">
+        <h3 className="mb-3.5 flex items-center gap-2 text-sm font-bold text-slate-900 sm:text-base">
+          <ShieldCheck className="h-4.5 w-4.5 text-amber-500" />
           คำแนะนำก่อนเริ่ม
         </h3>
         <ul className="space-y-2.5 text-left">
-          {adviceList.map((bullet, idx) => (
-            <li key={idx} className="flex items-start gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0 mt-1.5" />
-              <p className="text-[11px] sm:text-xs text-slate-600 font-semibold leading-[1.55]">
+          {adviceList.map((bullet) => (
+            <li key={bullet} className="flex items-start gap-2">
+              <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500" aria-hidden="true" />
+              <p className="text-[11px] font-semibold leading-[1.6] text-slate-600 sm:text-xs">
                 {bullet}
               </p>
             </li>
           ))}
         </ul>
-      </div>
+      </section>
 
-      {/* CARD 4: ภารกิจนักวิทย์ */}
-      <div className="bg-white rounded-2xl border border-slate-200/70 p-5 relative overflow-hidden group">
-        <div className="absolute top-0 right-0 w-12 h-12 bg-purple-500/5 rounded-bl-full" />
-        
-        <div className="flex items-center gap-2.5 mb-3 border-b border-slate-50 pb-2">
-          <div className="w-7 h-7 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">
-            <Award className="w-4 h-4" />
+      <section className="rounded-2xl border border-slate-200/70 bg-white p-5">
+        <div className="mb-3 flex items-center gap-2.5 border-b border-slate-100 pb-3">
+          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-violet-50 text-violet-600">
+            <Award className="h-4 w-4" />
           </div>
-          <div>
-            <h3 className="text-xs sm:text-sm font-bold text-slate-800">ภารกิจนักวิทย์</h3>
-            <p className="text-[10px] text-slate-500 font-semibold">ทำแล็บนี้ให้ครบและบันทึกผล</p>
+          <div className="min-w-0">
+            <h3 className="text-xs font-bold text-slate-800 sm:text-sm">ภารกิจนักวิทย์</h3>
+            <p className="truncate text-[10px] font-semibold text-slate-500">ทำแล็บนี้ให้ครบและบันทึกผล</p>
           </div>
         </div>
 
-        {/* Progress details */}
         <div className="space-y-2">
-          <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden" role="progressbar" aria-valuenow={labProgress} aria-valuemin={0} aria-valuemax={100} aria-label="ความคืบหน้าภารกิจแล็บนี้">
-            <div className="h-full bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full transition-all duration-500 group-hover:scale-x-105 origin-left" style={{ width: `${labProgress}%` }} />
+          <div
+            className="h-2.5 w-full overflow-hidden rounded-full bg-slate-100"
+            role="progressbar"
+            aria-valuenow={labProgress}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label="ความคืบหน้าภารกิจแล็บนี้"
+          >
+            <div
+              className="h-full rounded-full bg-violet-500 transition-all duration-500"
+              style={{ width: `${labProgress}%` }}
+            />
           </div>
-          
-          <div className="flex items-center justify-between text-[10px] font-bold">
-            <span className="text-slate-500 flex items-center gap-1">
-              <Beaker className="w-3.5 h-3.5 text-purple-500" />
+
+          <div className="flex items-center justify-between gap-3 text-[10px] font-bold">
+            <span className="flex items-center gap-1 text-slate-500">
+              <Sparkles className="h-3.5 w-3.5 text-violet-500" />
               สถานะ
             </span>
-            <span className="text-purple-600 bg-purple-50 px-2 py-0.5 rounded-md">
+            <span className="rounded-md bg-violet-50 px-2 py-0.5 text-violet-600">
               {missionProgressLabel}
             </span>
           </div>
         </div>
-      </div>
-
+      </section>
     </aside>
   );
 }

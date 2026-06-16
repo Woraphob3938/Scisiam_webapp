@@ -1,9 +1,10 @@
 "use client";
 
 import React from "react";
+import dynamic from "next/dynamic";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Home, Clock, AlertTriangle } from "lucide-react";
+import { AlertTriangle, ArrowLeft, Clock, Home } from "lucide-react";
 
 import { labsById } from "@/data/labs";
 import { isLabReady } from "@/data/labReadiness";
@@ -13,37 +14,68 @@ import {
   type DirectSimulationLabId,
 } from "@/data/labSimulationRegistry";
 
-import OhmsLawSimulation from "@/components/labs/simulation/OhmsLawSimulation";
-import HookesLawSimulation from "@/components/labs/simulation/HookesLawSimulation";
-import AcidBaseTitrationSimulation from "@/components/labs/simulation/AcidBaseTitrationSimulation";
-import BoylesLawSimulation from "@/components/labs/simulation/BoylesLawSimulation";
-import CharlesLawSimulation from "@/components/labs/simulation/CharlesLawSimulation";
-import PhotosynthesisRateSimulation from "@/components/labs/simulation/PhotosynthesisRateSimulation";
-import MendelianGeneticsSimulation from "@/components/labs/simulation/MendelianGeneticsSimulation";
-import MitosisCellCycleSimulation from "@/components/labs/simulation/MitosisCellCycleSimulation";
-import SnellsLawSimulation from "@/components/labs/simulation/SnellsLawSimulation";
-import IdealGasLawSimulation from "@/components/labs/simulation/IdealGasLawSimulation";
-import NewtonsSecondLawSimulation from "@/components/labs/simulation/NewtonsSecondLawSimulation";
-import PhotoelectricEffectSimulation from "@/components/labs/simulation/PhotoelectricEffectSimulation";
-import KeplersLawsSimulation from "@/components/labs/simulation/KeplersLawsSimulation";
-import StefanBoltzmannSimulation from "@/components/labs/simulation/StefanBoltzmannSimulation";
-import MomentumConservationSimulation from "@/components/labs/simulation/MomentumConservationSimulation";
-import FaradaysLawSimulation from "@/components/labs/simulation/FaradaysLawSimulation";
-import BernoullisPrincipleSimulation from "@/components/labs/simulation/BernoullisPrincipleSimulation";
-import NewtonsCoolingSimulation from "@/components/labs/simulation/NewtonsCoolingSimulation";
-import LeChateliersPrincipleSimulation from "@/components/labs/simulation/LeChateliersPrincipleSimulation";
-import BeerLambertLawSimulation from "@/components/labs/simulation/BeerLambertLawSimulation";
-import HesssLawSimulation from "@/components/labs/simulation/HesssLawSimulation";
-import ChemistryConceptSimulation from "@/components/labs/simulation/ChemistryConceptSimulation";
-import OsmosisPlasmolysisSimulation from "@/components/labs/simulation/OsmosisPlasmolysisSimulation";
-import EnzymeKineticsSimulation from "@/components/labs/simulation/EnzymeKineticsSimulation";
-import DnaExtractionSimulation from "@/components/labs/simulation/DnaExtractionSimulation";
-import CellularRespirationSimulation from "@/components/labs/simulation/CellularRespirationSimulation";
-import PlantTranspirationSimulation from "@/components/labs/simulation/PlantTranspirationSimulation";
-import NaturalSelectionSimulation from "@/components/labs/simulation/NaturalSelectionSimulation";
-import BloodTypingAgglutinationSimulation from "@/components/labs/simulation/BloodTypingAgglutinationSimulation";
-import FoodChainEcologySimulation from "@/components/labs/simulation/FoodChainEcologySimulation";
-import CardiovascularSystemSimulation from "@/components/labs/simulation/CardiovascularSystemSimulation";
+const NewtonsCoolingSimulation = dynamic(() =>
+  import("@/components/labs/simulation/NewtonsCoolingSimulation"));
+const OhmsLawSimulation = dynamic(() =>
+  import("@/components/labs/simulation/OhmsLawSimulation"));
+const HookesLawSimulation = dynamic(() =>
+  import("@/components/labs/simulation/HookesLawSimulation"));
+const AcidBaseTitrationSimulation = dynamic(() =>
+  import("@/components/labs/simulation/AcidBaseTitrationSimulation"));
+const BoylesLawSimulation = dynamic(() =>
+  import("@/components/labs/simulation/BoylesLawSimulation"));
+const CharlesLawSimulation = dynamic(() =>
+  import("@/components/labs/simulation/CharlesLawSimulation"));
+const PhotosynthesisRateSimulation = dynamic(() =>
+  import("@/components/labs/simulation/PhotosynthesisRateSimulation"));
+const MendelianGeneticsSimulation = dynamic(() =>
+  import("@/components/labs/simulation/MendelianGeneticsSimulation"));
+const MitosisCellCycleSimulation = dynamic(() =>
+  import("@/components/labs/simulation/MitosisCellCycleSimulation"));
+const SnellsLawSimulation = dynamic(() =>
+  import("@/components/labs/simulation/SnellsLawSimulation"));
+const IdealGasLawSimulation = dynamic(() =>
+  import("@/components/labs/simulation/IdealGasLawSimulation"));
+const NewtonsSecondLawSimulation = dynamic(() =>
+  import("@/components/labs/simulation/NewtonsSecondLawSimulation"));
+const PhotoelectricEffectSimulation = dynamic(() =>
+  import("@/components/labs/simulation/PhotoelectricEffectSimulation"));
+const KeplersLawsSimulation = dynamic(() =>
+  import("@/components/labs/simulation/KeplersLawsSimulation"));
+const StefanBoltzmannSimulation = dynamic(() =>
+  import("@/components/labs/simulation/StefanBoltzmannSimulation"));
+const MomentumConservationSimulation = dynamic(() =>
+  import("@/components/labs/simulation/MomentumConservationSimulation"));
+const FaradaysLawSimulation = dynamic(() =>
+  import("@/components/labs/simulation/FaradaysLawSimulation"));
+const BernoullisPrincipleSimulation = dynamic(() =>
+  import("@/components/labs/simulation/BernoullisPrincipleSimulation"));
+const LeChateliersPrincipleSimulation = dynamic(() =>
+  import("@/components/labs/simulation/LeChateliersPrincipleSimulation"));
+const BeerLambertLawSimulation = dynamic(() =>
+  import("@/components/labs/simulation/BeerLambertLawSimulation"));
+const HesssLawSimulation = dynamic(() =>
+  import("@/components/labs/simulation/HesssLawSimulation"));
+const ChemistryConceptSimulation = dynamic(() =>
+  import("@/components/labs/simulation/ChemistryConceptSimulation"));
+const OsmosisPlasmolysisSimulation = dynamic(() =>
+  import("@/components/labs/simulation/OsmosisPlasmolysisSimulation"));
+const EnzymeKineticsSimulation = dynamic(() =>
+  import("@/components/labs/simulation/EnzymeKineticsSimulation"));
+const DnaExtractionSimulation = dynamic(() =>
+  import("@/components/labs/simulation/DnaExtractionSimulation"));
+const CellularRespirationSimulation = dynamic(() =>
+  import("@/components/labs/simulation/CellularRespirationSimulation"));
+const PlantTranspirationSimulation = dynamic(() =>
+  import("@/components/labs/simulation/PlantTranspirationSimulation"));
+const NaturalSelectionSimulation = dynamic(() =>
+  import("@/components/labs/simulation/NaturalSelectionSimulation"));
+const BloodTypingAgglutinationSimulation = dynamic(() =>
+  import("@/components/labs/simulation/BloodTypingAgglutinationSimulation"));
+const FoodChainEcologySimulation = dynamic(() =>
+  import("@/components/labs/simulation/FoodChainEcologySimulation"));
+const CardiovascularSystemSimulation = dynamic(() =>
+  import("@/components/labs/simulation/CardiovascularSystemSimulation"));
 
 const simulationComponents: Record<DirectSimulationLabId, React.ComponentType> = {
   "newtons-cooling": NewtonsCoolingSimulation,

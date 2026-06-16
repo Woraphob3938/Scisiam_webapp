@@ -43,6 +43,7 @@ yarn-error.log*
 # local agent/tooling workspaces
 /.agents/
 /.impeccable/
+/supabase/.temp/
 
 # vercel
 .vercel

@@ -431,10 +431,7 @@ export default function LeChateliersPrincipleSimulation() {
           if (nextProg >= 12 && !questSuccessRef.current) {
             setQuestSuccess(true);
             questSuccessRef.current = true;
-            const pts = Number(localStorage.getItem("scisiam_points") || "120");
-            localStorage.setItem("scisiam_points", String(pts + 25));
-            window.dispatchEvent(new Event("points-updated"));
-            alert("🎉 เก่งมาก! คุณปรับจูนจนความเข้มข้นสารประกอบเชิงซ้อนสีแดงอยู่ในช่วงเป้าหมาย 12 วินาทีต่อเนื่องสำเร็จ! รับ +25 แต้ม 💎");
+            alert("🎉 เก่งมาก! คุณปรับจูนจนความเข้มข้นสารประกอบเชิงซ้อนสีแดงอยู่ในช่วงเป้าหมาย 12 วินาทีต่อเนื่องสำเร็จ บันทึกผลเพื่อเก็บความคืบหน้า");
           }
         } else {
           setQuestProgress(0);

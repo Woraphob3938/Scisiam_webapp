@@ -472,12 +472,7 @@ export default function PhotoelectricEffectSimulation() {
     ) {
       const timer = setTimeout(() => {
         setQuestSuccess(true);
-
-        // Award +25 points
-        const currentPoints = Number(localStorage.getItem("scisiam_points") || "120");
-        localStorage.setItem("scisiam_points", String(currentPoints + 25));
-        window.dispatchEvent(new Event("points-updated"));
-        alert("🎉 ภารกิจสำเร็จ! คุณหาแรงดันหยุดยั้ง (Stopping Voltage) ของโซเดียมที่ความยาวคลื่น 300 nm ได้ถูกต้องที่ -1.85 V ซึ่งกระแสมีค่าเป็น 0.00 μA พอดี ได้รับ +25 คะแนน 💎");
+        alert("🎉 ภารกิจสำเร็จ! คุณหาแรงดันหยุดยั้งของโซเดียมที่ความยาวคลื่น 300 nm ได้ถูกต้องที่ -1.85 V บันทึกผลเพื่อเก็บความคืบหน้า");
       }, 0);
       return () => clearTimeout(timer);
     }

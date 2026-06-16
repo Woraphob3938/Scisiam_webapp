@@ -140,10 +140,7 @@ export default function BernoullisPrincipleSimulation() {
           if (nextProg >= 5.0 && !questSuccessRef.current) {
             setQuestSuccess(true);
             questSuccessRef.current = true;
-            const currentPoints = Number(localStorage.getItem("scisiam_points") || "120");
-            localStorage.setItem("scisiam_points", String(currentPoints + 25));
-            window.dispatchEvent(new Event("points-updated"));
-            alert("🎉 ภารกิจสำเร็จ! รักษาความดันที่คอคอดให้ต่ำกว่า 100 kPa ต่อเนื่องครบ 5 วินาทีสำเร็จ! ได้รับ +25 แต้ม 💎");
+            alert("🎉 ภารกิจสำเร็จ! รักษาความดันที่คอคอดให้ต่ำกว่า 100 kPa ต่อเนื่องครบ 5 วินาที บันทึกผลเพื่อเก็บความคืบหน้า");
           }
         } else {
           setQuestProgress(0);

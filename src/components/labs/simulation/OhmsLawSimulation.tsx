@@ -301,11 +301,7 @@ export default function OhmsLawSimulation() {
           if (nextProg >= 20 && !questSuccessRef.current) {
             setQuestSuccess(true);
             questSuccessRef.current = true;
-
-            const currentPoints = Number(localStorage.getItem("scisiam_points") || "120");
-            localStorage.setItem("scisiam_points", String(currentPoints + 25));
-            window.dispatchEvent(new Event("points-updated"));
-            alert("🎉 ยินดีด้วย! คุณรักษากระแสไฟฟ้าให้อยู่ระหว่าง 0.1A - 0.2A ต่อเนื่องเป็นเวลา 20 วินาทีสำเร็จ! รับ +25 แต้ม 💎");
+            alert("🎉 ยินดีด้วย! คุณรักษากระแสไฟฟ้าให้อยู่ระหว่าง 0.1A - 0.2A ต่อเนื่องเป็นเวลา 20 วินาทีสำเร็จ บันทึกผลเพื่อเก็บความคืบหน้า");
           }
         } else {
           setQuestProgress(0);

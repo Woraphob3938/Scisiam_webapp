@@ -220,7 +220,6 @@ export default function MissionsPage() {
     try {
       const result = await claimMissionReward({
         missionId: id,
-        progressCount: mission.progress,
       });
 
       if (result.ok) {

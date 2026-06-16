@@ -383,7 +383,7 @@ const SpindleVisual = () => (
 );
 
 interface EquipmentListProps {
-  labId?: string;
+  labId: string;
 }
 
 const SpringVisual = () => (
@@ -619,6 +619,40 @@ const EquilibriumTubesVisual = () => (
   </svg>
 );
 
+const BloodTypingPlateVisual = () => (
+  <svg viewBox="0 0 96 96" className="h-14 w-14" fill="none" aria-hidden="true">
+    <rect x="16" y="18" width="64" height="56" rx="14" fill="#ecfeff" stroke="#0891b2" strokeWidth="3" />
+    {["A", "B", "D"].map((label, index) => (
+      <g key={label} transform={`translate(${30 + index * 18}, 44)`}>
+        <circle r="8" fill="#fff1f2" stroke="#fb7185" strokeWidth="2.5" />
+        <path d="M-3 -1C0 -5 5 -2 4 3C2 8 -5 6 -4 1Z" fill="#e11d48" opacity="0.85" />
+        <text x="0" y="26" fill="#0e7490" fontSize="8" fontWeight="900" textAnchor="middle">{label}</text>
+      </g>
+    ))}
+    <text x="48" y="90" fill="#0e7490" fontSize="8" fontWeight="800" textAnchor="middle">BLOOD TYPE</text>
+  </svg>
+);
+
+const FoodChainVisual = () => (
+  <svg viewBox="0 0 96 96" className="h-14 w-14" fill="none" aria-hidden="true">
+    <path d="M48 14L76 72H20L48 14Z" fill="#ecfdf5" stroke="#10b981" strokeWidth="3" />
+    <path d="M31 50H65M25 63H71" stroke="#10b981" strokeWidth="2.5" />
+    <circle cx="48" cy="32" r="6" fill="#f59e0b" />
+    <circle cx="41" cy="57" r="5" fill="#22c55e" />
+    <circle cx="55" cy="57" r="5" fill="#3b82f6" />
+    <text x="48" y="90" fill="#047857" fontSize="8" fontWeight="800" textAnchor="middle">FOOD CHAIN</text>
+  </svg>
+);
+
+const HeartRateMonitorVisual = () => (
+  <svg viewBox="0 0 96 96" className="h-14 w-14" fill="none" aria-hidden="true">
+    <rect x="14" y="20" width="68" height="48" rx="10" fill="#eff6ff" stroke="#3b82f6" strokeWidth="3" />
+    <path d="M20 48H32L37 36L45 60L53 42H64L68 48H76" stroke="#ef4444" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
+    <circle cx="68" cy="31" r="5" fill="#22c55e" />
+    <text x="48" y="84" fill="#1d4ed8" fontSize="8" fontWeight="800" textAnchor="middle">HEART RATE</text>
+  </svg>
+);
+
 const visualMap: Record<string, React.ReactNode> = {
   ThermometerVisual: <ThermometerVisual />,
   BeakerVisual: <BeakerVisual />,
@@ -674,9 +708,12 @@ const visualMap: Record<string, React.ReactNode> = {
   CuvetteVisual: <CuvetteVisual />,
   CalorimeterVisual: <CalorimeterVisual />,
   EquilibriumTubesVisual: <EquilibriumTubesVisual />,
+  BloodTypingSVG: <BloodTypingPlateVisual />,
+  FoodChainSVG: <FoodChainVisual />,
+  HeartRateSVG: <HeartRateMonitorVisual />,
 };
 
-export default function EquipmentList({ labId = "newtons-cooling" }: EquipmentListProps) {
+export default function EquipmentList({ labId }: EquipmentListProps) {
   const [showDetails, setShowDetails] = React.useState(false);
 
   const details = getLabDetails(labId);
@@ -728,7 +765,7 @@ export default function EquipmentList({ labId = "newtons-cooling" }: EquipmentLi
             aria-expanded={showDetails}
             className="inline-flex items-center gap-1.5 rounded-full border border-indigo-100 bg-white px-3 py-1.5 text-[11px] font-bold text-indigo-600 transition-all duration-200 hover:border-indigo-200 hover:bg-indigo-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
           >
-            <span>{showDetails ? "ย่อรายละเอียด" : "ดูรายละเอียด"}</span>
+            <span>{showDetails ? "ย่อรายละเอียด" : "เพิ่มรายละเอียด"}</span>
             <ChevronDown
               className={`h-3.5 w-3.5 transition-transform duration-200 ${showDetails ? "rotate-180" : ""}`}
             />

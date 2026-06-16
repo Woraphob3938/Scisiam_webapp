@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Breadcrumb from "@/components/labs/Breadcrumb";
 import DecorativeBackground from "@/components/labs/DecorativeBackground";
@@ -39,6 +40,28 @@ interface SavedCoolingExperiment {
   coolingConstant?: number;
 }
 
+const AUTH_CHECK_TIMEOUT_MS = 6_000;
+const isDemoModeEnabled =
+  process.env.NEXT_PUBLIC_ENABLE_DEMO_MODE === "true";
+
+async function hasAuthenticatedSupabaseUser() {
+  const supabase = createClient();
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
+  const timeout = new Promise<false>((resolve) => {
+    timeoutId = setTimeout(() => resolve(false), AUTH_CHECK_TIMEOUT_MS);
+  });
+  const authCheck = Promise.resolve(supabase.auth.getUser())
+    .then(({ data }) => Boolean(data.user))
+    .catch(() => false);
+
+  try {
+    return await Promise.race([authCheck, timeout]);
+  } finally {
+    if (timeoutId) clearTimeout(timeoutId);
+  }
+}
+
 export default function ProfilePage() {
   const { isCollapsed } = useSidebar();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -53,6 +76,7 @@ export default function ProfilePage() {
 
   const [points, setPoints] = useState(0);
   const [completedCount, setCompletedCount] = useState(0);
+  const [completedLabIds, setCompletedLabIds] = useState<string[]>([]);
   const [recentRuns, setRecentRuns] = useState<LearningRunSnapshot[]>([]);
   const [activeStudentTab, setActiveStudentTab] = useState<"overview" | "rewards">("overview");
 
@@ -60,23 +84,30 @@ export default function ProfilePage() {
     const applyLearningSnapshot = (snapshot: ReturnType<typeof readLocalLearningSnapshot>) => {
       setPoints(snapshot.points);
       setCompletedCount(snapshot.completedCount);
+      setCompletedLabIds(snapshot.completedLabIds);
       setRecentRuns(snapshot.recentRuns);
     };
 
     const loadProfileData = async () => {
+      const isDemo =
+        isDemoModeEnabled &&
+        localStorage.getItem("scisiam_demo_mode") === "true";
+      const trustLocalIdentity = isDemo || !isSupabaseConfigured();
       const storedName = localStorage.getItem("scisiam_user_name");
       const storedRole = localStorage.getItem("scisiam_user_role");
 
-      if (storedRole) {
+      if (trustLocalIdentity && storedRole) {
         setRole(storedRole);
       }
       
-      if (storedName) {
+      if (trustLocalIdentity && storedName) {
         setUsername(storedName);
         setTempName(storedName);
       } else {
-        // Default fallback names based on role
-        const defaultName = storedRole === "teacher" ? "ครูอรทัย" : "นักเรียน";
+        const defaultName =
+          trustLocalIdentity && storedRole === "teacher"
+            ? "ครูอรทัย"
+            : "นักเรียน";
         setUsername(defaultName);
         setTempName(defaultName);
       }
@@ -92,7 +123,6 @@ export default function ProfilePage() {
         }
       }
 
-      const isDemo = localStorage.getItem("scisiam_demo_mode") === "true";
       if (isDemo) return;
 
       try {
@@ -113,46 +143,35 @@ export default function ProfilePage() {
 
     const checkAuthStatus = async () => {
       let loggedIn = false;
-      const isDemo = localStorage.getItem("scisiam_demo_mode") === "true";
+      const isDemo =
+        isDemoModeEnabled &&
+        localStorage.getItem("scisiam_demo_mode") === "true";
 
       if (isDemo) {
         loggedIn = true;
       } else if (isSupabaseConfigured()) {
-        const supabase = createClient();
-        const { data: { user } } = await supabase.auth.getUser();
-        loggedIn = !!user;
+        loggedIn = await hasAuthenticatedSupabaseUser();
       } else {
         loggedIn = localStorage.getItem("scisiam_logged_in") === "true";
       }
 
       setIsLoggedIn(loggedIn);
+      setCheckingAuth(false);
       
       if (loggedIn) {
-        await loadProfileData();
+        void loadProfileData();
       } else {
         // Clear all state values if not logged in
         setPoints(0);
         setCompletedCount(0);
+        setCompletedLabIds([]);
         setRecentRuns([]);
         setSavedExperiment(null);
       }
-      setCheckingAuth(false);
     };
 
-    // Dynamic tab and role selection via URL search parameters
+    // The URL may select a display tab, but never an authorization role.
     const searchParams = new URLSearchParams(window.location.search);
-    const roleParam = searchParams.get("role");
-
-    if (roleParam === "teacher" || roleParam === "student") {
-      const defaultName = roleParam === "teacher" ? "ครูอรทัย" : "นักเรียน";
-      localStorage.setItem("scisiam_logged_in", "true");
-      localStorage.setItem("scisiam_user_role", roleParam);
-      localStorage.setItem("scisiam_user_name", defaultName);
-      localStorage.setItem("scisiam_user_email", `${roleParam}.demo@scisiam.com`);
-      localStorage.setItem("scisiam_demo_mode", "true");
-      window.dispatchEvent(new Event(SCISIAM_AUTH_EVENT));
-    }
-
     const tabParam = searchParams.get("tab");
     if (tabParam === "rewards") {
       setTimeout(() => setActiveStudentTab("rewards"), 0);
@@ -181,6 +200,11 @@ export default function ProfilePage() {
   };
 
   // Student dashboard derives real progress from Supabase first, then local prototype cache.
+  const completedLabIdSet = useMemo(
+    () => new Set(completedLabIds),
+    [completedLabIds],
+  );
+
   const studentStats = useMemo(() => {
     return [
       {
@@ -193,9 +217,9 @@ export default function ProfilePage() {
         glow: "hover:shadow-lg hover:shadow-blue-500/5 hover:border-blue-200"
       },
       {
-        title: "ภารกิจที่ทำเสร็จ",
-        subtitle: "จาก 15 ภารกิจ",
-        value: String(Math.min(15, Math.floor(completedCount * 1.2))),
+        title: "บันทึกล่าสุด",
+        subtitle: "สูงสุด 12 รายการ",
+        value: String(recentRuns.length),
         icon: ClipboardCheck,
         color: "text-emerald-500",
         bg: "bg-emerald-50/70 border border-emerald-100/50",
@@ -211,16 +235,16 @@ export default function ProfilePage() {
         glow: "hover:shadow-lg hover:shadow-amber-500/5 hover:border-amber-200"
       },
       {
-        title: "อันดับ",
-        subtitle: "จากนักเรียนทั้งหมด",
-        value: String(Math.max(1, 520 - Math.floor(points * 1.5))),
+        title: "ระดับปัจจุบัน",
+        subtitle: "คำนวณจากคะแนนสะสม",
+        value: String(Math.floor(points / 200) + 1),
         icon: Award,
         color: "text-purple-500",
         bg: "bg-purple-50/70 border border-purple-100/50",
         glow: "hover:shadow-lg hover:shadow-purple-500/5 hover:border-purple-200"
       }
     ];
-  }, [completedCount, points]);
+  }, [completedCount, points, recentRuns.length]);
 
   const studentActivities = useMemo(() => {
     const list = recentRuns.map((run) => ({
@@ -236,20 +260,20 @@ export default function ProfilePage() {
     return list;
   }, [recentRuns]);
 
-  const activeMissions = [
+  const activeMissions = useMemo(() => [
     {
       id: 1,
-      title: "นักทดลองเริ่มต้น",
-      progress: 3,
-      total: 5,
+      title: "เริ่มต้นการทดลองแรก",
+      progress: Math.min(1, completedCount),
+      total: 1,
       color: "bg-emerald-500",
       icon: FlaskConical,
       iconColor: "text-emerald-500 bg-emerald-50 border border-emerald-100/30"
     },
     {
       id: 2,
-      title: "นักวิทย์ตัวน้อย",
-      progress: 2,
+      title: "บันทึกผลครบ 5 แล็บ",
+      progress: Math.min(5, completedCount),
       total: 5,
       color: "bg-blue-500",
       icon: Star,
@@ -257,24 +281,23 @@ export default function ProfilePage() {
     },
     {
       id: 3,
-      title: "ทำการติดต่อเนื่อง 7 วัน",
-      progress: 4,
-      total: 7,
+      title: "สำรวจวงจรไฟฟ้ากฎของโอห์ม",
+      progress: completedLabIdSet.has("ohms-law") ? 1 : 0,
+      total: 1,
       color: "bg-purple-500",
       icon: Flame,
       iconColor: "text-purple-500 bg-purple-50 border border-purple-100/30"
     },
     {
       id: 4,
-      title: "ผู้เชี่ยวชาญ",
-      progress: 0,
+      title: "ศึกษากฎการเย็นตัวของนิวตัน",
+      progress: completedLabIdSet.has("newtons-cooling") ? 1 : 0,
       total: 1,
-      color: "bg-slate-300",
-      isLocked: true,
-      icon: Lock,
-      iconColor: "text-slate-400 bg-slate-100 border border-slate-200/30"
+      color: "bg-cyan-500",
+      icon: Flame,
+      iconColor: "text-cyan-500 bg-cyan-50 border border-cyan-100/30"
     }
-  ];
+  ], [completedCount, completedLabIdSet]);
 
   return (
     <div className="flex flex-col min-h-screen bg-slate-50 relative pb-16 overflow-hidden">
@@ -403,7 +426,7 @@ export default function ProfilePage() {
                     </div>
 
                     <p className="text-xs text-slate-400 font-bold mt-1 select-none">
-                      ไอดีผู้ใช้: <span className="text-slate-500">student001</span>
+                      <span className="text-slate-500">บัญชีผู้เรียน SciSiam</span>
                     </p>
 
                     {/* Level and XP Bar */}
@@ -526,13 +549,13 @@ export default function ProfilePage() {
                         <Activity className="w-5 h-5 text-indigo-500 animate-pulse" />
                         กิจกรรมล่าสุด
                       </h3>
-                      <button 
-                        onClick={() => alert("ระบบบันทึกประวัติการทำแล็บทั้งหมดกำลังเตรียมการเชื่อมต่อ Supabase! 📝")}
+                      <Link
+                        href="/history"
                         className="text-xs font-bold text-indigo-500 hover:text-indigo-600 transition-colors flex items-center gap-0.5 focus:ring-2 focus:ring-indigo-500 focus:outline-none rounded px-1.5 py-0.5 cursor-pointer"
                       >
                         <span>ดูทั้งหมด</span>
                         <ChevronRight className="w-3.5 h-3.5" />
-                      </button>
+                      </Link>
                     </div>
 
                     <div className="space-y-3.5">
@@ -607,11 +630,7 @@ export default function ProfilePage() {
                           return (
                             <div 
                               key={mis.id}
-                              className={`p-3.5 border rounded-3xl flex items-center gap-3.5 transition-all duration-200 ${
-                                mis.isLocked 
-                                  ? "bg-slate-50/40 border-slate-100/60 opacity-75 cursor-not-allowed" 
-                                  : "bg-white border-slate-100/80 hover:border-slate-200/60 hover:shadow-xs cursor-pointer group/mission"
-                              }`}
+                              className="group/mission flex items-center gap-3.5 rounded-3xl border border-slate-100/80 bg-white p-3.5 transition-all duration-200 hover:border-slate-200/60 hover:shadow-xs"
                             >
                               <div className={`w-11 h-11 rounded-full flex items-center justify-center shrink-0 ${mis.iconColor} shadow-xs`}>
                                 <Icon className="w-5 h-5" />
@@ -738,10 +757,10 @@ export default function ProfilePage() {
                           คุณเก็บสะสมเหรียญตราเกียรติยศสำหรับนักเรียนได้แล้ว <b className="text-indigo-600 font-extrabold">{
                             [
                               completedCount >= 1,
-                              typeof window !== 'undefined' && localStorage.getItem("scisiam_saved_ohms_experiment"),
-                              typeof window !== 'undefined' && localStorage.getItem("scisiam_saved_cooling_experiment"),
-                              typeof window !== 'undefined' && localStorage.getItem("scisiam_saved_le_chateliers_experiment"),
-                              typeof window !== 'undefined' && localStorage.getItem("scisiam_saved_hesss_experiment"),
+                              completedLabIdSet.has("ohms-law"),
+                              completedLabIdSet.has("newtons-cooling"),
+                              completedLabIdSet.has("le-chateliers-principle"),
+                              completedLabIdSet.has("hesss-law"),
                               points >= 300,
                               completedCount >= 5
                             ].filter(Boolean).length
@@ -753,8 +772,10 @@ export default function ProfilePage() {
                           <Award className="w-5 h-5" />
                         </div>
                         <div className="text-left">
-                          <p className="text-[11px] font-bold text-slate-500">อันดับเซิร์ฟเวอร์จำลอง</p>
-                          <p className="text-sm font-black text-slate-700">Top {((Math.max(1, 520 - Math.floor(points * 1.5)) / 1500) * 100).toFixed(1)}% ของระบบ</p>
+                          <p className="text-[11px] font-bold text-slate-500">ความก้าวหน้าส่วนตัว</p>
+                          <p className="text-sm font-black text-slate-700">
+                            บันทึกแล้ว {completedCount} จาก 36 แล็บ
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -788,7 +809,7 @@ export default function ProfilePage() {
                           icon: Zap,
                           color: "text-amber-500",
                           bg: "bg-amber-50/80 border border-amber-100",
-                          unlocked: typeof window !== 'undefined' && !!localStorage.getItem("scisiam_saved_ohms_experiment"),
+                          unlocked: completedLabIdSet.has("ohms-law"),
                         },
                         {
                           id: "cooling-exp",
@@ -797,7 +818,7 @@ export default function ProfilePage() {
                           icon: Flame,
                           color: "text-cyan-500",
                           bg: "bg-cyan-50/80 border border-cyan-100",
-                          unlocked: typeof window !== 'undefined' && !!localStorage.getItem("scisiam_saved_cooling_experiment"),
+                          unlocked: completedLabIdSet.has("newtons-cooling"),
                         },
                         {
                           id: "eq-sage",
@@ -806,7 +827,7 @@ export default function ProfilePage() {
                           icon: Star,
                           color: "text-rose-500",
                           bg: "bg-rose-50/80 border border-rose-100",
-                          unlocked: typeof window !== 'undefined' && !!localStorage.getItem("scisiam_saved_le_chateliers_experiment"),
+                          unlocked: completedLabIdSet.has("le-chateliers-principle"),
                         },
                         {
                           id: "hesss-hero",
@@ -815,7 +836,7 @@ export default function ProfilePage() {
                           icon: Activity,
                           color: "text-orange-500",
                           bg: "bg-orange-50/80 border border-orange-100",
-                          unlocked: typeof window !== 'undefined' && !!localStorage.getItem("scisiam_saved_hesss_experiment"),
+                          unlocked: completedLabIdSet.has("hesss-law"),
                         },
                         {
                           id: "pts-coll",

@@ -5,7 +5,7 @@ import { BookOpen } from "lucide-react";
 import { getLabDetails, GraphConfigData } from "@/data/labDetails";
 
 interface TheoryCardProps {
-  labId?: string;
+  labId: string;
 }
 
 interface TheoryGraphRendererProps {
@@ -227,7 +227,7 @@ function TheoryGraphRenderer({ config }: TheoryGraphRendererProps) {
   );
 }
 
-export default function TheoryCard({ labId = "newtons-cooling" }: TheoryCardProps) {
+export default function TheoryCard({ labId }: TheoryCardProps) {
   const details = getLabDetails(labId);
   if (!details) return null;
 

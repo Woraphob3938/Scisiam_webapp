@@ -528,10 +528,7 @@ export default function MomentumConservationSimulation() {
     const isQuestV = Math.abs(finalV1 - 1.0) < 0.02 && Math.abs(finalV2 - 1.0) < 0.02;
     if (collisionType === "Inelastic" && isQuestV && !questSuccess) {
       setQuestSuccess(true);
-      const currentPoints = Number(localStorage.getItem("scisiam_points") || "120");
-      localStorage.setItem("scisiam_points", String(currentPoints + 25));
-      window.dispatchEvent(new Event("points-updated"));
-      alert("🎉 ภารกิจสำเร็จ! ตั้งค่าการชนแบบไม่ยืดหยุ่นให้ได้ความเร็วปลายร่วมกัน v = 1.0 m/s สำเร็จ! ได้รับ +25 แต้ม 💎");
+      alert("🎉 ภารกิจสำเร็จ! ตั้งค่าการชนแบบไม่ยืดหยุ่นให้ได้ความเร็วปลายร่วมกัน v = 1.0 m/s บันทึกผลเพื่อเก็บความคืบหน้า");
     }
   };
 

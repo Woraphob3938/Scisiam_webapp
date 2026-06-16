@@ -415,10 +415,7 @@ export default function HookesLawSimulation() {
           if (nextProg >= 15 && !questSuccessRef.current) {
             setQuestSuccess(true);
             questSuccessRef.current = true;
-            const pts = Number(localStorage.getItem("scisiam_points") || "120");
-            localStorage.setItem("scisiam_points", String(pts + 25));
-            window.dispatchEvent(new Event("points-updated"));
-            alert("🎉 ยินดีด้วย! คุณรักษาระยะยืดสปริงให้อยู่ระหว่าง 0.02 m – 0.04 m ต่อเนื่อง 15 วินาทีสำเร็จ! รับ +25 แต้ม 💎");
+            alert("🎉 ยินดีด้วย! คุณรักษาระยะยืดสปริงให้อยู่ระหว่าง 0.02 m – 0.04 m ต่อเนื่อง 15 วินาทีสำเร็จ บันทึกผลเพื่อเก็บความคืบหน้า");
           }
         } else {
           setQuestProgress(0);

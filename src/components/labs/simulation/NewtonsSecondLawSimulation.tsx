@@ -285,10 +285,7 @@ export default function NewtonsSecondLawSimulation() {
     // Quest Check: Check if logged point has acceleration equal to 4.0 m/s²
     if (Math.abs(acceleration - 4.0) < 0.05 && !questSuccess) {
       setQuestSuccess(true);
-      const currentPoints = Number(localStorage.getItem("scisiam_points") || "120");
-      localStorage.setItem("scisiam_points", String(currentPoints + 25));
-      window.dispatchEvent(new Event("points-updated"));
-      alert("🎉 ยินดีด้วย! คุณทำการตั้งค่าให้มีความเร่ง a = 4.0 m/s² สำเร็จ! ได้รับ +25 แต้ม 💎");
+      alert("🎉 ยินดีด้วย! คุณตั้งค่าให้มีความเร่ง a = 4.0 m/s² สำเร็จ บันทึกผลเพื่อเก็บความคืบหน้า");
     }
   };
 
