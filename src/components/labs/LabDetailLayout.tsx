@@ -10,6 +10,8 @@ import {
   ClipboardList,
   Clock,
   Database,
+  Info,
+  ListChecks,
   LucideIcon,
   Sparkles,
   Target,
@@ -60,6 +62,8 @@ type FactItem = {
   helper: string;
   icon: LucideIcon;
 };
+
+type DetailTab = "overview" | "equipment" | "theory" | "steps" | "saved" | "info";
 
 const SUBJECT_THEMES: Record<string, SubjectTheme> = {
   Physics: {
@@ -242,14 +246,14 @@ function DetailFactStrip({
 
   return (
     <section aria-label="สรุปรายละเอียดห้องแล็บ" className="w-full">
-      <div className="grid overflow-hidden rounded-2xl border border-slate-200/70 bg-slate-100/80 shadow-[0_1px_2px_rgba(15,23,42,0.04)] sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 overflow-hidden rounded-2xl border border-slate-200/70 bg-slate-100/80 shadow-[0_1px_2px_rgba(15,23,42,0.04)] lg:grid-cols-4">
         {facts.map((fact) => {
           const Icon = fact.icon;
           return (
-            <div key={fact.label} className="min-w-0 bg-white p-4 sm:p-5">
-              <div className="flex items-start gap-3">
-                <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border ${theme.accentBorder} ${theme.accentBg} ${theme.accentText}`}>
-                  <Icon className="h-4.5 w-4.5" />
+            <div key={fact.label} className="min-w-0 bg-white p-3 sm:p-5">
+              <div className="flex items-start gap-2.5 sm:gap-3">
+                <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border sm:h-9 sm:w-9 ${theme.accentBorder} ${theme.accentBg} ${theme.accentText}`}>
+                  <Icon className="h-4 w-4 sm:h-4.5 sm:w-4.5" />
                 </div>
                 <div className="min-w-0 text-left">
                   <p className="text-[11px] font-bold text-slate-500">{fact.label}</p>
@@ -417,6 +421,7 @@ function SavedExperimentPanel({
 export default function LabDetailLayout({ labId, lab, details }: LabDetailLayoutProps) {
   const router = useRouter();
   const [savedData, setSavedData] = useState<SavedExperimentRecord | null>(null);
+  const [activeTab, setActiveTab] = useState<DetailTab>("overview");
   const theme = useMemo(() => getSubjectTheme(lab.category), [lab.category]);
   const readiness = useMemo(() => getLabReadiness(labId), [labId]);
 
@@ -475,6 +480,40 @@ export default function LabDetailLayout({ labId, lab, details }: LabDetailLayout
     setSavedData(null);
   };
 
+  const tabs: Array<{ key: DetailTab; label: string; icon: LucideIcon }> = [
+    { key: "overview", label: "ภาพรวม", icon: Info },
+    { key: "equipment", label: "อุปกรณ์", icon: Beaker },
+    { key: "theory", label: "ทฤษฎี", icon: BookOpen },
+    { key: "steps", label: "ขั้นตอน", icon: ListChecks },
+    { key: "saved", label: "ผลบันทึก", icon: BarChart3 },
+    { key: "info", label: "ข้อมูลแล็บ", icon: ClipboardList },
+  ];
+
+  const tabContent = {
+    overview: <LearningOverviewPanel details={details} theme={theme} />,
+    equipment: <EquipmentList labId={labId} />,
+    theory: <TheoryCard labId={labId} />,
+    steps: <ExperimentSteps labId={labId} />,
+    saved: savedData ? (
+      <SavedExperimentPanel
+        labId={labId}
+        savedData={savedData}
+        onClear={handleClearSavedData}
+      />
+    ) : (
+      <section className="rounded-2xl border border-slate-200/70 bg-white p-5 text-left shadow-sm shadow-slate-200/40">
+        <h2 className="flex items-center gap-2 text-base font-black text-slate-900">
+          <BarChart3 className={`h-5 w-5 ${theme.accentText}`} />
+          ยังไม่มีผลการทดลองที่บันทึกไว้
+        </h2>
+        <p className="mt-2 text-sm font-semibold leading-relaxed text-slate-500">
+          เริ่มทดลองและกดบันทึกผลในห้องแล็บจำลอง แล้วข้อมูลล่าสุดจะแสดงในหมวดนี้
+        </p>
+      </section>
+    ),
+    info: <LabSidebar labId={labId} hasSavedResult={Boolean(savedData)} />,
+  } satisfies Record<DetailTab, React.ReactNode>;
+
   return (
     <div className="relative flex min-h-screen flex-col bg-[#f8fafc] pb-[calc(5rem+env(safe-area-inset-bottom))] lg:pb-12">
       <Navbar />
@@ -499,27 +538,32 @@ export default function LabDetailLayout({ labId, lab, details }: LabDetailLayout
           theme={theme}
         />
 
-        <div className="mt-6 grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
-          <section className="min-w-0 space-y-5 lg:col-span-8">
-            <LearningOverviewPanel details={details} theme={theme} />
+        <section className="mt-6 space-y-4">
+          <div className="flex gap-2 overflow-x-auto rounded-2xl border border-slate-200 bg-white p-2 shadow-sm shadow-slate-200/40">
+            {tabs.map((tab) => {
+              const TabIcon = tab.icon;
+              const selected = activeTab === tab.key;
 
-            <EquipmentList labId={labId} />
-            <TheoryCard labId={labId} />
-            <ExperimentSteps labId={labId} />
-
-            {savedData ? (
-              <SavedExperimentPanel
-                labId={labId}
-                savedData={savedData}
-                onClear={handleClearSavedData}
-              />
-            ) : null}
-          </section>
-
-          <div className="min-w-0 self-start lg:col-span-4 lg:sticky lg:top-24">
-            <LabSidebar labId={labId} hasSavedResult={Boolean(savedData)} />
+              return (
+                <button
+                  key={tab.key}
+                  type="button"
+                  onClick={() => setActiveTab(tab.key)}
+                  className={`inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl px-4 text-sm font-black transition ${
+                    selected
+                      ? `${theme.accentBg} ${theme.accentText} ring-1 ring-inset ${theme.accentBorder}`
+                      : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+                  }`}
+                >
+                  <TabIcon className="h-4 w-4" />
+                  {tab.label}
+                </button>
+              );
+            })}
           </div>
-        </div>
+
+          {tabContent[activeTab]}
+        </section>
       </main>
     </div>
   );

@@ -5,6 +5,20 @@ import { LayoutGrid, Atom, Beaker, Leaf } from "lucide-react";
 
 export type Category = "All" | "Physics" | "Chemistry" | "Biology";
 
+const categoriesList = [
+  { id: "All" as Category, name: "ทั้งหมด", icon: LayoutGrid, color: "blue" },
+  { id: "Physics" as Category, name: "ฟิสิกส์", icon: Atom, color: "indigo" },
+  { id: "Chemistry" as Category, name: "เคมี", icon: Beaker, color: "purple" },
+  { id: "Biology" as Category, name: "ชีววิทยา", icon: Leaf, color: "green" },
+];
+
+const activeColorClasses: Record<string, string> = {
+  blue: "border-blue-600 bg-blue-600 text-white shadow-md shadow-blue-500/15",
+  indigo: "border-blue-600 bg-blue-600 text-white shadow-md shadow-blue-500/15",
+  purple: "border-purple-600 bg-purple-600 text-white shadow-md shadow-purple-500/15",
+  green: "border-green-600 bg-green-600 text-white shadow-md shadow-green-500/15",
+};
+
 interface CategoryFilterProps {
   activeCategory: Category;
   onCategoryChange: (category: Category) => void;
@@ -14,20 +28,6 @@ export default function CategoryFilter({
   activeCategory,
   onCategoryChange,
 }: CategoryFilterProps) {
-  const categoriesList = [
-    { id: "All" as Category, name: "ทั้งหมด", icon: LayoutGrid, color: "blue" },
-    { id: "Physics" as Category, name: "ฟิสิกส์", icon: Atom, color: "indigo" },
-    { id: "Chemistry" as Category, name: "เคมี", icon: Beaker, color: "purple" },
-    { id: "Biology" as Category, name: "ชีววิทยา", icon: Leaf, color: "green" },
-  ];
-
-  const activeColorClasses: Record<string, string> = {
-    blue: "border-blue-600 bg-blue-600 text-white shadow-md shadow-blue-500/15",
-    indigo: "border-blue-600 bg-blue-600 text-white shadow-md shadow-blue-500/15",
-    purple: "border-purple-600 bg-purple-600 text-white shadow-md shadow-purple-500/15",
-    green: "border-green-600 bg-green-600 text-white shadow-md shadow-green-500/15",
-  };
-
   return (
     <div className="flex w-full justify-center px-4 pb-5 pt-4 md:pb-6">
       <div className="w-full max-w-2xl rounded-full border border-slate-200/80 bg-white p-1.5 shadow-sm">

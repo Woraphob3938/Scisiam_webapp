@@ -176,7 +176,7 @@ export default function AIChatButton() {
   }
 
   return (
-    <div className="fixed bottom-[calc(5.75rem+env(safe-area-inset-bottom))] right-3 z-50 flex flex-col items-end gap-3 select-none sm:right-6 lg:bottom-6">
+    <div className="fixed bottom-[calc(6.75rem+env(safe-area-inset-bottom))] right-4 z-50 flex flex-col items-end gap-3 select-none sm:right-6 lg:bottom-6">
       {isOpen && (
         <div
           id="ai-tutor-dialog"
