@@ -20,24 +20,32 @@ const OhmsLawSimulation = dynamic(() =>
   import("@/components/labs/simulation/OhmsLawSimulation"));
 const HookesLawSimulation = dynamic(() =>
   import("@/components/labs/simulation/HookesLawSimulation"));
-const AcidBaseTitrationSimulation = dynamic(() =>
-  import("@/components/labs/simulation/AcidBaseTitrationSimulation"));
-const BoylesLawSimulation = dynamic(() =>
-  import("@/components/labs/simulation/BoylesLawSimulation"));
-const CharlesLawSimulation = dynamic(() =>
-  import("@/components/labs/simulation/CharlesLawSimulation"));
+const UnifiedLegacySimulation = dynamic(() =>
+  import("@/components/labs/simulation/UnifiedLegacySimulation"));
+function AcidBaseTitrationSimulation() {
+  return <UnifiedLegacySimulation labId="acid-base-titration" />;
+}
+function BoylesLawSimulation() {
+  return <UnifiedLegacySimulation labId="boyles-law" />;
+}
+function CharlesLawSimulation() {
+  return <UnifiedLegacySimulation labId="charles-law" />;
+}
 const PhotosynthesisRateSimulation = dynamic(() =>
   import("@/components/labs/simulation/PhotosynthesisRateSimulation"));
 const MendelianGeneticsSimulation = dynamic(() =>
   import("@/components/labs/simulation/MendelianGeneticsSimulation"));
 const MitosisCellCycleSimulation = dynamic(() =>
   import("@/components/labs/simulation/MitosisCellCycleSimulation"));
-const SnellsLawSimulation = dynamic(() =>
-  import("@/components/labs/simulation/SnellsLawSimulation"));
-const IdealGasLawSimulation = dynamic(() =>
-  import("@/components/labs/simulation/IdealGasLawSimulation"));
-const NewtonsSecondLawSimulation = dynamic(() =>
-  import("@/components/labs/simulation/NewtonsSecondLawSimulation"));
+function SnellsLawSimulation() {
+  return <UnifiedLegacySimulation labId="snells-law" />;
+}
+function IdealGasLawSimulation() {
+  return <UnifiedLegacySimulation labId="ideal-gas-law" />;
+}
+function NewtonsSecondLawSimulation() {
+  return <UnifiedLegacySimulation labId="newtons-second-law" />;
+}
 const PhotoelectricEffectSimulation = dynamic(() =>
   import("@/components/labs/simulation/PhotoelectricEffectSimulation"));
 const KeplersLawsSimulation = dynamic(() =>
@@ -58,6 +66,8 @@ const HesssLawSimulation = dynamic(() =>
   import("@/components/labs/simulation/HesssLawSimulation"));
 const ChemistryConceptSimulation = dynamic(() =>
   import("@/components/labs/simulation/ChemistryConceptSimulation"));
+const PeriodicTableSimulation = dynamic(() =>
+  import("@/components/labs/simulation/PeriodicTableSimulation"));
 const OsmosisPlasmolysisSimulation = dynamic(() =>
   import("@/components/labs/simulation/OsmosisPlasmolysisSimulation"));
 const EnzymeKineticsSimulation = dynamic(() =>
@@ -82,6 +92,7 @@ const simulationComponents: Record<DirectSimulationLabId, React.ComponentType> =
   "ohms-law": OhmsLawSimulation,
   "hookes-law": HookesLawSimulation,
   "acid-base-titration": AcidBaseTitrationSimulation,
+  "periodic-table": PeriodicTableSimulation,
   "boyles-law": BoylesLawSimulation,
   "charles-law": CharlesLawSimulation,
   "photosynthesis-rate": PhotosynthesisRateSimulation,

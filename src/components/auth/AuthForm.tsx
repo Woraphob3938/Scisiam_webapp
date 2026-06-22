@@ -1,16 +1,15 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
   ArrowRight,
   Atom,
   Beaker,
   Check,
-  Compass,
   Eye,
   EyeOff,
-  FlaskConical,
   Leaf,
   Lock,
   Mail,
@@ -42,20 +41,26 @@ const roleOptions: Array<{
 const subjectBooks = [
   {
     title: "ฟิสิกส์",
-    label: "วิชา 01",
-    tone: "border-t-blue-500 bg-blue-50/70 text-blue-700",
+    label: "01",
+    summary: "แรง การเคลื่อนที่ พลังงาน",
+    image: "/images/auth/physics-auth.png",
+    tone: "border-blue-100 bg-blue-50 text-blue-700",
     icon: Atom,
   },
   {
     title: "เคมี",
-    label: "วิชา 02",
-    tone: "border-t-purple-500 bg-purple-50/70 text-purple-700",
+    label: "02",
+    summary: "สารละลาย ปฏิกิริยา สมดุล",
+    image: "/images/auth/chemistry-auth.png",
+    tone: "border-purple-100 bg-purple-50 text-purple-700",
     icon: Beaker,
   },
   {
     title: "ชีววิทยา",
-    label: "วิชา 03",
-    tone: "border-t-emerald-500 bg-emerald-50/70 text-emerald-700",
+    label: "03",
+    summary: "เซลล์ พันธุกรรม สิ่งแวดล้อม",
+    image: "/images/auth/biology-auth.png",
+    tone: "border-emerald-100 bg-emerald-50 text-emerald-700",
     icon: Leaf,
   },
 ];
@@ -224,18 +229,18 @@ export default function AuthForm({ initialMode }: AuthFormProps) {
 
   return (
     <section
-      className="mx-auto grid w-full max-w-[1180px] grid-cols-1 gap-5 px-4 py-5 sm:px-6 lg:min-h-[660px] lg:grid-cols-[minmax(0,1.05fr)_minmax(430px,0.95fr)] lg:items-stretch lg:gap-10 lg:px-8 lg:py-4"
+      className="mx-auto grid w-full max-w-[1240px] grid-cols-1 gap-5 px-4 py-5 sm:px-6 lg:min-h-[calc(100svh-48px)] lg:grid-cols-[minmax(0,1fr)_minmax(410px,0.78fr)] lg:items-stretch lg:gap-8 lg:px-8 lg:py-6"
       aria-label={isRegister ? "หน้าสมัครสมาชิก SciSiam" : "หน้าเข้าสู่ระบบ SciSiam"}
     >
       <ScienceIntro mode={mode} />
 
       <div className="flex min-w-0 items-center justify-center">
         <div className="grid w-full max-w-[500px] gap-4">
-          <MobileIntro mode={mode} />
+          <MobileIntro />
 
           <form
             onSubmit={handleSubmit}
-            className="w-full rounded-[24px] border border-slate-200 bg-white p-4 shadow-xl shadow-slate-200/60 sm:p-6 lg:p-7"
+            className="w-full rounded-[28px] border border-white/80 bg-white/95 p-4 shadow-[0_24px_80px_rgba(15,23,42,0.12)] ring-1 ring-slate-200/70 backdrop-blur sm:p-6 lg:p-7"
           >
             <div className={`grid ${isRegister ? "gap-4" : "gap-5"}`}>
             <div className="grid grid-cols-2 gap-1 rounded-[14px] border border-slate-200 bg-slate-50 p-1">
@@ -523,69 +528,71 @@ function ScienceIntro({ mode }: { mode: AuthMode }) {
   const isRegister = mode === "register";
 
   return (
-    <aside className="hidden min-w-0 content-start gap-5 rounded-[28px] border border-slate-200 bg-white/80 p-5 shadow-sm shadow-slate-200/50 sm:p-7 lg:grid lg:content-between lg:p-7">
-      <div className="flex items-center gap-3">
-        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-[14px] bg-blue-600 text-white shadow-md shadow-blue-500/20">
-          <Compass className="h-5.5 w-5.5" />
-        </span>
-        <span className="grid gap-0.5">
-          <strong className="text-lg font-extrabold leading-[1.1] text-blue-600">
-            SciSiam
-          </strong>
-        </span>
+    <aside className="relative hidden min-w-0 overflow-hidden rounded-[34px] border border-slate-200 bg-white p-7 text-slate-950 shadow-[0_28px_90px_rgba(15,23,42,0.12)] lg:grid lg:content-between">
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(120deg,rgba(37,99,235,0.08),transparent_40%),linear-gradient(180deg,rgba(255,255,255,0.9),transparent_36%)]" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-white" />
+
+      <div className="relative z-10 flex items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <span className="relative h-12 w-12 shrink-0 overflow-hidden rounded-2xl bg-white shadow-lg shadow-blue-500/15 ring-1 ring-slate-200">
+            <Image src="/scisiam-logo.png" alt="SciSiam logo" fill sizes="48px" className="object-contain p-0.5" priority />
+          </span>
+          <span className="grid gap-0.5">
+            <strong className="text-xl font-extrabold leading-[1.1] text-blue-600">
+              SciSiam
+            </strong>
+          </span>
+        </div>
       </div>
 
-      <div className="grid gap-4">
-        <p className="text-xs font-bold leading-[1.45] tracking-normal text-slate-400">
-          {isRegister ? "สร้างบัญชีสำหรับชั้นเรียนวิทย์" : "SciSiam สำหรับการทดลองวิทยาศาสตร์"}
-        </p>
-        <h2 className="max-w-2xl text-3xl font-extrabold leading-[1.25] tracking-normal text-slate-950 sm:text-4xl lg:text-[42px]">
+      <div className="relative z-10 my-8 grid max-w-2xl gap-5">
+        <h2 className="text-4xl font-extrabold leading-[1.18] tracking-normal text-slate-950 xl:text-5xl">
           {isRegister
-            ? "สร้างบัญชี SciSiam เพื่อเรียนและจัดการห้องแล็บ"
-            : "เข้าสู่ SciSiam แล้วเริ่มทดลองได้ทันที"}
+            ? "สร้างพื้นที่ทดลองวิทยาศาสตร์ที่พร้อมใช้ในชั้นเรียน"
+            : "กลับเข้าสู่ห้องทดลอง แล้วเรียนต่อได้ทันที"}
         </h2>
-        <p className="max-w-xl text-sm font-semibold leading-[1.75] text-slate-500 sm:text-base">
+        <p className="max-w-xl text-base font-semibold leading-[1.8] text-slate-600">
           {isRegister
-            ? "เลือกบทบาทนักเรียนหรือคุณครู เพื่อใช้แล็บ บันทึกความคืบหน้า และดูภาพรวมการเรียนรู้ให้ตรงกับการใช้งานของคุณ"
-            : "ค้นหาแล็บ ทดลอง บันทึกผล และให้ AI ไออุ่นช่วยอธิบายแนวคิดวิทยาศาสตร์ในที่เดียว"}
+            ? "เลือกบทบาทนักเรียนหรือคุณครู เพื่อใช้แล็บ บันทึกความคืบหน้า และจัดการการเรียนรู้ให้ตรงกับห้องเรียนจริง"
+            : "ค้นหาแล็บ ทดลอง บันทึกผล และให้ AI ไออุ่นช่วยทบทวนแนวคิดวิทยาศาสตร์ในจุดเดียว"}
         </p>
       </div>
 
-      <div className="grid gap-5 rounded-[24px] border border-slate-200 bg-[linear-gradient(135deg,#eff6ff_0%,#ffffff_44%,#f5f3ff_100%)] p-4 sm:p-5">
-        <div className="grid grid-cols-3 items-end gap-3">
-          {subjectBooks.map((subject, index) => {
+      <div className="relative z-10 grid gap-4">
+        <div className="grid grid-cols-3 gap-3">
+          {subjectBooks.map((subject) => {
             const Icon = subject.icon;
             return (
               <div
                 key={subject.title}
-                className={`grid min-h-[124px] content-between rounded-2xl border border-slate-200 border-t-4 p-3 shadow-lg shadow-slate-200/50 sm:min-h-[148px] ${
-                  index === 1 ? "sm:min-h-[168px]" : ""
-                } ${subject.tone}`}
+                className="group overflow-hidden rounded-3xl border border-slate-200 bg-slate-50 p-3 transition-colors hover:bg-white"
               >
-                <span className="text-[10px] font-extrabold uppercase leading-[1.3] text-slate-400">
-                  {subject.label}
-                </span>
-                <Icon className="h-5 w-5" />
-                <span className="break-words text-sm font-extrabold leading-[1.2] sm:text-lg">
-                  {subject.title}
-                </span>
-                <span className="h-1.5 rounded-full bg-white/80" />
+                <div className="relative mb-3 h-24 overflow-hidden rounded-2xl bg-white/90">
+                  <Image src={subject.image} alt={`${subject.title} illustration`} fill sizes="180px" className="object-cover" />
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className={`grid h-8 w-8 place-items-center rounded-xl border ${subject.tone}`}>
+                    <Icon className="h-4 w-4" />
+                  </span>
+                  <div className="min-w-0">
+                    <span className="block text-[10px] font-extrabold leading-[1.3] text-slate-400">
+                      {subject.label}
+                    </span>
+                    <strong className="block truncate text-sm font-extrabold leading-[1.35] text-slate-950">
+                      {subject.title}
+                    </strong>
+                  </div>
+                </div>
+                <p className="mt-2 text-xs font-semibold leading-relaxed text-slate-500">
+                  {subject.summary}
+                </p>
               </div>
             );
           })}
         </div>
-
-        <div className="grid grid-cols-[38px_1fr] gap-3">
-          <span className="grid h-9 w-9 place-items-center rounded-xl border border-slate-200 bg-white text-slate-500">
-            <FlaskConical className="h-4.5 w-4.5" />
-          </span>
-          <p className="text-xs font-semibold leading-relaxed text-slate-500 sm:text-sm">
-            แบ่งแล็บตามรายวิชาและสถานะการเรียนรู้ ช่วยให้เลือกบททดลองต่อไปได้เร็วขึ้น
-          </p>
-        </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-3">
+      <div className="relative z-10 grid grid-cols-3 gap-3">
         <TrustItem title="36 แล็บ" text="ครบฟิสิกส์ เคมี ชีวะ" />
         <TrustItem title="AI ไออุ่น" text="ช่วยทบทวนแนวคิด" />
         <TrustItem title="ครู/นักเรียน" text="บทบาทพร้อมใช้งาน" />
@@ -594,15 +601,13 @@ function ScienceIntro({ mode }: { mode: AuthMode }) {
   );
 }
 
-function MobileIntro({ mode }: { mode: AuthMode }) {
-  const isRegister = mode === "register";
-
+function MobileIntro() {
   return (
-    <div className="grid gap-3 rounded-[22px] border border-slate-200 bg-white/85 p-3 shadow-sm shadow-slate-200/50 lg:hidden">
+    <div className="grid gap-3 rounded-[24px] border border-white/80 bg-white/90 p-3 shadow-lg shadow-slate-200/50 ring-1 ring-slate-200/60 backdrop-blur lg:hidden">
       <div className="flex items-center justify-between gap-3">
         <div className="flex min-w-0 items-center gap-3">
-          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[13px] bg-blue-600 text-white shadow-md shadow-blue-500/20">
-            <Compass className="h-4.5 w-4.5" />
+          <span className="relative h-10 w-10 shrink-0 overflow-hidden rounded-[13px] bg-white shadow-md shadow-blue-500/20">
+            <Image src="/scisiam-logo.png" alt="SciSiam logo" fill sizes="40px" className="object-contain p-0.5" priority />
           </span>
           <span className="grid min-w-0 gap-0.5">
             <strong className="text-lg font-extrabold leading-[1.1] text-blue-600">
@@ -610,9 +615,6 @@ function MobileIntro({ mode }: { mode: AuthMode }) {
             </strong>
           </span>
         </div>
-        <span className="rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-[11px] font-extrabold leading-[1.45] text-blue-600">
-          {isRegister ? "Register" : "Login"}
-        </span>
       </div>
 
       <div className="grid grid-cols-3 gap-2">
@@ -621,7 +623,7 @@ function MobileIntro({ mode }: { mode: AuthMode }) {
           return (
             <div
               key={subject.title}
-              className={`grid min-h-14 content-between rounded-xl border border-slate-200 border-t-4 p-2 ${subject.tone}`}
+              className={`grid min-h-16 content-between rounded-2xl border p-2 ${subject.tone}`}
             >
               <Icon className="h-3.5 w-3.5" />
               <span className="break-words text-[10px] font-extrabold leading-[1.15]">
@@ -716,10 +718,10 @@ function ValidationItem({ valid, label }: { valid: boolean; label: string }) {
 function TrustItem({ title, text }: { title: string; text: string }) {
   return (
     <div className="grid gap-1 border-t border-slate-200 pt-3">
-      <strong className="text-xs font-extrabold leading-[1.45] text-slate-900 sm:text-sm">
+      <strong className="text-xs font-extrabold leading-[1.45] text-slate-950 sm:text-sm">
         {title}
       </strong>
-      <span className="text-[11px] font-semibold leading-relaxed text-slate-400">
+      <span className="text-[11px] font-semibold leading-relaxed text-slate-500">
         {text}
       </span>
     </div>

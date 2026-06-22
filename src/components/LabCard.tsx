@@ -4,10 +4,13 @@ import React from "react";
 import { Eye, ArrowRight } from "lucide-react";
 import { getLabReadiness } from "@/data/labReadiness";
 
+export type GradeLevel = "ประถม" | "มัธยมต้น" | "มัธยมปลาย";
+
 export interface LabData {
   id: string;
   title: string;
   category: "Physics" | "Chemistry" | "Biology";
+  gradeLevel: GradeLevel;
   status: "ว่าง" | string;
   description: string;
 }
@@ -106,6 +109,27 @@ const TitrationSVG = () => (
     {/* Chemical Sparkles */}
     <circle cx="60" cy="40" r="2" fill="#a855f7" className="animate-pulse" />
     <circle cx="148" cy="50" r="1.5" fill="#c084fc" />
+  </svg>
+);
+
+const PeriodicTableSVG = () => (
+  <svg className="h-32 w-full" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <circle cx="100" cy="60" r="45" fill="#f3e8ff" opacity="0.45" />
+    <g transform="translate(32 22)">
+      {([
+        ["H", 0, 0, "#10b981"], ["He", 126, 0, "#8b5cf6"],
+        ["Li", 0, 20, "#f43f5e"], ["Be", 18, 20, "#f97316"], ["B", 88, 20, "#f59e0b"], ["C", 106, 20, "#10b981"], ["N", 124, 20, "#10b981"],
+        ["Na", 0, 40, "#f43f5e"], ["Mg", 18, 40, "#f97316"], ["Al", 88, 40, "#6366f1"], ["Si", 106, 40, "#f59e0b"], ["P", 124, 40, "#10b981"],
+        ["K", 0, 60, "#f43f5e"], ["Ca", 18, 60, "#f97316"], ["Fe", 52, 60, "#0ea5e9"], ["Cu", 70, 60, "#0ea5e9"], ["Zn", 88, 60, "#0ea5e9"], ["Kr", 126, 60, "#8b5cf6"],
+      ] as const).map(([symbol, x, y, color]) => (
+        <g key={symbol} transform={`translate(${x}, ${y})`}>
+          <rect width="16" height="16" rx="4" fill={color} />
+          <text x="8" y="11" textAnchor="middle" fontSize="7" fontWeight="900" fill="#fff">{symbol}</text>
+        </g>
+      ))}
+    </g>
+    <rect x="60" y="95" width="80" height="14" rx="7" fill="#ffffff" stroke="#ddd6fe" />
+    <text x="100" y="105" textAnchor="middle" fontSize="7" fontWeight="900" fill="#7c3aed">Periodic Table</text>
   </svg>
 );
 
@@ -1044,6 +1068,8 @@ export default function LabCard({
         return <StefanBoltzmannSVG />;
       case "acid-base-titration":
         return <TitrationSVG />;
+      case "periodic-table":
+        return <PeriodicTableSVG />;
       case "boyles-law":
         return <BoylesLawSVG />;
       case "charles-law":
@@ -1123,13 +1149,16 @@ export default function LabCard({
         </div>
 
         {/* Lab Header details */}
-        <div className="mb-2.5 flex items-center justify-between gap-2">
+        <div className="mb-2.5 flex flex-wrap items-center gap-2">
           {/* Department Tag */}
           <span className={`rounded-full border px-3 py-1 text-xs font-bold leading-[1.45] ${themeColors.badgeColor}`}>
             {lab.category}
           </span>
+          <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[10px] font-extrabold leading-[1.4] text-slate-600">
+            {lab.gradeLevel}
+          </span>
           <span
-            className={`rounded-full border px-2.5 py-1 text-[10px] font-extrabold leading-[1.4] ${
+            className={`ml-auto rounded-full border px-2.5 py-1 text-[10px] font-extrabold leading-[1.4] ${
               readiness.isReady
                 ? "border-emerald-100 bg-emerald-50 text-emerald-700"
                 : "border-amber-100 bg-amber-50 text-amber-700"

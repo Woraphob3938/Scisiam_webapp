@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import {
@@ -55,7 +55,10 @@ interface SharedSimulationShellProps {
   progressPercent: number;
   tips: string[];
   scoreLabel?: string;
-  onSave: () => void;
+  showLiveMetrics?: boolean;
+  showInfoTabs?: boolean;
+  showSaveButton?: boolean;
+  onSave?: () => void;
 }
 
 const accentClasses = {
@@ -143,13 +146,41 @@ export default function SharedSimulationShell({
   progressPercent,
   tips,
   scoreLabel = "+25 คะแนน",
+  showLiveMetrics = true,
+  showInfoTabs = true,
+  showSaveButton = true,
   onSave,
 }: SharedSimulationShellProps) {
   const tone = accentClasses[accent];
+  const stageShellRef = useRef<HTMLElement | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
   const [controlsOpen, setControlsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<InfoTab>("about");
   const boundedProgress = Math.min(100, Math.max(0, progressPercent));
+  const hasDrawerSummary = showLiveMetrics || (showSaveButton && onSave);
+
+  useEffect(() => {
+    const syncFullscreen = () => setIsExpanded(document.fullscreenElement === stageShellRef.current);
+    document.addEventListener("fullscreenchange", syncFullscreen);
+    return () => document.removeEventListener("fullscreenchange", syncFullscreen);
+  }, []);
+
+  const toggleFullscreen = async () => {
+    if (document.fullscreenElement) {
+      await document.exitFullscreen();
+      setIsExpanded(false);
+      return;
+    }
+
+    const stage = stageShellRef.current;
+    if (stage?.requestFullscreen) {
+      await stage.requestFullscreen();
+      setIsExpanded(true);
+      return;
+    }
+
+    setIsExpanded((value) => !value);
+  };
 
   const tabs: Array<{ key: InfoTab; label: string; icon: LucideIcon }> = [
     { key: "about", label: "ภาพรวม", icon: Info },
@@ -211,24 +242,30 @@ export default function SharedSimulationShell({
       </button>
 
       {controlsOpen && (
-        <div className="grid gap-4 border-t border-slate-100 p-4 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <div className={`grid gap-4 border-t border-slate-100 p-4 ${hasDrawerSummary ? "lg:grid-cols-[minmax(0,1fr)_320px]" : ""}`}>
           <div>{controls}</div>
-          <div className="flex flex-col gap-3">
-            <div className="grid grid-cols-2 gap-2 text-[11px] font-bold text-slate-500">
-              {metrics.map((metric) => (
-                <span key={metric.label} className={`rounded-xl px-3 py-2 ${metricToneClasses[metric.tone ?? accent]}`}>
-                  {metric.label}: <b>{metric.value}</b>
-                </span>
-              ))}
+          {hasDrawerSummary && (
+            <div className="flex flex-col gap-3">
+              {showLiveMetrics && (
+                <div className="grid grid-cols-2 gap-2 text-[11px] font-bold text-slate-500">
+                  {metrics.map((metric) => (
+                    <span key={metric.label} className={`rounded-xl px-3 py-2 ${metricToneClasses[metric.tone ?? accent]}`}>
+                      {metric.label}: <b>{metric.value}</b>
+                    </span>
+                  ))}
+                </div>
+              )}
+              {showSaveButton && onSave && (
+                <button
+                  onClick={onSave}
+                  className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-xs font-black text-white shadow-sm ${tone.button}`}
+                >
+                  <Save className="h-4 w-4" />
+                  บันทึกผลการทดลอง
+                </button>
+              )}
             </div>
-            <button
-              onClick={onSave}
-              className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-xs font-black text-white shadow-sm ${tone.button}`}
-            >
-              <Save className="h-4 w-4" />
-              บันทึกผลการทดลอง
-            </button>
-          </div>
+          )}
         </div>
       )}
     </section>
@@ -236,9 +273,10 @@ export default function SharedSimulationShell({
 
   const simulationStage = (
     <section
+      ref={stageShellRef}
       className={`relative overflow-hidden rounded-[24px] border border-slate-200 bg-slate-900 shadow-2xl shadow-slate-300/60 ${
         isExpanded
-          ? "h-[calc(100vh-24px)] min-h-[620px]"
+          ? "h-screen min-h-screen rounded-none border-0 shadow-none"
           : "h-[72vh] min-h-[620px] max-h-[840px]"
       }`}
     >
@@ -259,10 +297,10 @@ export default function SharedSimulationShell({
         </div>
 
         <div className="flex items-start gap-3">
-          <div className="hidden sm:block">{liveMetricsCard}</div>
+          {showLiveMetrics && <div className="hidden sm:block">{liveMetricsCard}</div>}
           <button
             type="button"
-            onClick={() => setIsExpanded((value) => !value)}
+            onClick={toggleFullscreen}
             className="grid h-11 w-11 place-items-center rounded-2xl border border-white/70 bg-white/92 text-slate-700 shadow-lg shadow-slate-900/10 backdrop-blur-md transition hover:text-slate-950"
             aria-label={isExpanded ? "ออกจากโหมดเต็มจอ" : "ขยายห้องทดลอง"}
           >
@@ -271,12 +309,12 @@ export default function SharedSimulationShell({
         </div>
       </div>
 
-      <div className="absolute right-5 top-[148px] z-20 sm:hidden">
+      {showLiveMetrics && <div className="absolute right-5 top-[148px] z-20 sm:hidden">
         <div className="inline-flex max-w-[180px] items-center gap-2 rounded-2xl border border-white/70 bg-white/92 px-3 py-2 text-[11px] font-black text-slate-900 shadow-lg shadow-slate-900/10 backdrop-blur-md">
           <BarChart3 className={`h-3.5 w-3.5 ${tone.text}`} />
           <span className="truncate">{metrics[0]?.label}: {metrics[0]?.value}</span>
         </div>
-      </div>
+      </div>}
 
       <div className={`absolute inset-x-4 top-[122px] z-10 transition-all duration-300 sm:inset-x-5 ${controlsOpen ? "bottom-[calc(32vh+48px)]" : "bottom-[96px] sm:bottom-[104px]"}`}>
         <div className="h-full overflow-hidden rounded-[22px] border border-white/70 bg-white shadow-inner shadow-slate-200/70">
@@ -375,13 +413,9 @@ export default function SharedSimulationShell({
             <span className="text-slate-800">Simulator</span>
           </div>
 
-          {isExpanded ? (
-            <div className="fixed inset-0 z-[80] bg-slate-950 p-3">{simulationStage}</div>
-          ) : (
-            simulationStage
-          )}
+          {simulationStage}
 
-          <section className="space-y-4">
+          {showInfoTabs && <section className="space-y-4">
             <div className="flex gap-2 overflow-x-auto rounded-2xl border border-slate-200 bg-white p-2 shadow-sm shadow-slate-200/40">
               {tabs.map((tab) => {
                 const TabIcon = tab.icon;
@@ -404,7 +438,7 @@ export default function SharedSimulationShell({
             </div>
 
             {activeTabContent[activeTab]}
-          </section>
+          </section>}
         </div>
       </main>
     </div>

@@ -3,6 +3,7 @@ export const directSimulationLabIds = [
   "ohms-law",
   "hookes-law",
   "acid-base-titration",
+  "periodic-table",
   "boyles-law",
   "charles-law",
   "photosynthesis-rate",

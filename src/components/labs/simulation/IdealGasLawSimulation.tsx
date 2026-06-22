@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import { useRouter } from "next/navigation";
+import * as THREE from "three";
 import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";
 import {
   BarChart3,
@@ -135,6 +136,273 @@ function MoleculeViewport({
         />
       ))}
     </g>
+  );
+}
+
+export function GasChamber3DScene({
+  volume,
+  temperature,
+  moles,
+  pressure,
+  isRunning,
+}: {
+  volume: number;
+  temperature: number;
+  moles: number;
+  pressure: number;
+  isRunning: boolean;
+}) {
+  const mountRef = useRef<HTMLDivElement | null>(null);
+  const propsRef = useRef({ volume, temperature, pressure, isRunning });
+  const rotationRef = useRef({ x: -0.08, y: -0.45 });
+  const distanceRef = useRef(9.4);
+  const dragRef = useRef<{ active: boolean; x: number; y: number }>({ active: false, x: 0, y: 0 });
+  const [webglFailed, setWebglFailed] = useState(false);
+
+  useEffect(() => {
+    propsRef.current = { volume, temperature, pressure, isRunning };
+  }, [volume, temperature, pressure, isRunning]);
+
+  useEffect(() => {
+    const host = mountRef.current;
+    if (!host) return;
+
+    let renderer: THREE.WebGLRenderer;
+    try {
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    } catch {
+      const fallbackTimer = window.setTimeout(() => setWebglFailed(true), 0);
+      return () => window.clearTimeout(fallbackTimer);
+    }
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
+    const clock = new THREE.Clock();
+    const root = new THREE.Group();
+    const bottom = -1.8;
+    const particleCount = Math.min(64, Math.max(16, Math.round(moles * 26)));
+    const particleColor = new THREE.Color();
+    let frameId = 0;
+
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    host.appendChild(renderer.domElement);
+
+    scene.background = new THREE.Color(0xf8fafc);
+    scene.add(root);
+    scene.add(new THREE.HemisphereLight(0xffffff, 0xdbeafe, 2.4));
+
+    const keyLight = new THREE.DirectionalLight(0xffffff, 2.8);
+    keyLight.position.set(5, 6, 4);
+    scene.add(keyLight);
+
+    camera.position.set(5.4, 3.6, distanceRef.current);
+    camera.lookAt(0, 0.35, 0);
+
+    const chamberMaterial = new THREE.MeshStandardMaterial({
+      color: 0xdff7ff,
+      transparent: true,
+      opacity: 0.34,
+      roughness: 0.2,
+      metalness: 0.05,
+    });
+    const chamber = new THREE.Mesh(new THREE.BoxGeometry(4, 1, 2.8), chamberMaterial);
+    root.add(chamber);
+
+    const edgeGeometry = new THREE.EdgesGeometry(new THREE.BoxGeometry(4, 1, 2.8));
+    const edges = new THREE.LineSegments(
+      edgeGeometry,
+      new THREE.LineBasicMaterial({ color: 0x2563eb, transparent: true, opacity: 0.75 })
+    );
+    root.add(edges);
+
+    const piston = new THREE.Mesh(
+      new THREE.BoxGeometry(4.35, 0.16, 3.05),
+      new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.42, metalness: 0.22 })
+    );
+    root.add(piston);
+
+    const rod = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.055, 0.055, 1.9, 24),
+      new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.28, metalness: 0.5 })
+    );
+    root.add(rod);
+
+    const floor = new THREE.Mesh(
+      new THREE.CylinderGeometry(1.9, 1.9, 0.08, 64),
+      new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.55 })
+    );
+    floor.position.y = bottom - 0.08;
+    floor.scale.z = 0.72;
+    root.add(floor);
+
+    const particles: Array<{ mesh: THREE.Mesh; velocity: THREE.Vector3 }> = [];
+    const particleGeometry = new THREE.SphereGeometry(0.085, 20, 20);
+    const particleMaterial = new THREE.MeshStandardMaterial({
+      color: 0x10b981,
+      roughness: 0.22,
+      metalness: 0.05,
+    });
+
+    for (let i = 0; i < particleCount; i += 1) {
+      const mesh = new THREE.Mesh(particleGeometry, particleMaterial);
+      mesh.position.set(
+        (Math.random() - 0.5) * 3.2,
+        bottom + 0.3 + Math.random() * 2.2,
+        (Math.random() - 0.5) * 2.1
+      );
+      particles.push({
+        mesh,
+        velocity: new THREE.Vector3(
+          (Math.random() - 0.5) * 1.4,
+          (Math.random() - 0.5) * 1.4,
+          (Math.random() - 0.5) * 1.4
+        ),
+      });
+      root.add(mesh);
+    }
+
+    const resize = () => {
+      const width = Math.max(1, host.clientWidth);
+      const height = Math.max(1, host.clientHeight);
+      renderer.setSize(width, height, false);
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+    };
+
+    const resizeObserver = new ResizeObserver(resize);
+    resizeObserver.observe(host);
+    resize();
+
+    const onPointerDown = (event: PointerEvent) => {
+      dragRef.current = { active: true, x: event.clientX, y: event.clientY };
+      host.setPointerCapture(event.pointerId);
+    };
+    const onPointerMove = (event: PointerEvent) => {
+      if (!dragRef.current.active) return;
+      const dx = event.clientX - dragRef.current.x;
+      const dy = event.clientY - dragRef.current.y;
+      dragRef.current = { active: true, x: event.clientX, y: event.clientY };
+      rotationRef.current.y += dx * 0.008;
+      rotationRef.current.x = THREE.MathUtils.clamp(rotationRef.current.x + dy * 0.006, -0.55, 0.35);
+    };
+    const onPointerUp = (event: PointerEvent) => {
+      dragRef.current.active = false;
+      if (host.hasPointerCapture(event.pointerId)) host.releasePointerCapture(event.pointerId);
+    };
+    const onWheel = (event: WheelEvent) => {
+      event.preventDefault();
+      distanceRef.current = THREE.MathUtils.clamp(distanceRef.current + event.deltaY * 0.006, 6.4, 13);
+    };
+
+    host.addEventListener("pointerdown", onPointerDown);
+    host.addEventListener("pointermove", onPointerMove);
+    host.addEventListener("pointerup", onPointerUp);
+    host.addEventListener("pointercancel", onPointerUp);
+    host.addEventListener("wheel", onWheel, { passive: false });
+
+    const animate = () => {
+      const delta = Math.min(0.032, clock.getDelta());
+      const current = propsRef.current;
+      const volumeRatio = current.volume <= 8
+        ? (current.volume - 1) / 7
+        : (current.volume - 10) / 40;
+      const height = 1.35 + THREE.MathUtils.clamp(volumeRatio, 0, 1) * 2.85;
+      const top = bottom + height;
+      const speed = (current.isRunning ? 1.2 : 0.24) * Math.sqrt(current.temperature / 300);
+
+      chamber.scale.y = height;
+      chamber.position.y = bottom + height / 2;
+      edges.scale.y = height;
+      edges.position.y = bottom + height / 2;
+      piston.position.y = top + 0.1;
+      rod.position.y = top + 1.05;
+      if (!dragRef.current.active) rotationRef.current.y += delta * (current.isRunning ? 0.16 : 0.025);
+      root.rotation.x = rotationRef.current.x;
+      root.rotation.y = rotationRef.current.y;
+      camera.position.set(5.4, 3.6, distanceRef.current);
+      camera.lookAt(0, 0.35, 0);
+
+      particleColor.set(current.temperature > 360 ? 0xef4444 : current.temperature < 220 ? 0x3b82f6 : 0x10b981);
+      particleMaterial.color.copy(particleColor);
+
+      particles.forEach((particle) => {
+        particle.mesh.position.addScaledVector(particle.velocity, delta * speed);
+
+        if (particle.mesh.position.x < -1.85 || particle.mesh.position.x > 1.85) {
+          particle.velocity.x *= -1;
+          particle.mesh.position.x = THREE.MathUtils.clamp(particle.mesh.position.x, -1.85, 1.85);
+        }
+        if (particle.mesh.position.z < -1.25 || particle.mesh.position.z > 1.25) {
+          particle.velocity.z *= -1;
+          particle.mesh.position.z = THREE.MathUtils.clamp(particle.mesh.position.z, -1.25, 1.25);
+        }
+        if (particle.mesh.position.y < bottom + 0.14 || particle.mesh.position.y > top - 0.14) {
+          particle.velocity.y *= -1;
+          particle.mesh.position.y = THREE.MathUtils.clamp(particle.mesh.position.y, bottom + 0.14, top - 0.14);
+        }
+      });
+
+      renderer.render(scene, camera);
+      frameId = requestAnimationFrame(animate);
+    };
+
+    frameId = requestAnimationFrame(animate);
+
+    return () => {
+      cancelAnimationFrame(frameId);
+      resizeObserver.disconnect();
+      host.removeEventListener("pointerdown", onPointerDown);
+      host.removeEventListener("pointermove", onPointerMove);
+      host.removeEventListener("pointerup", onPointerUp);
+      host.removeEventListener("pointercancel", onPointerUp);
+      host.removeEventListener("wheel", onWheel);
+      renderer.dispose();
+      chamber.geometry.dispose();
+      chamberMaterial.dispose();
+      edgeGeometry.dispose();
+      (edges.material as THREE.Material).dispose();
+      piston.geometry.dispose();
+      (piston.material as THREE.Material).dispose();
+      rod.geometry.dispose();
+      (rod.material as THREE.Material).dispose();
+      floor.geometry.dispose();
+      (floor.material as THREE.Material).dispose();
+      particleGeometry.dispose();
+      particleMaterial.dispose();
+      renderer.domElement.remove();
+    };
+  }, [moles]);
+
+  if (webglFailed) {
+    return (
+      <GasChamberScene
+        volume={volume}
+        temperature={temperature}
+        moles={moles}
+        pressure={pressure}
+        isRunning={isRunning}
+      />
+    );
+  }
+
+  return (
+    <div className="relative h-full min-h-[340px] overflow-hidden rounded-2xl border border-emerald-100 bg-[linear-gradient(135deg,#f8fafc_0%,#ecfeff_48%,#f0fdf4_100%)]">
+      <div
+        ref={mountRef}
+        className="h-full min-h-[340px] w-full cursor-grab active:cursor-grabbing"
+        style={{ touchAction: "none" }}
+        aria-label="3D ideal gas molecule chamber"
+      />
+      <div className="pointer-events-none absolute left-4 top-4 rounded-2xl border border-white/80 bg-white/85 px-3 py-2 text-left shadow-sm backdrop-blur">
+        <p className="text-[10px] font-black uppercase text-emerald-600">3D gas chamber</p>
+        <p className="mt-0.5 text-xs font-bold text-slate-600">ลากเพื่อหมุน ใช้ล้อเมาส์เพื่อซูม</p>
+      </div>
+      <div className="pointer-events-none absolute bottom-4 left-4 right-4 grid grid-cols-3 gap-2 text-center text-[10px] font-black text-slate-600">
+        <span className="rounded-xl bg-white/85 px-2 py-2 shadow-sm">V {volume.toFixed(1)} L</span>
+        <span className="rounded-xl bg-white/85 px-2 py-2 shadow-sm">T {temperature.toFixed(0)} K</span>
+        <span className="rounded-xl bg-white/85 px-2 py-2 shadow-sm">P {pressure.toFixed(1)} kPa</span>
+      </div>
+    </div>
   );
 }
 
@@ -524,7 +792,7 @@ export default function IdealGasLawSimulation() {
                         P = {pressure.toFixed(1)} kPa
                       </span>
                     </div>
-                    <GasChamberScene
+                    <GasChamber3DScene
                       volume={volume}
                       temperature={temperature}
                       moles={moles}

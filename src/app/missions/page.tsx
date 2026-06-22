@@ -1,20 +1,17 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import Breadcrumb from "@/components/labs/Breadcrumb";
-import DecorativeBackground from "@/components/labs/DecorativeBackground";
 import Sidebar from "@/components/Sidebar";
 import { useSidebar } from "@/context/SidebarContext";
 import { loadSupabaseLearningSnapshot, readLocalLearningSnapshot } from "@/lib/supabase/learning-snapshot";
 import { claimMissionReward, loadClaimedMissionIds } from "@/lib/supabase/missions";
-import { 
-  Star,
+import {
   ArrowRight,
   Gift,
-  Compass,
-  Trophy
+  Star,
 } from "lucide-react";
 
 interface Mission {
@@ -35,14 +32,13 @@ export default function MissionsPage() {
   const [completedCount, setCompletedCount] = useState(0);
   const [claimedMissions, setClaimedMissions] = useState<Record<string, boolean>>({});
   const [claimingMissionId, setClaimingMissionId] = useState<string | null>(null);
-  
-  // Labs status checked dynamically
+  const [activeMissionType, setActiveMissionType] = useState<"daily" | "achievement">("daily");
+
   const [hasOhms, setHasOhms] = useState(false);
   const [hasCooling, setHasCooling] = useState(false);
   const [hasEquilibrium, setHasEquilibrium] = useState(false);
   const [hasHess, setHasHess] = useState(false);
 
-  // Toast feedback state
   const [toast, setToast] = useState<{ message: string; type: "success" | "info" | "error" } | null>(null);
 
   const showToast = (message: string, type: "success" | "info" | "error" = "success") => {
@@ -80,17 +76,14 @@ export default function MissionsPage() {
         });
     };
 
-    // Timeout to prevent Next.js hydration issues
     const timer = setTimeout(loadData, 0);
     return () => clearTimeout(timer);
   }, []);
 
-  // Level progression formulas
   const currentLevel = useMemo(() => Math.floor(points / 200) + 1, [points]);
   const currentXP = useMemo(() => points % 200, [points]);
   const xpPercentage = useMemo(() => (currentXP / 200) * 100, [currentXP]);
 
-  // List of missions dynamically mapped from state
   const missionsList = useMemo<Mission[]>(() => {
     return [
       {
@@ -102,7 +95,7 @@ export default function MissionsPage() {
         category: "General",
         progress: 1,
         total: 1,
-        isCompleted: true
+        isCompleted: true,
       },
       {
         id: "daily-science-1",
@@ -113,7 +106,7 @@ export default function MissionsPage() {
         category: "General",
         progress: Math.min(1, completedCount),
         total: 1,
-        isCompleted: completedCount >= 1
+        isCompleted: completedCount >= 1,
       },
       {
         id: "daily-science-3",
@@ -124,7 +117,7 @@ export default function MissionsPage() {
         category: "General",
         progress: Math.min(3, completedCount),
         total: 3,
-        isCompleted: completedCount >= 3
+        isCompleted: completedCount >= 3,
       },
       {
         id: "quest-ohms",
@@ -135,7 +128,7 @@ export default function MissionsPage() {
         category: "Physics",
         progress: hasOhms ? 1 : 0,
         total: 1,
-        isCompleted: hasOhms
+        isCompleted: hasOhms,
       },
       {
         id: "quest-cooling",
@@ -146,7 +139,7 @@ export default function MissionsPage() {
         category: "Physics",
         progress: hasCooling ? 1 : 0,
         total: 1,
-        isCompleted: hasCooling
+        isCompleted: hasCooling,
       },
       {
         id: "quest-equilibrium",
@@ -157,7 +150,7 @@ export default function MissionsPage() {
         category: "Chemistry",
         progress: hasEquilibrium ? 1 : 0,
         total: 1,
-        isCompleted: hasEquilibrium
+        isCompleted: hasEquilibrium,
       },
       {
         id: "quest-hesss",
@@ -168,7 +161,7 @@ export default function MissionsPage() {
         category: "Chemistry",
         progress: hasHess ? 1 : 0,
         total: 1,
-        isCompleted: hasHess
+        isCompleted: hasHess,
       },
       {
         id: "ach-first-lab",
@@ -179,7 +172,7 @@ export default function MissionsPage() {
         category: "General",
         progress: Math.min(1, completedCount),
         total: 1,
-        isCompleted: completedCount >= 1
+        isCompleted: completedCount >= 1,
       },
       {
         id: "ach-five-labs",
@@ -190,7 +183,7 @@ export default function MissionsPage() {
         category: "General",
         progress: Math.min(5, completedCount),
         total: 5,
-        isCompleted: completedCount >= 5
+        isCompleted: completedCount >= 5,
       },
       {
         id: "ach-point-collector",
@@ -201,16 +194,15 @@ export default function MissionsPage() {
         category: "General",
         progress: Math.min(300, points),
         total: 300,
-        isCompleted: points >= 300
-      }
+        isCompleted: points >= 300,
+      },
     ];
   }, [completedCount, hasOhms, hasCooling, hasEquilibrium, hasHess, points]);
 
-  // Separate daily and achievements
-  const dailyMissions = useMemo(() => missionsList.filter(m => m.type === "daily"), [missionsList]);
-  const achievements = useMemo(() => missionsList.filter(m => m.type === "achievement"), [missionsList]);
+  const dailyMissions = useMemo(() => missionsList.filter((mission) => mission.type === "daily"), [missionsList]);
+  const achievements = useMemo(() => missionsList.filter((mission) => mission.type === "achievement"), [missionsList]);
+  const visibleMissions = activeMissionType === "daily" ? dailyMissions : achievements;
 
-  // Claim handler
   const handleClaimReward = async (id: string, title: string) => {
     const mission = missionsList.find((item) => item.id === id);
     if (claimingMissionId || claimedMissions[id] || !mission?.isCompleted) return;
@@ -248,348 +240,261 @@ export default function MissionsPage() {
     }
   };
 
-  return (
-    <div className="flex flex-col min-h-screen bg-slate-50 relative pb-16 overflow-hidden">
-      {/* Absolute Background decoration */}
-      <DecorativeBackground />
+  const claimedCount = Object.values(claimedMissions).filter(Boolean).length;
+  const completedMissionCount = missionsList.filter((mission) => mission.isCompleted).length;
+  const availableRewardPoints = missionsList
+    .filter((mission) => mission.isCompleted && !claimedMissions[mission.id])
+    .reduce((total, mission) => total + mission.rewardPoints, 0);
 
-      {/* Navbar */}
+  const renderMissionCard = (mission: Mission, variant: "daily" | "achievement") => {
+    const isClaimed = claimedMissions[mission.id];
+    const percent = Math.min(100, (mission.progress / mission.total) * 100);
+    const isDaily = variant === "daily";
+    const accent = isDaily
+      ? {
+          chip: "border-slate-200 bg-slate-50 text-slate-600",
+          bar: mission.isCompleted ? "bg-emerald-500" : "bg-blue-500",
+          button: "bg-blue-600 text-white hover:bg-blue-700 focus-visible:ring-blue-100",
+        }
+      : {
+          chip: "border-blue-100 bg-blue-50 text-blue-700",
+          bar: mission.isCompleted ? "bg-emerald-500" : "bg-blue-500",
+          button: "bg-blue-600 text-white hover:bg-blue-700 focus-visible:ring-blue-100",
+        };
+
+    return (
+      <article
+        key={mission.id}
+        className={`group rounded-2xl border bg-white p-4 shadow-sm shadow-slate-200/40 transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md sm:p-5 ${
+          isClaimed ? "border-slate-100 opacity-75" : "border-slate-200/80"
+        }`}
+      >
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0 flex-1">
+            <div className="mb-2 flex flex-wrap items-center gap-2">
+              <span className={`rounded-full border px-2.5 py-1 text-[10px] font-extrabold leading-[1.4] ${accent.chip}`}>
+                {isDaily ? "รายวัน" : "ความสำเร็จ"}
+              </span>
+              <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[10px] font-extrabold leading-[1.4] text-slate-500">
+                {mission.category}
+              </span>
+            </div>
+            <h3 className="text-base font-extrabold leading-[1.45] tracking-normal text-slate-900">
+              {mission.title}
+            </h3>
+            <p className="mt-1 text-sm font-semibold leading-relaxed text-slate-500">
+              {mission.desc}
+            </p>
+          </div>
+
+          <div className="flex shrink-0 items-center gap-2 sm:flex-col sm:items-end">
+            <span className="rounded-xl bg-slate-50 px-3 py-1.5 text-xs font-extrabold text-slate-700">
+              +{mission.rewardPoints} XP
+            </span>
+            {isClaimed ? (
+              <span className="rounded-xl border border-emerald-100 bg-emerald-50 px-3 py-1.5 text-xs font-extrabold text-emerald-700">
+                รับแล้ว
+              </span>
+            ) : mission.isCompleted ? (
+              <button
+                type="button"
+                disabled={claimingMissionId === mission.id}
+                onClick={() => handleClaimReward(mission.id, mission.title)}
+                className={`inline-flex min-h-10 items-center justify-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-extrabold transition-all active:scale-[0.98] disabled:cursor-wait disabled:opacity-70 focus:outline-none focus-visible:ring-3 ${accent.button}`}
+              >
+                <Gift className="h-3.5 w-3.5" />
+                <span>{claimingMissionId === mission.id ? "กำลังบันทึก..." : "รับรางวัล"}</span>
+              </button>
+            ) : (
+              <span className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-extrabold text-slate-400">
+                ยังไม่ครบ
+              </span>
+            )}
+          </div>
+        </div>
+
+        <div className="mt-4 flex items-center gap-3">
+          <div className="h-2.5 flex-1 overflow-hidden rounded-full bg-slate-100">
+            <div className={`h-full rounded-full transition-[width] duration-500 ${accent.bar}`} style={{ width: `${percent}%` }} />
+          </div>
+          <span className="w-14 text-right text-[11px] font-extrabold leading-[1.45] text-slate-500">
+            {mission.progress} / {mission.total}
+          </span>
+        </div>
+      </article>
+    );
+  };
+
+  return (
+    <div className="relative flex min-h-screen flex-col bg-slate-50 pb-24 font-sans text-slate-900">
       <Navbar />
 
-      {/* Persistent desktop sidebar */}
       <div className="hidden lg:block">
         <Sidebar activeMenu="ภารกิจนักวิทย์" />
       </div>
 
       <div className={`relative z-10 min-w-0 transition-[padding-left] duration-300 ${isCollapsed ? "lg:pl-[76px]" : "lg:pl-[260px]"}`}>
-        
-        {/* Breadcrumb Navigation */}
-        <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-8 md:px-12 pt-6 pb-2 select-none">
+        <div className="mx-auto w-full max-w-[1440px] px-4 pb-2 pt-6 sm:px-8 lg:px-8">
           <Breadcrumb category="Dashboard" title="ภารกิจนักวิทย์ / Missions" />
         </div>
 
-        {/* Main Content */}
-        <main className="w-full px-4 py-2 lg:px-8 max-w-[1440px] mx-auto space-y-8">
-          
-          {/* LEVEL XP PROGRESS BANNER CONTAINER */}
-          <section className="bg-gradient-to-br from-[#f0f7ff]/95 via-[#f8fbff]/90 to-[#e0f2fe]/40 backdrop-blur-xl border border-blue-100/40 rounded-[32px] p-6 sm:p-8 flex flex-col md:flex-row justify-between items-center gap-6 relative shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden">
-            <div className="absolute top-4 sm:top-6 right-4 sm:right-8 flex items-center gap-1.5 bg-emerald-50 border border-emerald-100/60 px-3.5 py-1.5 rounded-full text-[11px] font-extrabold text-emerald-600 select-none">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span>อัปเดตเรียลไทม์</span>
-            </div>
+        <main className="mx-auto grid w-full max-w-[1440px] gap-5 px-4 py-2 sm:px-8 lg:px-8 lg:py-5">
+          <section className="overflow-hidden rounded-[28px] border border-slate-200/80 bg-white p-5 shadow-sm shadow-slate-200/50 sm:p-6 lg:p-7">
+            <div className="flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
+              <div className="flex min-w-0 flex-col gap-5 sm:flex-row sm:items-center">
+                <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl border border-blue-100 bg-blue-50 shadow-sm sm:h-24 sm:w-24">
+                  <Image src="/student_avatar_3d.png" alt="SciSiam student avatar" fill sizes="96px" className="object-cover" priority />
+                </div>
 
-            <div className="flex flex-col sm:flex-row items-center gap-6 w-full md:w-auto">
-              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-blue-100/60 border-4 border-white shadow-md flex items-center justify-center relative overflow-hidden select-none shrink-0">
-                <Image src="/student_avatar_3d.png" alt="Mascot Avatar" fill sizes="96px" className="object-cover" />
-              </div>
-
-              <div className="flex flex-col text-center sm:text-left min-w-0 flex-1">
-                <div className="flex items-center justify-center sm:justify-start gap-2">
-                  <h1 className="text-xl sm:text-2xl font-black text-slate-800 leading-normal" style={{ lineHeight: '1.5' }}>
-                    ภารกิจและการผจญภัยทางวิทยาศาสตร์
+                <div className="min-w-0">
+                  <h1 className="max-w-2xl text-2xl font-extrabold leading-[1.25] tracking-normal text-slate-950 sm:text-3xl">
+                    ภารกิจนักวิทย์ของคุณ
                   </h1>
+                  <p className="mt-2 max-w-2xl text-sm font-semibold leading-relaxed text-slate-500 sm:text-base">
+                    ทำแล็บ บันทึกผล และรับ XP เพื่อปลดล็อกความสำเร็จใน SciSiam
+                  </p>
                 </div>
-                <p className="text-xs text-slate-400 font-bold mt-1 select-none">
-                  เคลียร์เควสต์แล็บจำลองและรับคะแนน XP เพื่ออัปเกรดระดับพลังงานนักวิทย์ของคุณ
-                </p>
+              </div>
 
-                {/* Level and XP progress bar */}
-                <div className="mt-4 w-full sm:w-80">
-                  <div className="flex justify-between items-center text-[10px] sm:text-xs font-bold mb-1.5 select-none">
-                    <span className="text-indigo-600 bg-indigo-50 px-2.5 py-0.5 rounded-lg border border-indigo-100/50">
-                      เลเวล {currentLevel}
-                    </span>
-                    <span className="text-slate-500">
-                      {currentXP} / 200 XP
-                    </span>
-                  </div>
-                  <div className="w-full bg-slate-100/80 h-3.5 rounded-full overflow-hidden relative border border-slate-200/20">
-                    <div 
-                      className="h-full bg-gradient-to-r from-blue-500 via-indigo-500 to-emerald-500 rounded-full transition-all duration-500 relative"
-                      style={{ width: `${xpPercentage}%` }}
-                      role="progressbar"
-                      aria-valuenow={xpPercentage}
-                      aria-valuemin={0}
-                      aria-valuemax={100}
-                    >
-                      <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.25),transparent)] -translate-x-full animate-[pulse_2s_infinite]" />
-                    </div>
-                  </div>
+              <div className="grid gap-3 sm:grid-cols-2 xl:min-w-[300px]">
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                  <span className="text-[10px] font-extrabold uppercase leading-[1.45] text-slate-400">คะแนนสะสม</span>
+                  <strong className="mt-1 block text-2xl font-extrabold leading-none text-slate-950">{points}</strong>
+                </div>
+                <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-4">
+                  <span className="text-[10px] font-extrabold uppercase leading-[1.45] text-emerald-600">เคลียร์แล้ว</span>
+                  <strong className="mt-1 block text-2xl font-extrabold leading-none text-emerald-700">{claimedCount}/{missionsList.length}</strong>
                 </div>
               </div>
             </div>
 
-            {/* Claimed Summary stats widget */}
-            <div className="bg-white/80 border border-blue-100/40 rounded-2xl p-4 flex gap-6 shadow-xs select-none">
-              <div className="text-center">
-                <span className="text-[10px] font-bold text-slate-400 block uppercase">คะแนนสะสม</span>
-                <span className="text-2xl font-black text-slate-800 mt-1 block">{points}</span>
+            <div className="mt-6 rounded-2xl border border-slate-200/80 bg-slate-50 p-4">
+              <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-extrabold leading-[1.45] text-slate-600">
+                <span>เลเวล {currentLevel}</span>
+                <span>{currentXP} / 200 XP</span>
               </div>
-              <div className="w-[1px] bg-slate-200" />
-              <div className="text-center">
-                <span className="text-[10px] font-bold text-slate-400 block uppercase">ภารกิจที่เคลียร์</span>
-                <span className="text-2xl font-black text-emerald-600 mt-1 block">
-                  {Object.values(claimedMissions).filter(Boolean).length} / {missionsList.length}
-                </span>
+              <div className="mt-3 h-3 overflow-hidden rounded-full bg-white">
+                <div
+                  className="h-full rounded-full bg-blue-600 transition-[width] duration-500"
+                  style={{ width: `${xpPercentage}%` }}
+                  role="progressbar"
+                  aria-valuenow={xpPercentage}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-label="ความคืบหน้า XP"
+                />
               </div>
             </div>
           </section>
 
-          {/* MAIN PAGE GRID GRID-COL-12 */}
-          <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
-            
-            {/* LEFT COLUMN: DAILY MISSIONS (8-COLS ON DESKTOP) */}
-            <div className="xl:col-span-7 space-y-6">
-              
-              <div className="bg-white border border-slate-200/60 rounded-[32px] p-6 shadow-sm">
-                <div className="flex items-center gap-2.5 pb-4 mb-6 border-b border-slate-100 select-none">
-                  <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-500">
-                    <Compass className="w-5.5 h-5.5" />
-                  </div>
-                  <div>
-                    <h3 className="text-base sm:text-lg font-black text-slate-800">ภารกิจรายวัน (Daily Quests)</h3>
-                    <p className="text-[11px] font-bold text-slate-400 mt-0.5">รีเซ็ตคะแนนและสถานะภารกิจใหม่ทุก 24 ชั่วโมง</p>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  {dailyMissions.map((mission) => {
-                    const isClaimed = claimedMissions[mission.id];
-                    const percent = (mission.progress / mission.total) * 100;
-                    
-                    return (
-                      <div 
-                        key={mission.id}
-                        className={`p-5 rounded-2xl border transition-all duration-200 flex flex-col sm:flex-row items-center sm:justify-between gap-4 ${
-                          isClaimed
-                            ? "bg-slate-50/40 border-slate-100 opacity-75"
-                            : mission.isCompleted
-                              ? "bg-white border-blue-200/80 shadow-xs hover:border-blue-300"
-                              : "bg-white border-slate-200/60"
+          <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
+            <div className="grid gap-5">
+              <section className="rounded-[28px] border border-slate-200/80 bg-white p-4 shadow-sm shadow-slate-200/50 sm:p-5">
+                <header className="mb-4 grid gap-4 border-b border-slate-100 pb-4">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                    <div className="min-w-0">
+                      <h2 className="text-lg font-extrabold leading-[1.35] tracking-normal text-slate-950">
+                        ภารกิจ
+                      </h2>
+                      <p className="mt-1 text-sm font-semibold leading-relaxed text-slate-500">
+                        เลือกหมวดภารกิจที่ต้องการติดตามและรับรางวัล
+                      </p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-1 rounded-2xl border border-slate-200 bg-slate-50 p-1">
+                      <button
+                        type="button"
+                        onClick={() => setActiveMissionType("daily")}
+                        className={`min-h-11 rounded-xl px-3 text-sm font-extrabold leading-[1.45] transition-colors ${
+                          activeMissionType === "daily"
+                            ? "bg-white text-blue-700 shadow-sm"
+                            : "text-slate-500 hover:text-slate-900"
                         }`}
                       >
-                        <div className="flex-1 min-w-0 text-left">
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs font-black bg-slate-100 text-slate-500 px-2 py-0.5 rounded-lg select-none">
-                              รายวัน
-                            </span>
-                            <h4 className="text-sm font-black text-slate-800">{mission.title}</h4>
-                          </div>
-                          <p className="text-xs text-slate-400 mt-1 leading-relaxed">{mission.desc}</p>
-                          
-                          {/* Progress bar info */}
-                          <div className="flex items-center gap-3 mt-3 w-full sm:max-w-xs">
-                            <div className="flex-1 bg-slate-100 h-2 rounded-full overflow-hidden relative">
-                              <div 
-                                className={`h-full rounded-full transition-all duration-500 ${
-                                  mission.isCompleted ? "bg-emerald-500" : "bg-blue-500"
-                                }`}
-                                style={{ width: `${percent}%` }}
-                              />
-                            </div>
-                            <span className="text-[10px] font-extrabold text-slate-400 shrink-0 w-8 text-right select-none">
-                              {mission.progress} / {mission.total}
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* Claim action button wrapper */}
-                        <div className="shrink-0">
-                          {isClaimed ? (
-                            <span className="px-4 py-2.5 inline-block text-xs font-black text-slate-400 bg-slate-100 rounded-xl select-none cursor-default">
-                              รับแล้ว ✓
-                            </span>
-                              ) : mission.isCompleted ? (
-                                <button
-                                  type="button"
-                                  disabled={claimingMissionId === mission.id}
-                                  onClick={() => handleClaimReward(mission.id, mission.title)}
-                                  className="px-4 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-xs font-black rounded-xl shadow-md shadow-orange-500/10 hover:scale-[1.03] active:scale-[0.97] transition-all cursor-pointer flex items-center gap-1.5 disabled:cursor-wait disabled:opacity-70"
-                                >
-                                  <Gift className="w-3.5 h-3.5" />
-                                  <span>{claimingMissionId === mission.id ? "กำลังบันทึก..." : `รับรางวัล +${mission.rewardPoints} XP`}</span>
-                                </button>
-                          ) : (
-                            <span className="px-4 py-2.5 inline-block text-xs font-bold text-slate-400 bg-slate-100/60 rounded-xl select-none cursor-default">
-                              กำลังทำ...
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* ACHIEVEMENTS BLOCK */}
-              <div className="bg-white border border-slate-200/60 rounded-[32px] p-6 shadow-sm">
-                <div className="flex items-center gap-2.5 pb-4 mb-6 border-b border-slate-100 select-none">
-                  <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-500">
-                    <Trophy className="w-5.5 h-5.5" />
-                  </div>
-                  <div>
-                    <h3 className="text-base sm:text-lg font-black text-slate-800">เกียรติยศถาวร (Milestone Achievements)</h3>
-                    <p className="text-[11px] font-bold text-slate-400 mt-0.5">รางวัลสำหรับความก้าวหน้าและการทดลองเสมือนจริงตลอดการใช้งาน</p>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  {achievements.map((mission) => {
-                    const isClaimed = claimedMissions[mission.id];
-                    const percent = (mission.progress / mission.total) * 100;
-                    
-                    return (
-                      <div 
-                        key={mission.id}
-                        className={`p-5 rounded-2xl border transition-all duration-200 flex flex-col sm:flex-row items-center sm:justify-between gap-4 ${
-                          isClaimed
-                            ? "bg-slate-50/40 border-slate-100 opacity-75"
-                            : mission.isCompleted
-                              ? "bg-white border-blue-200/80 shadow-xs hover:border-blue-300"
-                              : "bg-white border-slate-200/60"
+                        ภารกิจรายวัน
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setActiveMissionType("achievement")}
+                        className={`min-h-11 rounded-xl px-3 text-sm font-extrabold leading-[1.45] transition-colors ${
+                          activeMissionType === "achievement"
+                            ? "bg-white text-blue-700 shadow-sm"
+                            : "text-slate-500 hover:text-slate-900"
                         }`}
                       >
-                        <div className="flex-1 min-w-0 text-left">
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs font-black bg-indigo-50 text-indigo-500 px-2 py-0.5 rounded-lg select-none">
-                              ความสำเร็จ
-                            </span>
-                            <h4 className="text-sm font-black text-slate-800">{mission.title}</h4>
-                          </div>
-                          <p className="text-xs text-slate-400 mt-1 leading-relaxed">{mission.desc}</p>
-                          
-                          {/* Progress bar info */}
-                          <div className="flex items-center gap-3 mt-3 w-full sm:max-w-xs">
-                            <div className="flex-1 bg-slate-100 h-2 rounded-full overflow-hidden relative">
-                              <div 
-                                className={`h-full rounded-full transition-all duration-500 ${
-                                  mission.isCompleted ? "bg-emerald-500" : "bg-indigo-500"
-                                }`}
-                                style={{ width: `${percent}%` }}
-                              />
-                            </div>
-                            <span className="text-[10px] font-extrabold text-slate-400 shrink-0 w-12 text-right select-none">
-                              {mission.progress} / {mission.total}
-                            </span>
-                          </div>
-                        </div>
+                        ความสำเร็จระยะยาว
+                      </button>
+                    </div>
+                  </div>
+                </header>
 
-                        {/* Claim action button wrapper */}
-                        <div className="shrink-0">
-                          {isClaimed ? (
-                            <span className="px-4 py-2.5 inline-block text-xs font-black text-slate-400 bg-slate-100 rounded-xl select-none cursor-default">
-                              รับแล้ว ✓
-                            </span>
-                              ) : mission.isCompleted ? (
-                                <button
-                                  type="button"
-                                  disabled={claimingMissionId === mission.id}
-                                  onClick={() => handleClaimReward(mission.id, mission.title)}
-                                  className="px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-black rounded-xl shadow-md shadow-blue-600/10 hover:scale-[1.03] active:scale-[0.97] transition-all cursor-pointer flex items-center gap-1.5 disabled:cursor-wait disabled:opacity-70"
-                                >
-                                  <Gift className="w-3.5 h-3.5" />
-                                  <span>{claimingMissionId === mission.id ? "กำลังบันทึก..." : `รับรางวัล +${mission.rewardPoints} XP`}</span>
-                                </button>
-                          ) : (
-                            <span className="px-4 py-2.5 inline-block text-xs font-bold text-slate-400 bg-slate-100/60 rounded-xl select-none cursor-default">
-                              กำลังทำ...
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
+                <div className="grid gap-3">
+                  {visibleMissions.map((mission) => renderMissionCard(mission, activeMissionType))}
                 </div>
-              </div>
-
+              </section>
             </div>
 
-            {/* RIGHT COLUMN: QUEST CATEGORIES INFO & TIPS (4-COLS ON DESKTOP) */}
-            <div className="xl:col-span-5 space-y-6">
-              
-              {/* Leaderboard or Tips card */}
-              <div className="bg-gradient-to-br from-indigo-50/70 to-blue-50/50 border border-blue-100/50 rounded-[32px] p-6 shadow-sm text-left">
-                <div className="flex items-center gap-2">
-                  <Star className="w-5 h-5 text-indigo-500 animate-pulse" />
-                  <h4 className="text-sm font-black text-indigo-700 bg-indigo-100/60 px-2.5 py-1 rounded-lg inline-block select-none">
-                    เคล็ดลับนักวิทยาศาสตร์
-                  </h4>
+            <aside className="grid content-start gap-5 xl:sticky xl:top-24">
+              <section className="rounded-[28px] border border-slate-200/80 bg-white p-5 shadow-sm shadow-slate-200/50">
+                <div className="mb-4 flex items-center gap-2">
+                  <Star className="h-5 w-5 text-blue-600" />
+                  <h2 className="text-base font-extrabold leading-[1.35] tracking-normal text-slate-950">ภาพรวมภารกิจ</h2>
                 </div>
-                <h3 className="text-base font-black text-slate-800 mt-4 leading-normal">
-                  ทําแล็บจำลองและสอบถาม AI ไออุ่นอย่างสม่ำเสมอ
-                </h3>
-                <p className="text-xs text-slate-500 mt-2 leading-relaxed">
-                  ทุกๆ การทดลองจำลองที่บันทึกผลการประเมินลงในคลาวด์จะนำมาคิดระดับความก้าวหน้า +25 XP โดยอัตโนมัติ และคุณสามารถปลดล็อกเหรียญตราเกียรติยศต่างๆ ในหน้าโปรไฟล์เพื่อแสดงประวัติการทดลองอันน่าภาคภูมิใจ
+                <div className="grid gap-3">
+                  <div className="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3 text-sm font-extrabold text-slate-700">
+                    <span>ภารกิจที่ครบเงื่อนไข</span>
+                    <span>{completedMissionCount}/{missionsList.length}</span>
+                  </div>
+                  <div className="flex items-center justify-between rounded-2xl bg-blue-50 px-4 py-3 text-sm font-extrabold text-blue-700">
+                    <span>แล็บที่บันทึกผลแล้ว</span>
+                    <span>{completedCount}</span>
+                  </div>
+                  <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-extrabold text-slate-700">
+                    <span>XP ที่รอรับ</span>
+                    <span>+{availableRewardPoints}</span>
+                  </div>
+                </div>
+              </section>
+
+              <section className="rounded-[28px] border border-blue-100 bg-blue-50/70 p-5">
+                <h2 className="text-base font-extrabold leading-[1.35] tracking-normal text-blue-800">วิธีปลดล็อกเร็วขึ้น</h2>
+                <ul className="mt-3 space-y-2.5 text-sm font-semibold leading-relaxed text-slate-600">
+                  <li>บันทึกผลหลังจบแล็บทุกครั้ง เพื่อให้ระบบนับความคืบหน้า</li>
+                  <li>เริ่มจาก Newton, Ohm และ Chemical Equilibrium เพราะมีเควสต์เฉพาะ</li>
+                  <li>กลับมารับรางวัลในหน้านี้เมื่อภารกิจขึ้นสถานะครบเงื่อนไข</li>
+                </ul>
+              </section>
+
+              <section className="rounded-[28px] border border-slate-200/80 bg-white p-5 text-slate-950 shadow-sm shadow-slate-200/50">
+                <h2 className="text-base font-extrabold leading-[1.35] tracking-normal">พร้อมทำภารกิจต่อไหม?</h2>
+                <p className="mt-2 text-sm font-semibold leading-relaxed text-slate-500">
+                  เลือกแล็บที่พร้อมทดลอง แล้วบันทึกผลเพื่อเก็บ XP ต่อได้ทันที
                 </p>
-
-                <div className="border-t border-indigo-100/60 pt-4 mt-5 space-y-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center border border-indigo-100 text-indigo-500 shadow-xs shrink-0 select-none">
-                      🧪
-                    </div>
-                    <div className="text-left min-w-0">
-                      <h5 className="text-[11px] font-black text-slate-800 truncate">บันทึกแล็บวงจรโอห์ม</h5>
-                      <p className="text-[10px] text-slate-400 mt-0.5 leading-none">เคลียร์เควสต์ฟิสิกส์: +30 XP</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center border border-indigo-100 text-indigo-500 shadow-xs shrink-0 select-none">
-                      🌡️
-                    </div>
-                    <div className="text-left min-w-0">
-                      <h5 className="text-[11px] font-black text-slate-800 truncate">บันทึกแล็บการเย็นตัว</h5>
-                      <p className="text-[10px] text-slate-400 mt-0.5 leading-none">เคลียร์เควสต์ฟิสิกส์: +30 XP</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center border border-indigo-100 text-indigo-500 shadow-xs shrink-0 select-none">
-                      ⚖️
-                    </div>
-                    <div className="text-left min-w-0">
-                      <h5 className="text-[11px] font-black text-slate-800 truncate">บันทึกสมดุลเคมีเลอชาเตอลิเย</h5>
-                      <p className="text-[10px] text-slate-400 mt-0.5 leading-none">เคลียร์เควสต์เคมี: +30 XP</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Callout button to return to simulations */}
-              <div className="relative overflow-hidden rounded-[24px] bg-gradient-to-r from-blue-400 via-indigo-400 to-blue-500 p-[1.2px] shadow-sm select-none">
-                <div className="bg-white/95 rounded-[23px] p-5.5 flex flex-col gap-4 text-center sm:text-left relative overflow-hidden">
-                  <div className="flex flex-col text-left">
-                    <h4 className="text-sm font-extrabold text-slate-800 leading-normal">
-                      พร้อมออกสํารวจแล็บจำลองหรือยัง?
-                    </h4>
-                    <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-                      เข้าไปที่หน้าแรกและเลือกแล็บฟิสิกส์ เคมี หรือชีววิทยา เพื่อสะสม XP และรางวัลเกียรติยศต่างๆ กันเถอะ! 🚀
-                    </p>
-                  </div>
-                  
-                  <button
-                    onClick={() => window.location.href = "/"}
-                    className="w-full flex items-center justify-center gap-1.5 text-xs font-black text-indigo-500 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200/50 px-4 py-2.5 rounded-xl transition-all duration-300 active:scale-95 cursor-pointer"
-                  >
-                    <span>สำรวจห้องแล็บทดลอง</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              </div>
-
-            </div>
-
+                <button
+                  type="button"
+                  onClick={() => {
+                    window.location.href = "/labs";
+                  }}
+                  className="mt-4 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-extrabold leading-[1.45] text-white transition-colors hover:bg-blue-700 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-200"
+                >
+                  <span>ไปหน้าห้องแล็บ</span>
+                  <ArrowRight className="h-4 w-4" />
+                </button>
+              </section>
+            </aside>
           </div>
-
         </main>
       </div>
 
-      {/* FLOAT TOAST FEEDBACK NOTIFICATION */}
       {toast && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 rounded-2xl bg-slate-900/95 text-white text-xs font-bold shadow-2xl animate-in slide-in-from-bottom-6 duration-300 select-none">
-          <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
-          <span>{toast.message}</span>
+        <div
+          className={`fixed bottom-6 right-4 z-50 flex max-w-[calc(100vw-2rem)] items-center gap-2.5 rounded-2xl px-4 py-3 text-xs font-extrabold text-white shadow-2xl sm:right-6 ${
+            toast.type === "error" ? "bg-rose-600" : toast.type === "info" ? "bg-blue-700" : "bg-slate-950"
+          }`}
+        >
+          <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-white/80" />
+          <span className="leading-relaxed">{toast.message}</span>
         </div>
       )}
-
     </div>
   );
 }

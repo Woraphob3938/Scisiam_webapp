@@ -1619,7 +1619,51 @@ const heartRateDetails: LabDetailData = {
   }
 };
 
-// Main Export Mapping of all 36 Labs details
+const periodicTableDetails: LabDetailData = {
+  overviewBullets: [
+    "สำรวจตารางธาตุผ่านแบบจำลอง 3D-style เพื่ออ่านเลขอะตอม สัญลักษณ์ มวลอะตอม คาบ และหมู่",
+    "เปรียบเทียบสมบัติของธาตุในหมวดหลัก 7 หมู่และดูแนวโน้มที่เปลี่ยนไปตามตำแหน่ง",
+    "เชื่อมโยงโครงสร้างอะตอมกับสมบัติของธาตุก่อนต่อยอดสู่แล็บสารละลาย ปฏิกิริยา และแก๊ส"
+  ],
+  learningObjectives: [
+    "ระบุข้อมูลสำคัญบนช่องธาตุ เช่น เลขอะตอม สัญลักษณ์ ชื่อธาตุ และมวลอะตอมได้",
+    "อธิบายความหมายของคาบ หมู่ และหมวดธาตุหลัก 7 หมู่ได้อย่างถูกต้อง",
+    "เปรียบเทียบแนวโน้มสมบัติพื้นฐาน เช่น ความเป็นโลหะและการเกิดไอออนตามตำแหน่งบนตารางธาตุได้"
+  ],
+  equipments: [
+    { id: "periodic-board", name: "ตารางธาตุ 3D", role: "แสดงตำแหน่งธาตุ เลขอะตอม สัญลักษณ์ คาบ และหมู่แบบเลือกดูได้", note: "เลือกธาตุหนึ่งช่องเพื่อดูรายละเอียดและเปรียบเทียบกับธาตุใกล้เคียง", unit: "118", tone: "violet", visualKey: "PeriodicTableVisual" },
+    { id: "element-card", name: "การ์ดรายละเอียดธาตุ", role: "แสดงชื่อธาตุ หมวดธาตุ มวลอะตอม และตำแหน่งคาบ/หมู่", note: "ใช้ดูสมบัติเด่นและตัวอย่างการใช้งานของธาตุที่เลือก", unit: "info", tone: "blue", visualKey: "ClipboardVisual" },
+    { id: "category-filter", name: "ตัวกรองหมวดธาตุ 7 หมู่", role: "แยกสีธาตุตามหมวด เช่น โลหะแอลคาไล อโลหะ กึ่งโลหะ และแก๊สมีตระกูล", note: "สังเกตว่าแต่ละหมวดกระจายตัวอยู่บริเวณใดของตาราง", unit: "7", tone: "emerald", visualKey: "PHMeterVisual" },
+    { id: "trend-panel", name: "แผงแนวโน้มสมบัติ", role: "ช่วยอ่านแนวโน้มรัศมีอะตอม ความเป็นโลหะ และพลังงานไอออไนเซชันโดยภาพรวม", note: "ใช้เป็นแนวทางเบื้องต้น ไม่แทนค่าตารางอ้างอิงเชิงลึก", unit: "trend", tone: "amber", visualKey: "GraphVisual" }
+  ],
+  steps: [
+    { num: 1, title: "เลือกหมวดธาตุ", desc: "เริ่มจากเลือกหมวดธาตุหนึ่งจาก 7 หมู่เพื่อเน้นสีและดูตัวอย่างธาตุในกลุ่มนั้น", iconKey: "Sliders", color: "text-violet-500", bg: "bg-violet-50" },
+    { num: 2, title: "เลือกธาตุบนตาราง", desc: "คลิกช่องธาตุเพื่ออ่านเลขอะตอม สัญลักษณ์ ชื่อธาตุ มวลอะตอม คาบ และหมู่", iconKey: "Atom", color: "text-blue-500", bg: "bg-blue-50" },
+    { num: 3, title: "เปรียบเทียบตำแหน่ง", desc: "ดูว่าธาตุอยู่คาบเดียวกันหรือหมู่เดียวกันกับธาตุอื่น และเปรียบเทียบสมบัติที่คล้ายกัน", iconKey: "LineChart", color: "text-emerald-500", bg: "bg-emerald-50" },
+    { num: 4, title: "สรุปแนวโน้ม", desc: "สรุปความสัมพันธ์ระหว่างตำแหน่งในตารางกับสมบัติของธาตุก่อนนำไปใช้ในแล็บเคมี", iconKey: "ClipboardList", color: "text-amber-500", bg: "bg-amber-50" }
+  ],
+  theoryDescription: "ตารางธาตุจัดเรียงธาตุตามเลขอะตอมจากน้อยไปมาก โดยคาบบอกจำนวนระดับพลังงานหลักของอิเล็กตรอน ส่วนหมู่ช่วยบอกจำนวนอิเล็กตรอนเวเลนซ์โดยประมาณในธาตุกลุ่มหลัก ธาตุที่อยู่หมู่เดียวกันจึงมักมีสมบัติคล้ายกัน และสามารถแยกหมวดพื้นฐานได้เป็น 7 หมู่เพื่อช่วยอ่านแนวโน้มทางเคมี",
+  equationHtml: "Z = p<sup>+</sup> = จำนวนโปรตอน",
+  equationLabels: [
+    { label: "Z", desc: "เลขอะตอม ใช้จัดลำดับธาตุในตารางธาตุ", color: "text-violet-500" },
+    { label: "Period", desc: "คาบหรือแถวแนวนอน บอกระดับพลังงานหลัก", color: "text-blue-500" },
+    { label: "Group", desc: "หมู่หรือคอลัมน์แนวตั้ง บอกสมบัติคล้ายกันของธาตุ", color: "text-emerald-500" }
+  ],
+  graph: {
+    title: "แนวโน้มสมบัติบนตารางธาตุ",
+    subtitle: "Periodic Trend Overview",
+    xTitle: "ตำแหน่งบนตาราง",
+    yTitle: "แนวโน้มสมบัติ",
+    yLabels: ["สูง", "กลาง", "ต่ำ", "เริ่มต้น"],
+    xLabels: ["ซ้ายล่าง", "กลาง", "ขวาบน", "แก๊สมีตระกูล"],
+    graphType: "custom",
+    customPath: "M22,102 C62,86 86,62 116,52 C142,43 158,30 182,20",
+    pathColor: "#7c3aed",
+    annotation: { x: 132, y: 42, text: "Ionization ↑", color: "#7c3aed" }
+  }
+};
+
+// Main Export Mapping of all lab details
 export const labDetails: Record<string, LabDetailData> = {
   "newtons-cooling": coolingDetails,
   "ohms-law": ohmsLawDetails,
@@ -1634,6 +1678,7 @@ export const labDetails: Record<string, LabDetailData> = {
   "keplers-laws": keplersLawsDetails,
   "stefan-boltzmann": stefanBoltzmannDetails,
   "acid-base-titration": acidBaseDetails,
+  "periodic-table": periodicTableDetails,
   "boyles-law": boylesLawDetails,
   "charles-law": charlesLawDetails,
   "photosynthesis-rate": photosynthesisDetails,

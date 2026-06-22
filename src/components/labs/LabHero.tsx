@@ -777,6 +777,7 @@ export default function LabHero({
   const isOhmsLaw = labId === "ohms-law";
   const isHookesLaw = labId === "hookes-law";
   const isAcidBase = labId === "acid-base-titration";
+  const isPeriodicTable = labId === "periodic-table";
   const isBoylesLaw = labId === "boyles-law";
   const isCharlesLaw = labId === "charles-law";
   const isPhotosynthesis = labId === "photosynthesis-rate";
@@ -811,6 +812,7 @@ export default function LabHero({
     : isPhotosynthesis ? Leaf
     : isCharlesLaw ? Thermometer
     : isBoylesLaw ? Gauge
+    : isPeriodicTable ? Atom
     : (isAcidBase || isLeChateliers || isBeerLambert || isChemicalKinetics || isSolubilityProduct) ? FlaskConical
     : isGalvanicCell || isElectrolysis ? Zap
     : isAvogadrosLaw ? Gauge
@@ -823,7 +825,7 @@ export default function LabHero({
     : isStefanBoltzmann ? Sun
     : Atom;
 
-  const chemistryTone = isAcidBase || isBoylesLaw || isCharlesLaw || isIdealGas || isLeChateliers || isBeerLambert || isHesssLaw || isGalvanicCell || isChemicalKinetics || isSolubilityProduct || isAvogadrosLaw || isElectrolysis || isColligative;
+  const chemistryTone = isPeriodicTable || isAcidBase || isBoylesLaw || isCharlesLaw || isIdealGas || isLeChateliers || isBeerLambert || isHesssLaw || isGalvanicCell || isChemicalKinetics || isSolubilityProduct || isAvogadrosLaw || isElectrolysis || isColligative;
   const readiness = getLabReadiness(labId);
   const iconClass = isBiology ? "bg-emerald-600 shadow-emerald-500/20" : chemistryTone ? "bg-violet-600 shadow-violet-500/20" : "bg-blue-600 shadow-blue-500/20";
   const badgeClass = isBiology ? "bg-emerald-50 text-emerald-700 border-emerald-100" : chemistryTone ? "bg-violet-50 text-violet-700 border-violet-100" : "bg-blue-50 text-blue-700 border-blue-100";
@@ -1100,6 +1102,30 @@ export default function LabHero({
                 <rect x="0" y="0" width="68" height="39" rx="15" fill="#ffffff" stroke="#bae6fd" strokeWidth="2" />
                 <text x="34" y="17" fill="#64748b" fontSize="9" fontWeight="800" textAnchor="middle">Boyle</text>
                 <text x="34" y="31" fill="#0891b2" fontSize="14" fontWeight="900" textAnchor="middle">PV=k</text>
+              </g>
+            </svg>
+          ) : isPeriodicTable ? (
+            <svg className="h-full w-full" viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <circle cx="122" cy="124" r="74" fill="#ddd6fe" opacity="0.42" filter="blur(30px)" />
+              <circle cx="122" cy="124" r="52" fill="#faf5ff" opacity="0.9" />
+              <g transform="translate(34, 48)">
+                {([
+                  ["H", "1", 0, 0, "#10b981"], ["He", "2", 152, 0, "#8b5cf6"],
+                  ["Li", "3", 0, 34, "#f43f5e"], ["Be", "4", 32, 34, "#f97316"], ["B", "5", 104, 34, "#f59e0b"], ["C", "6", 136, 34, "#10b981"], ["N", "7", 168, 34, "#10b981"],
+                  ["Na", "11", 0, 68, "#f43f5e"], ["Mg", "12", 32, 68, "#f97316"], ["Al", "13", 104, 68, "#6366f1"], ["Si", "14", 136, 68, "#f59e0b"], ["P", "15", 168, 68, "#10b981"],
+                  ["K", "19", 0, 102, "#f43f5e"], ["Ca", "20", 32, 102, "#f97316"], ["Fe", "26", 72, 102, "#0ea5e9"], ["Cu", "29", 104, 102, "#0ea5e9"], ["Zn", "30", 136, 102, "#0ea5e9"], ["Kr", "36", 168, 102, "#8b5cf6"],
+                ] as const).map(([symbol, number, x, y, color]) => (
+                  <g key={symbol} transform={`translate(${x}, ${y})`}>
+                    <rect x="0" y="0" width="28" height="28" rx="7" fill={color} opacity="0.95" />
+                    <text x="4" y="9" fill="#ffffff" fontSize="6" fontWeight="900">{number}</text>
+                    <text x="14" y="21" fill="#ffffff" fontSize="11" fontWeight="900" textAnchor="middle">{symbol}</text>
+                  </g>
+                ))}
+              </g>
+              <g transform="translate(62, 178)">
+                <rect x="0" y="0" width="116" height="36" rx="15" fill="#ffffff" stroke="#ddd6fe" strokeWidth="2" />
+                <text x="58" y="15" fill="#64748b" fontSize="9" fontWeight="800" textAnchor="middle">Periodic Table</text>
+                <text x="58" y="29" fill="#7c3aed" fontSize="13" fontWeight="900" textAnchor="middle">Z = p⁺</text>
               </g>
             </svg>
           ) : isAcidBase ? (

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Prompt:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=Prompt:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
 :root {
@@ -7,7 +7,10 @@
 }
 
 @theme {
-  --font-sans: 'Prompt', 'Inter', sans-serif;
+  --font-sans: 'Sukhumvit Set', SukhumvitSet, 'Noto Sans Thai', 'Prompt', 'Inter', sans-serif;
+  --font-looped: 'Sukhumvit Set', SukhumvitSet, 'Noto Sans Thai', 'Prompt', 'Inter', sans-serif;
+  --font-mono: 'Chakra Petch', monospace;
+  
   --animate-float-slow: float-slow 8s ease-in-out infinite;
   --animate-float-medium: float-medium 6s ease-in-out infinite;
   --animate-float-fast: float-fast 4s ease-in-out infinite;
@@ -31,8 +34,12 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: 'Prompt', 'Inter', sans-serif;
+  font-family: var(--font-sans);
   overflow-x: hidden;
+}
+
+p, li, .font-looped {
+  font-family: var(--font-looped);
 }
 
 html[data-scisiam-text-size="large"] {

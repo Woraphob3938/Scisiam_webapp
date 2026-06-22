@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Bell, Sparkles, ChevronDown, Compass, Award, Menu, User } from "lucide-react";
+import { Bell, Sparkles, ChevronDown, Award, Menu, User } from "lucide-react";
 import { useSidebar } from "@/context/SidebarContext";
 import SettingsModal from "@/components/SettingsModal";
 import {
@@ -193,8 +193,8 @@ export default function Navbar() {
         </button>
 
         <Link href="/" className="group flex min-w-0 cursor-pointer items-center gap-2 select-none sm:gap-2.5">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 text-white shadow-md shadow-blue-500/20 transition-all duration-300 group-hover:scale-105">
-            <Compass className="h-5 w-5 animate-spin-slow sm:h-5.5 sm:w-5.5" />
+          <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-xl bg-white shadow-md shadow-blue-500/20 transition-all duration-300 group-hover:scale-105">
+            <Image src="/scisiam-logo.png" alt="SciSiam logo" fill sizes="40px" className="object-contain p-0.5" priority />
           </div>
           <span className="truncate whitespace-nowrap bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 bg-clip-text text-lg font-bold tracking-tight text-transparent select-none sm:text-xl">
             SciSiam

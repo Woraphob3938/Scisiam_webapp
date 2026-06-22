@@ -12,6 +12,7 @@ export const LAB_SAVED_EXPERIMENT_KEYS: Record<string, string> = {
   "keplers-laws": "scisiam_saved_kepler_experiment",
   "stefan-boltzmann": "scisiam_saved_stefan_boltzmann_experiment",
   "acid-base-titration": "scisiam_saved_titration_experiment",
+  "periodic-table": "scisiam_saved_periodic_table_experiment",
   "boyles-law": "scisiam_saved_boyle_experiment",
   "charles-law": "scisiam_saved_charles_experiment",
   "le-chateliers-principle": "scisiam_saved_le_chateliers_experiment",
