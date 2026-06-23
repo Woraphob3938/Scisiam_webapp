@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Suspense, useMemo, useState } from "react";
+import React, { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   ArrowRight,
@@ -8,7 +8,6 @@ import {
   BarChart3,
   Beaker,
   BookOpenCheck,
-  CheckCircle,
   FlaskConical,
   Gauge,
   HelpCircle,
@@ -30,6 +29,7 @@ import { labsData } from "@/data/labs";
 import { isLabReady } from "@/data/labReadiness";
 
 const INITIAL_VISIBLE_LABS = 12;
+const LABS_RETURN_STATE_KEY = "scisiam_labs_return_state";
 const VALID_CATEGORIES: Category[] = ["All", "Foundation", "Physics", "Chemistry", "Biology"];
 type GradeFilter = "All" | GradeLevel;
 const GRADE_FILTERS: Array<{ id: GradeFilter; label: string }> = [
@@ -45,6 +45,48 @@ const CATEGORY_LABELS: Record<Category, string> = {
   Chemistry: "เคมี",
   Biology: "ชีววิทยา",
 };
+
+type LabsReturnState = {
+  scrollY: number;
+  selectedCategory: Category;
+  selectedGradeLevel: GradeFilter;
+  showAllLabs: boolean;
+  searchQuery: string;
+};
+
+function readLabsReturnState(): LabsReturnState | null {
+  if (typeof window === "undefined") return null;
+
+  try {
+    const raw = sessionStorage.getItem(LABS_RETURN_STATE_KEY);
+    if (!raw) return null;
+
+    const state = JSON.parse(raw) as Partial<LabsReturnState>;
+    const selectedCategory = state.selectedCategory && VALID_CATEGORIES.includes(state.selectedCategory)
+      ? state.selectedCategory
+      : null;
+    const selectedGradeLevel = state.selectedGradeLevel && GRADE_FILTERS.some((grade) => grade.id === state.selectedGradeLevel)
+      ? state.selectedGradeLevel
+      : null;
+    const scrollY = Number(state.scrollY);
+
+    if (!selectedCategory || !selectedGradeLevel || !Number.isFinite(scrollY)) {
+      sessionStorage.removeItem(LABS_RETURN_STATE_KEY);
+      return null;
+    }
+
+    return {
+      scrollY,
+      selectedCategory,
+      selectedGradeLevel,
+      showAllLabs: Boolean(state.showAllLabs),
+      searchQuery: typeof state.searchQuery === "string" ? state.searchQuery : "",
+    };
+  } catch {
+    sessionStorage.removeItem(LABS_RETURN_STATE_KEY);
+    return null;
+  }
+}
 
 type LabCategory = Exclude<Category, "All" | "Foundation">;
 type FoundationTrack = "Science" | LabCategory;
@@ -326,13 +368,16 @@ function LabsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { isCollapsed } = useSidebar();
+  const restoredState = useMemo(() => readLabsReturnState(), []);
 
   const [selectedCategory, setSelectedCategory] = useState<Category>(
-    () => getInitialCategory(searchParams)
+    () => restoredState?.selectedCategory ?? getInitialCategory(searchParams)
   );
-  const [selectedGradeLevel, setSelectedGradeLevel] = useState<GradeFilter>("All");
-  const [showAllLabs, setShowAllLabs] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedGradeLevel, setSelectedGradeLevel] = useState<GradeFilter>(
+    () => restoredState?.selectedGradeLevel ?? "All"
+  );
+  const [showAllLabs, setShowAllLabs] = useState(() => restoredState?.showAllLabs ?? false);
+  const [searchQuery, setSearchQuery] = useState(() => restoredState?.searchQuery ?? "");
   const isFoundationCategory = selectedCategory === "Foundation";
 
   const categoryLabs = useMemo(
@@ -382,32 +427,39 @@ function LabsContent() {
     });
   }, [categoryLabs, searchQuery, selectedGradeLevel]);
 
-  const readyLabCount = useMemo(() => {
-    if (isFoundationCategory) return filteredFoundationTopics.length;
-    return filteredLabs.filter((lab) => isLabReady(lab.id)).length;
-  }, [filteredFoundationTopics.length, filteredLabs, isFoundationCategory]);
-
   const visibleLabs = showAllLabs ? filteredLabs : filteredLabs.slice(0, INITIAL_VISIBLE_LABS);
   const hiddenLabCount = filteredLabs.length - visibleLabs.length;
-  const itemLabel = isFoundationCategory ? "หัวข้อ" : "ห้อง";
-  const availabilityHeading = isFoundationCategory
-    ? "ความรู้พื้นฐานเกี่ยวกับวิทยาศาสตร์"
-    : "พร้อมทดลองทันที";
-  const displayedItemCount = isFoundationCategory
-    ? filteredFoundationTopics.length
-    : filteredLabs.length;
-  const totalItemCount = isFoundationCategory ? foundationTopics.length : categoryLabs.length;
   const hasNoResults = isFoundationCategory
     ? filteredFoundationTopics.length === 0
     : filteredLabs.length === 0;
 
+  useEffect(() => {
+    if (!restoredState) return;
+
+    requestAnimationFrame(() => requestAnimationFrame(() => window.scrollTo(0, restoredState.scrollY)));
+    sessionStorage.removeItem(LABS_RETURN_STATE_KEY);
+  }, [restoredState]);
+
+  const saveReturnState = useCallback(() => {
+    const state: LabsReturnState = {
+      scrollY: window.scrollY,
+      selectedCategory,
+      selectedGradeLevel,
+      showAllLabs,
+      searchQuery,
+    };
+    sessionStorage.setItem(LABS_RETURN_STATE_KEY, JSON.stringify(state));
+  }, [searchQuery, selectedCategory, selectedGradeLevel, showAllLabs]);
+
   const handleViewDetails = (id: string) => {
     if (!isLabReady(id)) return;
+    saveReturnState();
     router.push(`/labs/${id}`);
   };
 
   const handleEnterRoom = (id: string) => {
     if (!isLabReady(id)) return;
+    saveReturnState();
     router.push(`/labs/${id}/simulation`);
   };
 
@@ -430,6 +482,7 @@ function LabsContent() {
   };
 
   const handleFoundationEnterLab = (labId: string) => {
+    saveReturnState();
     if (!isLabReady(labId)) {
       router.push(`/labs/${labId}`);
       return;
@@ -462,48 +515,27 @@ function LabsContent() {
         />
 
         <section className="w-full px-4 pb-8 pt-1 lg:px-8">
-          <div className="mb-4 flex flex-col gap-3 rounded-2xl border border-slate-200/70 bg-white px-4 py-3.5 shadow-sm shadow-slate-200/40 lg:flex-row lg:items-center lg:justify-between lg:px-5">
-            <div className="min-w-0">
-              <p className="text-xs font-bold leading-[1.45] text-blue-600">
-                {isFoundationCategory ? "พื้นฐานก่อนเข้าห้องแล็บ" : "ห้องแล็บสำหรับเริ่มใช้งาน"}
-              </p>
-              <h2 className="mt-1 text-lg font-extrabold leading-[1.45] tracking-normal text-slate-900">
-                {availabilityHeading}
-              </h2>
-              <p className="mt-1 text-sm font-semibold leading-relaxed text-slate-500">
-                แสดง {displayedItemCount} {itemLabel}
-                {selectedCategory !== "All" ? ` ในหมวด ${CATEGORY_LABELS[selectedCategory]}` : ""} จากทั้งหมด {totalItemCount} {itemLabel}
-                {!isFoundationCategory && selectedGradeLevel !== "All" ? ` ระดับ${selectedGradeLevel}` : ""}
-                {searchQuery.trim() ? ` จากคำค้นหา "${searchQuery.trim()}"` : ""}
-              </p>
-              {!isFoundationCategory && (
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {GRADE_FILTERS.map((grade) => {
-                    const isActive = selectedGradeLevel === grade.id;
-                    return (
-                      <button
-                        key={grade.id}
-                        type="button"
-                        onClick={() => handleGradeLevelChange(grade.id)}
-                        className={`min-h-9 rounded-xl border px-3 py-1.5 text-xs font-extrabold leading-[1.45] transition-colors focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100 ${
-                          isActive
-                            ? "border-blue-600 bg-blue-600 text-white shadow-sm shadow-blue-500/20"
-                            : "border-slate-200 bg-slate-50 text-slate-600 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
-                        }`}
-                      >
-                        {grade.label}
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
+          {!isFoundationCategory && (
+            <div className="mb-4 flex flex-wrap justify-center gap-2">
+              {GRADE_FILTERS.map((grade) => {
+                const isActive = selectedGradeLevel === grade.id;
+                return (
+                  <button
+                    key={grade.id}
+                    type="button"
+                    onClick={() => handleGradeLevelChange(grade.id)}
+                    className={`min-h-9 rounded-xl border px-3 py-1.5 text-xs font-extrabold leading-[1.45] transition-colors focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100 ${
+                      isActive
+                        ? "border-blue-600 bg-blue-600 text-white shadow-sm shadow-blue-500/20"
+                        : "border-slate-200 bg-white text-slate-600 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+                    }`}
+                  >
+                    {grade.label}
+                  </button>
+                );
+              })}
             </div>
-
-            <div className="inline-flex min-h-10 shrink-0 items-center justify-center gap-2 rounded-xl border border-emerald-100 bg-emerald-50 px-3.5 py-2 text-xs font-extrabold leading-[1.45] text-emerald-700">
-              <CheckCircle className="h-4 w-4" />
-              {isFoundationCategory ? `พร้อมเรียน ${readyLabCount} หัวข้อ` : `พร้อมทดลอง ${readyLabCount} ห้อง`}
-            </div>
-          </div>
+          )}
 
           {hasNoResults ? (
             <div className="flex flex-col items-center gap-3 rounded-2xl border border-slate-100 bg-white p-10 text-center shadow-sm">

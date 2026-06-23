@@ -333,6 +333,11 @@ export default function UnifiedLegacySimulation({ labId }: { labId: UnifiedLegac
   }, [isRunning]);
 
   const updateValue = (key: ControlKey, value: number) => setValues((current) => ({ ...current, [key]: value }));
+  const commitValue = (control: ControlConfig, raw: string) => {
+    const value = Number(raw);
+    if (!Number.isFinite(value)) return;
+    updateValue(control.key, Math.min(control.max, Math.max(control.min, value)));
+  };
   const progressPercent = labId === "acid-base-titration"
     ? Math.min(100, (getValue(values, "baseVolume") / Math.max(result.secondary, 0.1)) * 100)
     : Math.min(100, (elapsedSeconds / 30) * 100);
@@ -372,6 +377,65 @@ export default function UnifiedLegacySimulation({ labId }: { labId: UnifiedLegac
     </div>
   );
 
+  const compactControls = (
+    <div className="grid gap-3 lg:grid-cols-3">
+      {config.controls.map((control) => (
+        <label key={control.key} className="rounded-xl border border-slate-100 bg-slate-50/80 px-3 py-2">
+          <div className="mb-2 flex items-center justify-between gap-2">
+            <span className="truncate text-xs font-black text-slate-700">{control.label}</span>
+            <input
+              type="number"
+              min={control.min}
+              max={control.max}
+              step={control.step}
+              value={toFixedSmart(getValue(values, control.key), control.step)}
+              onChange={(event) => commitValue(control, event.target.value)}
+              className="h-7 w-20 rounded-lg border border-slate-200 bg-white px-2 text-right text-xs font-black text-slate-800 outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100"
+              aria-label={`กรอก${control.label}`}
+            />
+          </div>
+          <input
+            type="range"
+            min={control.min}
+            max={control.max}
+            step={control.step}
+            value={getValue(values, control.key)}
+            onChange={(event) => updateValue(control.key, Number(event.target.value))}
+            className={`h-1.5 w-full rounded-full bg-slate-100 ${control.accent}`}
+          />
+        </label>
+      ))}
+    </div>
+  );
+
+  const drawerSummary = (
+    <div className="grid grid-cols-2 gap-2 text-[11px] font-bold text-slate-500">
+      {config.controls.map((control) => (
+        <label key={control.key} className="rounded-xl bg-slate-50 px-3 py-2 text-slate-700">
+          <span className="block truncate opacity-75">{control.label}</span>
+          <input
+            type="number"
+            min={control.min}
+            max={control.max}
+            step={control.step}
+            value={toFixedSmart(getValue(values, control.key), control.step)}
+            onChange={(event) => commitValue(control, event.target.value)}
+            className="mt-1 h-8 w-full rounded-lg border border-slate-200 bg-white/80 px-2 text-right text-sm font-black text-slate-800 outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100"
+            aria-label={`กรอก${control.label}`}
+          />
+        </label>
+      ))}
+      <div className="rounded-xl bg-cyan-50 px-3 py-2 text-cyan-700">
+        <span className="block opacity-75">เวลา</span>
+        <span className="mt-1 block h-8 rounded-lg bg-white/60 px-2 py-1.5 text-right text-sm font-black">{timeLabel}</span>
+      </div>
+      <div className="rounded-xl bg-emerald-50 px-3 py-2 text-emerald-700">
+        <span className="block opacity-75">สถานะ</span>
+        <span className="mt-1 block h-8 rounded-lg bg-white/60 px-2 py-1.5 text-right text-sm font-black">{isRunning ? "กำลังทดลอง" : "พร้อม"}</span>
+      </div>
+    </div>
+  );
+
   const tableRows = config.controls.map((control) => ({
     label: control.label,
     value: `${toFixedSmart(getValue(values, control.key), control.step)} ${control.suffix}`,
@@ -390,6 +454,8 @@ export default function UnifiedLegacySimulation({ labId }: { labId: UnifiedLegac
       scene={<LabScene labId={labId} result={result} values={values} isRunning={isRunning} />}
       controlsTitle="แผงควบคุมการทดลอง"
       controls={controls}
+      compactControls={compactControls}
+      drawerSummary={drawerSummary}
       metrics={[
         { label: "ค่าหลัก", value: `${result.primary.toFixed(2)} ${result.unit}`, tone: config.accent },
         { label: "ค่าอ้างอิง", value: `${result.secondary.toFixed(2)} ${result.secondaryUnit}`, tone: "blue" },

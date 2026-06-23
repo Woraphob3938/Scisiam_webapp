@@ -23,7 +23,7 @@ export default function HeroSection({
             รายชื่อห้องแล็บ
           </h1>
           <p className="mt-1.5 max-w-2xl text-sm font-semibold leading-relaxed text-slate-500 sm:text-base">
-            ค้นหา เลือกหมวด แล้วเริ่มจากห้องที่พร้อมทดลองได้ทันที
+            ค้นหา เลือกหมวด แล้วเริ่มการทดลองทันที
           </p>
 
           <div className="relative mt-4 w-full sm:mt-5">

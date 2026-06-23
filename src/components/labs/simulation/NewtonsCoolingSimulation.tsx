@@ -90,27 +90,27 @@ function CoolingViewport({
       <div className="absolute inset-0 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:16px_16px] opacity-50" />
 
       {/* Environmental Info Panel (Left Overlay) */}
-      <div className="absolute top-3.5 left-3.5 bg-white/80 backdrop-blur-md p-3 rounded-xl border border-slate-200/50 text-left text-[10px] sm:text-xs text-slate-500 font-semibold space-y-1.5 shadow-xs z-10">
-        <span className="text-[10px] font-bold text-indigo-500 uppercase tracking-wide block mb-1">
+      <div className="absolute top-4 left-4 bg-white/85 backdrop-blur-md p-4 rounded-2xl border border-slate-200/60 text-left text-xs sm:text-sm text-slate-600 font-bold space-y-2 shadow-sm z-10">
+        <span className="text-xs font-black text-indigo-500 uppercase tracking-wide block mb-1">
           สภาพแวดล้อม
         </span>
-        <div className="flex items-center gap-1.5">
-          <Snowflake className="w-3.5 h-3.5 text-blue-400" />
+        <div className="flex items-center gap-2">
+          <Snowflake className="w-4 h-4 text-blue-400" />
           <span>{environmentLabel}</span>
         </div>
-        <div className="flex items-center gap-1.5">
-          <Wind className="w-3.5 h-3.5 text-slate-400" />
+        <div className="flex items-center gap-2">
+          <Wind className="w-4 h-4 text-slate-400" />
           <span>{airflowLabel}</span>
         </div>
       </div>
 
       {/* Ice / Ambient Cooler Display (Bottom Left Overlay) */}
-      <div className="absolute bottom-3.5 left-3.5 bg-white/85 backdrop-blur-md p-2 rounded-xl border border-slate-200/50 flex items-center gap-2 shadow-xs z-10">
+      <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-md p-3 rounded-2xl border border-slate-200/60 flex items-center gap-3 shadow-sm z-10">
         <div className="text-right select-none">
-          <span className="text-[8px] font-bold text-slate-400 block -mb-0.5">AMBIENT</span>
-          <span className="text-xs sm:text-sm font-extrabold text-blue-600">{ambientTemp.toFixed(1)}°C</span>
+          <span className="text-[10px] font-black text-slate-400 block -mb-0.5">AMBIENT</span>
+          <span className="text-base sm:text-lg font-extrabold text-blue-600">{ambientTemp.toFixed(1)}°C</span>
         </div>
-        <svg className="w-6 h-6 animate-pulse" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg className="w-8 h-8 animate-pulse" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M12,2 L3,6 L12,10 L21,6 Z" fill="#bae6fd" />
           <path d="M3,6 L12,10 L12,20 L3,16 Z" fill="#93c5fd" opacity="0.8" />
           <path d="M12,10 L21,6 L21,16 L12,20 Z" fill="#60a5fa" opacity="0.9" />
@@ -744,10 +744,32 @@ export default function NewtonsCoolingSimulation() {
   };
 
   const timeLabel = `${Math.floor(elapsedSeconds / 60).toString().padStart(2, "0")}:${Math.floor(elapsedSeconds % 60).toString().padStart(2, "0")}`;
+  const clampNumber = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
+  const commitNumber = (set: (value: number) => void, min: number, max: number, raw: string) => {
+    const value = Number(raw);
+    if (!Number.isFinite(value)) return;
+    set(clampNumber(value, min, max));
+  };
+  const commitCurrentTemp = (raw: string) => {
+    const value = Number(raw);
+    if (!Number.isFinite(value)) return;
+    const next = clampNumber(value, 0, 100);
+    setCurrentTemp(next);
+    currentTempRef.current = next;
+    if (!isRunning) {
+      setInitialTemp(next);
+      initialTempRef.current = next;
+    }
+  };
   const environmentPresets = [
     { label: "ห้องปกติ", helper: "25°C / k 0.120", ambient: 25, k: 0.12, icon: Wind },
     { label: "ลมพัด", helper: "20°C / k 0.180", ambient: 20, k: 0.18, icon: Wind },
     { label: "อ่างน้ำแข็ง", helper: "5°C / k 0.260", ambient: 5, k: 0.26, icon: Snowflake },
+  ];
+  const coolingControls = [
+    { label: "อุณหภูมิเริ่มต้น (T₀)", shortLabel: "T₀", value: initialTemp, set: setInitialTemp, min: 20, max: 100, step: 1, suffix: "°C", color: "accent-rose-500", icon: Thermometer },
+    { label: "อุณหภูมิสิ่งแวดล้อม (Tₛ)", shortLabel: "Tₛ", value: ambientTemp, set: setAmbientTemp, min: 0, max: 40, step: 1, suffix: "°C", color: "accent-blue-500", icon: Thermometer },
+    { label: "ค่าคงที่การเย็นตัว (k)", shortLabel: "k", value: coolingConstant, set: setCoolingConstant, min: 0.001, max: 1.000, step: 0.005, suffix: "/นาที", color: "accent-purple-500", icon: Sliders },
   ];
 
   const controls = (
@@ -789,12 +811,9 @@ export default function NewtonsCoolingSimulation() {
         </div>
       </div>
 
-      {[
-        { label: "อุณหภูมิเริ่มต้น (T₀)", value: initialTemp, set: setInitialTemp, min: 20, max: 100, step: 1, suffix: "°C", color: "accent-rose-500", icon: Thermometer },
-        { label: "อุณหภูมิสิ่งแวดล้อม (Tₛ)", value: ambientTemp, set: setAmbientTemp, min: 0, max: 40, step: 1, suffix: "°C", color: "accent-blue-500", icon: Thermometer },
-        { label: "ค่าคงที่การเย็นตัว (k)", value: coolingConstant, set: setCoolingConstant, min: 0.001, max: 1.000, step: 0.005, suffix: "/นาที", color: "accent-purple-500", icon: Sliders },
-      ].map((control) => {
+      {coolingControls.map((control) => {
         const ControlIcon = control.icon;
+        const disabled = isRunning && control.shortLabel === "T₀";
 
         return (
           <label key={control.label} className="block">
@@ -803,9 +822,17 @@ export default function NewtonsCoolingSimulation() {
                 <ControlIcon className="h-3.5 w-3.5 text-blue-600" />
                 {control.label}
               </span>
-              <span className="rounded-md bg-slate-50 px-2 py-0.5 font-black text-slate-800">
-                {control.label.includes("k") ? control.value.toFixed(3) : control.value.toFixed(0)} {control.suffix}
-              </span>
+              <input
+                type="number"
+                min={control.min}
+                max={control.max}
+                step={control.step}
+                value={control.shortLabel === "k" ? control.value.toFixed(3) : control.value.toFixed(0)}
+                disabled={disabled}
+                onChange={(event) => commitNumber(control.set, control.min, control.max, event.target.value)}
+                className="h-8 w-24 rounded-lg border border-slate-200 bg-white px-2 text-right text-xs font-black text-slate-800 outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100 disabled:bg-slate-50 disabled:text-slate-400"
+                aria-label={`กรอก${control.label}`}
+              />
             </div>
             <input
               type="range"
@@ -813,7 +840,7 @@ export default function NewtonsCoolingSimulation() {
               max={control.max}
               step={control.step}
               value={control.value}
-              disabled={isRunning}
+              disabled={disabled}
               onChange={(event) => control.set(Number(event.target.value))}
               className={`h-1.5 w-full rounded-full bg-slate-100 ${control.color} disabled:opacity-45`}
             />
@@ -887,6 +914,98 @@ export default function NewtonsCoolingSimulation() {
     </div>
   );
 
+  const compactControls = (
+    <div className="grid gap-3 lg:grid-cols-3">
+      {coolingControls.map((control) => {
+        const ControlIcon = control.icon;
+        const disabled = isRunning && control.shortLabel === "T₀";
+
+        return (
+          <label key={control.label} className="rounded-xl border border-slate-100 bg-slate-50/80 px-3 py-2">
+            <div className="mb-2 flex items-center justify-between gap-2">
+              <span className="inline-flex min-w-0 items-center gap-1.5 text-xs font-black text-slate-700">
+                <ControlIcon className="h-3.5 w-3.5 shrink-0 text-blue-600" />
+                <span className="truncate">{control.shortLabel}</span>
+              </span>
+              <input
+                type="number"
+                min={control.min}
+                max={control.max}
+                step={control.step}
+                value={control.shortLabel === "k" ? control.value.toFixed(3) : control.value.toFixed(0)}
+                disabled={disabled}
+                onChange={(event) => commitNumber(control.set, control.min, control.max, event.target.value)}
+                className="h-7 w-20 rounded-lg border border-slate-200 bg-white px-2 text-right text-xs font-black text-slate-800 outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100 disabled:bg-slate-50 disabled:text-slate-400"
+                aria-label={`กรอก${control.label}`}
+              />
+            </div>
+            <input
+              type="range"
+              min={control.min}
+              max={control.max}
+              step={control.step}
+              value={control.value}
+              disabled={disabled}
+              onChange={(event) => control.set(Number(event.target.value))}
+              className={`h-1.5 w-full rounded-full bg-slate-100 ${control.color} disabled:opacity-45`}
+            />
+          </label>
+        );
+      })}
+    </div>
+  );
+
+  const drawerSummary = (
+    <div className="grid grid-cols-2 gap-2 text-[11px] font-bold text-slate-500">
+      <label className="rounded-xl bg-rose-50 px-3 py-2 text-rose-700">
+        <span className="block opacity-75">อุณหภูมิน้ำ</span>
+        <input
+          type="number"
+          min={0}
+          max={100}
+          step={0.5}
+          value={currentTemp.toFixed(1)}
+          onChange={(event) => commitCurrentTemp(event.target.value)}
+          className="mt-1 h-8 w-full rounded-lg border border-rose-100 bg-white/80 px-2 text-right text-sm font-black text-rose-700 outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100"
+          aria-label="กรอกอุณหภูมิน้ำ"
+        />
+      </label>
+      <label className="rounded-xl bg-blue-50 px-3 py-2 text-blue-700">
+        <span className="block opacity-75">สิ่งแวดล้อม</span>
+        <input
+          type="number"
+          min={0}
+          max={40}
+          step={1}
+          value={ambientTemp.toFixed(0)}
+          onChange={(event) => commitNumber(setAmbientTemp, 0, 40, event.target.value)}
+          className="mt-1 h-8 w-full rounded-lg border border-blue-100 bg-white/80 px-2 text-right text-sm font-black text-blue-700 outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100"
+          aria-label="กรอกอุณหภูมิสิ่งแวดล้อม"
+        />
+      </label>
+      <div className="rounded-xl bg-cyan-50 px-3 py-2 text-cyan-700">
+        <span className="block opacity-75">เวลา</span>
+        <span className="mt-1 block h-8 rounded-lg bg-white/60 px-2 py-1.5 text-right text-sm font-black">{timeLabel}</span>
+      </div>
+      <label className="rounded-xl bg-violet-50 px-3 py-2 text-violet-700">
+        <span className="block opacity-75">ค่า k</span>
+        <input
+          type="number"
+          min={0.001}
+          max={1}
+          step={0.005}
+          value={coolingConstant.toFixed(3)}
+          onChange={(event) => commitNumber(setCoolingConstant, 0.001, 1, event.target.value)}
+          className="mt-1 h-8 w-full rounded-lg border border-violet-100 bg-white/80 px-2 text-right text-sm font-black text-violet-700 outline-none focus:border-violet-300 focus:ring-2 focus:ring-violet-100"
+          aria-label="กรอกค่าคงที่การเย็นตัว"
+        />
+      </label>
+      <div className="col-span-2 rounded-xl bg-slate-50 px-3 py-2 text-slate-700">
+        สถานะฮีตเตอร์: <b>{isHeaterOn ? "เปิดทำความร้อน" : "ปิด/เย็นลง"}</b>
+      </div>
+    </div>
+  );
+
   return (
     <SharedSimulationShell
       accent="blue"
@@ -907,6 +1026,8 @@ export default function NewtonsCoolingSimulation() {
       }
       controlsTitle="แผงควบคุมอุณหภูมิ"
       controls={controls}
+      compactControls={compactControls}
+      drawerSummary={drawerSummary}
       metrics={[
         { label: "อุณหภูมิน้ำ", value: `${currentTemp.toFixed(1)}°C`, tone: "rose" },
         { label: "สิ่งแวดล้อม", value: `${ambientTemp.toFixed(1)}°C`, tone: "blue" },

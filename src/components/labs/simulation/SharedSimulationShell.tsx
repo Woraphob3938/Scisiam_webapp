@@ -3,9 +3,14 @@
 import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
+import EquipmentList from "@/components/labs/EquipmentList";
+import DetailExperimentSteps from "@/components/labs/ExperimentSteps";
+import TheoryCard from "@/components/labs/TheoryCard";
+import { getLabDetails } from "@/data/labDetails";
 import {
   ArrowLeft,
   BarChart3,
+  Beaker,
   BookOpen,
   CheckCircle2,
   ChevronRight,
@@ -44,6 +49,8 @@ interface SharedSimulationShellProps {
   scene: React.ReactNode;
   controlsTitle: string;
   controls: React.ReactNode;
+  compactControls?: React.ReactNode;
+  drawerSummary?: React.ReactNode;
   metrics: SimulationMetric[];
   graph: React.ReactNode;
   table: React.ReactNode;
@@ -121,7 +128,7 @@ const metricToneClasses: Record<NonNullable<SimulationMetric["tone"]>, string> =
   violet: "bg-violet-50 text-violet-700",
 };
 
-type InfoTab = "about" | "goals" | "results" | "theory" | "steps" | "tips";
+type InfoTab = "about" | "steps" | "theory" | "equipment" | "results" | "goals" | "tips";
 
 export default function SharedSimulationShell({
   accent,
@@ -135,6 +142,8 @@ export default function SharedSimulationShell({
   scene,
   controlsTitle,
   controls,
+  compactControls,
+  drawerSummary,
   metrics,
   graph,
   table,
@@ -157,7 +166,16 @@ export default function SharedSimulationShell({
   const [controlsOpen, setControlsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<InfoTab>("about");
   const boundedProgress = Math.min(100, Math.max(0, progressPercent));
-  const hasDrawerSummary = showLiveMetrics || (showSaveButton && onSave);
+  const hasDrawerSummary = Boolean(drawerSummary) || showLiveMetrics || (showSaveButton && onSave);
+  const hasLabDetailContent = Boolean(getLabDetails(labId));
+  const collapsedControls = compactControls ?? controls;
+  const hasCollapsedControls =
+    collapsedControls !== null && collapsedControls !== undefined && collapsedControls !== false;
+  const stageBottomClass = controlsOpen
+    ? "bottom-[calc(32vh+48px)]"
+    : hasCollapsedControls
+      ? "bottom-[210px] sm:bottom-[220px]"
+      : "bottom-[96px] sm:bottom-[104px]";
 
   useEffect(() => {
     const syncFullscreen = () => setIsExpanded(document.fullscreenElement === stageShellRef.current);
@@ -184,10 +202,11 @@ export default function SharedSimulationShell({
 
   const tabs: Array<{ key: InfoTab; label: string; icon: LucideIcon }> = [
     { key: "about", label: "ภาพรวม", icon: Info },
-    { key: "goals", label: "เป้าหมาย", icon: Target },
-    { key: "results", label: "ผลการทดลอง", icon: BarChart3 },
-    { key: "theory", label: "ทฤษฎี", icon: BookOpen },
     { key: "steps", label: "ขั้นตอน", icon: ListChecks },
+    { key: "theory", label: "ทฤษฎี", icon: BookOpen },
+    { key: "equipment", label: "อุปกรณ์", icon: Beaker },
+    { key: "results", label: "ผลการทดลอง", icon: BarChart3 },
+    { key: "goals", label: "เป้าหมาย", icon: Target },
     { key: "tips", label: "คำแนะนำ", icon: CheckCircle2 },
   ];
 
@@ -228,16 +247,16 @@ export default function SharedSimulationShell({
       <button
         type="button"
         onClick={() => setControlsOpen((value) => !value)}
-        className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left"
+        className="flex w-full items-center justify-between gap-3 px-4 py-4 text-left"
         aria-expanded={controlsOpen}
       >
-        <span className="flex items-center gap-2 text-sm font-black text-slate-900">
-          <Target className={`h-4.5 w-4.5 ${tone.text}`} />
+        <span className="flex items-center gap-2 text-base font-black text-slate-900">
+          <Target className={`h-5 w-5 ${tone.text}`} />
           {controlsTitle}
         </span>
-        <span className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-black ${tone.soft}`}>
+        <span className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-xs font-black sm:text-sm ${tone.soft}`}>
           {controlsOpen ? "ย่อแผง" : "เปิดแผง"}
-          {controlsOpen ? <ChevronsDown className="h-3.5 w-3.5" /> : <ChevronsUp className="h-3.5 w-3.5" />}
+          {controlsOpen ? <ChevronsDown className="h-4 w-4" /> : <ChevronsUp className="h-4 w-4" />}
         </span>
       </button>
 
@@ -246,7 +265,7 @@ export default function SharedSimulationShell({
           <div>{controls}</div>
           {hasDrawerSummary && (
             <div className="flex flex-col gap-3">
-              {showLiveMetrics && (
+              {drawerSummary ?? (showLiveMetrics && (
                 <div className="grid grid-cols-2 gap-2 text-[11px] font-bold text-slate-500">
                   {metrics.map((metric) => (
                     <span key={metric.label} className={`rounded-xl px-3 py-2 ${metricToneClasses[metric.tone ?? accent]}`}>
@@ -254,7 +273,7 @@ export default function SharedSimulationShell({
                     </span>
                   ))}
                 </div>
-              )}
+              ))}
               {showSaveButton && onSave && (
                 <button
                   onClick={onSave}
@@ -266,6 +285,14 @@ export default function SharedSimulationShell({
               )}
             </div>
           )}
+        </div>
+      )}
+
+      {!controlsOpen && hasCollapsedControls && (
+        <div className="border-t border-slate-100 px-4 pb-4 pt-1">
+          <div className={compactControls ? "" : "max-h-[170px] overflow-y-auto pr-1"}>
+            {collapsedControls}
+          </div>
         </div>
       )}
     </section>
@@ -281,7 +308,7 @@ export default function SharedSimulationShell({
       }`}
     >
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(59,130,246,0.18),transparent_30%),radial-gradient(circle_at_80%_20%,rgba(16,185,129,0.14),transparent_28%)]" />
-      <div className="absolute inset-1.5 rounded-[20px] bg-slate-100" />
+      <div className="absolute inset-px rounded-[22px] bg-slate-100" />
 
       <div className="absolute left-5 right-5 top-5 z-20 flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0 max-w-[calc(100%-64px)] rounded-2xl border border-white/70 bg-white/92 px-4 py-3 shadow-lg shadow-slate-900/10 backdrop-blur-md sm:max-w-none">
@@ -316,7 +343,7 @@ export default function SharedSimulationShell({
         </div>
       </div>}
 
-      <div className={`absolute inset-x-4 top-[122px] z-10 transition-all duration-300 sm:inset-x-5 ${controlsOpen ? "bottom-[calc(32vh+48px)]" : "bottom-[96px] sm:bottom-[104px]"}`}>
+      <div className={`absolute inset-x-4 top-[122px] z-10 transition-all duration-300 sm:inset-x-5 ${stageBottomClass}`}>
         <div className="h-full overflow-hidden rounded-[22px] border border-white/70 bg-white shadow-inner shadow-slate-200/70">
           {scene}
         </div>
@@ -358,8 +385,17 @@ export default function SharedSimulationShell({
         {table}
       </div>
     ),
-    theory,
-    steps: (
+    theory: hasLabDetailContent ? <TheoryCard labId={labId} /> : theory,
+    equipment: hasLabDetailContent ? (
+      <EquipmentList labId={labId} />
+    ) : (
+      <section className="rounded-2xl border border-slate-200/70 bg-white p-5 text-sm font-semibold leading-relaxed text-slate-500 shadow-sm shadow-slate-200/40">
+        ยังไม่มีข้อมูลอุปกรณ์สำหรับแล็บนี้
+      </section>
+    ),
+    steps: hasLabDetailContent ? (
+      <DetailExperimentSteps labId={labId} />
+    ) : (
       <section className="grid grid-cols-1 gap-3 rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40 sm:grid-cols-2 xl:grid-cols-5">
         {steps.map((step, index) => {
           const StepIcon = step.icon;
@@ -427,7 +463,7 @@ export default function SharedSimulationShell({
                     type="button"
                     onClick={() => setActiveTab(tab.key)}
                     className={`inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl px-4 text-sm font-black transition ${
-                      selected ? `${tone.icon} shadow-sm` : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+                      selected ? `${tone.soft} ring-1 ring-inset ${tone.border}` : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
                     }`}
                   >
                     <TabIcon className="h-4 w-4" />

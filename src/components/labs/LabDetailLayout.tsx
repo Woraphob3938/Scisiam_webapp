@@ -8,12 +8,10 @@ import {
   BookOpen,
   CheckCircle2,
   ClipboardList,
-  Clock,
   Database,
   Info,
   ListChecks,
   LucideIcon,
-  Sparkles,
   Target,
   Trash2,
 } from "lucide-react";
@@ -27,7 +25,6 @@ import LabHero from "@/components/labs/LabHero";
 import LabSidebar from "@/components/labs/LabSidebar";
 import TheoryCard from "@/components/labs/TheoryCard";
 import type { LabDetailData } from "@/data/labDetails";
-import { getLabReadiness } from "@/data/labReadiness";
 import { getSavedExperimentKey } from "@/data/labSavedExperiments";
 
 type SavedExperimentRecord = {
@@ -54,13 +51,6 @@ type SubjectTheme = {
   accentText: string;
   dot: string;
   subtleSurface: string;
-};
-
-type FactItem = {
-  label: string;
-  value: string;
-  helper: string;
-  icon: LucideIcon;
 };
 
 type DetailTab = "overview" | "equipment" | "theory" | "steps" | "saved" | "info";
@@ -91,11 +81,6 @@ const SUBJECT_THEMES: Record<string, SubjectTheme> = {
 
 function getSubjectTheme(category: string) {
   return SUBJECT_THEMES[category] ?? SUBJECT_THEMES.Physics;
-}
-
-function getEstimatedTime(stepCount: number) {
-  const min = Math.max(20, stepCount * 5);
-  return `${min}-${min + 10} นาที`;
 }
 
 const EXCLUDED_SAVED_FIELDS = new Set([
@@ -204,73 +189,6 @@ function collectSavedMetrics(savedData: SavedExperimentRecord): SavedMetric[] {
     .filter((metric): metric is SavedMetric => Boolean(metric));
 
   return [...topLevelMetrics, ...pointMetrics].slice(0, 4);
-}
-
-function DetailFactStrip({
-  details,
-  hasSavedResult,
-  readiness,
-  theme,
-}: {
-  details: LabDetailData;
-  hasSavedResult: boolean;
-  readiness: ReturnType<typeof getLabReadiness>;
-  theme: SubjectTheme;
-}) {
-  const facts: FactItem[] = [
-    {
-      label: "ความพร้อม",
-      value: readiness.label,
-      helper: readiness.description,
-      icon: CheckCircle2,
-    },
-    {
-      label: "เวลาโดยประมาณ",
-      value: getEstimatedTime(details.steps.length),
-      helper: `${details.steps.length} ขั้นตอนหลัก`,
-      icon: Clock,
-    },
-    {
-      label: "อุปกรณ์",
-      value: `${details.equipments.length} รายการ`,
-      helper: "กดย่อ/ขยายรายละเอียดได้",
-      icon: Beaker,
-    },
-    {
-      label: "คะแนน",
-      value: "+25 คะแนน",
-      helper: hasSavedResult ? "มีผลบันทึกล่าสุดแล้ว" : "บันทึกผลหลังทดลอง",
-      icon: Sparkles,
-    },
-  ];
-
-  return (
-    <section aria-label="สรุปรายละเอียดห้องแล็บ" className="w-full">
-      <div className="grid grid-cols-2 overflow-hidden rounded-2xl border border-slate-200/70 bg-slate-100/80 shadow-[0_1px_2px_rgba(15,23,42,0.04)] lg:grid-cols-4">
-        {facts.map((fact) => {
-          const Icon = fact.icon;
-          return (
-            <div key={fact.label} className="min-w-0 bg-white p-3 sm:p-5">
-              <div className="flex items-start gap-2.5 sm:gap-3">
-                <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border sm:h-9 sm:w-9 ${theme.accentBorder} ${theme.accentBg} ${theme.accentText}`}>
-                  <Icon className="h-4 w-4 sm:h-4.5 sm:w-4.5" />
-                </div>
-                <div className="min-w-0 text-left">
-                  <p className="text-[11px] font-bold text-slate-500">{fact.label}</p>
-                  <p className="mt-0.5 break-words text-sm font-extrabold leading-snug text-slate-900">
-                    {fact.value}
-                  </p>
-                  <p className="mt-1 break-words text-[11px] font-semibold leading-relaxed text-slate-500">
-                    {fact.helper}
-                  </p>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </section>
-  );
 }
 
 function LearningOverviewPanel({
@@ -423,7 +341,6 @@ export default function LabDetailLayout({ labId, lab, details }: LabDetailLayout
   const [savedData, setSavedData] = useState<SavedExperimentRecord | null>(null);
   const [activeTab, setActiveTab] = useState<DetailTab>("overview");
   const theme = useMemo(() => getSubjectTheme(lab.category), [lab.category]);
-  const readiness = useMemo(() => getLabReadiness(labId), [labId]);
 
   const loadSavedData = useCallback(() => {
     const key = getSavedExperimentKey(labId);
@@ -482,9 +399,9 @@ export default function LabDetailLayout({ labId, lab, details }: LabDetailLayout
 
   const tabs: Array<{ key: DetailTab; label: string; icon: LucideIcon }> = [
     { key: "overview", label: "ภาพรวม", icon: Info },
-    { key: "equipment", label: "อุปกรณ์", icon: Beaker },
-    { key: "theory", label: "ทฤษฎี", icon: BookOpen },
     { key: "steps", label: "ขั้นตอน", icon: ListChecks },
+    { key: "theory", label: "ทฤษฎี", icon: BookOpen },
+    { key: "equipment", label: "อุปกรณ์", icon: Beaker },
     { key: "saved", label: "ผลบันทึก", icon: BarChart3 },
     { key: "info", label: "ข้อมูลแล็บ", icon: ClipboardList },
   ];
@@ -531,14 +448,7 @@ export default function LabDetailLayout({ labId, lab, details }: LabDetailLayout
       />
 
       <main className="relative z-10 mx-auto w-full max-w-[1440px] px-4 py-5 sm:px-12 md:px-20">
-        <DetailFactStrip
-          details={details}
-          hasSavedResult={Boolean(savedData)}
-          readiness={readiness}
-          theme={theme}
-        />
-
-        <section className="mt-6 space-y-4">
+        <section className="space-y-4">
           <div className="flex gap-2 overflow-x-auto rounded-2xl border border-slate-200 bg-white p-2 shadow-sm shadow-slate-200/40">
             {tabs.map((tab) => {
               const TabIcon = tab.icon;
