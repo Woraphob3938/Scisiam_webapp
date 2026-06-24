@@ -1,10 +1,10 @@
 "use client";
 
 import React from "react";
-import { LayoutGrid, Atom, Beaker, Leaf, BookOpen } from "lucide-react";
+import { LayoutGrid, Atom, Beaker, Leaf, BookOpen, Calculator } from "lucide-react";
 import Image from "next/image";
 
-export type Category = "All" | "Foundation" | "Physics" | "Chemistry" | "Biology";
+export type Category = "All" | "Foundation" | "Physics" | "Chemistry" | "Biology" | "Mathematics";
 
 const categoriesList = [
   { id: "All" as Category, name: "ทั้งหมด", icon: LayoutGrid, color: "blue", imagePath: null },
@@ -12,6 +12,7 @@ const categoriesList = [
   { id: "Physics" as Category, name: "ฟิสิกส์", icon: Atom, color: "indigo", imagePath: "/images/categories/physics.png" },
   { id: "Chemistry" as Category, name: "เคมี", icon: Beaker, color: "purple", imagePath: "/images/categories/chemistry.png" },
   { id: "Biology" as Category, name: "ชีววิทยา", icon: Leaf, color: "green", imagePath: "/images/categories/biology.png" },
+  { id: "Mathematics" as Category, name: "คณิตศาสตร์", icon: Calculator, color: "violet", imagePath: null },
 ];
 
 const activeColorClasses: Record<string, string> = {
@@ -20,6 +21,7 @@ const activeColorClasses: Record<string, string> = {
   indigo: "border-blue-200 bg-blue-50/80 text-blue-700 shadow-sm shadow-blue-500/5",
   purple: "border-purple-200 bg-purple-50/80 text-purple-700 shadow-sm shadow-purple-500/5",
   green: "border-green-200 bg-green-50/80 text-green-700 shadow-sm shadow-green-500/5",
+  violet: "border-violet-200 bg-violet-50/80 text-violet-700 shadow-sm shadow-violet-500/5",
 };
 
 interface CategoryFilterProps {
@@ -33,8 +35,8 @@ export default function CategoryFilter({
 }: CategoryFilterProps) {
   return (
     <div className="flex w-full justify-center px-4 pb-5 pt-4 md:pb-6">
-      <div className="w-full max-w-3xl rounded-full border border-slate-200/80 bg-white p-1.5 shadow-sm">
-        <div className="grid grid-cols-5 w-full gap-1.5">
+      <div className="w-full max-w-4xl rounded-full border border-slate-200/80 bg-white p-1.5 shadow-sm">
+        <div className="grid grid-cols-3 w-full gap-1.5 sm:grid-cols-6">
         {categoriesList.map((category) => {
           const Icon = category.icon;
           const isActive = activeCategory === category.id;

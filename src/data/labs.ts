@@ -296,6 +296,54 @@ export const labsData: LabData[] = [
     gradeLevel: "ประถม",
     status: "",
     description: "วิเคราะห์อัตราการเต้นของหัวใจและความดันเลือดภายใต้การตอบสนองต่อการทำกิจกรรมและระดับสารกระตุ้นจำลอง"
+  },
+  {
+    id: "graphing-lines",
+    title: "Graphing Lines & Slope",
+    category: "Mathematics",
+    gradeLevel: "มัธยมต้น",
+    status: "",
+    description: "สำรวจสมการเส้นตรง ความชัน จุดตัดแกน และการอ่านกราฟ เพื่อเชื่อมโยงสูตรคณิตศาสตร์กับข้อมูลจากการทดลองวิทยาศาสตร์"
+  },
+  {
+    id: "ratio-and-proportion",
+    title: "Ratio & Proportion Lab",
+    category: "Mathematics",
+    gradeLevel: "ประถม",
+    status: "",
+    description: "ฝึกเปรียบเทียบอัตราส่วน สัดส่วน และอัตราต่อหน่วย ผ่านสถานการณ์การผสมสาร การปรับสเกล และการแปลงหน่วยในห้องทดลอง"
+  },
+  {
+    id: "vector-addition",
+    title: "Vector Addition Lab",
+    category: "Mathematics",
+    gradeLevel: "มัธยมปลาย",
+    status: "",
+    description: "ทดลองรวมเวกเตอร์ด้วยภาพ ลูกศร องค์ประกอบแกน x-y และผลลัพธ์สุทธิ เพื่อรองรับแรง การเคลื่อนที่ และไฟฟ้าในแล็บวิทยาศาสตร์"
+  },
+  {
+    id: "center-and-variability",
+    title: "Center & Variability",
+    category: "Mathematics",
+    gradeLevel: "มัธยมต้น",
+    status: "",
+    description: "เรียนรู้ค่าเฉลี่ย มัธยฐาน พิสัย และการกระจายของข้อมูล จากชุดข้อมูลทดลองที่มีความแปรปรวนเหมือนการวัดจริง"
+  },
+  {
+    id: "curve-fitting",
+    title: "Curve Fitting & Trend Lines",
+    category: "Mathematics",
+    gradeLevel: "มัธยมปลาย",
+    status: "",
+    description: "วิเคราะห์จุดข้อมูล เลือกเส้นแนวโน้ม และตีความความคลาดเคลื่อน เพื่อช่วยอ่านผลแล็บที่เป็นเส้นตรง เส้นโค้ง หรือข้อมูลมี noise"
+  },
+  {
+    id: "function-builder",
+    title: "Function Builder",
+    category: "Mathematics",
+    gradeLevel: "มัธยมต้น",
+    status: "",
+    description: "ประกอบฟังก์ชันจาก input-output, table, graph และ rule เพื่อให้เห็นว่าการเปลี่ยนตัวแปรส่งผลต่อผลลัพธ์อย่างไร"
   }
 ];
 

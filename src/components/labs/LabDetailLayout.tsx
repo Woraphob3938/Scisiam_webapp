@@ -77,6 +77,13 @@ const SUBJECT_THEMES: Record<string, SubjectTheme> = {
     dot: "bg-emerald-500",
     subtleSurface: "bg-emerald-50/45",
   },
+  Mathematics: {
+    accentBg: "bg-violet-50",
+    accentBorder: "border-violet-100",
+    accentText: "text-violet-700",
+    dot: "bg-violet-500",
+    subtleSurface: "bg-violet-50/45",
+  },
 };
 
 function getSubjectTheme(category: string) {

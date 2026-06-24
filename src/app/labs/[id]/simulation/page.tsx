@@ -11,6 +11,7 @@ import { isLabReady } from "@/data/labReadiness";
 import {
   isChemistryConceptSimulationLabId,
   isDirectSimulationLabId,
+  isMathConceptSimulationLabId,
   type DirectSimulationLabId,
 } from "@/data/labSimulationRegistry";
 
@@ -86,6 +87,8 @@ const FoodChainEcologySimulation = dynamic(() =>
   import("@/components/labs/simulation/FoodChainEcologySimulation"));
 const CardiovascularSystemSimulation = dynamic(() =>
   import("@/components/labs/simulation/CardiovascularSystemSimulation"));
+const GraphingLinesSimulation = dynamic(() =>
+  import("@/components/labs/simulation/GraphingLinesSimulation"));
 
 const simulationComponents: Record<DirectSimulationLabId, React.ComponentType> = {
   "newtons-cooling": NewtonsCoolingSimulation,
@@ -147,7 +150,13 @@ function SimulationPlaceholder({ labId }: { labId: string }) {
       border: "border-green-100",
       gradient: "from-green-600 to-emerald-600 shadow-green-500/10",
     },
-  }[category as "Physics" | "Chemistry" | "Biology"] || {
+    Mathematics: {
+      accent: "text-violet-600",
+      bg: "bg-violet-50/50",
+      border: "border-violet-100",
+      gradient: "from-violet-600 to-indigo-600 shadow-violet-500/10",
+    },
+  }[category as "Physics" | "Chemistry" | "Biology" | "Mathematics"] || {
     accent: "text-slate-600",
     bg: "bg-slate-50",
     border: "border-slate-100",
@@ -174,7 +183,9 @@ function SimulationPlaceholder({ labId }: { labId: string }) {
               ? "border-blue-100 bg-blue-50 text-blue-700"
               : category === "Chemistry"
               ? "border-purple-100 bg-purple-50 text-purple-700"
-              : "border-green-100 bg-green-50 text-green-700"
+              : category === "Biology"
+              ? "border-green-100 bg-green-50 text-green-700"
+              : "border-violet-100 bg-violet-50 text-violet-700"
           }`}>
             {category}
           </span>
@@ -233,6 +244,14 @@ export default function SimulationRoomPage() {
 
   if (isChemistryConceptSimulationLabId(labId)) {
     return <ChemistryConceptSimulation labId={labId} />;
+  }
+
+  if (labId === "graphing-lines") {
+    return <GraphingLinesSimulation />;
+  }
+
+  if (isMathConceptSimulationLabId(labId)) {
+    return <SimulationPlaceholder labId={labId} />;
   }
 
   return <SimulationPlaceholder labId={labId} />;

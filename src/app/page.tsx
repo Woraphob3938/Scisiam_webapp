@@ -69,6 +69,12 @@ const categoryMeta = [
     thai: "ชีววิทยา",
     tone: "border-emerald-100 bg-emerald-50 text-emerald-700",
   },
+  {
+    id: "Mathematics",
+    label: "Mathematics",
+    thai: "คณิตศาสตร์",
+    tone: "border-violet-100 bg-violet-50 text-violet-700",
+  },
 ] as const;
 
 function readHomeSnapshot(): HomeSnapshot {

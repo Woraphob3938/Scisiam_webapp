@@ -1663,6 +1663,439 @@ const periodicTableDetails: LabDetailData = {
   }
 };
 
+function createMathConceptDetails(input: {
+  title: string;
+  focus: string;
+  equation: string;
+  xTitle: string;
+  yTitle: string;
+  graphType?: GraphConfigData["graphType"];
+  pathColor?: string;
+  overviewBullets?: string[];
+  learningObjectives?: string[];
+  equipments?: EquipmentItemData[];
+  steps?: StepItemData[];
+  theoryDescription?: string;
+  equationLabels?: EquationLabelData[];
+  graph?: GraphConfigData;
+}): LabDetailData {
+  return {
+    overviewBullets: input.overviewBullets ?? [
+      `สำรวจแนวคิด ${input.focus} ผ่านการปรับค่าและอ่านผลลัพธ์จากภาพ กราฟ และตาราง`,
+      "เชื่อมโยงภาษาคณิตศาสตร์กับข้อมูลจากห้องทดลองวิทยาศาสตร์ เพื่อช่วยอธิบายแนวโน้มและความสัมพันธ์ของตัวแปร",
+      "ฝึกตั้งคำถามจากข้อมูล สังเกตรูปแบบ และสรุปผลด้วยเหตุผลเชิงปริมาณอย่างเป็นขั้นตอน",
+    ],
+    learningObjectives: input.learningObjectives ?? [
+      `อธิบายความหมายของ ${input.focus} ได้ด้วยคำพูด กราฟ และสัญลักษณ์ทางคณิตศาสตร์`,
+      "อ่านค่าจากกราฟหรือตาราง และระบุว่าตัวแปรใดเป็น input, output หรือค่าที่ต้องควบคุม",
+      "นำแนวคิดคณิตศาสตร์ไปช่วยวิเคราะห์ผลการทดลองในแล็บวิทยาศาสตร์ของ SciSiam ได้",
+    ],
+    equipments: input.equipments ?? [
+      {
+        id: "coordinate-grid",
+        name: "กริดพิกัด",
+        role: "พื้นที่สำหรับวางจุด อ่านแกน และติดตามความสัมพันธ์ของตัวแปร",
+        note: "สังเกตชื่อแกน หน่วย และช่วงค่าก่อนตีความกราฟทุกครั้ง",
+        unit: "x-y",
+        tone: "violet",
+        visualKey: "GraphVisual",
+      },
+      {
+        id: "data-table",
+        name: "ตารางข้อมูล",
+        role: "เก็บค่า input-output หรือผลการวัดหลายครั้งเพื่อเปรียบเทียบ",
+        note: "ตรวจว่าข้อมูลอยู่ในหน่วยเดียวกันก่อนนำไปคำนวณ",
+        unit: "data",
+        tone: "blue",
+        visualKey: "ClipboardVisual",
+      },
+      {
+        id: "math-rule",
+        name: "กฎหรือสมการ",
+        role: "อธิบายรูปแบบที่เชื่อมค่าตัวแปรต้นกับตัวแปรตาม",
+        note: "ใช้สมการเป็นแบบจำลอง ไม่ใช่คำตอบสุดท้ายโดยไม่ตรวจข้อมูล",
+        unit: "rule",
+        tone: "emerald",
+        visualKey: "PHMeterVisual",
+      },
+      {
+        id: "trend-marker",
+        name: "ตัวอ่านแนวโน้ม",
+        role: "ช่วยดูทิศทาง ความชัน ความแปรปรวน หรือค่าคลาดเคลื่อนจากข้อมูล",
+        note: "เปรียบเทียบแนวโน้มกับจุดข้อมูลจริงเสมอ",
+        unit: "trend",
+        tone: "amber",
+        visualKey: "GraphVisual",
+      },
+    ],
+    steps: input.steps ?? [
+      {
+        num: 1,
+        title: "ตั้งคำถามจากสถานการณ์",
+        desc: `ระบุว่าต้องการศึกษา ${input.focus} ในบริบทใด และตัวแปรใดควรเปลี่ยนทีละตัว`,
+        iconKey: "Target",
+        color: "text-violet-500",
+        bg: "bg-violet-50",
+      },
+      {
+        num: 2,
+        title: "สร้างหรือเลือกข้อมูล",
+        desc: "ปรับค่า input หรือใช้ข้อมูลตัวอย่าง แล้วบันทึกผลในตารางอย่างเป็นลำดับ",
+        iconKey: "ClipboardList",
+        color: "text-blue-500",
+        bg: "bg-blue-50",
+      },
+      {
+        num: 3,
+        title: "อ่านกราฟและรูปแบบ",
+        desc: "ดูทิศทาง จุดสำคัญ ความชัน หรือการกระจายของข้อมูลก่อนสรุปผล",
+        iconKey: "LineChart",
+        color: "text-emerald-500",
+        bg: "bg-emerald-50",
+      },
+      {
+        num: 4,
+        title: "เชื่อมกับแล็บวิทยาศาสตร์",
+        desc: "อธิบายว่าคณิตศาสตร์ช่วยทำให้ผลทดลองอ่านง่ายขึ้นหรือแม่นยำขึ้นอย่างไร",
+        iconKey: "BookOpen",
+        color: "text-amber-500",
+        bg: "bg-amber-50",
+      },
+    ],
+    theoryDescription: input.theoryDescription ?? `${input.title} เป็นแล็บคณิตศาสตร์พื้นฐานสำหรับช่วยอ่านความสัมพันธ์ของข้อมูลใน SciSiam ผู้เรียนจะใช้ภาพ ตาราง กราฟ และสมการเพื่อแปลความหมายของตัวแปรและแนวโน้มอย่างเป็นระบบ`,
+    equationHtml: input.equation,
+    equationLabels: input.equationLabels ?? [
+      { label: "input", desc: "ค่าที่ผู้เรียนปรับหรือกำหนดก่อนสังเกตผลลัพธ์", color: "text-violet-500" },
+      { label: "output", desc: "ค่าที่เปลี่ยนตามกฎ แบบจำลอง หรือข้อมูลที่เก็บได้", color: "text-blue-500" },
+      { label: "model", desc: "รูปแบบคณิตศาสตร์ที่ช่วยอธิบายข้อมูลจริง", color: "text-emerald-500" },
+    ],
+    graph: input.graph ?? {
+      title: `${input.title} Overview`,
+      subtitle: "Math relationship preview",
+      xTitle: input.xTitle,
+      yTitle: input.yTitle,
+      yLabels: ["สูง", "กลาง", "ต่ำ", "เริ่มต้น"],
+      xLabels: ["0", "1", "2", "3", "4"],
+      graphType: input.graphType ?? "line",
+      customPath: "M20,92 C58,72 82,58 112,50 C140,42 158,28 182,22",
+      pathColor: input.pathColor ?? "#7c3aed",
+      points: [
+        { x: 24, y: 92 },
+        { x: 62, y: 72 },
+        { x: 104, y: 54 },
+        { x: 146, y: 38 },
+        { x: 182, y: 22 },
+      ],
+    },
+  };
+}
+
+const graphingLinesDetails = createMathConceptDetails({
+  title: "Graphing Lines & Slope",
+  focus: "สมการเส้นตรง ความชัน และจุดตัดแกน",
+  equation: "y = mx + b",
+  xTitle: "x",
+  yTitle: "y",
+  overviewBullets: [
+    "สำรวจเส้นตรงบนระนาบพิกัดโดยปรับความชัน (m) และจุดตัดแกน y (b) แล้วเห็นกราฟเปลี่ยนทันที",
+    "อ่านค่าจากจุดสองจุด ตารางค่า และสมการ เพื่อดูว่าทั้งสามรูปแบบอธิบายเส้นเดียวกันได้อย่างไร",
+    "เชื่อมโยงความชันกับอัตราการเปลี่ยนแปลง เช่น อุณหภูมิต่อเวลา ระยะทางต่อเวลา หรือแรงต่อระยะยืดในแล็บวิทยาศาสตร์",
+  ],
+  learningObjectives: [
+    "คำนวณความชันจากจุดสองจุดและอธิบายความหมายของความชันบวก ลบ ศูนย์ และไม่กำหนดได้",
+    "ระบุจุดตัดแกน y จากกราฟ ตาราง หรือสมการเส้นตรงได้ถูกต้อง",
+    "แปลงข้อมูลทดลองอย่างง่ายให้เป็นสมการ y = mx + b และตีความ m กับ b ในบริบทจริงได้",
+  ],
+  equipments: [
+    { id: "coordinate-plane", name: "ระนาบพิกัด x-y", role: "แสดงตำแหน่งจุดและเส้นตรงเพื่ออ่านค่าพิกัดอย่างเป็นระบบ", note: "ตรวจทิศแกนและสเกลก่อนอ่านความชันทุกครั้ง", unit: "x-y", tone: "violet", visualKey: "RulerVisual" },
+    { id: "slope-triangle", name: "สามเหลี่ยมความชัน", role: "ช่วยเทียบ rise/run ระหว่างสองจุดบนเส้นตรง", note: "ใช้จุดที่อยู่บนเส้นเดียวกันและอ่านสเกลให้ตรงกัน", unit: "Δy/Δx", tone: "emerald", visualKey: "ProtractorVisual" },
+    { id: "intercept-marker", name: "ตัวชี้จุดตัดแกน", role: "ทำเครื่องหมายจุดที่เส้นตัดแกน y เพื่อระบุค่า b", note: "จุดตัดแกน y คือค่าของ y เมื่อ x = 0", unit: "b", tone: "amber", visualKey: "PHMeterVisual" },
+    { id: "linear-data-table", name: "ตารางค่า x-y", role: "บันทึกคู่ลำดับที่สร้างจากสมการหรืออ่านจากกราฟ", note: "ตรวจว่าค่า y เปลี่ยนด้วยอัตราคงที่เมื่อ x เพิ่มเท่ากัน", unit: "pairs", tone: "blue", visualKey: "ClipboardListVisual" },
+  ],
+  steps: [
+    { num: 1, title: "วางจุดสองจุด", desc: "เลือกจุดเริ่มต้นและจุดปลายบนระนาบพิกัดเพื่อกำหนดแนวเส้นตรง", iconKey: "Target", color: "text-violet-500", bg: "bg-violet-50" },
+    { num: 2, title: "คำนวณความชัน", desc: "ใช้ m = Δy/Δx จากสองจุด แล้วสังเกตว่าเส้นเอียงขึ้นหรือลง", iconKey: "Ruler", color: "text-emerald-500", bg: "bg-emerald-50" },
+    { num: 3, title: "หาจุดตัดแกน y", desc: "อ่านค่า b เมื่อเส้นตัดแกน y และใส่ลงในสมการ y = mx + b", iconKey: "LineChart", color: "text-amber-500", bg: "bg-amber-50" },
+    { num: 4, title: "ตรวจด้วยตารางค่า", desc: "แทนค่า x หลายค่าเพื่อดูว่าแต่ละคู่ลำดับวางอยู่บนเส้นตรงเดียวกัน", iconKey: "ClipboardList", color: "text-blue-500", bg: "bg-blue-50" },
+  ],
+  theoryDescription: "สมการเส้นตรง y = mx + b อธิบายความสัมพันธ์ที่มีอัตราการเปลี่ยนแปลงคงที่ โดย m คือความชันหรือการเปลี่ยนของ y ต่อการเปลี่ยนของ x ส่วน b คือค่าเริ่มต้นเมื่อ x = 0 แนวคิดนี้ช่วยอ่านกราฟจากแล็บวิทยาศาสตร์ได้ เช่น กราฟแรง-ระยะยืด หรือกราฟแรงดัน-กระแส",
+  equationLabels: [
+    { label: "m", desc: "ความชันหรืออัตราการเปลี่ยนแปลงของ y ต่อ x", color: "text-violet-500" },
+    { label: "b", desc: "จุดตัดแกน y หรือค่าเริ่มต้นเมื่อ x = 0", color: "text-amber-500" },
+    { label: "(x, y)", desc: "คู่ลำดับที่ต้องอยู่บนเส้นตรงเมื่อแทนค่าในสมการ", color: "text-blue-500" },
+  ],
+  graph: {
+    title: "กราฟเส้นตรงและความชัน",
+    subtitle: "Slope-Intercept Form",
+    xTitle: "x",
+    yTitle: "y",
+    yLabels: ["12", "8", "4", "0"],
+    xLabels: ["0", "2", "4", "6", "8"],
+    graphType: "line",
+    customPath: "M24,94 L180,24",
+    pathColor: "#7c3aed",
+  },
+});
+
+const ratioAndProportionDetails = createMathConceptDetails({
+  title: "Ratio & Proportion Lab",
+  focus: "อัตราส่วน สัดส่วน และอัตราต่อหน่วย",
+  equation: "a / b = c / d",
+  xTitle: "ปริมาณตั้งต้น",
+  yTitle: "ปริมาณที่เทียบสัดส่วน",
+  pathColor: "#0891b2",
+  overviewBullets: [
+    "ทดลองเปลี่ยนปริมาณสองอย่างที่ต้องรักษาอัตราส่วนเดิม เช่น สารละลาย สีผสม หรือขนาดแบบจำลอง",
+    "เปรียบเทียบตารางอัตราส่วน เส้นจำนวนคู่ และสเกลแฟกเตอร์ เพื่อดูว่าสัดส่วนใดเทียบเท่ากัน",
+    "ใช้แนวคิดอัตราต่อหน่วยช่วยแปลข้อมูลวิทยาศาสตร์ เช่น ความเร็ว ความเข้มข้น หรืออัตราการเกิดปฏิกิริยา",
+  ],
+  learningObjectives: [
+    "ระบุอัตราส่วนที่เทียบเท่ากันจากตารางหรือภาพจำลองได้",
+    "ใช้การคูณไขว้และสเกลแฟกเตอร์เพื่อหาค่าที่หายไปในสัดส่วนได้",
+    "อธิบายความหมายของอัตราต่อหน่วยและนำไปใช้กับสถานการณ์แล็บได้อย่างเหมาะสม",
+  ],
+  equipments: [
+    { id: "ratio-table", name: "ตารางอัตราส่วน", role: "บันทึกคู่ค่าที่ต้องเพิ่มหรือลดพร้อมกันเพื่อรักษาสัดส่วน", note: "แต่ละแถวควรมีตัวคูณเดียวกันทั้งสองคอลัมน์", unit: "a:b", tone: "blue", visualKey: "ClipboardListVisual" },
+    { id: "double-number-line", name: "เส้นจำนวนคู่", role: "แสดงสองปริมาณบนสเกลคู่ขนานเพื่อเปรียบเทียบการเพิ่มทีละช่วง", note: "ตำแหน่งที่ตรงกันคือคู่ค่าที่สัมพันธ์กัน", unit: "scale", tone: "violet", visualKey: "RulerVisual" },
+    { id: "scale-factor-control", name: "ตัวปรับสเกลแฟกเตอร์", role: "คูณอัตราส่วนตั้งต้นให้ใหญ่ขึ้นหรือเล็กลงโดยรักษารูปแบบเดิม", note: "สเกลแฟกเตอร์ต้องคูณทั้งสองจำนวน ไม่ใช่คูณเพียงด้านเดียว", unit: "k", tone: "emerald", visualKey: "MassSetVisual" },
+    { id: "unit-rate-card", name: "การ์ดอัตราต่อหน่วย", role: "แปลงอัตราส่วนให้เป็นค่าต่อ 1 หน่วยเพื่อเปรียบเทียบง่ายขึ้น", note: "เหมาะกับโจทย์ความเร็ว ราคา ความเข้มข้น หรืออัตราการไหล", unit: "per 1", tone: "amber", visualKey: "PHMeterVisual" },
+  ],
+  steps: [
+    { num: 1, title: "ตั้งอัตราส่วนเริ่มต้น", desc: "กำหนดปริมาณสองอย่าง เช่น สาร A : สาร B หรือ ระยะทาง : เวลา", iconKey: "Sliders", color: "text-violet-500", bg: "bg-violet-50" },
+    { num: 2, title: "ขยายหรือลดสเกล", desc: "คูณทั้งสองปริมาณด้วยตัวคูณเดียวกันแล้วดูว่าสัดส่วนยังเท่าเดิมหรือไม่", iconKey: "Activity", color: "text-emerald-500", bg: "bg-emerald-50" },
+    { num: 3, title: "หาค่าที่หายไป", desc: "ใช้การคูณไขว้หรือสเกลแฟกเตอร์เพื่อเติมค่าที่ไม่ทราบในสัดส่วน", iconKey: "Target", color: "text-amber-500", bg: "bg-amber-50" },
+    { num: 4, title: "แปลเป็นอัตราต่อหน่วย", desc: "ลดรูปให้เหลือต่อ 1 หน่วย แล้วอธิบายว่าค่านั้นหมายถึงอะไรในสถานการณ์แล็บ", iconKey: "BookOpen", color: "text-blue-500", bg: "bg-blue-50" },
+  ],
+  theoryDescription: "สัดส่วนคือความเท่ากันของอัตราส่วนสองชุด ถ้าคูณหรือหารทั้งสองจำนวนในอัตราส่วนด้วยตัวเดียวกัน ความสัมพันธ์จะยังคงเดิม แนวคิดนี้สำคัญต่อการอ่านความเข้มข้น การเจือจางสาร การขยายแบบจำลอง และอัตราการเปลี่ยนแปลงในข้อมูลทดลอง",
+  equationLabels: [
+    { label: "a:b", desc: "อัตราส่วนตั้งต้นของสองปริมาณ", color: "text-violet-500" },
+    { label: "c:d", desc: "อัตราส่วนใหม่ที่ควรเทียบเท่ากับชุดตั้งต้น", color: "text-blue-500" },
+    { label: "unit rate", desc: "ค่าต่อ 1 หน่วยที่ช่วยให้เปรียบเทียบสถานการณ์ต่างกันได้", color: "text-emerald-500" },
+  ],
+  graph: {
+    title: "ตารางสัดส่วนเทียบเท่า",
+    subtitle: "Equivalent Ratio Scaling",
+    xTitle: "ตัวคูณ",
+    yTitle: "ปริมาณ",
+    yLabels: ["40", "30", "20", "10"],
+    xLabels: ["1x", "2x", "3x", "4x"],
+    graphType: "line",
+    customPath: "M26,94 L72,72 L118,50 L164,28",
+    pathColor: "#0891b2",
+  },
+});
+
+const vectorAdditionDetails = createMathConceptDetails({
+  title: "Vector Addition Lab",
+  focus: "การรวมเวกเตอร์และองค์ประกอบแกน x-y",
+  equation: "R = A + B",
+  xTitle: "แกน x",
+  yTitle: "แกน y",
+  graphType: "custom",
+  pathColor: "#2563eb",
+  overviewBullets: [
+    "ทดลองลากเวกเตอร์หลายตัวบนระนาบแล้วดูผลรวมสุทธิจากวิธีหัวต่อหางและวิธีองค์ประกอบ",
+    "แยกเวกเตอร์เป็นแกน x และ y เพื่อเห็นว่าการรวมเวกเตอร์ไม่ใช่การบวกขนาดอย่างเดียว",
+    "เชื่อมโยงกับแรง การกระจัด ความเร็ว และสนามไฟฟ้าที่ต้องมีทั้งขนาดและทิศทาง",
+  ],
+  learningObjectives: [
+    "อธิบายความแตกต่างระหว่างปริมาณสเกลาร์และเวกเตอร์ได้",
+    "คำนวณองค์ประกอบ Ax, Ay และรวมองค์ประกอบเพื่อหาผลลัพธ์ Rx, Ry ได้",
+    "ตีความขนาดและทิศทางของเวกเตอร์ลัพธ์จากภาพลูกศรหรือข้อมูลเชิงตัวเลขได้",
+  ],
+  equipments: [
+    { id: "vector-arrows", name: "ลูกศรเวกเตอร์ A และ B", role: "แสดงขนาดและทิศทางของเวกเตอร์แต่ละตัวบนระนาบ", note: "ความยาวแทนขนาด ส่วนหัวลูกศรแทนทิศทาง", unit: "N / m", tone: "blue", visualKey: "DynamicsCartVisual" },
+    { id: "component-grid", name: "กริดองค์ประกอบ", role: "ช่วยแยกเวกเตอร์เป็นส่วนตามแกน x และแกน y", note: "เวกเตอร์หนึ่งตัวสามารถแทนด้วยคู่ค่า (x, y)", unit: "x,y", tone: "violet", visualKey: "RulerVisual" },
+    { id: "angle-protractor", name: "ตัววัดมุม", role: "อ่านมุมของเวกเตอร์เทียบกับแกนอ้างอิง", note: "กำหนดทิศบวกของแกน x ให้ชัดก่อนวัดมุม", unit: "deg", tone: "amber", visualKey: "ProtractorVisual" },
+    { id: "resultant-meter", name: "ตัวอ่านเวกเตอร์ลัพธ์", role: "สรุปขนาดและทิศทางของ R หลังรวมเวกเตอร์", note: "ตรวจทั้ง Rx, Ry และขนาด R ก่อนสรุปผล", unit: "R", tone: "emerald", visualKey: "VoltmeterVisual" },
+  ],
+  steps: [
+    { num: 1, title: "กำหนดเวกเตอร์ A", desc: "เลือกขนาดและมุมของเวกเตอร์แรกบนระนาบพิกัด", iconKey: "Target", color: "text-blue-500", bg: "bg-blue-50" },
+    { num: 2, title: "เพิ่มเวกเตอร์ B", desc: "วางเวกเตอร์ที่สองแบบหัวต่อหางหรือวางที่จุดกำเนิดเพื่อเปรียบเทียบ", iconKey: "Sliders", color: "text-violet-500", bg: "bg-violet-50" },
+    { num: 3, title: "แยกองค์ประกอบ", desc: "อ่านหรือคำนวณ Ax, Ay, Bx และ By แล้วนำแกนเดียวกันมาบวกกัน", iconKey: "Ruler", color: "text-amber-500", bg: "bg-amber-50" },
+    { num: 4, title: "สรุปเวกเตอร์ลัพธ์", desc: "ลาก R จากจุดเริ่มต้นถึงจุดปลายสุดและอธิบายขนาดกับทิศทางของผลลัพธ์", iconKey: "LineChart", color: "text-emerald-500", bg: "bg-emerald-50" },
+  ],
+  theoryDescription: "เวกเตอร์เป็นปริมาณที่มีทั้งขนาดและทิศทาง การรวมเวกเตอร์ทำได้โดยต่อหัวกับหางหรือแยกเป็นองค์ประกอบตามแกน x-y แล้วบวกองค์ประกอบแกนเดียวกัน เวกเตอร์ลัพธ์ R จึงบอกผลสุทธิของแรง การเคลื่อนที่ หรือการกระจัดในระบบเดียวกัน",
+  equationLabels: [
+    { label: "A, B", desc: "เวกเตอร์ตั้งต้นที่มีขนาดและทิศทาง", color: "text-blue-500" },
+    { label: "Rx, Ry", desc: "ผลรวมองค์ประกอบตามแกน x และแกน y", color: "text-violet-500" },
+    { label: "|R|", desc: "ขนาดของเวกเตอร์ลัพธ์ที่คำนวณจากองค์ประกอบ", color: "text-emerald-500" },
+  ],
+  graph: {
+    title: "การรวมเวกเตอร์บนระนาบ",
+    subtitle: "Component and Resultant View",
+    xTitle: "แกน x",
+    yTitle: "แกน y",
+    yLabels: ["+y", "", "0", "-y"],
+    xLabels: ["-x", "0", "+x"],
+    graphType: "custom",
+    solidLineCoords: { x1: 35, y1: 88, x2: 105, y2: 45 },
+    dashedLineCoords: { x1: 105, y1: 45, x2: 165, y2: 70 },
+    customPath: "M35,88 L165,70",
+    pathColor: "#2563eb",
+  },
+});
+
+const centerAndVariabilityDetails = createMathConceptDetails({
+  title: "Center & Variability",
+  focus: "ค่าเฉลี่ย มัธยฐาน พิสัย และการกระจายของข้อมูล",
+  equation: "mean = Σx / n",
+  xTitle: "ชุดข้อมูล",
+  yTitle: "ค่าที่วัดได้",
+  graphType: "scatter",
+  pathColor: "#10b981",
+  overviewBullets: [
+    "สำรวจชุดข้อมูลจากการวัดซ้ำ เช่น เวลา อุณหภูมิ ความยาว หรือคะแนน แล้วดูว่าค่ากลางเล่าเรื่องอะไร",
+    "เปรียบเทียบค่าเฉลี่ย มัธยฐาน พิสัย และความแปรปรวนอย่างง่ายเพื่อไม่สรุปผลจากตัวเลขเดียว",
+    "ใช้ dot plot และเครื่องหมายค่ากลางช่วยดู outlier และความสม่ำเสมอของข้อมูลทดลอง",
+  ],
+  learningObjectives: [
+    "คำนวณและเปรียบเทียบค่าเฉลี่ยกับมัธยฐานของข้อมูลชุดเดียวกันได้",
+    "อธิบายความหมายของพิสัยและการกระจายว่าเกี่ยวกับความน่าเชื่อถือของผลทดลองอย่างไร",
+    "ระบุ outlier และตัดสินใจได้ว่าควรตรวจสอบข้อมูลซ้ำก่อนนำไปสรุปผลหรือไม่",
+  ],
+  equipments: [
+    { id: "measurement-cards", name: "การ์ดข้อมูลการวัด", role: "เก็บค่าจากการทดลองซ้ำหลายครั้งเพื่อใช้คำนวณสถิติ", note: "อย่าลบค่าผิดปกติก่อนตรวจเหตุผลว่าผิดจริงหรือเป็นผลสำคัญ", unit: "data", tone: "blue", visualKey: "ClipboardListVisual" },
+    { id: "dot-plot-board", name: "แผง dot plot", role: "วางจุดข้อมูลแต่ละค่าให้เห็นการกระจุกและการกระจาย", note: "จุดที่อยู่โดดเดี่ยวมากควรถูกตรวจสอบเป็นพิเศษ", unit: "plot", tone: "emerald", visualKey: "RulerVisual" },
+    { id: "center-markers", name: "ตัวชี้ค่ากลาง", role: "ทำเครื่องหมายตำแหน่ง mean และ median บนข้อมูล", note: "ค่าเฉลี่ยไวต่อ outlier มากกว่ามัธยฐาน", unit: "mean/median", tone: "violet", visualKey: "PHMeterVisual" },
+    { id: "spread-ruler", name: "ไม้บรรทัดพิสัย", role: "วัดระยะจากค่าน้อยสุดถึงค่ามากสุดของชุดข้อมูล", note: "พิสัยกว้างหมายถึงผลทดลองแกว่งมากขึ้น", unit: "range", tone: "amber", visualKey: "RulerVisual" },
+  ],
+  steps: [
+    { num: 1, title: "รวบรวมข้อมูลซ้ำ", desc: "บันทึกค่าจากการวัดหลายรอบโดยใช้หน่วยเดียวกันทุกครั้ง", iconKey: "ClipboardList", color: "text-blue-500", bg: "bg-blue-50" },
+    { num: 2, title: "จัดเรียงและวาด dot plot", desc: "เรียงข้อมูลจากน้อยไปมากแล้ววางจุดเพื่อดูรูปแบบการกระจาย", iconKey: "LineChart", color: "text-emerald-500", bg: "bg-emerald-50" },
+    { num: 3, title: "หาค่ากลาง", desc: "คำนวณ mean และหา median จากข้อมูลที่เรียงแล้ว", iconKey: "Target", color: "text-violet-500", bg: "bg-violet-50" },
+    { num: 4, title: "วิเคราะห์ความแปรปรวน", desc: "ดูพิสัยและ outlier เพื่อสรุปว่าข้อมูลน่าเชื่อถือหรือควรวัดซ้ำ", iconKey: "Activity", color: "text-amber-500", bg: "bg-amber-50" },
+  ],
+  theoryDescription: "ค่ากลางช่วยอธิบายตัวแทนของข้อมูล แต่ไม่เพียงพอถ้าไม่ดูการกระจาย ค่าเฉลี่ยรวมผลของทุกข้อมูลจึงไวต่อ outlier ส่วนมัธยฐานบอกค่ากลางหลังเรียงข้อมูล พิสัยและรูปแบบบน dot plot ช่วยบอกว่าผลทดลองสม่ำเสมอหรือผันผวนมากเพียงใด",
+  equationLabels: [
+    { label: "Σx", desc: "ผลรวมค่าข้อมูลทั้งหมดในชุด", color: "text-blue-500" },
+    { label: "n", desc: "จำนวนข้อมูลหรือจำนวนครั้งที่วัด", color: "text-violet-500" },
+    { label: "range", desc: "ค่าสูงสุดลบค่าต่ำสุด ใช้ดูความกว้างของข้อมูล", color: "text-amber-500" },
+  ],
+  graph: {
+    title: "dot plot และค่ากลาง",
+    subtitle: "Center and Spread of Repeated Measurements",
+    xTitle: "รอบการวัด",
+    yTitle: "ค่าที่วัดได้",
+    yLabels: ["สูง", "กลาง", "ต่ำ", "เริ่ม"],
+    xLabels: ["1", "2", "3", "4", "5"],
+    graphType: "scatter",
+    customPath: "M30,70 C62,54 88,62 112,48 C140,38 156,55 178,32",
+    pathColor: "#10b981",
+    points: [
+      { x: 30, y: 70 },
+      { x: 62, y: 54 },
+      { x: 88, y: 62 },
+      { x: 112, y: 48 },
+      { x: 178, y: 32 },
+    ],
+  },
+});
+
+const curveFittingDetails = createMathConceptDetails({
+  title: "Curve Fitting & Trend Lines",
+  focus: "เส้นแนวโน้ม แบบจำลอง และค่าคลาดเคลื่อน",
+  equation: "error = observed - predicted",
+  xTitle: "ตัวแปรต้น",
+  yTitle: "ผลการวัด",
+  graphType: "curve",
+  pathColor: "#db2777",
+  overviewBullets: [
+    "วางจุดข้อมูลทดลองบน scatter plot แล้วเลือกเส้นแนวโน้มที่อธิบายรูปแบบโดยรวมได้ดีที่สุด",
+    "เปรียบเทียบแบบจำลองเส้นตรง เส้นโค้ง หรือแนวโน้มอิ่มตัว เพื่อดูว่าโมเดลใดเข้ากับข้อมูลมากกว่า",
+    "ใช้ residual หรือค่าคลาดเคลื่อนเพื่อไม่ให้เลือกเส้นเพียงเพราะดูสวย แต่ต้องสอดคล้องกับข้อมูลจริง",
+  ],
+  learningObjectives: [
+    "อธิบายความแตกต่างระหว่างจุดข้อมูลจริง เส้นแนวโน้ม และค่าที่โมเดลทำนายได้",
+    "ประเมิน residual เพื่อดูว่าแบบจำลองมากหรือน้อยเกินจริงในช่วงใด",
+    "ใช้เส้นแนวโน้มทำนายอย่างระมัดระวังและบอกข้อจำกัดเมื่อต้อง extrapolate นอกช่วงข้อมูล",
+  ],
+  equipments: [
+    { id: "scatter-plot", name: "กราฟจุดข้อมูล", role: "แสดงข้อมูลจริงทีละจุดเพื่อเห็นรูปแบบก่อนเลือกโมเดล", note: "จุดข้อมูลจริงสำคัญกว่าเส้นที่ลากผ่านอย่างสวยงาม", unit: "points", tone: "blue", visualKey: "RulerVisual" },
+    { id: "trend-line-tool", name: "เครื่องมือเส้นแนวโน้ม", role: "ลองวางเส้นตรงหรือเส้นโค้งเพื่ออธิบายแนวโน้มรวม", note: "อย่าบังคับข้อมูลโค้งให้เป็นเส้นตรงถ้า residual มีรูปแบบชัดเจน", unit: "model", tone: "violet", visualKey: "RulerVisual" },
+    { id: "residual-meter", name: "ตัววัด residual", role: "แสดงส่วนต่างระหว่างค่าจริงกับค่าที่โมเดลทำนาย", note: "residual ควรกระจายรอบศูนย์ ไม่เอนด้านเดียวตลอด", unit: "error", tone: "rose", visualKey: "VoltmeterVisual" },
+    { id: "prediction-card", name: "การ์ดทำนายค่า", role: "ใช้โมเดลอ่านค่าที่คาดการณ์สำหรับ input ใหม่", note: "ทำนายในช่วงข้อมูลปลอดภัยกว่าทำนายนอกช่วงข้อมูล", unit: "predict", tone: "amber", visualKey: "ClipboardListVisual" },
+  ],
+  steps: [
+    { num: 1, title: "วางจุดข้อมูลจริง", desc: "บันทึกตัวแปรต้นและผลการวัดลงบน scatter plot โดยไม่ลากเส้นก่อน", iconKey: "ClipboardList", color: "text-blue-500", bg: "bg-blue-50" },
+    { num: 2, title: "เลือกแบบจำลอง", desc: "ลองเส้นตรงหรือเส้นโค้ง แล้วดูว่าเส้นสะท้อนแนวโน้มโดยรวมเพียงใด", iconKey: "LineChart", color: "text-violet-500", bg: "bg-violet-50" },
+    { num: 3, title: "ตรวจ residual", desc: "คำนวณ observed - predicted เพื่อดูจุดที่โมเดลคลาดเคลื่อนมาก", iconKey: "Activity", color: "text-rose-500", bg: "bg-rose-50" },
+    { num: 4, title: "ใช้ทำนายและบอกข้อจำกัด", desc: "อ่านค่าจากเส้นแนวโน้ม พร้อมระบุว่าการทำนายอยู่ในช่วงข้อมูลหรือเกินช่วงข้อมูล", iconKey: "BookOpen", color: "text-amber-500", bg: "bg-amber-50" },
+  ],
+  theoryDescription: "การ fit เส้นแนวโน้มคือการเลือกแบบจำลองคณิตศาสตร์ที่อธิบายข้อมูลจริงได้เหมาะสม ไม่จำเป็นต้องผ่านทุกจุด แต่ควรทำให้ residual ไม่มีรูปแบบผิดปกติ ถ้า residual เป็นบวกหรือลบต่อเนื่อง แสดงว่าโมเดลอาจไม่เหมาะกับความสัมพันธ์ของตัวแปร",
+  equationLabels: [
+    { label: "observed", desc: "ค่าจริงที่วัดได้จากข้อมูลทดลอง", color: "text-blue-500" },
+    { label: "predicted", desc: "ค่าที่แบบจำลองหรือเส้นแนวโน้มคาดการณ์", color: "text-violet-500" },
+    { label: "error", desc: "ส่วนต่างที่ใช้ตรวจคุณภาพของโมเดล", color: "text-rose-500" },
+  ],
+  graph: {
+    title: "จุดข้อมูลและเส้นแนวโน้ม",
+    subtitle: "Scatter, Fit, and Residual Thinking",
+    xTitle: "input",
+    yTitle: "observed",
+    yLabels: ["สูง", "กลาง", "ต่ำ", "เริ่ม"],
+    xLabels: ["0", "1", "2", "3", "4"],
+    graphType: "curve",
+    customPath: "M24,92 C56,76 72,46 104,42 C132,39 150,24 182,22",
+    pathColor: "#db2777",
+    points: [
+      { x: 24, y: 92 },
+      { x: 56, y: 74 },
+      { x: 85, y: 52 },
+      { x: 120, y: 47 },
+      { x: 160, y: 28 },
+    ],
+  },
+});
+
+const functionBuilderDetails = createMathConceptDetails({
+  title: "Function Builder",
+  focus: "ความสัมพันธ์ input-output และกฎของฟังก์ชัน",
+  equation: "f(x) = output",
+  xTitle: "input",
+  yTitle: "output",
+  pathColor: "#9333ea",
+  overviewBullets: [
+    "สร้างฟังก์ชันจากการ์ดกฎ เช่น บวก คูณ ยกกำลัง หรือประกอบหลายกฎ แล้วสังเกต output ที่เปลี่ยนตาม input",
+    "เปรียบเทียบฟังก์ชันผ่านสามมุมมอง: เครื่องฟังก์ชัน ตารางค่า และกราฟ",
+    "ฝึกย้อนคิดจาก output เพื่อเดากฎของฟังก์ชัน และเชื่อมกับแบบจำลองข้อมูลในวิทยาศาสตร์",
+  ],
+  learningObjectives: [
+    "อธิบายได้ว่า input, rule และ output ทำงานร่วมกันอย่างไรในฟังก์ชันหนึ่งตัว",
+    "สร้างตารางค่าและกราฟจากกฎฟังก์ชันที่กำหนดให้ได้",
+    "วิเคราะห์ผลของการประกอบฟังก์ชัน เช่น ทำกฎแรกแล้วส่งผลต่อกฎถัดไปได้",
+  ],
+  equipments: [
+    { id: "input-machine", name: "เครื่องฟังก์ชัน", role: "รับค่า input แล้วส่งผ่านกฎเพื่อสร้าง output", note: "input เดียวกันในฟังก์ชันเดียวกันควรให้ output เดิมเสมอ", unit: "f(x)", tone: "violet", visualKey: "PowerSupplyVisual" },
+    { id: "rule-cards", name: "การ์ดกฎ", role: "แทนการดำเนินการ เช่น +3, ×2, x² หรือหารด้วยจำนวนคงที่", note: "ลำดับของกฎสำคัญมากเมื่อประกอบฟังก์ชัน", unit: "rule", tone: "amber", visualKey: "ClipboardListVisual" },
+    { id: "function-table", name: "ตาราง input-output", role: "บันทึกค่า x และ f(x) เพื่อหารูปแบบของฟังก์ชัน", note: "ลอง input หลายค่าเพื่อดูรูปแบบให้ชัด ไม่พึ่งค่าเดียว", unit: "table", tone: "blue", visualKey: "RulerVisual" },
+    { id: "output-checker", name: "ตัวตรวจ output", role: "ตรวจว่าค่าที่ได้สอดคล้องกับกฎที่เลือกหรือไม่", note: "ถ้า output ไม่ตรง ให้ตรวจลำดับการใช้กฎก่อน", unit: "output", tone: "emerald", visualKey: "PHMeterVisual" },
+  ],
+  steps: [
+    { num: 1, title: "เลือกกฎฟังก์ชัน", desc: "เริ่มจากกฎเดียว เช่น f(x)=2x+1 หรือเลือกการ์ดกฎหลายใบเพื่อประกอบกัน", iconKey: "Sliders", color: "text-violet-500", bg: "bg-violet-50" },
+    { num: 2, title: "ป้อนค่า input", desc: "ทดลองค่า x หลายค่า ทั้งลบ ศูนย์ และบวก เพื่อดู output ที่เกิดขึ้น", iconKey: "Target", color: "text-blue-500", bg: "bg-blue-50" },
+    { num: 3, title: "สร้างตารางและกราฟ", desc: "บันทึกคู่ค่า input-output แล้ววาดกราฟเพื่อดูรูปแบบของฟังก์ชัน", iconKey: "LineChart", color: "text-emerald-500", bg: "bg-emerald-50" },
+    { num: 4, title: "เดากฎจากผลลัพธ์", desc: "ซ่อนกฎบางส่วน แล้วใช้ตารางและ output เพื่ออธิบายว่ากฎน่าจะเป็นอะไร", iconKey: "BookOpen", color: "text-amber-500", bg: "bg-amber-50" },
+  ],
+  theoryDescription: "ฟังก์ชันคือความสัมพันธ์ที่ input แต่ละค่าให้ output เพียงค่าเดียวภายใต้กฎเดียวกัน การมองฟังก์ชันผ่านเครื่องฟังก์ชัน ตาราง และกราฟช่วยให้เห็นรูปแบบของกฎได้ชัดขึ้น เมื่อประกอบฟังก์ชัน ลำดับการใช้กฎมีผลต่อ output จึงต้องอ่านจากด้านในออกด้านนอกหรือทำตามลำดับเครื่องมือ",
+  equationLabels: [
+    { label: "x", desc: "ค่า input ที่ใส่เข้าสู่ฟังก์ชัน", color: "text-blue-500" },
+    { label: "f", desc: "กฎหรือกระบวนการที่แปลง input", color: "text-violet-500" },
+    { label: "output", desc: "ผลลัพธ์หลังผ่านกฎของฟังก์ชัน", color: "text-emerald-500" },
+  ],
+  graph: {
+    title: "ตารางและกราฟของฟังก์ชัน",
+    subtitle: "Input-Rule-Output Mapping",
+    xTitle: "input",
+    yTitle: "output",
+    yLabels: ["12", "8", "4", "0"],
+    xLabels: ["-2", "0", "2", "4"],
+    graphType: "line",
+    customPath: "M28,92 L78,70 L128,48 L178,26",
+    pathColor: "#9333ea",
+  },
+});
+
 // Main Export Mapping of all lab details
 export const labDetails: Record<string, LabDetailData> = {
   "newtons-cooling": coolingDetails,
@@ -1702,6 +2135,12 @@ export const labDetails: Record<string, LabDetailData> = {
   "blood-typing": bloodTypingDetails,
   "food-chain": foodChainDetails,
   "heart-rate": heartRateDetails,
+  "graphing-lines": graphingLinesDetails,
+  "ratio-and-proportion": ratioAndProportionDetails,
+  "vector-addition": vectorAdditionDetails,
+  "center-and-variability": centerAndVariabilityDetails,
+  "curve-fitting": curveFittingDetails,
+  "function-builder": functionBuilderDetails,
 };
 
 export const labDetailIds = Object.keys(labDetails);

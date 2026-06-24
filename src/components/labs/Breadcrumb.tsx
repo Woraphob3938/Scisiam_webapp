@@ -10,7 +10,7 @@ interface BreadcrumbProps {
 }
 
 export default function Breadcrumb({ category, title }: BreadcrumbProps) {
-  const categoryHref = ["Physics", "Chemistry", "Biology"].includes(category)
+  const categoryHref = ["Physics", "Chemistry", "Biology", "Mathematics"].includes(category)
     ? `/labs?category=${encodeURIComponent(category)}`
     : "/labs";
 

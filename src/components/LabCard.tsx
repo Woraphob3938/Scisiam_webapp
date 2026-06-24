@@ -9,7 +9,7 @@ export type GradeLevel = "ประถม" | "มัธยมต้น" | "ม�
 export interface LabData {
   id: string;
   title: string;
-  category: "Physics" | "Chemistry" | "Biology";
+  category: "Physics" | "Chemistry" | "Biology" | "Mathematics";
   gradeLevel: GradeLevel;
   status: "ว่าง" | string;
   description: string;
@@ -130,6 +130,27 @@ const PeriodicTableSVG = () => (
     </g>
     <rect x="60" y="95" width="80" height="14" rx="7" fill="#ffffff" stroke="#ddd6fe" />
     <text x="100" y="105" textAnchor="middle" fontSize="7" fontWeight="900" fill="#7c3aed">Periodic Table</text>
+  </svg>
+);
+
+const MathConceptSVG = () => (
+  <svg className="h-32 w-full" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <circle cx="100" cy="60" r="45" fill="#ede9fe" opacity="0.5" />
+    <rect x="35" y="24" width="130" height="72" rx="14" fill="#ffffff" stroke="#c4b5fd" strokeWidth="2" />
+    <path d="M52 78H150" stroke="#e2e8f0" strokeWidth="2" strokeLinecap="round" />
+    <path d="M60 86V38" stroke="#e2e8f0" strokeWidth="2" strokeLinecap="round" />
+    <path d="M60 76 C82 70 92 56 108 58 C124 60 132 42 150 36" stroke="#7c3aed" strokeWidth="4" strokeLinecap="round" fill="none" />
+    <circle cx="60" cy="76" r="4" fill="#7c3aed" />
+    <circle cx="108" cy="58" r="4" fill="#2563eb" />
+    <circle cx="150" cy="36" r="4" fill="#10b981" />
+    <g transform="translate(43 31)">
+      <rect width="42" height="20" rx="10" fill="#f5f3ff" stroke="#ddd6fe" />
+      <text x="21" y="14" textAnchor="middle" fontSize="9" fontWeight="900" fill="#6d28d9">y = mx+b</text>
+    </g>
+    <g transform="translate(116 68)">
+      <rect width="38" height="18" rx="9" fill="#eef2ff" stroke="#c7d2fe" />
+      <text x="19" y="12" textAnchor="middle" fontSize="8" fontWeight="900" fill="#4338ca">data</text>
+    </g>
   </svg>
 );
 
@@ -1027,6 +1048,16 @@ export default function LabCard({
       btnOutline: "border-green-200 text-green-600 hover:bg-green-50/50",
       iconColor: "text-green-500",
     },
+    Mathematics: {
+      border: "border-violet-100 hover:border-violet-300",
+      accentBg: "bg-violet-50/50",
+      accentText: "text-violet-600",
+      glow: "soft-glow-chemistry",
+      badgeColor: "bg-violet-50 text-violet-700 border-violet-100",
+      btnPrimary: "bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white shadow-md shadow-violet-500/10",
+      btnOutline: "border-violet-200 text-violet-700 hover:bg-violet-50/50",
+      iconColor: "text-violet-500",
+    },
   }[lab.category] || {
     border: "border-slate-100 hover:border-slate-300",
     accentBg: "bg-slate-50",
@@ -1116,6 +1147,13 @@ export default function LabCard({
         return <FoodChainSVG />;
       case "heart-rate":
         return <HeartRateSVG />;
+      case "graphing-lines":
+      case "ratio-and-proportion":
+      case "vector-addition":
+      case "center-and-variability":
+      case "curve-fitting":
+      case "function-builder":
+        return <MathConceptSVG />;
       default:
         switch (lab.category) {
           case "Physics":
@@ -1124,6 +1162,8 @@ export default function LabCard({
             return <TitrationSVG />;
           case "Biology":
             return <PhotosynthesisSVG />;
+          case "Mathematics":
+            return <MathConceptSVG />;
           default:
             return (
               <div className="w-full h-32 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-400">

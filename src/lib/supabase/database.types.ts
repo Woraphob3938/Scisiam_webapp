@@ -7,7 +7,7 @@ export type Json =
   | Json[];
 
 export type ScisiamUserRole = "student" | "teacher" | "admin";
-export type ScisiamLabCategory = "Physics" | "Chemistry" | "Biology";
+export type ScisiamLabCategory = "Physics" | "Chemistry" | "Biology" | "Mathematics";
 export type ScisiamLabStatus = "draft" | "ready" | "sandbox" | "archived";
 export type ScisiamProgressStatus = "not_started" | "in_progress" | "completed";
 export type ScisiamSubmissionStatus = "draft" | "submitted" | "reviewed" | "returned";
