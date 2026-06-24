@@ -22,6 +22,8 @@ import {
   Microscope,
   Shuffle,
   Activity,
+  BookOpen,
+  Target,
   LucideIcon
 } from "lucide-react";
 import { getLabDetails } from "@/data/labDetails";
@@ -46,6 +48,8 @@ const iconMap: Record<string, LucideIcon> = {
   Microscope,
   Shuffle,
   Activity,
+  BookOpen,
+  Target,
   ListOrdered,
 };
 

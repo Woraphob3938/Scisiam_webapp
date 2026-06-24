@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { Atom, CircuitBoard, FlaskConical, Gauge, Play, ArrowLeft, Snowflake, Thermometer, Leaf, Dna, Microscope, Weight, Sliders, Zap, Sun } from "lucide-react";
+import { Atom, Calculator, CircuitBoard, FlaskConical, Gauge, Play, ArrowLeft, Snowflake, Thermometer, Leaf, Dna, Microscope, Weight, Sliders, Zap, Sun } from "lucide-react";
 import { getLabReadiness } from "@/data/labReadiness";
 
 interface LabHeroProps {
@@ -650,6 +650,46 @@ type ChemistryHeroVariant =
   | "electrolysis"
   | "colligative";
 
+const mathConceptLabIds = new Set([
+  "graphing-lines",
+  "ratio-and-proportion",
+  "vector-addition",
+  "center-and-variability",
+  "curve-fitting",
+  "function-builder",
+]);
+
+const MathConceptHeroIllustration = () => (
+  <svg className="h-full w-full" viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <circle cx="122" cy="124" r="76" fill="#ddd6fe" opacity="0.42" filter="blur(30px)" />
+    <circle cx="122" cy="124" r="54" fill="#faf5ff" opacity="0.9" />
+
+    <g transform="translate(42 42)">
+      <rect x="0" y="0" width="150" height="138" rx="20" fill="#ffffff" stroke="#c4b5fd" strokeWidth="4" />
+      <path d="M26 18V114M12 100H132" stroke="#cbd5e1" strokeWidth="3.5" strokeLinecap="round" />
+      <path d="M26 82H132M26 64H132M26 46H132M44 18V100M62 18V100M80 18V100M98 18V100M116 18V100" stroke="#ede9fe" strokeWidth="2" />
+      <path d="M26 90C44 76 55 68 72 61C92 52 105 39 132 27" stroke="#7c3aed" strokeWidth="6" strokeLinecap="round" />
+      <path d="M35 37L52 54L72 31" stroke="#10b981" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="44" cy="76" r="5" fill="#2563eb" />
+      <circle cx="72" cy="61" r="5" fill="#7c3aed" />
+      <circle cx="104" cy="40" r="5" fill="#db2777" />
+      <circle cx="132" cy="27" r="5" fill="#f59e0b" />
+    </g>
+
+    <g transform="translate(128 157)">
+      <rect x="0" y="0" width="78" height="38" rx="15" fill="#ffffff" stroke="#ddd6fe" strokeWidth="2" />
+      <text x="39" y="16" fill="#64748b" fontSize="9" fontWeight="800" textAnchor="middle">Math Lab</text>
+      <text x="39" y="30" fill="#7c3aed" fontSize="14" fontWeight="900" textAnchor="middle">y = mx + b</text>
+    </g>
+
+    <g className="animate-pulse">
+      <circle cx="44" cy="185" r="5" fill="#22c55e" opacity="0.75" />
+      <circle cx="201" cy="82" r="4" fill="#a78bfa" opacity="0.8" />
+      <circle cx="190" cy="137" r="3" fill="#38bdf8" opacity="0.7" />
+    </g>
+  </svg>
+);
+
 const ChemistryConceptHeroIllustration = ({ variant }: { variant: ChemistryHeroVariant }) => {
   const isGalvanic = variant === "galvanic";
   const isKinetics = variant === "kinetics";
@@ -803,9 +843,11 @@ export default function LabHero({
   const isPhotoelectric = labId === "photoelectric-effect";
   const isKepler = labId === "keplers-laws";
   const isStefanBoltzmann = labId === "stefan-boltzmann";
+  const isMathematics = category === "Mathematics" || mathConceptLabIds.has(labId);
 
   const isBiology = isPhotosynthesis || isMendelian || isMitosis;
   const HeroIcon = isHookesLaw ? Weight
+    : isMathematics ? Calculator
     : isOhmsLaw ? CircuitBoard
     : isMitosis ? Microscope
     : isMendelian ? Dna
@@ -827,8 +869,8 @@ export default function LabHero({
 
   const chemistryTone = isPeriodicTable || isAcidBase || isBoylesLaw || isCharlesLaw || isIdealGas || isLeChateliers || isBeerLambert || isHesssLaw || isGalvanicCell || isChemicalKinetics || isSolubilityProduct || isAvogadrosLaw || isElectrolysis || isColligative;
   const readiness = getLabReadiness(labId);
-  const iconClass = isBiology ? "bg-emerald-600 shadow-emerald-500/20" : chemistryTone ? "bg-violet-600 shadow-violet-500/20" : "bg-blue-600 shadow-blue-500/20";
-  const badgeClass = isBiology ? "bg-emerald-50 text-emerald-700 border-emerald-100" : chemistryTone ? "bg-violet-50 text-violet-700 border-violet-100" : "bg-blue-50 text-blue-700 border-blue-100";
+  const iconClass = isMathematics ? "bg-indigo-600 shadow-indigo-500/20" : isBiology ? "bg-emerald-600 shadow-emerald-500/20" : chemistryTone ? "bg-violet-600 shadow-violet-500/20" : "bg-blue-600 shadow-blue-500/20";
+  const badgeClass = isMathematics ? "bg-indigo-50 text-indigo-700 border-indigo-100" : isBiology ? "bg-emerald-50 text-emerald-700 border-emerald-100" : chemistryTone ? "bg-violet-50 text-violet-700 border-violet-100" : "bg-blue-50 text-blue-700 border-blue-100";
 
   return (
     <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-12 md:px-20 py-3 select-none">
@@ -935,6 +977,8 @@ export default function LabHero({
             <KeplersHeroIllustration />
           ) : isStefanBoltzmann ? (
             <StefanBoltzmannHeroIllustration />
+          ) : isMathematics ? (
+            <MathConceptHeroIllustration />
           ) : isMitosis ? (
             <svg className="w-full h-full" viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
               <circle cx="122" cy="124" r="74" fill="#cffafe" opacity="0.4" filter="blur(30px)" />

@@ -41,16 +41,31 @@ export const chemistryConceptSimulationLabIds = [
   "colligative-properties",
 ] as const;
 
+export const mathConceptSimulationLabIds = [
+  "graphing-lines",
+  "ratio-and-proportion",
+  "vector-addition",
+  "center-and-variability",
+  "curve-fitting",
+  "function-builder",
+] as const;
+
 export type DirectSimulationLabId = (typeof directSimulationLabIds)[number];
 export type ChemistryConceptSimulationLabId = (typeof chemistryConceptSimulationLabIds)[number];
-export type ReadySimulationLabId = DirectSimulationLabId | ChemistryConceptSimulationLabId;
+export type MathConceptSimulationLabId = (typeof mathConceptSimulationLabIds)[number];
+export type ReadySimulationLabId =
+  | DirectSimulationLabId
+  | ChemistryConceptSimulationLabId
+  | MathConceptSimulationLabId;
 
 const directSimulationLabIdSet = new Set<string>(directSimulationLabIds);
 const chemistryConceptSimulationLabIdSet = new Set<string>(chemistryConceptSimulationLabIds);
+const mathConceptSimulationLabIdSet = new Set<string>(mathConceptSimulationLabIds);
 
 export const readySimulationLabIds = [
   ...directSimulationLabIds,
   ...chemistryConceptSimulationLabIds,
+  ...mathConceptSimulationLabIds,
 ] as const;
 
 export const readySimulationLabIdSet = new Set<string>(readySimulationLabIds);
@@ -63,6 +78,12 @@ export function isChemistryConceptSimulationLabId(
   labId: string
 ): labId is ChemistryConceptSimulationLabId {
   return chemistryConceptSimulationLabIdSet.has(labId);
+}
+
+export function isMathConceptSimulationLabId(
+  labId: string
+): labId is MathConceptSimulationLabId {
+  return mathConceptSimulationLabIdSet.has(labId);
 }
 
 export function isReadySimulationLabId(labId: string): labId is ReadySimulationLabId {

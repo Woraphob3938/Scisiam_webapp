@@ -30,7 +30,7 @@ import { isLabReady } from "@/data/labReadiness";
 
 const INITIAL_VISIBLE_LABS = 12;
 const LABS_RETURN_STATE_KEY = "scisiam_labs_return_state";
-const VALID_CATEGORIES: Category[] = ["All", "Foundation", "Physics", "Chemistry", "Biology"];
+const VALID_CATEGORIES: Category[] = ["All", "Foundation", "Physics", "Chemistry", "Biology", "Mathematics"];
 type GradeFilter = "All" | GradeLevel;
 const GRADE_FILTERS: Array<{ id: GradeFilter; label: string }> = [
   { id: "All", label: "ทุกระดับ" },
@@ -44,6 +44,7 @@ const CATEGORY_LABELS: Record<Category, string> = {
   Physics: "ฟิสิกส์",
   Chemistry: "เคมี",
   Biology: "ชีววิทยา",
+  Mathematics: "คณิตศาสตร์",
 };
 
 type LabsReturnState = {
@@ -126,6 +127,7 @@ const FOUNDATION_TRACK_LABELS: Record<FoundationTrack, string> = {
   Physics: "ต่อยอดฟิสิกส์",
   Chemistry: "ต่อยอดเคมี",
   Biology: "ต่อยอดชีววิทยา",
+  Mathematics: "ต่อยอดคณิตศาสตร์",
 };
 
 const FOUNDATION_TRACK_STYLES: Record<
@@ -155,6 +157,12 @@ const FOUNDATION_TRACK_STYLES: Record<
     icon: "bg-emerald-50 text-emerald-600 ring-emerald-100",
     badge: "border-emerald-100 bg-emerald-50 text-emerald-700",
     button: "border-emerald-100 bg-white text-emerald-700 hover:bg-emerald-50",
+  },
+  Mathematics: {
+    card: "border-violet-100 bg-violet-50/25",
+    icon: "bg-violet-50 text-violet-600 ring-violet-100",
+    badge: "border-violet-100 bg-violet-50 text-violet-700",
+    button: "border-violet-100 bg-white text-violet-700 hover:bg-violet-50",
   },
 };
 

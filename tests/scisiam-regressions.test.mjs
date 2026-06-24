@@ -191,6 +191,25 @@ test("simulation route code-splits heavy lab implementations", () => {
   );
 });
 
+test("graphing lines math lab uses its own interactive simulation", () => {
+  const route = readProjectFile("src/app/labs/[id]/simulation/page.tsx");
+  const simulationFile = "src/components/labs/simulation/GraphingLinesSimulation.tsx";
+
+  assert.equal(existsSync(join(rootDir, simulationFile)), true, `${simulationFile} should exist`);
+  assert.match(
+    route,
+    /const GraphingLinesSimulation = dynamic\(\(\) =>\s*import\("@\/components\/labs\/simulation\/GraphingLinesSimulation"\)/,
+  );
+  assert.match(route, /labId === "graphing-lines"/);
+  assert.match(route, /<GraphingLinesSimulation\s*\/>/);
+
+  const source = readProjectFile(simulationFile);
+  assert.match(source, /<SharedSimulationShell/);
+  assert.match(source, /labId="graphing-lines"/);
+  assert.match(source, /y = mx \+ b/);
+  assert.match(source, /localStorageKey: "scisiam_saved_graphing_lines_experiment"/);
+});
+
 test("final biology lab simulation components exist with save integration", () => {
   for (const lab of finalBiologySimulationLabs) {
     const absolutePath = join(rootDir, lab.file);

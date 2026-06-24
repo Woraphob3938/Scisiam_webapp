@@ -36,6 +36,12 @@ export const LAB_SAVED_EXPERIMENT_KEYS: Record<string, string> = {
   "blood-typing": "scisiam_saved_blood_typing_experiment",
   "food-chain": "scisiam_saved_food_chain_experiment",
   "heart-rate": "scisiam_saved_heart_rate_experiment",
+  "graphing-lines": "scisiam_saved_graphing_lines_experiment",
+  "ratio-and-proportion": "scisiam_saved_ratio_proportion_experiment",
+  "vector-addition": "scisiam_saved_vector_addition_experiment",
+  "center-and-variability": "scisiam_saved_center_variability_experiment",
+  "curve-fitting": "scisiam_saved_curve_fitting_experiment",
+  "function-builder": "scisiam_saved_function_builder_experiment",
 };
 
 export function getSavedExperimentKey(labId: string) {

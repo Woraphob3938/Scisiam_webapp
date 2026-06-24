@@ -33,7 +33,7 @@ import {
 } from "@/lib/supabase/learning-snapshot";
 import { SCISIAM_AUTH_EVENT, SCISIAM_POINTS_EVENT } from "@/lib/supabase/auth-cache";
 
-type CategoryFilter = "All" | "Physics" | "Chemistry" | "Biology";
+type CategoryFilter = "All" | "Physics" | "Chemistry" | "Biology" | "Mathematics";
 
 type HistorySource = "cloud" | "local";
 
@@ -90,18 +90,26 @@ const categoryFilters: Array<{
     shortLabel: "ชีววิทยา",
     tone: "border-emerald-100 bg-emerald-50 text-emerald-700",
   },
+  {
+    id: "Mathematics",
+    label: "Mathematics",
+    shortLabel: "คณิตศาสตร์",
+    tone: "border-violet-100 bg-violet-50 text-violet-700",
+  },
 ];
 
 const categoryLabels: Record<Exclude<CategoryFilter, "All">, string> = {
   Physics: "ฟิสิกส์",
   Chemistry: "เคมี",
   Biology: "ชีววิทยา",
+  Mathematics: "คณิตศาสตร์",
 };
 
 const categoryBarTone: Record<Exclude<CategoryFilter, "All">, string> = {
   Physics: "bg-blue-500",
   Chemistry: "bg-purple-500",
   Biology: "bg-emerald-500",
+  Mathematics: "bg-violet-500",
 };
 
 function formatDateTime(value: string) {
@@ -286,7 +294,7 @@ export default function LearningHistoryPage() {
 
   const categoryProgress = useMemo(
     () =>
-      (["Physics", "Chemistry", "Biology"] as const).map((item) => {
+      (["Physics", "Chemistry", "Biology", "Mathematics"] as const).map((item) => {
         const total = labsData.filter((lab) => lab.category === item).length;
         const completed = labsData.filter(
           (lab) => lab.category === item && completedLabIds.has(lab.id)
