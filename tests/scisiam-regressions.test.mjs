@@ -82,6 +82,49 @@ test("lab detail sidebar derives guidance from shared lab data", () => {
   assert.doesNotMatch(source, /บันทึกข้อมูลและค่าอุณหภูมิอย่างสม่ำเสมอ/);
 });
 
+test("mathematics lab cards use lab-specific SVG illustrations", () => {
+  const source = readProjectFile("src/components/LabCard.tsx");
+  const mathIllustrations = [
+    ["graphing-lines", "GraphingLinesCardSVG"],
+    ["ratio-and-proportion", "RatioProportionCardSVG"],
+    ["vector-addition", "VectorAdditionCardSVG"],
+    ["center-and-variability", "CenterVariabilityCardSVG"],
+    ["curve-fitting", "CurveFittingCardSVG"],
+    ["function-builder", "FunctionBuilderCardSVG"],
+  ];
+
+  for (const [labId, component] of mathIllustrations) {
+    assert.match(source, new RegExp(`const ${component} = \\(\\) =>`));
+    assert.match(source, new RegExp(`data-testid="${labId}-card-svg"`));
+    assert.match(source, new RegExp(`case "${labId}":\\s*return <${component} \\/>;`));
+  }
+
+  assert.doesNotMatch(
+    source,
+    /case "graphing-lines":\s*case "ratio-and-proportion":\s*case "vector-addition":\s*case "center-and-variability":\s*case "curve-fitting":\s*case "function-builder":\s*return <MathConceptSVG \/>;/
+  );
+});
+
+test("mathematics lab detail heroes use lab-specific SVG variants", () => {
+  const source = readProjectFile("src/components/labs/LabHero.tsx");
+  const mathLabIds = [
+    "graphing-lines",
+    "ratio-and-proportion",
+    "vector-addition",
+    "center-and-variability",
+    "curve-fitting",
+    "function-builder",
+  ];
+
+  for (const labId of mathLabIds) {
+    assert.match(source, new RegExp(`"${labId}": "${labId}"`));
+  }
+
+  assert.match(source, /data-testid=\{`math-hero-\$\{variant\}`\}/);
+  assert.match(source, /<MathConceptHeroIllustration labId=\{labId\} \/>/);
+  assert.doesNotMatch(source, /isMathematics \? \(\s*<MathConceptHeroIllustration \/>/);
+});
+
 test("lab detail layout avoids a duplicate bottom start CTA", () => {
   const source = readProjectFile("src/components/labs/LabDetailLayout.tsx");
 
@@ -191,6 +234,21 @@ test("simulation route code-splits heavy lab implementations", () => {
   );
 });
 
+test("shared simulation shell places live metrics inside the stage content area", () => {
+  const source = readProjectFile("src/components/labs/simulation/SharedSimulationShell.tsx");
+
+  assert.doesNotMatch(source, /showLiveMetrics && <div className="hidden sm:block">\{liveMetricsCard\}<\/div>/);
+  assert.match(source, /data-testid="simulation-stage-content"/);
+  assert.match(source, /data-testid="simulation-stage-scene"/);
+  assert.match(source, /data-testid="simulation-stage-metrics"/);
+  assert.doesNotMatch(source, /xl:grid-cols-\[minmax\(0,1fr\)_320px\]/);
+  assert.match(source, /data-testid="simulation-stage-content"[\s\S]*className="relative h-full/);
+  assert.match(source, /data-testid="simulation-stage-scene"[\s\S]*className=\{`h-full min-h-0/);
+  assert.match(source, /showLiveMetrics \? "xl:mr-\[336px\]" : ""/);
+  assert.match(source, /<aside data-testid="simulation-stage-metrics" className="pointer-events-none absolute right-3 top-3 z-20 hidden w-\[320px\] max-w-\[calc\(100%-24px\)\] xl:block">/);
+  assert.match(source, /drawerSummary \?\? \(showLiveMetrics && liveMetricsCard\)/);
+});
+
 test("graphing lines math lab uses its own interactive simulation", () => {
   const route = readProjectFile("src/app/labs/[id]/simulation/page.tsx");
   const simulationFile = "src/components/labs/simulation/GraphingLinesSimulation.tsx";
@@ -227,6 +285,169 @@ test("ratio and proportion math lab uses its own interactive simulation", () => 
   assert.match(source, /labId="ratio-and-proportion"/);
   assert.match(source, /a \/ b = c \/ d/);
   assert.match(source, /localStorageKey: "scisiam_saved_ratio_proportion_experiment"/);
+});
+
+test("ratio and proportion drawer summary exposes manual numeric inputs", () => {
+  const simulationFile = "src/components/labs/simulation/RatioProportionSimulation.tsx";
+  const source = readProjectFile(simulationFile);
+
+  assert.match(source, /drawerSummary=\{drawerSummary\}/);
+  assert.match(source, /Manual number input/);
+  assert.match(source, /ariaLabel="Enter base quantity A"/);
+  assert.match(source, /ariaLabel="Enter base quantity B"/);
+  assert.match(source, /ariaLabel="Enter scale factor"/);
+  assert.match(source, /label="scale"[\s\S]*?tone="pink"/);
+  assert.match(source, /label="Scale factor"[\s\S]*?tone="pink"/);
+  assert.match(source, /ariaLabel="Enter given value c"/);
+  assert.match(source, /aria-label=\{ariaLabel\}/);
+});
+
+test("all mathematics simulation drawers expose manual numeric inputs", () => {
+  const manualInputsBySimulation = [
+    {
+      file: "src/components/labs/simulation/GraphingLinesSimulation.tsx",
+      labels: ["Enter slope m", "Enter y-intercept b", "Enter probe x"],
+    },
+    {
+      file: "src/components/labs/simulation/RatioProportionSimulation.tsx",
+      labels: ["Enter base quantity A", "Enter base quantity B", "Enter scale factor", "Enter given value c"],
+    },
+    {
+      file: "src/components/labs/simulation/VectorAdditionSimulation.tsx",
+      labels: ["Enter vector A magnitude", "Enter vector A angle", "Enter vector B magnitude", "Enter vector B angle"],
+    },
+    {
+      file: "src/components/labs/simulation/CenterVariabilitySimulation.tsx",
+      labels: ["Enter selected data point", "Enter selected data value"],
+    },
+    {
+      file: "src/components/labs/simulation/CurveFittingSimulation.tsx",
+      labels: ["Enter selected trend point", "Enter selected point x", "Enter selected point y"],
+    },
+    {
+      file: "src/components/labs/simulation/FunctionBuilderSimulation.tsx",
+      labels: ["Enter input x", "Enter scale a", "Enter horizontal shift h", "Enter vertical shift k"],
+    },
+  ];
+
+  for (const { file, labels } of manualInputsBySimulation) {
+    const source = readProjectFile(file);
+    assert.match(source, /drawerSummary=\{drawerSummary\}/, `${file} should pass drawerSummary to the shell`);
+    assert.match(source, /ManualNumberInput/, `${file} should expose manual number inputs`);
+
+    for (const label of labels) {
+      assert.match(source, new RegExp(`ariaLabel="${label}"`), `${file} should expose ${label}`);
+    }
+  }
+});
+
+test("ratio and proportion stage uses compact balanced sizing", () => {
+  const simulationFile = "src/components/labs/simulation/RatioProportionSimulation.tsx";
+  const source = readProjectFile(simulationFile);
+
+  assert.match(source, /data-testid="ratio-proportion-stage"/);
+  assert.match(source, /data-testid="ratio-proportion-bars-panel"/);
+  assert.match(source, /data-testid="ratio-proportion-graph-panel"/);
+  assert.doesNotMatch(source, /top-\[118px\]/);
+  assert.match(source, /top-\[104px\]/);
+  assert.match(source, /lg:grid-cols-\[minmax\(0,0\.92fr\)_280px\]/);
+  assert.doesNotMatch(source, /className="h-6 overflow-hidden rounded-full bg-slate-100"/);
+  assert.match(source, /className="h-4 overflow-hidden rounded-full bg-slate-100"/);
+  assert.match(source, /className="h-\[calc\(100%-28px\)\] min-h-\[190px\] w-full"/);
+});
+
+test("vector addition math lab uses its own interactive simulation", () => {
+  const route = readProjectFile("src/app/labs/[id]/simulation/page.tsx");
+  const simulationFile = "src/components/labs/simulation/VectorAdditionSimulation.tsx";
+
+  assert.equal(existsSync(join(rootDir, simulationFile)), true, `${simulationFile} should exist`);
+  assert.match(
+    route,
+    /const VectorAdditionSimulation = dynamic\(\(\) =>\s*import\("@\/components\/labs\/simulation\/VectorAdditionSimulation"\)/,
+  );
+  assert.match(route, /labId === "vector-addition"/);
+  assert.match(route, /<VectorAdditionSimulation\s*\/>/);
+
+  const source = readProjectFile(simulationFile);
+  assert.match(source, /<SharedSimulationShell/);
+  assert.match(source, /labId="vector-addition"/);
+  assert.match(source, /A \+ B = R/);
+  assert.match(source, /head-to-tail/);
+  assert.match(source, /localStorageKey: "scisiam_saved_vector_addition_experiment"/);
+});
+
+test("center and variability math lab uses its own interactive simulation", () => {
+  const route = readProjectFile("src/app/labs/[id]/simulation/page.tsx");
+  const simulationFile = "src/components/labs/simulation/CenterVariabilitySimulation.tsx";
+
+  assert.equal(existsSync(join(rootDir, simulationFile)), true, `${simulationFile} should exist`);
+  assert.match(
+    route,
+    /const CenterVariabilitySimulation = dynamic\(\(\) =>\s*import\("@\/components\/labs\/simulation\/CenterVariabilitySimulation"\)/,
+  );
+  assert.match(route, /labId === "center-and-variability"/);
+  assert.match(route, /<CenterVariabilitySimulation\s*\/>/);
+
+  const source = readProjectFile(simulationFile);
+  assert.match(source, /<SharedSimulationShell/);
+  assert.match(source, /labId="center-and-variability"/);
+  assert.match(source, /mean/);
+  assert.match(source, /median/);
+  assert.match(source, /IQR/);
+  assert.match(source, /standard deviation/);
+  assert.match(source, /localStorageKey: "scisiam_saved_center_variability_experiment"/);
+});
+
+test("curve fitting math lab uses its own interactive simulation", () => {
+  const route = readProjectFile("src/app/labs/[id]/simulation/page.tsx");
+  const simulationFile = "src/components/labs/simulation/CurveFittingSimulation.tsx";
+
+  assert.equal(existsSync(join(rootDir, simulationFile)), true, `${simulationFile} should exist`);
+  assert.match(
+    route,
+    /const CurveFittingSimulation = dynamic\(\(\) =>\s*import\("@\/components\/labs\/simulation\/CurveFittingSimulation"\)/,
+  );
+  assert.match(route, /labId === "curve-fitting"/);
+  assert.match(route, /<CurveFittingSimulation\s*\/>/);
+
+  const source = readProjectFile(simulationFile);
+  assert.match(source, /<SharedSimulationShell/);
+  assert.match(source, /labId="curve-fitting"/);
+  assert.match(source, /trend line/);
+  assert.match(source, /R\^2/);
+  assert.match(source, /residual/);
+  assert.match(source, /localStorageKey: "scisiam_saved_curve_fitting_experiment"/);
+});
+
+test("function builder math lab uses its own interactive simulation", () => {
+  const route = readProjectFile("src/app/labs/[id]/simulation/page.tsx");
+  const simulationFile = "src/components/labs/simulation/FunctionBuilderSimulation.tsx";
+
+  assert.equal(existsSync(join(rootDir, simulationFile)), true, `${simulationFile} should exist`);
+  assert.match(
+    route,
+    /const FunctionBuilderSimulation = dynamic\(\(\) =>\s*import\("@\/components\/labs\/simulation\/FunctionBuilderSimulation"\)/,
+  );
+  assert.match(route, /labId === "function-builder"/);
+  assert.match(route, /<FunctionBuilderSimulation\s*\/>/);
+
+  const source = readProjectFile(simulationFile);
+  assert.match(source, /<SharedSimulationShell/);
+  assert.match(source, /labId="function-builder"/);
+  assert.match(source, /function machine/);
+  assert.match(source, /input/);
+  assert.match(source, /output/);
+  assert.match(source, /f\(x\)/);
+  assert.match(source, /localStorageKey: "scisiam_saved_function_builder_experiment"/);
+});
+
+test("curve fitting stage keeps helper cards out of the chart overlay layer", () => {
+  const source = readProjectFile("src/components/labs/simulation/CurveFittingSimulation.tsx");
+
+  assert.doesNotMatch(source, /absolute right-5 top-5/);
+  assert.match(source, /data-testid="curve-fitting-stage-header"/);
+  assert.match(source, /data-testid="curve-fitting-chart"/);
+  assert.match(source, /className="relative flex h-full w-full flex-col overflow-hidden/);
 });
 
 test("final biology lab simulation components exist with save integration", () => {

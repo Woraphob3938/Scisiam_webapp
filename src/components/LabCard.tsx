@@ -154,6 +154,116 @@ const MathConceptSVG = () => (
   </svg>
 );
 
+const GraphingLinesCardSVG = () => (
+  <svg data-testid="graphing-lines-card-svg" className="h-32 w-full" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <circle cx="100" cy="60" r="45" fill="#ede9fe" opacity="0.5" />
+    <rect x="34" y="24" width="132" height="74" rx="16" fill="#ffffff" stroke="#c4b5fd" strokeWidth="2" />
+    <path d="M54 84H154M60 88V34" stroke="#e2e8f0" strokeWidth="2" strokeLinecap="round" />
+    <path d="M58 78L150 34" stroke="#7c3aed" strokeWidth="4" strokeLinecap="round" />
+    <path d="M105 56H136V41" stroke="#f97316" strokeWidth="3" strokeLinecap="round" strokeDasharray="5 4" />
+    <circle cx="76" cy="69" r="5" fill="#7c3aed" />
+    <circle cx="150" cy="34" r="5" fill="#10b981" />
+    <circle cx="61" cy="76" r="3" fill="#f59e0b" />
+    <text x="68" y="40" fontSize="9" fontWeight="900" fill="#6d28d9">m</text>
+    <text x="64" y="72" fontSize="9" fontWeight="900" fill="#f59e0b">b</text>
+    <rect x="112" y="67" width="34" height="16" rx="8" fill="#fff7ed" stroke="#fed7aa" />
+    <text x="129" y="78" textAnchor="middle" fontSize="7" fontWeight="900" fill="#ea580c">rise/run</text>
+  </svg>
+);
+
+const RatioProportionCardSVG = () => (
+  <svg data-testid="ratio-and-proportion-card-svg" className="h-32 w-full" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <circle cx="100" cy="60" r="45" fill="#ede9fe" opacity="0.5" />
+    <rect x="36" y="26" width="128" height="68" rx="16" fill="#ffffff" stroke="#c4b5fd" strokeWidth="2" />
+    <rect x="54" y="38" width="35" height="14" rx="7" fill="#7c3aed" />
+    <rect x="54" y="57" width="52" height="14" rx="7" fill="#06b6d4" />
+    <text x="122" y="51" fontSize="17" fontWeight="900" fill="#0f172a">2:3</text>
+    <path d="M84 82H116" stroke="#8b5cf6" strokeWidth="3" strokeLinecap="round" />
+    <path d="M110 76L118 82L110 88" stroke="#8b5cf6" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+    <rect x="123" y="73" width="31" height="17" rx="8.5" fill="#ecfeff" stroke="#bae6fd" />
+    <text x="138.5" y="85" textAnchor="middle" fontSize="9" fontWeight="900" fill="#0891b2">x4</text>
+    <text x="54" y="88" fontSize="14" fontWeight="900" fill="#0f172a">8:12</text>
+  </svg>
+);
+
+const VectorAdditionCardSVG = () => (
+  <svg data-testid="vector-addition-card-svg" className="h-32 w-full" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <circle cx="100" cy="60" r="45" fill="#ede9fe" opacity="0.5" />
+    <rect x="40" y="22" width="120" height="76" rx="16" fill="#ffffff" stroke="#c4b5fd" strokeWidth="2" />
+    <path d="M57 82H147M70 92V34" stroke="#e2e8f0" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M70 82L119 54" stroke="#7c3aed" strokeWidth="5" strokeLinecap="round" />
+    <path d="M119 54L135 47L127 62Z" fill="#7c3aed" />
+    <path d="M119 54L138 76" stroke="#06b6d4" strokeWidth="5" strokeLinecap="round" />
+    <path d="M138 76L142 92L126 84Z" fill="#06b6d4" />
+    <path d="M70 82L138 76" stroke="#f97316" strokeWidth="4" strokeLinecap="round" strokeDasharray="5 4" />
+    <path d="M138 76L151 69L147 84Z" fill="#f97316" />
+    <circle cx="70" cy="82" r="4" fill="#0f172a" />
+    <text x="99" y="53" fontSize="10" fontWeight="900" fill="#6d28d9">A</text>
+    <text x="134" y="70" fontSize="10" fontWeight="900" fill="#0891b2">B</text>
+    <text x="104" y="77" fontSize="10" fontWeight="900" fill="#ea580c">R</text>
+  </svg>
+);
+
+const CenterVariabilityCardSVG = () => (
+  <svg data-testid="center-and-variability-card-svg" className="h-32 w-full" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <circle cx="100" cy="60" r="45" fill="#ede9fe" opacity="0.5" />
+    <rect x="35" y="25" width="130" height="70" rx="16" fill="#ffffff" stroke="#c4b5fd" strokeWidth="2" />
+    <path d="M50 68H150" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" />
+    {[60, 76, 76, 92, 108, 108, 124, 140].map((x, index) => (
+      <circle key={`${x}-${index}`} cx={x} cy={index % 2 === 0 ? 58 : 48} r="6" fill="#0891b2" stroke="#ffffff" strokeWidth="2" />
+    ))}
+    <path d="M69 83H131M83 78V88M117 78V88" stroke="#475569" strokeWidth="3" strokeLinecap="round" />
+    <rect x="86" y="75" width="28" height="16" rx="6" fill="#f5f3ff" stroke="#7c3aed" strokeWidth="2" />
+    <path d="M100 75V91" stroke="#7c3aed" strokeWidth="3" strokeLinecap="round" />
+    <text x="51" y="38" fontSize="8" fontWeight="900" fill="#6d28d9">mean</text>
+    <text x="122" y="38" fontSize="8" fontWeight="900" fill="#0891b2">IQR</text>
+  </svg>
+);
+
+const CurveFittingCardSVG = () => (
+  <svg data-testid="curve-fitting-card-svg" className="h-32 w-full" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <circle cx="100" cy="60" r="45" fill="#ede9fe" opacity="0.5" />
+    <rect x="36" y="24" width="128" height="74" rx="16" fill="#ffffff" stroke="#c4b5fd" strokeWidth="2" />
+    <path d="M54 84H148M60 88V36" stroke="#e2e8f0" strokeWidth="2" strokeLinecap="round" />
+    <path d="M58 80C80 70 95 59 112 51C126 45 139 40 150 32" stroke="#7c3aed" strokeWidth="4" strokeLinecap="round" />
+    {[
+      [64, 76],
+      [82, 66],
+      [98, 59],
+      [116, 50],
+      [135, 43],
+      [148, 34],
+    ].map(([x, y]) => (
+      <g key={`${x}-${y}`}>
+        <path d={`M${x} ${y}V${y + 10}`} stroke="#f97316" strokeWidth="2" strokeDasharray="3 3" />
+        <circle cx={x} cy={y} r="5" fill="#7c3aed" stroke="#ffffff" strokeWidth="2" />
+      </g>
+    ))}
+    <rect x="103" y="70" width="42" height="16" rx="8" fill="#ecfeff" stroke="#bae6fd" />
+    <text x="124" y="81" textAnchor="middle" fontSize="8" fontWeight="900" fill="#0891b2">R2 fit</text>
+  </svg>
+);
+
+const FunctionBuilderCardSVG = () => (
+  <svg data-testid="function-builder-card-svg" className="h-32 w-full" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <circle cx="100" cy="60" r="45" fill="#ede9fe" opacity="0.5" />
+    <rect x="30" y="28" width="38" height="32" rx="10" fill="#ecfeff" stroke="#bae6fd" />
+    <text x="49" y="48" textAnchor="middle" fontSize="12" fontWeight="900" fill="#0891b2">x</text>
+    <path d="M72 44H88" stroke="#cbd5e1" strokeWidth="3" strokeLinecap="round" />
+    <path d="M83 38L90 44L83 50" stroke="#cbd5e1" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+    <rect x="91" y="20" width="48" height="52" rx="14" fill="#7c3aed" />
+    <text x="115" y="38" textAnchor="middle" fontSize="8" fontWeight="900" fill="#ffffff">rule</text>
+    <text x="115" y="54" textAnchor="middle" fontSize="9" fontWeight="900" fill="#ffffff">f(x)</text>
+    <path d="M143 44H158" stroke="#cbd5e1" strokeWidth="3" strokeLinecap="round" />
+    <path d="M153 38L160 44L153 50" stroke="#cbd5e1" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+    <rect x="162" y="28" width="32" height="32" rx="10" fill="#fff7ed" stroke="#fed7aa" />
+    <text x="178" y="48" textAnchor="middle" fontSize="12" fontWeight="900" fill="#ea580c">y</text>
+    <rect x="58" y="80" width="86" height="18" rx="9" fill="#f8fafc" stroke="#e2e8f0" />
+    <path d="M67 92C84 90 94 86 105 88C118 90 126 83 138 82" stroke="#06b6d4" strokeWidth="3" strokeLinecap="round" />
+    <text x="100" y="76" textAnchor="middle" fontSize="8" fontWeight="900" fill="#6d28d9">f(x)=ax+k</text>
+  </svg>
+);
+
 // 4. Boyle's Law SVG
 const BoylesLawSVG = () => (
   <svg className="w-full h-32" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1148,12 +1258,17 @@ export default function LabCard({
       case "heart-rate":
         return <HeartRateSVG />;
       case "graphing-lines":
+        return <GraphingLinesCardSVG />;
       case "ratio-and-proportion":
+        return <RatioProportionCardSVG />;
       case "vector-addition":
+        return <VectorAdditionCardSVG />;
       case "center-and-variability":
+        return <CenterVariabilityCardSVG />;
       case "curve-fitting":
+        return <CurveFittingCardSVG />;
       case "function-builder":
-        return <MathConceptSVG />;
+        return <FunctionBuilderCardSVG />;
       default:
         switch (lab.category) {
           case "Physics":

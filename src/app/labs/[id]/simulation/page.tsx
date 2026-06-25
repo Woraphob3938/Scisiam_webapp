@@ -91,6 +91,14 @@ const GraphingLinesSimulation = dynamic(() =>
   import("@/components/labs/simulation/GraphingLinesSimulation"));
 const RatioProportionSimulation = dynamic(() =>
   import("@/components/labs/simulation/RatioProportionSimulation"));
+const VectorAdditionSimulation = dynamic(() =>
+  import("@/components/labs/simulation/VectorAdditionSimulation"));
+const CenterVariabilitySimulation = dynamic(() =>
+  import("@/components/labs/simulation/CenterVariabilitySimulation"));
+const CurveFittingSimulation = dynamic(() =>
+  import("@/components/labs/simulation/CurveFittingSimulation"));
+const FunctionBuilderSimulation = dynamic(() =>
+  import("@/components/labs/simulation/FunctionBuilderSimulation"));
 
 const simulationComponents: Record<DirectSimulationLabId, React.ComponentType> = {
   "newtons-cooling": NewtonsCoolingSimulation,
@@ -254,6 +262,22 @@ export default function SimulationRoomPage() {
 
   if (labId === "ratio-and-proportion") {
     return <RatioProportionSimulation />;
+  }
+
+  if (labId === "vector-addition") {
+    return <VectorAdditionSimulation />;
+  }
+
+  if (labId === "center-and-variability") {
+    return <CenterVariabilitySimulation />;
+  }
+
+  if (labId === "curve-fitting") {
+    return <CurveFittingSimulation />;
+  }
+
+  if (labId === "function-builder") {
+    return <FunctionBuilderSimulation />;
   }
 
   if (isMathConceptSimulationLabId(labId)) {
