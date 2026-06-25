@@ -89,6 +89,8 @@ const CardiovascularSystemSimulation = dynamic(() =>
   import("@/components/labs/simulation/CardiovascularSystemSimulation"));
 const GraphingLinesSimulation = dynamic(() =>
   import("@/components/labs/simulation/GraphingLinesSimulation"));
+const RatioProportionSimulation = dynamic(() =>
+  import("@/components/labs/simulation/RatioProportionSimulation"));
 
 const simulationComponents: Record<DirectSimulationLabId, React.ComponentType> = {
   "newtons-cooling": NewtonsCoolingSimulation,
@@ -248,6 +250,10 @@ export default function SimulationRoomPage() {
 
   if (labId === "graphing-lines") {
     return <GraphingLinesSimulation />;
+  }
+
+  if (labId === "ratio-and-proportion") {
+    return <RatioProportionSimulation />;
   }
 
   if (isMathConceptSimulationLabId(labId)) {

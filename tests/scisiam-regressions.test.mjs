@@ -210,6 +210,25 @@ test("graphing lines math lab uses its own interactive simulation", () => {
   assert.match(source, /localStorageKey: "scisiam_saved_graphing_lines_experiment"/);
 });
 
+test("ratio and proportion math lab uses its own interactive simulation", () => {
+  const route = readProjectFile("src/app/labs/[id]/simulation/page.tsx");
+  const simulationFile = "src/components/labs/simulation/RatioProportionSimulation.tsx";
+
+  assert.equal(existsSync(join(rootDir, simulationFile)), true, `${simulationFile} should exist`);
+  assert.match(
+    route,
+    /const RatioProportionSimulation = dynamic\(\(\) =>\s*import\("@\/components\/labs\/simulation\/RatioProportionSimulation"\)/,
+  );
+  assert.match(route, /labId === "ratio-and-proportion"/);
+  assert.match(route, /<RatioProportionSimulation\s*\/>/);
+
+  const source = readProjectFile(simulationFile);
+  assert.match(source, /<SharedSimulationShell/);
+  assert.match(source, /labId="ratio-and-proportion"/);
+  assert.match(source, /a \/ b = c \/ d/);
+  assert.match(source, /localStorageKey: "scisiam_saved_ratio_proportion_experiment"/);
+});
+
 test("final biology lab simulation components exist with save integration", () => {
   for (const lab of finalBiologySimulationLabs) {
     const absolutePath = join(rootDir, lab.file);
