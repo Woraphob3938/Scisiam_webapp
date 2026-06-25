@@ -62,6 +62,11 @@ function simplifyRatio(first: number, second: number) {
   return `${first / divisor}:${second / divisor}`;
 }
 
+function clampNumber(value: number, min: number, max: number) {
+  if (!Number.isFinite(value)) return min;
+  return Math.min(max, Math.max(min, value));
+}
+
 function RatioStage({
   baseA,
   baseB,
@@ -96,53 +101,53 @@ function RatioStage({
   const path = points.map((point, index) => `${index === 0 ? "M" : "L"}${point.x},${point.y}`).join(" ");
 
   return (
-    <div className="relative h-full w-full overflow-hidden bg-gradient-to-br from-violet-50 via-white to-cyan-50">
-      <div className="absolute left-4 top-4 z-10 max-w-[360px] rounded-2xl border border-white/80 bg-white/92 px-4 py-3 shadow-lg shadow-violet-100/70 backdrop-blur-md">
+    <div data-testid="ratio-proportion-stage" className="relative h-full w-full overflow-hidden bg-gradient-to-br from-violet-50 via-white to-cyan-50">
+      <div className="absolute left-4 top-4 z-10 max-w-[320px] rounded-2xl border border-white/80 bg-white/92 px-4 py-2.5 shadow-lg shadow-violet-100/70 backdrop-blur-md">
         <p className="text-[10px] font-black uppercase text-violet-500">Ratio & Proportion Lab</p>
-        <p className="mt-1 font-mono text-xl font-black text-slate-900">
+        <p className="mt-0.5 font-mono text-lg font-black text-slate-900">
           {baseA}:{baseB} = {formatNumber(scaledA)}:{formatNumber(scaledB)}
         </p>
-        <p className="mt-1 text-xs font-bold leading-relaxed text-slate-500">
+        <p className="mt-0.5 text-[11px] font-bold leading-relaxed text-slate-500">
           scale factor = {scaleFactor} | simplified ratio = {simplifyRatio(baseA, baseB)}
         </p>
       </div>
 
-      <div className="absolute right-5 top-5 z-10 hidden rounded-2xl border border-cyan-100 bg-white/95 px-4 py-3 shadow-lg shadow-cyan-100/80 backdrop-blur-md md:block">
+      <div className="absolute right-4 top-4 z-10 hidden rounded-2xl border border-cyan-100 bg-white/95 px-4 py-2.5 shadow-lg shadow-cyan-100/80 backdrop-blur-md md:block">
         <p className="text-[10px] font-black text-cyan-600">Missing value model</p>
         <p className="mt-1 font-mono text-sm font-black text-slate-700">
           {baseA} / {baseB} = {targetA} / {formatNumber(missingB)}
         </p>
       </div>
 
-      <div className="absolute bottom-5 left-5 right-5 top-[118px] grid gap-4 lg:grid-cols-[minmax(0,1fr)_300px]">
-        <section className="flex min-h-0 flex-col justify-center gap-4 rounded-2xl border border-slate-100 bg-white/80 p-4 shadow-inner shadow-slate-100">
-          <div className="grid gap-3">
+      <div className="absolute bottom-4 left-4 right-4 top-[104px] grid gap-3 lg:grid-cols-[minmax(0,0.92fr)_280px]">
+        <section data-testid="ratio-proportion-bars-panel" className="flex min-h-0 flex-col justify-center gap-2.5 overflow-hidden rounded-2xl border border-slate-100 bg-white/80 p-3 shadow-inner shadow-slate-100">
+          <div className="grid gap-2">
             <BarRow label="Base A" value={baseA} width={baseAWidth} color="bg-violet-500" />
             <BarRow label="Base B" value={baseB} width={baseBWidth} color="bg-cyan-500" />
           </div>
 
-          <div className="rounded-2xl border border-violet-100 bg-violet-50/70 px-4 py-3 text-center">
-            <p className="text-xs font-black uppercase text-violet-500">multiply both sides by the same factor</p>
-            <p className="font-mono text-2xl font-black text-slate-900">x {scaleFactor}</p>
+          <div className="rounded-2xl border border-violet-100 bg-violet-50/70 px-4 py-2 text-center">
+            <p className="text-[11px] font-black uppercase text-violet-500">multiply both sides by the same factor</p>
+            <p className="font-mono text-xl font-black text-slate-900">x {scaleFactor}</p>
           </div>
 
-          <div className="grid gap-3">
+          <div className="grid gap-2">
             <BarRow label="Scaled A" value={scaledA} width={scaledAWidth} color="bg-violet-600" />
             <BarRow label="Scaled B" value={scaledB} width={scaledBWidth} color="bg-cyan-600" />
           </div>
 
-          <div className="grid gap-3 rounded-2xl border border-cyan-100 bg-cyan-50/60 p-3 sm:grid-cols-2">
+          <div className="grid gap-2 rounded-2xl border border-cyan-100 bg-cyan-50/60 p-2.5 sm:grid-cols-2">
             <BarRow label="Given c" value={targetA} width={targetAWidth} color="bg-amber-500" />
             <BarRow label="Solve d" value={missingB} width={missingBWidth} color="bg-emerald-500" />
           </div>
         </section>
 
-        <section className="hidden min-h-0 rounded-2xl border border-slate-100 bg-slate-950 p-3 shadow-lg shadow-slate-200 lg:block">
+        <section data-testid="ratio-proportion-graph-panel" className="hidden min-h-0 rounded-2xl border border-slate-100 bg-slate-950 p-3 shadow-lg shadow-slate-200 lg:block">
           <div className="mb-2 flex items-center justify-between">
             <h3 className="text-xs font-black text-white">Proportional pairs</h3>
             <span className="font-mono text-[10px] font-bold text-cyan-200">B = kA</span>
           </div>
-          <svg className="h-[calc(100%-28px)] min-h-[230px] w-full" viewBox="0 0 420 300" fill="none" role="img" aria-label="Proportional relationship graph">
+          <svg className="h-[calc(100%-28px)] min-h-[190px] w-full" viewBox="0 0 420 300" fill="none" role="img" aria-label="Proportional relationship graph">
             <defs>
               <linearGradient id="ratio-line-gradient" x1="44" y1="270" x2="390" y2="50" gradientUnits="userSpaceOnUse">
                 <stop stopColor="#22d3ee" />
@@ -192,7 +197,7 @@ function BarRow({
         <span>{label}</span>
         <span className="font-mono text-slate-900">{formatNumber(value)}</span>
       </div>
-      <div className="h-6 overflow-hidden rounded-full bg-slate-100">
+      <div className="h-4 overflow-hidden rounded-full bg-slate-100">
         <div className={`h-full rounded-full ${color} shadow-sm`} style={{ width: `${width}%` }} />
       </div>
     </div>
@@ -518,6 +523,59 @@ export default function RatioProportionSimulation() {
     router.push("/labs/ratio-and-proportion");
   };
 
+  const drawerSummary = (
+    <div className="space-y-3">
+      <div className="rounded-2xl border border-violet-100 bg-violet-50/70 p-3">
+        <p className="text-[10px] font-black uppercase text-violet-600">Manual number input</p>
+        <p className="mt-1 text-xs font-bold leading-relaxed text-slate-500">กรอกค่าเอง หรือใช้ slider ด้านซ้ายควบคู่กันได้</p>
+      </div>
+
+      <div className="grid grid-cols-2 gap-2">
+        <ManualNumberInput
+          label="A"
+          ariaLabel="Enter base quantity A"
+          value={baseA}
+          min={1}
+          max={12}
+          tone="violet"
+          onChange={setBaseA}
+        />
+        <ManualNumberInput
+          label="B"
+          ariaLabel="Enter base quantity B"
+          value={baseB}
+          min={1}
+          max={12}
+          tone="cyan"
+          onChange={setBaseB}
+        />
+        <ManualNumberInput
+          label="scale"
+          ariaLabel="Enter scale factor"
+          value={scaleFactor}
+          min={1}
+          max={8}
+          tone="pink"
+          onChange={setScaleFactor}
+        />
+        <ManualNumberInput
+          label="c"
+          ariaLabel="Enter given value c"
+          value={targetA}
+          min={2}
+          max={48}
+          tone="amber"
+          onChange={setTargetA}
+        />
+      </div>
+
+      <div className="grid grid-cols-2 gap-2 text-[11px] font-black">
+        <span className="rounded-xl bg-cyan-50 px-3 py-2 text-cyan-700">scaled: {formatNumber(scaledA)}:{formatNumber(scaledB)}</span>
+        <span className="rounded-xl bg-emerald-50 px-3 py-2 text-emerald-700">d: {formatNumber(missingB)}</span>
+      </div>
+    </div>
+  );
+
   const controls = (
     <div className="space-y-4">
       <div className="grid gap-3 sm:grid-cols-2">
@@ -525,7 +583,7 @@ export default function RatioProportionSimulation() {
         <ControlSlider label="Base quantity B" icon={Scale} value={baseB} min={1} max={12} step={1} tone="cyan" onChange={setBaseB} />
       </div>
 
-      <ControlSlider label="Scale factor" icon={Sliders} value={scaleFactor} min={1} max={8} step={1} tone="violet" onChange={setScaleFactor} />
+      <ControlSlider label="Scale factor" icon={Sliders} value={scaleFactor} min={1} max={8} step={1} tone="pink" onChange={setScaleFactor} />
       <ControlSlider label="Given value c" icon={Target} value={targetA} min={2} max={48} step={1} tone="amber" onChange={setTargetA} />
 
       <div className="grid grid-cols-4 gap-2 pt-1">
@@ -573,6 +631,7 @@ export default function RatioProportionSimulation() {
       controlsTitle="Ratio controls"
       controls={controls}
       compactControls={compactControls}
+      drawerSummary={drawerSummary}
       metrics={[
         { label: "base ratio", value: `${baseA}:${baseB}`, tone: "violet" },
         { label: "scaled ratio", value: `${formatNumber(scaledA)}:${formatNumber(scaledB)}`, tone: "cyan" },
@@ -626,13 +685,14 @@ function ControlSlider({
   min: number;
   max: number;
   step: number;
-  tone: "violet" | "cyan" | "amber";
+  tone: "violet" | "cyan" | "amber" | "pink";
   onChange: (value: number) => void;
 }) {
   const toneClasses = {
     violet: "text-violet-600 bg-violet-50 border-violet-100 accent-violet-600",
     cyan: "text-cyan-600 bg-cyan-50 border-cyan-100 accent-cyan-600",
     amber: "text-amber-600 bg-amber-50 border-amber-100 accent-amber-500",
+    pink: "text-pink-600 bg-pink-50 border-pink-100 accent-pink-500",
   }[tone];
 
   return (
@@ -654,5 +714,47 @@ function ControlSlider({
         className={`h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-slate-200 ${toneClasses.split(" ").at(-1)}`}
       />
     </div>
+  );
+}
+
+function ManualNumberInput({
+  label,
+  ariaLabel,
+  value,
+  min,
+  max,
+  tone,
+  onChange,
+}: {
+  label: string;
+  ariaLabel: string;
+  value: number;
+  min: number;
+  max: number;
+  tone: "violet" | "cyan" | "amber" | "pink";
+  onChange: (value: number) => void;
+}) {
+  const toneClasses = {
+    violet: "border-violet-100 bg-violet-50 text-violet-700 focus:border-violet-300 focus:ring-violet-200",
+    cyan: "border-cyan-100 bg-cyan-50 text-cyan-700 focus:border-cyan-300 focus:ring-cyan-200",
+    amber: "border-amber-100 bg-amber-50 text-amber-700 focus:border-amber-300 focus:ring-amber-200",
+    pink: "border-pink-100 bg-pink-50 text-pink-700 focus:border-pink-300 focus:ring-pink-200",
+  }[tone];
+
+  return (
+    <label className="block rounded-2xl border border-slate-100 bg-white p-2.5 text-[11px] font-black text-slate-500 shadow-sm">
+      <span className="mb-1 block">{label}</span>
+      <input
+        aria-label={ariaLabel}
+        type="number"
+        inputMode="numeric"
+        min={min}
+        max={max}
+        step={1}
+        value={value}
+        onChange={(event) => onChange(clampNumber(Number(event.target.value), min, max))}
+        className={`h-10 w-full rounded-xl border px-3 text-center font-mono text-base font-black outline-none transition focus:ring-2 ${toneClasses}`}
+      />
+    </label>
   );
 }

@@ -659,36 +659,146 @@ const mathConceptLabIds = new Set([
   "function-builder",
 ]);
 
-const MathConceptHeroIllustration = () => (
-  <svg className="h-full w-full" viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <circle cx="122" cy="124" r="76" fill="#ddd6fe" opacity="0.42" filter="blur(30px)" />
-    <circle cx="122" cy="124" r="54" fill="#faf5ff" opacity="0.9" />
+type MathHeroVariant =
+  | "graphing-lines"
+  | "ratio-and-proportion"
+  | "vector-addition"
+  | "center-and-variability"
+  | "curve-fitting"
+  | "function-builder"
+  | "general";
 
-    <g transform="translate(42 42)">
-      <rect x="0" y="0" width="150" height="138" rx="20" fill="#ffffff" stroke="#c4b5fd" strokeWidth="4" />
-      <path d="M26 18V114M12 100H132" stroke="#cbd5e1" strokeWidth="3.5" strokeLinecap="round" />
-      <path d="M26 82H132M26 64H132M26 46H132M44 18V100M62 18V100M80 18V100M98 18V100M116 18V100" stroke="#ede9fe" strokeWidth="2" />
-      <path d="M26 90C44 76 55 68 72 61C92 52 105 39 132 27" stroke="#7c3aed" strokeWidth="6" strokeLinecap="round" />
-      <path d="M35 37L52 54L72 31" stroke="#10b981" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx="44" cy="76" r="5" fill="#2563eb" />
-      <circle cx="72" cy="61" r="5" fill="#7c3aed" />
-      <circle cx="104" cy="40" r="5" fill="#db2777" />
-      <circle cx="132" cy="27" r="5" fill="#f59e0b" />
-    </g>
+const mathHeroVariants: Record<string, MathHeroVariant> = {
+  "graphing-lines": "graphing-lines",
+  "ratio-and-proportion": "ratio-and-proportion",
+  "vector-addition": "vector-addition",
+  "center-and-variability": "center-and-variability",
+  "curve-fitting": "curve-fitting",
+  "function-builder": "function-builder",
+};
 
-    <g transform="translate(128 157)">
-      <rect x="0" y="0" width="78" height="38" rx="15" fill="#ffffff" stroke="#ddd6fe" strokeWidth="2" />
-      <text x="39" y="16" fill="#64748b" fontSize="9" fontWeight="800" textAnchor="middle">Math Lab</text>
-      <text x="39" y="30" fill="#7c3aed" fontSize="14" fontWeight="900" textAnchor="middle">y = mx + b</text>
-    </g>
+const MathConceptHeroIllustration = ({ labId }: { labId: string }) => {
+  const variant = mathHeroVariants[labId] ?? "general";
+  const label = variant === "ratio-and-proportion"
+    ? "Ratio"
+    : variant === "vector-addition"
+    ? "Vector"
+    : variant === "center-and-variability"
+    ? "Stats"
+    : variant === "curve-fitting"
+    ? "Trend"
+    : variant === "function-builder"
+    ? "Function"
+    : "Slope";
+  const equation = variant === "ratio-and-proportion"
+    ? "2:3 = 8:12"
+    : variant === "vector-addition"
+    ? "A + B = R"
+    : variant === "center-and-variability"
+    ? "mean | IQR"
+    : variant === "curve-fitting"
+    ? "R2 fit"
+    : variant === "function-builder"
+    ? "f(x)"
+    : "y = mx + b";
 
-    <g className="animate-pulse">
-      <circle cx="44" cy="185" r="5" fill="#22c55e" opacity="0.75" />
-      <circle cx="201" cy="82" r="4" fill="#a78bfa" opacity="0.8" />
-      <circle cx="190" cy="137" r="3" fill="#38bdf8" opacity="0.7" />
-    </g>
-  </svg>
-);
+  return (
+    <svg data-testid={`math-hero-${variant}`} className="h-full w-full" viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <circle cx="122" cy="124" r="76" fill="#ddd6fe" opacity="0.42" filter="blur(30px)" />
+      <circle cx="122" cy="124" r="54" fill="#faf5ff" opacity="0.9" />
+
+      {variant === "ratio-and-proportion" ? (
+        <g transform="translate(43 55)">
+          <rect x="0" y="0" width="154" height="104" rx="22" fill="#ffffff" stroke="#c4b5fd" strokeWidth="4" />
+          <rect x="24" y="27" width="42" height="16" rx="8" fill="#7c3aed" />
+          <rect x="24" y="51" width="63" height="16" rx="8" fill="#06b6d4" />
+          <rect x="89" y="25" width="40" height="40" rx="13" fill="#ecfeff" stroke="#bae6fd" strokeWidth="3" />
+          <text x="109" y="49" fill="#0891b2" fontSize="15" fontWeight="900" textAnchor="middle">x4</text>
+          <text x="47" y="84" fill="#0f172a" fontSize="17" fontWeight="900" textAnchor="middle">2:3</text>
+          <text x="120" y="84" fill="#0f172a" fontSize="17" fontWeight="900" textAnchor="middle">8:12</text>
+        </g>
+      ) : variant === "vector-addition" ? (
+        <g transform="translate(45 44)">
+          <rect x="0" y="0" width="150" height="122" rx="22" fill="#ffffff" stroke="#c4b5fd" strokeWidth="4" />
+          <path d="M26 96H132M40 106V20" stroke="#e2e8f0" strokeWidth="2.5" strokeLinecap="round" />
+          <path d="M40 91L96 52" stroke="#7c3aed" strokeWidth="8" strokeLinecap="round" />
+          <path d="M96 52L118 43L107 66Z" fill="#7c3aed" />
+          <path d="M96 52L122 81" stroke="#06b6d4" strokeWidth="8" strokeLinecap="round" />
+          <path d="M122 81L129 105L106 92Z" fill="#06b6d4" />
+          <path d="M40 91L122 81" stroke="#f97316" strokeWidth="6" strokeLinecap="round" strokeDasharray="7 6" />
+          <path d="M122 81L140 70L135 93Z" fill="#f97316" />
+          <text x="72" y="53" fill="#6d28d9" fontSize="13" fontWeight="900">A</text>
+          <text x="128" y="79" fill="#0891b2" fontSize="13" fontWeight="900">B</text>
+          <text x="78" y="92" fill="#ea580c" fontSize="13" fontWeight="900">R</text>
+        </g>
+      ) : variant === "center-and-variability" ? (
+        <g transform="translate(42 52)">
+          <rect x="0" y="0" width="156" height="112" rx="22" fill="#ffffff" stroke="#c4b5fd" strokeWidth="4" />
+          <path d="M22 64H134" stroke="#94a3b8" strokeWidth="3" strokeLinecap="round" />
+          {([36, 53, 53, 72, 91, 91, 110, 127] as const).map((x, index) => (
+            <circle key={`${x}-${index}`} cx={x} cy={index % 2 === 0 ? 52 : 40} r="7" fill="#0891b2" stroke="#ffffff" strokeWidth="3" />
+          ))}
+          <path d="M37 88H119M52 80V96M104 80V96" stroke="#475569" strokeWidth="4" strokeLinecap="round" />
+          <rect x="61" y="77" width="34" height="22" rx="7" fill="#f5f3ff" stroke="#7c3aed" strokeWidth="3" />
+          <path d="M78 77V99" stroke="#7c3aed" strokeWidth="4" strokeLinecap="round" />
+          <text x="46" y="25" fill="#6d28d9" fontSize="12" fontWeight="900" textAnchor="middle">mean</text>
+          <text x="116" y="25" fill="#0891b2" fontSize="12" fontWeight="900" textAnchor="middle">IQR</text>
+        </g>
+      ) : variant === "curve-fitting" ? (
+        <g transform="translate(42 42)">
+          <rect x="0" y="0" width="156" height="126" rx="22" fill="#ffffff" stroke="#c4b5fd" strokeWidth="4" />
+          <path d="M24 101H132M32 108V22" stroke="#e2e8f0" strokeWidth="3" strokeLinecap="round" />
+          <path d="M32 92C55 80 73 70 90 59C109 47 121 39 137 27" stroke="#7c3aed" strokeWidth="7" strokeLinecap="round" />
+          {([[38, 88], [59, 77], [80, 65], [103, 52], [124, 42], [136, 29]] as const).map(([x, y]) => (
+            <g key={`${x}-${y}`}>
+              <path d={`M${x} ${y}V${y + 15}`} stroke="#f97316" strokeWidth="3" strokeDasharray="4 4" />
+              <circle cx={x} cy={y} r="7" fill="#7c3aed" stroke="#ffffff" strokeWidth="3" />
+            </g>
+          ))}
+          <text x="115" y="101" fill="#0891b2" fontSize="13" fontWeight="900" textAnchor="middle">R2</text>
+        </g>
+      ) : variant === "function-builder" ? (
+        <g transform="translate(28 50)">
+          <rect x="0" y="27" width="48" height="42" rx="13" fill="#ecfeff" stroke="#bae6fd" strokeWidth="3" />
+          <text x="24" y="53" fill="#0891b2" fontSize="17" fontWeight="900" textAnchor="middle">x</text>
+          <path d="M55 48H74" stroke="#cbd5e1" strokeWidth="5" strokeLinecap="round" />
+          <path d="M68 39L78 48L68 57" stroke="#cbd5e1" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
+          <rect x="82" y="10" width="70" height="76" rx="20" fill="#7c3aed" />
+          <text x="117" y="38" fill="#ffffff" fontSize="13" fontWeight="900" textAnchor="middle">rule</text>
+          <text x="117" y="60" fill="#ffffff" fontSize="17" fontWeight="900" textAnchor="middle">f(x)</text>
+          <path d="M160 48H178" stroke="#cbd5e1" strokeWidth="5" strokeLinecap="round" />
+          <path d="M172 39L182 48L172 57" stroke="#cbd5e1" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
+          <rect x="186" y="27" width="44" height="42" rx="13" fill="#fff7ed" stroke="#fed7aa" strokeWidth="3" />
+          <text x="208" y="53" fill="#ea580c" fontSize="17" fontWeight="900" textAnchor="middle">y</text>
+          <path d="M74 107C93 101 106 96 124 99C140 102 153 93 168 91" stroke="#06b6d4" strokeWidth="4" strokeLinecap="round" />
+        </g>
+      ) : (
+        <g transform="translate(42 42)">
+          <rect x="0" y="0" width="150" height="138" rx="20" fill="#ffffff" stroke="#c4b5fd" strokeWidth="4" />
+          <path d="M26 18V114M12 100H132" stroke="#cbd5e1" strokeWidth="3.5" strokeLinecap="round" />
+          <path d="M26 82H132M26 64H132M26 46H132M44 18V100M62 18V100M80 18V100M98 18V100M116 18V100" stroke="#ede9fe" strokeWidth="2" />
+          <path d="M26 90L132 27" stroke="#7c3aed" strokeWidth="6" strokeLinecap="round" />
+          <path d="M78 60H118V38" stroke="#f97316" strokeWidth="4" strokeLinecap="round" strokeDasharray="7 6" />
+          <circle cx="26" cy="90" r="6" fill="#f59e0b" />
+          <circle cx="78" cy="60" r="7" fill="#7c3aed" />
+          <circle cx="132" cy="27" r="6" fill="#10b981" />
+        </g>
+      )}
+
+      <g transform="translate(127 158)">
+        <rect x="0" y="0" width="82" height="38" rx="15" fill="#ffffff" stroke="#ddd6fe" strokeWidth="2" />
+        <text x="41" y="16" fill="#64748b" fontSize="9" fontWeight="800" textAnchor="middle">{label}</text>
+        <text x="41" y="30" fill="#7c3aed" fontSize="13" fontWeight="900" textAnchor="middle">{equation}</text>
+      </g>
+
+      <g className="animate-pulse">
+        <circle cx="44" cy="185" r="5" fill="#22c55e" opacity="0.75" />
+        <circle cx="201" cy="82" r="4" fill="#a78bfa" opacity="0.8" />
+        <circle cx="190" cy="137" r="3" fill="#38bdf8" opacity="0.7" />
+      </g>
+    </svg>
+  );
+};
 
 const ChemistryConceptHeroIllustration = ({ variant }: { variant: ChemistryHeroVariant }) => {
   const isGalvanic = variant === "galvanic";
@@ -978,7 +1088,7 @@ export default function LabHero({
           ) : isStefanBoltzmann ? (
             <StefanBoltzmannHeroIllustration />
           ) : isMathematics ? (
-            <MathConceptHeroIllustration />
+            <MathConceptHeroIllustration labId={labId} />
           ) : isMitosis ? (
             <svg className="w-full h-full" viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
               <circle cx="122" cy="124" r="74" fill="#cffafe" opacity="0.4" filter="blur(30px)" />

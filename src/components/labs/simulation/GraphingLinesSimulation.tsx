@@ -15,6 +15,7 @@ import {
   Trash,
 } from "lucide-react";
 import SharedSimulationShell from "@/components/labs/simulation/SharedSimulationShell";
+import ManualNumberInput from "@/components/labs/simulation/ManualNumberInput";
 import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";
 
 interface LoggedPoint {
@@ -493,6 +494,25 @@ export default function GraphingLinesSimulation() {
     </div>
   );
 
+  const drawerSummary = (
+    <div className="space-y-3">
+      <div className="rounded-2xl border border-violet-100 bg-violet-50/70 p-3">
+        <p className="text-[10px] font-black uppercase text-violet-600">Manual number input</p>
+        <p className="mt-1 text-xs font-bold leading-relaxed text-slate-500">Type graph values directly, or use the sliders on the left.</p>
+      </div>
+
+      <div className="grid grid-cols-2 gap-2">
+        <ManualNumberInput label="m" ariaLabel="Enter slope m" value={slope} min={-3} max={3} step={0.25} tone="violet" onChange={setSlope} />
+        <ManualNumberInput label="b" ariaLabel="Enter y-intercept b" value={intercept} min={-6} max={6} step={0.5} tone="amber" onChange={setIntercept} />
+        <ManualNumberInput label="probe x" ariaLabel="Enter probe x" value={probeX} min={-8} max={8} step={0.5} tone="blue" onChange={setProbeX} />
+        <span className="rounded-2xl bg-emerald-50 px-3 py-2 text-[11px] font-black text-emerald-700">
+          probe y<br />
+          <span className="font-mono text-base">{formatNumber(probeY)}</span>
+        </span>
+      </div>
+    </div>
+  );
+
   return (
     <SharedSimulationShell
       accent="violet"
@@ -507,6 +527,7 @@ export default function GraphingLinesSimulation() {
       controlsTitle="แผงควบคุมเส้นตรง"
       controls={controls}
       compactControls={compactControls}
+      drawerSummary={drawerSummary}
       metrics={[
         { label: "สมการ", value: equation, tone: "violet" },
         { label: "ความชัน m", value: formatNumber(slope), tone: "blue" },

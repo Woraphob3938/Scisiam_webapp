@@ -211,7 +211,7 @@ export default function SharedSimulationShell({
   ];
 
   const liveMetricsCard = (
-    <section className="w-full max-w-[360px] rounded-2xl border border-white/70 bg-white/92 p-3 shadow-lg shadow-slate-900/10 backdrop-blur-md">
+    <section className="w-full rounded-2xl border border-white/70 bg-white/92 p-3 shadow-lg shadow-slate-900/10 backdrop-blur-md">
       <div className="mb-2 flex items-center justify-between gap-3">
         <h2 className="flex items-center gap-2 text-xs font-black text-slate-900">
           <BarChart3 className={`h-4 w-4 ${tone.text}`} />
@@ -265,15 +265,7 @@ export default function SharedSimulationShell({
           <div>{controls}</div>
           {hasDrawerSummary && (
             <div className="flex flex-col gap-3">
-              {drawerSummary ?? (showLiveMetrics && (
-                <div className="grid grid-cols-2 gap-2 text-[11px] font-bold text-slate-500">
-                  {metrics.map((metric) => (
-                    <span key={metric.label} className={`rounded-xl px-3 py-2 ${metricToneClasses[metric.tone ?? accent]}`}>
-                      {metric.label}: <b>{metric.value}</b>
-                    </span>
-                  ))}
-                </div>
-              ))}
+              {drawerSummary ?? (showLiveMetrics && liveMetricsCard)}
               {showSaveButton && onSave && (
                 <button
                   onClick={onSave}
@@ -324,7 +316,6 @@ export default function SharedSimulationShell({
         </div>
 
         <div className="flex items-start gap-3">
-          {showLiveMetrics && <div className="hidden sm:block">{liveMetricsCard}</div>}
           <button
             type="button"
             onClick={toggleFullscreen}
@@ -344,8 +335,18 @@ export default function SharedSimulationShell({
       </div>}
 
       <div className={`absolute inset-x-4 top-[122px] z-10 transition-all duration-300 sm:inset-x-5 ${stageBottomClass}`}>
-        <div className="h-full overflow-hidden rounded-[22px] border border-white/70 bg-white shadow-inner shadow-slate-200/70">
-          {scene}
+        <div
+          data-testid="simulation-stage-content"
+          className="relative h-full min-h-0 overflow-hidden rounded-[22px] border border-white/70 bg-white p-3 shadow-inner shadow-slate-200/70"
+        >
+          <div data-testid="simulation-stage-scene" className={`h-full min-h-0 overflow-hidden rounded-[18px] ${showLiveMetrics ? "xl:mr-[336px]" : ""}`}>
+            {scene}
+          </div>
+          {showLiveMetrics && (
+            <aside data-testid="simulation-stage-metrics" className="pointer-events-none absolute right-3 top-3 z-20 hidden w-[320px] max-w-[calc(100%-24px)] xl:block">
+              {liveMetricsCard}
+            </aside>
+          )}
         </div>
       </div>
 
