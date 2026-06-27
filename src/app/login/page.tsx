@@ -3,12 +3,14 @@ import AuthForm from "@/components/auth/AuthForm";
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ reset?: string }>;
+  searchParams: Promise<{ confirmed?: string; reset?: string }>;
 }) {
-  const { reset } = await searchParams;
+  const { confirmed, reset } = await searchParams;
   const initialNotice =
     reset === "success"
       ? "เปลี่ยนรหัสผ่านสำเร็จแล้ว กรุณาเข้าสู่ระบบด้วยรหัสผ่านใหม่"
+      : confirmed === "success"
+        ? "ยืนยันอีเมลสำเร็จแล้ว กรุณาเข้าสู่ระบบ"
       : "";
 
   return (

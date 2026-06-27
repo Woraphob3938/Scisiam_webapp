@@ -171,10 +171,12 @@ export default function AuthForm({ initialMode, initialNotice = "" }: AuthFormPr
       const normalizedEmail = email.trim().toLowerCase();
 
       if (mode === "register") {
+        const emailRedirectTo = `${window.location.origin}/auth/signup-callback`;
         const { data, error: signUpError } = await supabase.auth.signUp({
           email: normalizedEmail,
           password,
           options: {
+            emailRedirectTo,
             data: {
               display_name: fullName.trim(),
               requested_role: role,

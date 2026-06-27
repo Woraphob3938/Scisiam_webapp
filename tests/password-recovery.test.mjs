@@ -36,3 +36,23 @@ test("password recovery uses Supabase PKCE without exposing account existence", 
   assert.match(resetForm, /aria-pressed=\{visible\}/);
   assert.match(resetPage, /ResetPasswordForm/);
 });
+
+test("email signup uses its own production callback and returns to login", () => {
+  const signupCallbackPath = "src/app/auth/signup-callback/route.ts";
+
+  assert.equal(
+    existsSync(join(rootDir, signupCallbackPath)),
+    true,
+    `${signupCallbackPath} should exist`,
+  );
+
+  const authForm = readProjectFile("src/components/auth/AuthForm.tsx");
+  const signupCallback = readProjectFile(signupCallbackPath);
+  const loginPage = readProjectFile("src/app/login/page.tsx");
+
+  assert.match(authForm, /emailRedirectTo/);
+  assert.match(authForm, /\/auth\/signup-callback/);
+  assert.match(signupCallback, /exchangeCodeForSession/);
+  assert.match(signupCallback, /\/login\?confirmed=success/);
+  assert.match(loginPage, /confirmed === "success"/);
+});
