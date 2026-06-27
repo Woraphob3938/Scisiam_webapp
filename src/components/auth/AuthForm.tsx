@@ -112,7 +112,7 @@ export default function AuthForm({ initialMode, initialNotice = "" }: AuthFormPr
       try {
         const supabase = createClient();
         const normalizedEmail = email.trim().toLowerCase();
-        const redirectTo = `${window.location.origin}/auth/callback`;
+        const redirectTo = `${window.location.origin}/auth/verify`;
         const { error: recoveryError } = await supabase.auth.resetPasswordForEmail(
           normalizedEmail,
           { redirectTo },
@@ -171,7 +171,7 @@ export default function AuthForm({ initialMode, initialNotice = "" }: AuthFormPr
       const normalizedEmail = email.trim().toLowerCase();
 
       if (mode === "register") {
-        const emailRedirectTo = `${window.location.origin}/auth/signup-callback`;
+        const emailRedirectTo = `${window.location.origin}/auth/verify`;
         const { data, error: signUpError } = await supabase.auth.signUp({
           email: normalizedEmail,
           password,
