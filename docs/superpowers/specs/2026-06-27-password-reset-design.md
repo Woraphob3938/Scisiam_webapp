@@ -8,17 +8,17 @@ Replace the placeholder "ลืมรหัสผ่าน?" action with a worki
 
 1. A user selects "ลืมรหัสผ่าน?" on `/login`.
 2. The login form switches to an email-only recovery state.
-3. SciSiam calls `resetPasswordForEmail` with a redirect to `/auth/callback?next=/reset-password` on the current origin.
+3. SciSiam calls `resetPasswordForEmail` with a redirect to `/auth/callback` on the current origin.
 4. The UI always shows the same success message after an accepted request so it does not reveal whether an account exists.
 5. Supabase redirects the email link to `/auth/callback` with a PKCE authorization code.
-6. The callback route exchanges the code for a session, validates the local `next` path, and redirects to `/reset-password`.
+6. The callback route exchanges the code for a session and redirects only to `/reset-password`.
 7. The reset page verifies that a recovery session exists, accepts and confirms a new password, then calls `updateUser({ password })`.
 8. After success, the user returns to `/login` with a confirmation message and signs in with the new password.
 
 ## Components And Routes
 
 - `AuthForm.tsx`: add a recovery mode, email validation, loading state, generic success state, resend action, and return-to-login action.
-- `/auth/callback/route.ts`: exchange the PKCE code through the existing server Supabase client and allow only local redirect paths.
+- `/auth/callback/route.ts`: exchange the PKCE code through the existing server Supabase client and redirect only to `/reset-password`.
 - `/reset-password/page.tsx`: public route shell for the password update form.
 - `ResetPasswordForm.tsx`: validate the recovery session and password requirements, update the password, and handle expired or invalid links.
 

@@ -21,9 +21,10 @@ import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 
 interface AuthFormProps {
   initialMode: "login" | "register";
+  initialNotice?: string;
 }
 
-type AuthMode = "login" | "register";
+type AuthMode = "login" | "register" | "forgot-password";
 type AuthRole = "student" | "teacher";
 
 const isDemoModeEnabled =
@@ -65,7 +66,7 @@ const subjectBooks = [
   },
 ];
 
-export default function AuthForm({ initialMode }: AuthFormProps) {
+export default function AuthForm({ initialMode, initialNotice = "" }: AuthFormProps) {
   const router = useRouter();
   const [mode, setMode] = useState<AuthMode>(initialMode);
 
@@ -80,16 +81,55 @@ export default function AuthForm({ initialMode }: AuthFormProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState(initialNotice);
+  const [recoverySent, setRecoverySent] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const isRegister = mode === "register";
+  const isForgotPassword = mode === "forgot-password";
   const isMinLength = password.length >= 8;
   const hasUpperOrNum = /[A-Z]/.test(password) || /[0-9]/.test(password);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setNotice("");
     setLoading(true);
+
+    if (mode === "forgot-password") {
+      if (!email.trim()) {
+        setError("กรุณากรอกอีเมลที่ใช้สมัครสมาชิก");
+        setLoading(false);
+        return;
+      }
+
+      if (!isSupabaseConfigured()) {
+        setError("ยังไม่ได้ตั้งค่า Supabase URL หรือ Publishable Key ใน .env.local");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const supabase = createClient();
+        const normalizedEmail = email.trim().toLowerCase();
+        const redirectTo = `${window.location.origin}/auth/callback`;
+        const { error: recoveryError } = await supabase.auth.resetPasswordForEmail(
+          normalizedEmail,
+          { redirectTo },
+        );
+
+        if (recoveryError) {
+          setError("ส่งอีเมลรีเซ็ตรหัสผ่านไม่สำเร็จ กรุณารอสักครู่แล้วลองใหม่");
+        } else {
+          setRecoverySent(true);
+        }
+      } catch {
+        setError("เกิดข้อผิดพลาดในการเชื่อมต่อ Supabase กรุณาลองใหม่อีกครั้ง");
+      }
+
+      setLoading(false);
+      return;
+    }
 
     if (!email.trim() || !password.trim()) {
       setError("กรุณากรอกอีเมลและรหัสผ่านให้ครบถ้วน");
@@ -210,6 +250,8 @@ export default function AuthForm({ initialMode }: AuthFormProps) {
 
   const setAuthMode = (nextMode: AuthMode) => {
     setError("");
+    setNotice("");
+    setRecoverySent(false);
     setMode(nextMode);
   };
 
@@ -230,7 +272,13 @@ export default function AuthForm({ initialMode }: AuthFormProps) {
   return (
     <section
       className="mx-auto grid w-full max-w-[1240px] grid-cols-1 gap-5 px-4 py-5 sm:px-6 lg:min-h-[calc(100svh-48px)] lg:grid-cols-[minmax(0,1fr)_minmax(410px,0.78fr)] lg:items-stretch lg:gap-8 lg:px-8 lg:py-6"
-      aria-label={isRegister ? "หน้าสมัครสมาชิก SciSiam" : "หน้าเข้าสู่ระบบ SciSiam"}
+      aria-label={
+        isForgotPassword
+          ? "หน้ากู้คืนรหัสผ่าน SciSiam"
+          : isRegister
+            ? "หน้าสมัครสมาชิก SciSiam"
+            : "หน้าเข้าสู่ระบบ SciSiam"
+      }
     >
       <ScienceIntro mode={mode} />
 
@@ -243,7 +291,7 @@ export default function AuthForm({ initialMode }: AuthFormProps) {
             className="w-full rounded-[28px] border border-white/80 bg-white/95 p-4 shadow-[0_24px_80px_rgba(15,23,42,0.12)] ring-1 ring-slate-200/70 backdrop-blur sm:p-6 lg:p-7"
           >
             <div className={`grid ${isRegister ? "gap-4" : "gap-5"}`}>
-            <div className="grid grid-cols-2 gap-1 rounded-[14px] border border-slate-200 bg-slate-50 p-1">
+            {!isForgotPassword && <div className="grid grid-cols-2 gap-1 rounded-[14px] border border-slate-200 bg-slate-50 p-1">
               <button
                 type="button"
                 onClick={() => setAuthMode("login")}
@@ -268,21 +316,37 @@ export default function AuthForm({ initialMode }: AuthFormProps) {
               >
                 สมัครสมาชิก
               </button>
-            </div>
+            </div>}
 
             <div className="grid gap-2">
               <h1 className="text-2xl font-extrabold leading-[1.3] tracking-normal text-slate-950 sm:text-3xl">
-                {isRegister ? "สมัครสมาชิก" : "เข้าสู่ระบบ"}
+                {isForgotPassword ? "ลืมรหัสผ่าน" : isRegister ? "สมัครสมาชิก" : "เข้าสู่ระบบ"}
               </h1>
               <p className="text-sm font-semibold leading-relaxed text-slate-500">
-                {isRegister
+                {isForgotPassword
+                  ? "กรอกอีเมลที่ใช้สมัครสมาชิก แล้วเราจะส่งลิงก์สำหรับตั้งรหัสผ่านใหม่"
+                  : isRegister
                   ? "สร้างบัญชีเพื่อเรียน ทดลอง และติดตามความคืบหน้าใน SciSiam"
                   : "ใช้บัญชี SciSiam เพื่อเข้าเรียนหรือจัดการห้องเรียนวิทยาศาสตร์ของคุณ"}
               </p>
             </div>
 
+            {notice && (
+              <div className="flex items-start gap-2.5 rounded-xl border border-emerald-100 bg-emerald-50 px-3.5 py-3 text-xs font-bold leading-relaxed text-emerald-700" role="status">
+                <Check className="mt-0.5 h-4 w-4 shrink-0" />
+                <span>{notice}</span>
+              </div>
+            )}
+
+            {recoverySent && (
+              <div className="flex items-start gap-2.5 rounded-xl border border-emerald-100 bg-emerald-50 px-3.5 py-3 text-xs font-bold leading-relaxed text-emerald-700" role="status">
+                <Mail className="mt-0.5 h-4 w-4 shrink-0" />
+                <span>หากอีเมลนี้มีบัญชี เราได้ส่งลิงก์รีเซ็ตรหัสผ่านให้แล้ว กรุณาตรวจสอบกล่องจดหมายและโฟลเดอร์สแปม</span>
+              </div>
+            )}
+
             {error && (
-              <div className="flex items-start gap-2.5 rounded-xl border border-rose-100 bg-rose-50 px-3.5 py-3 text-xs font-bold leading-relaxed text-rose-700">
+              <div className="flex items-start gap-2.5 rounded-xl border border-rose-100 bg-rose-50 px-3.5 py-3 text-xs font-bold leading-relaxed text-rose-700" role="alert">
                 <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" />
                 <span>{error}</span>
               </div>
@@ -327,7 +391,7 @@ export default function AuthForm({ initialMode }: AuthFormProps) {
                 />
               </AuthField>
 
-              <AuthField
+              {!isForgotPassword && <AuthField
                 id="auth-password"
                 label="รหัสผ่าน"
                 helper=""
@@ -336,7 +400,7 @@ export default function AuthForm({ initialMode }: AuthFormProps) {
                   !isRegister ? (
                     <button
                       type="button"
-                      onClick={() => setError("ระบบกู้คืนรหัสผ่านจะเปิดให้ใช้งานในเวอร์ชันถัดไป")}
+                      onClick={() => setAuthMode("forgot-password")}
                       className="min-h-8 text-xs font-extrabold leading-[1.45] text-slate-500 transition-colors hover:text-blue-600 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
                     >
                       ลืมรหัสผ่าน?
@@ -361,7 +425,7 @@ export default function AuthForm({ initialMode }: AuthFormProps) {
                     label="รหัสผ่าน"
                   />
                 </div>
-              </AuthField>
+              </AuthField>}
 
               {isRegister && (
                 <>
@@ -397,7 +461,7 @@ export default function AuthForm({ initialMode }: AuthFormProps) {
                 </>
               )}
 
-              <div className="grid gap-2">
+              {!isForgotPassword && <div className="grid gap-2">
                 <span className="text-sm font-extrabold leading-[1.45] text-slate-900">
                   บทบาท
                 </span>
@@ -426,9 +490,9 @@ export default function AuthForm({ initialMode }: AuthFormProps) {
                     );
                   })}
                 </div>
-              </div>
+              </div>}
 
-              {!isRegister && (
+              {!isRegister && !isForgotPassword && (
                 <label className="flex min-h-11 cursor-pointer items-center gap-2 text-sm font-bold leading-[1.45] text-slate-700">
                   <input
                     type="checkbox"
@@ -464,24 +528,42 @@ export default function AuthForm({ initialMode }: AuthFormProps) {
                   <span className="h-5 w-5 rounded-full border-2 border-white/30 border-t-white animate-spin" />
                 ) : (
                   <>
-                    <span>{isRegister ? "สร้างบัญชี SciSiam" : "เข้าสู่ระบบ SciSiam"}</span>
+                    <span>
+                      {isForgotPassword
+                        ? recoverySent
+                          ? "ส่งอีเมลอีกครั้ง"
+                          : "ส่งลิงก์รีเซ็ตรหัสผ่าน"
+                        : isRegister
+                          ? "สร้างบัญชี SciSiam"
+                          : "เข้าสู่ระบบ SciSiam"}
+                    </span>
                     <ArrowRight className="h-4.5 w-4.5" />
                   </>
                 )}
               </button>
 
-              <p className="text-center text-sm font-semibold leading-relaxed text-slate-500">
-                {isRegister ? "มีบัญชีอยู่แล้ว?" : "ยังไม่มีบัญชี?"}{" "}
+              {isForgotPassword ? (
                 <button
                   type="button"
-                  onClick={() => setAuthMode(isRegister ? "login" : "register")}
-                  className="font-extrabold text-blue-600 underline-offset-4 hover:underline focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
+                  onClick={() => setAuthMode("login")}
+                  className="mx-auto min-h-10 px-3 text-sm font-extrabold text-blue-600 underline-offset-4 hover:underline focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
                 >
-                  {isRegister ? "เข้าสู่ระบบ" : "สมัครสมาชิก"}
+                  กลับไปเข้าสู่ระบบ
                 </button>
-              </p>
+              ) : (
+                <p className="text-center text-sm font-semibold leading-relaxed text-slate-500">
+                  {isRegister ? "มีบัญชีอยู่แล้ว?" : "ยังไม่มีบัญชี?"}{" "}
+                  <button
+                    type="button"
+                    onClick={() => setAuthMode(isRegister ? "login" : "register")}
+                    className="font-extrabold text-blue-600 underline-offset-4 hover:underline focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
+                  >
+                    {isRegister ? "เข้าสู่ระบบ" : "สมัครสมาชิก"}
+                  </button>
+                </p>
+              )}
 
-              {isDemoModeEnabled ? (
+              {isDemoModeEnabled && !isForgotPassword ? (
                 isRegister ? (
                   <button
                     type="button"
@@ -686,6 +768,7 @@ function PasswordToggle({
       onClick={onToggle}
       className="absolute right-2 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-lg text-slate-400 transition-colors hover:bg-slate-50 hover:text-slate-700 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
       aria-label={`${isVisible ? "ซ่อน" : "แสดง"}${label}`}
+      aria-pressed={isVisible}
     >
       {isVisible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
     </button>

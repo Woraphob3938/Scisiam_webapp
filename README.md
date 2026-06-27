@@ -124,6 +124,15 @@ Apply migrations to the target Supabase project before using the app as a real m
 
 Client-side code must use the publishable Supabase key only. Any secret or service-role key must stay server-side.
 
+### Password recovery
+
+Add these URLs in Supabase Dashboard > Authentication > URL Configuration > Redirect URLs:
+
+- `http://localhost:3000/auth/callback`
+- The `/auth/callback` path on the canonical deployed origin
+
+Production password reset emails require custom SMTP or a Supabase Send Email Hook. The default sender is suitable only for limited development testing.
+
 ## AI Tutor Security
 
 The AI tutor is served through `src/app/api/ai-tutor/route.ts`.
