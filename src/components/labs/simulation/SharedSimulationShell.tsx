@@ -27,7 +27,7 @@ import {
 export interface SimulationMetric {
   label: string;
   value: string;
-  tone?: "blue" | "cyan" | "emerald" | "orange" | "rose" | "violet";
+  tone?: "blue" | "cyan" | "emerald" | "orange" | "pink" | "rose" | "violet";
 }
 
 export interface SimulationStep {
@@ -129,6 +129,7 @@ const metricToneClasses: Record<NonNullable<SimulationMetric["tone"]>, string> =
   cyan: "bg-cyan-50 text-cyan-700",
   emerald: "bg-emerald-50 text-emerald-700",
   orange: "bg-orange-50 text-orange-700",
+  pink: "bg-pink-50 text-pink-900",
   rose: "bg-rose-50 text-rose-700",
   violet: "bg-violet-50 text-violet-700",
 };
@@ -230,7 +231,7 @@ export default function SharedSimulationShell({
       </div>
       <div className="grid grid-cols-2 gap-2">
         {metrics.slice(0, 4).map((metric) => (
-          <div key={metric.label} className={`rounded-xl px-2.5 py-2 text-[11px] font-black ${metricToneClasses[metric.tone ?? accent]}`}>
+          <div key={metric.label} className={`rounded-xl px-2.5 py-2 text-[11px] font-black ${metricToneClasses[metric.tone ?? resolvedAccent]}`}>
             <p className="truncate text-[10px] opacity-75">{metric.label}</p>
             <p className="truncate text-sm">{metric.value}</p>
           </div>

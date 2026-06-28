@@ -23,6 +23,7 @@ test("Mathematics uses the shared Pastel Blush theme", () => {
   assert.match(hero, /\$\{primaryButtonClass\}/);
   assert.match(shell, /const resolvedAccent = category === "Mathematics" \? "pink" : accent/);
   assert.match(shell, /accentClasses\[resolvedAccent\]/);
+  assert.match(shell, /metricToneClasses[\s\S]*?pink: "bg-pink-50 text-pink-900"/);
 });
 
 test("lab navigation links have visible button affordances", () => {
