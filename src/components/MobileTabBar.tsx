@@ -6,25 +6,20 @@ import { usePathname } from "next/navigation";
 import {
   ClipboardCheck,
   FlaskConical,
-  History,
-  Home,
   User,
 } from "lucide-react";
 
 const navItems = [
-  { name: "หน้าหลัก", href: "/", icon: Home },
   { name: "ห้องแล็บ", href: "/labs", icon: FlaskConical },
   { name: "ภารกิจ", href: "/missions", icon: ClipboardCheck },
-  { name: "ประวัติ", href: "/history", icon: History },
   { name: "โปรไฟล์", href: "/profile", icon: User },
 ];
 
 function getActiveItem(pathname: string) {
   if (pathname.startsWith("/labs")) return "ห้องแล็บ";
   if (pathname === "/missions") return "ภารกิจ";
-  if (pathname === "/history") return "ประวัติ";
   if (pathname === "/profile") return "โปรไฟล์";
-  return "หน้าหลัก";
+  return "ห้องแล็บ";
 }
 
 export default function MobileTabBar() {
@@ -46,7 +41,7 @@ export default function MobileTabBar() {
         className="fixed inset-x-0 bottom-0 z-50 border-t border-slate-200/80 bg-white/95 px-2 pb-[calc(0.4rem+env(safe-area-inset-bottom))] pt-1.5 shadow-[0_-14px_35px_rgba(15,23,42,0.08)] backdrop-blur-xl lg:hidden"
         aria-label="เมนูหลักบนมือถือ"
       >
-        <div className="mx-auto grid max-w-md grid-cols-5 gap-1">
+        <div className="mx-auto grid max-w-md grid-cols-3 gap-1">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeItem === item.name;
