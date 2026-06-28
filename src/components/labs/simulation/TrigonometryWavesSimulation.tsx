@@ -358,7 +358,7 @@ export default function TrigonometryWavesSimulation() {
                 onClick={() => setFuncType("Sin")}
                 className={`py-2 rounded-lg text-xs font-black transition cursor-pointer ${
                   funcType === "Sin"
-                    ? "bg-violet-600 text-white shadow-sm"
+                    ? "bg-rose-600 text-white shadow-sm"
                     : "bg-white border border-slate-200 text-slate-655 hover:bg-slate-50"
                 }`}
               >
@@ -369,7 +369,7 @@ export default function TrigonometryWavesSimulation() {
                 onClick={() => setFuncType("Cos")}
                 className={`py-2 rounded-lg text-xs font-black transition cursor-pointer ${
                   funcType === "Cos"
-                    ? "bg-violet-600 text-white shadow-sm"
+                    ? "bg-rose-600 text-white shadow-sm"
                     : "bg-white border border-slate-200 text-slate-655 hover:bg-slate-50"
                 }`}
               >
@@ -434,7 +434,7 @@ export default function TrigonometryWavesSimulation() {
             <button
               onClick={handleStartStop}
               className={`col-span-2 inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-xs font-black text-white shadow-sm ${
-                isRunning ? "bg-slate-700" : "bg-violet-600 hover:bg-violet-750"
+                isRunning ? "bg-slate-700" : "bg-rose-600 hover:bg-rose-700"
               }`}
             >
               {isRunning ? <Pause className="h-4 w-4 fill-white stroke-none" /> : <Play className="h-4 w-4 fill-white stroke-none" />}

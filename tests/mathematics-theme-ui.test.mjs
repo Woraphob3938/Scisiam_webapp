@@ -32,3 +32,27 @@ test("lab navigation links have visible button affordances", () => {
   assert.match(hero, /href="\/labs"[\s\S]*?border-slate-200[\s\S]*?bg-white[\s\S]*?กลับไปหน้ารายชื่อห้องแล็บ/);
   assert.match(shell, /href=\{`\/labs\/\$\{labId\}`\}[\s\S]*?border[\s\S]*?bg-white[\s\S]*?รายละเอียดแล็บ/);
 });
+
+test("Mathematics simulation command buttons use rose instead of violet chrome", () => {
+  const files = [
+    "AppliedMathSimulation.tsx",
+    "CenterVariabilitySimulation.tsx",
+    "CurveFittingSimulation.tsx",
+    "FunctionBuilderSimulation.tsx",
+    "GraphingLinesSimulation.tsx",
+    "NormalDistributionSimulation.tsx",
+    "ProbabilitySimulation.tsx",
+    "RatioProportionSimulation.tsx",
+    "TrigonometryWavesSimulation.tsx",
+    "VectorAdditionSimulation.tsx",
+  ];
+
+  for (const file of files) {
+    const source = readProjectFile(`src/components/labs/simulation/${file}`);
+    assert.doesNotMatch(
+      source,
+      /<button[\s\S]{0,400}?bg-(?:violet|purple|indigo)-600/,
+      `${file} still has a violet command button`,
+    );
+  }
+});
