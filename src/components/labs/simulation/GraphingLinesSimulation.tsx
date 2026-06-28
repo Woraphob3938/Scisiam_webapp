@@ -551,7 +551,7 @@ export default function GraphingLinesSimulation() {
         "เปรียบเทียบกราฟเมื่อ m หรือ b เปลี่ยนค่าได้อย่างมีเหตุผล",
       ]}
       progressLabel="ภารกิจอ่านเส้นตรง"
-      progressValue={`${questProgress.toFixed(0)} / 100 คะแนนความคืบหน้า`}
+      progressValue={`${questProgress.toFixed(0)} / 100 ความคืบหน้า`}
       progressPercent={questProgress}
       tips={[
         "ถ้า m เป็นบวก เส้นจะสูงขึ้นเมื่อ x เพิ่มขึ้น",
@@ -559,7 +559,6 @@ export default function GraphingLinesSimulation() {
         "ค่า b คือจุดที่เส้นตัดแกน y เมื่อ x = 0",
         "ลองบันทึกจุดที่ x = 0 เพื่อยืนยันค่า intercept",
       ]}
-      scoreLabel="+25 คะแนน"
       onSave={handleSaveResults}
     />
   );

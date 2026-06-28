@@ -1,5 +1,4 @@
 import { createClient, isSupabaseConfigured } from "./client";
-import { cacheSciSiamAuth } from "./auth-cache";
 import type { Json } from "./database.types";
 
 export type SyncExperimentInput = {
@@ -23,37 +22,22 @@ export type SyncExperimentResult =
 export type SaveExperimentInput = SyncExperimentInput & {
   localStorageKey: string;
   localPayload: unknown;
-  localPoints?: number;
 };
 
 export function saveExperimentLocally({
   localStorageKey,
   localPayload,
-  localPoints = 25,
-}: Pick<SaveExperimentInput, "localStorageKey" | "localPayload" | "localPoints">) {
-  if (typeof window === "undefined") {
-    return { awardedPoints: false };
-  }
+}: Pick<SaveExperimentInput, "localStorageKey" | "localPayload">) {
+  if (typeof window === "undefined") return;
 
-  const wasAlreadySaved = window.localStorage.getItem(localStorageKey) !== null;
   window.localStorage.setItem(localStorageKey, JSON.stringify(localPayload));
-
-  if (!wasAlreadySaved && localPoints > 0) {
-    const currentPoints = Number(window.localStorage.getItem("scisiam_points") || "0");
-    window.localStorage.setItem("scisiam_points", String(currentPoints + localPoints));
-  }
-
-  window.dispatchEvent(new Event("points-updated"));
   window.dispatchEvent(new Event("scisiam-auth-update"));
-
-  return { awardedPoints: !wasAlreadySaved && localPoints > 0 };
 }
 
 export async function saveExperimentAndSync(input: SaveExperimentInput): Promise<SyncExperimentResult> {
   saveExperimentLocally({
     localStorageKey: input.localStorageKey,
     localPayload: input.localPayload,
-    localPoints: input.localPoints,
   });
 
   return syncExperimentRun(input);
@@ -83,7 +67,7 @@ export async function syncExperimentRun(input: SyncExperimentInput): Promise<Syn
     p_prediction: (input.prediction ?? null) as Json,
     p_reflection: input.reflection ?? null,
     p_summary: (input.summary ?? {}) as Json,
-    p_score: input.score ?? null,
+    p_score: null,
     p_duration_seconds: input.durationSeconds ?? null,
   });
 
@@ -93,21 +77,6 @@ export async function syncExperimentRun(input: SyncExperimentInput): Promise<Syn
       reason: "supabase_error",
       message: error.message,
     };
-  }
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("display_name, role, total_points")
-    .eq("id", user.id)
-    .maybeSingle();
-
-  if (profile) {
-    cacheSciSiamAuth({
-      email: user.email,
-      role: profile.role,
-      displayName: profile.display_name,
-      totalPoints: profile.total_points,
-    });
   }
 
   return { ok: true, runId: data };

@@ -59,7 +59,6 @@ interface SharedSimulationShellProps {
   progressValue: string;
   progressPercent: number;
   tips: string[];
-  scoreLabel?: string;
   showLiveMetrics?: boolean;
   showInfoTabs?: boolean;
   showSaveButton?: boolean;
@@ -160,7 +159,6 @@ export default function SharedSimulationShell({
   progressValue,
   progressPercent,
   tips,
-  scoreLabel = "+25 คะแนน",
   showLiveMetrics = true,
   showInfoTabs = true,
   showSaveButton = true,
@@ -229,7 +227,6 @@ export default function SharedSimulationShell({
           <BarChart3 className={`h-4 w-4 ${tone.text}`} />
           ค่าทดลอง Real-time
         </h2>
-        <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-black text-emerald-700">{scoreLabel}</span>
       </div>
       <div className="grid grid-cols-2 gap-2">
         {metrics.slice(0, 4).map((metric) => (

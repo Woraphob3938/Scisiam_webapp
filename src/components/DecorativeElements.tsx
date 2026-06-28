@@ -68,7 +68,7 @@ export function LeftDecorations() {
             Reward
           </span>
           <span className="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-100">
-            +50 แต้ม
+            ปลดล็อกเมื่อสำเร็จ
           </span>
         </div>
       </div>

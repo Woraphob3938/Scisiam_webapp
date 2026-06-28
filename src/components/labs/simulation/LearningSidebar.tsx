@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Target, CheckCircle2, Award, HelpCircle, Check, Sparkles } from "lucide-react";
+import { Target, CheckCircle2, Award, HelpCircle, Check } from "lucide-react";
 
 interface LearningSidebarProps {
   questProgress?: number;
@@ -79,7 +79,7 @@ export default function LearningSidebar({
           </div>
           <p className="text-[10px] text-slate-400 font-semibold text-left">
             {questSuccess 
-              ? "ยินดีด้วย! คุณคุมความร้อนแล็บฟิสิกส์สำเร็จ (+25 แต้ม) 💎" 
+              ? "ยินดีด้วย! คุณคุมความร้อนในภารกิจแล็บฟิสิกส์สำเร็จ"
               : `คุมอุณหภูมิ 50-60°C: ${questProgress.toFixed(1)} / 20.0 วินาที`}
           </p>
         </div>
@@ -106,31 +106,6 @@ export default function LearningSidebar({
             </li>
           ))}
         </ul>
-      </div>
-
-      {/* 5. คะแนนที่ได้รับเมื่อสำเร็จ */}
-      <div className="bg-gradient-to-tr from-amber-500 to-yellow-400 text-white rounded-2xl border border-amber-400 p-5 shadow-md shadow-amber-500/10 hover:shadow-lg transition-all duration-300 flex items-center justify-between relative overflow-hidden group">
-        <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-5 transition-opacity" />
-        <div className="text-left z-10">
-          <span className="text-[9px] font-bold bg-white/20 px-2 py-0.5 rounded-full uppercase tracking-wider">
-            REWARD
-          </span>
-          <h5 className="text-sm font-bold mt-1.5">เมื่อเรียนรู้สำเร็จ</h5>
-          <p className="text-xs text-white/90 font-medium">เก็บใบกิจกรรมการทดลองได้</p>
-        </div>
-        
-        {/* Points display */}
-        <div className="flex items-center gap-1 z-10">
-          <Sparkles className="w-4 h-4 text-white fill-white animate-pulse" />
-          <span className="text-xl font-extrabold">+25 แต้ม</span>
-        </div>
-        
-        {/* Background Beaker Icon decoration */}
-        <div className="absolute -bottom-6 -right-6 text-white/10 select-none">
-          <svg className="w-24 h-24" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2m-9 15c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3m5-7h-3v-3h3v3M10 7h2v2h-2V7m-3 0h2v2H7V7z" />
-          </svg>
-        </div>
       </div>
 
     </aside>

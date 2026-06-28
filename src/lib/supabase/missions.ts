@@ -1,4 +1,3 @@
-import { cacheSciSiamAuth } from "./auth-cache";
 import { createClient, isSupabaseConfigured } from "./client";
 
 type ClaimMissionFailureReason =
@@ -13,10 +12,6 @@ export type ClaimMissionResult =
       ok: true;
       claimed: boolean;
       alreadyClaimed: boolean;
-      pointsAwarded: number;
-      totalPoints: number;
-      currentLevel: number;
-      xp: number;
     }
   | {
       ok: false;
@@ -29,10 +24,6 @@ type ClaimMissionRpcResult = {
   claimed?: boolean;
   already_claimed?: boolean;
   reason?: string;
-  points_awarded?: number;
-  total_points?: number;
-  current_level?: number;
-  xp?: number;
 };
 
 export async function loadClaimedMissionIds() {
@@ -92,28 +83,10 @@ export async function claimMissionReward(input: {
     };
   }
 
-  const totalPoints = Number(result.total_points ?? 0);
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("display_name, role, total_points")
-    .eq("id", user.id)
-    .maybeSingle();
-
-  cacheSciSiamAuth({
-    email: user.email,
-    role: profile?.role,
-    displayName: profile?.display_name,
-    totalPoints: profile?.total_points ?? totalPoints,
-  });
-
   return {
     ok: true,
     claimed: Boolean(result.claimed),
     alreadyClaimed: Boolean(result.already_claimed),
-    pointsAwarded: Number(result.points_awarded ?? 0),
-    totalPoints,
-    currentLevel: Number(result.current_level ?? 1),
-    xp: Number(result.xp ?? 0),
   };
 }
 

@@ -16,7 +16,6 @@ import {
   RotateCcw,
   Save,
   Sliders,
-  Sparkles,
   Target,
   Thermometer,
   Zap,
@@ -1002,18 +1001,9 @@ export default function IdealGasLawSimulation() {
                 </div>
                 {questSuccess && (
                   <div className="mt-3 rounded-xl bg-emerald-50 border border-emerald-100 p-2 text-center text-xs font-bold text-emerald-700">
-                    สำเร็จแล้ว! รับ +25 แต้ม 💎
+                    สำเร็จภารกิจควบคุมความดันแล้ว
                   </div>
                 )}
-              </section>
-
-              <section className="rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40">
-                <h2 className="mb-2 flex items-center gap-2 text-sm font-black text-slate-800">
-                  <Sparkles className="h-4.5 w-4.5 text-amber-500" />
-                  คะแนนเมื่อสำเร็จ
-                </h2>
-                <p className="text-2xl font-black text-emerald-600">+25 คะแนน</p>
-                <p className="mt-1 text-xs font-semibold leading-relaxed text-slate-400">บันทึกผล PV=nRT พร้อมตารางข้อมูลและกราฟสมบูรณ์</p>
               </section>
 
               <section className="rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40">

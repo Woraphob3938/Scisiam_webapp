@@ -627,7 +627,6 @@ export default function FunctionBuilderSimulation() {
         "The scale factor can stretch, compress, or reflect the graph.",
         "Use the table to verify points shown on the graph.",
       ]}
-      scoreLabel="+25 points"
       onSave={handleSaveResults}
     />
   );

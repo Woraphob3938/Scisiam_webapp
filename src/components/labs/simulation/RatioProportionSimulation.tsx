@@ -663,7 +663,6 @@ export default function RatioProportionSimulation() {
         "If a / b = c / d, then a x d = b x c.",
         "A proportional graph forms a straight line through the origin.",
       ]}
-      scoreLabel="+25 points"
       onSave={handleSaveResults}
     />
   );

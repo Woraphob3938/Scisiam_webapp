@@ -686,7 +686,6 @@ export default function CurveFittingSimulation() {
         "R^2 closer to 1 means the model explains more variation.",
         "Quadratic curves can fit bending data better, but compare residuals before deciding.",
       ]}
-      scoreLabel="+25 points"
       onSave={handleSaveResults}
     />
   );
