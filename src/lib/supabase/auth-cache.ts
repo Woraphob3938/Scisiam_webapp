@@ -1,13 +1,11 @@
 import type { ScisiamUserRole } from "./database.types";
 
 export const SCISIAM_AUTH_EVENT = "scisiam-auth-update";
-export const SCISIAM_POINTS_EVENT = "points-updated";
 
 type CacheAuthInput = {
   email?: string | null;
   role?: ScisiamUserRole | null;
   displayName?: string | null;
-  totalPoints?: number | null;
 };
 
 export function cacheSciSiamAuth(
@@ -24,13 +22,8 @@ export function cacheSciSiamAuth(
     localStorage.setItem("scisiam_user_email", input.email);
   }
 
-  if (typeof input.totalPoints === "number") {
-    localStorage.setItem("scisiam_points", String(input.totalPoints));
-  }
-
   if (options.emit ?? true) {
     window.dispatchEvent(new Event(SCISIAM_AUTH_EVENT));
-    window.dispatchEvent(new Event(SCISIAM_POINTS_EVENT));
   }
 }
 
@@ -41,10 +34,8 @@ export function clearSciSiamAuthCache(options: { emit?: boolean } = {}) {
   localStorage.removeItem("scisiam_user_role");
   localStorage.removeItem("scisiam_user_name");
   localStorage.removeItem("scisiam_user_email");
-  localStorage.removeItem("scisiam_points");
   localStorage.removeItem("scisiam_demo_mode");
   if (options.emit ?? true) {
     window.dispatchEvent(new Event(SCISIAM_AUTH_EVENT));
-    window.dispatchEvent(new Event(SCISIAM_POINTS_EVENT));
   }
 }

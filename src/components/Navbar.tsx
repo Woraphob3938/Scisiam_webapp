@@ -3,14 +3,13 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Bell, Sparkles, ChevronDown, Award, Menu, User } from "lucide-react";
+import { Bell, ChevronDown, Award, Menu, User } from "lucide-react";
 import { useSidebar } from "@/context/SidebarContext";
 import SettingsModal from "@/components/SettingsModal";
 import {
   cacheSciSiamAuth,
   clearSciSiamAuthCache,
   SCISIAM_AUTH_EVENT,
-  SCISIAM_POINTS_EVENT,
 } from "@/lib/supabase/auth-cache";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 
@@ -19,7 +18,6 @@ export default function Navbar() {
   const [showNotification, setShowNotification] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
-  const [points, setPoints] = useState(0);
   
   // Auth state variables
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -28,15 +26,6 @@ export default function Navbar() {
   const [notifications, setNotifications] = useState<Array<{ id: string; title: string; message: string; type: string }>>([]);
 
   useEffect(() => {
-    const loadPoints = () => {
-      const stored = localStorage.getItem("scisiam_points");
-      if (stored) {
-        setPoints(Number(stored));
-      } else {
-        localStorage.setItem("scisiam_points", "0");
-      }
-    };
-
     const loadAuthStateFromCache = () => {
       const loggedIn = localStorage.getItem("scisiam_logged_in") === "true";
       setIsLoggedIn(loggedIn);
@@ -66,27 +55,22 @@ export default function Navbar() {
 
       const { data: profile } = await supabase
         .from("profiles")
-        .select("display_name, role, total_points")
+        .select("display_name, role")
         .eq("id", user.id)
         .maybeSingle();
 
       const nextRole = profile?.role || "student";
       const nextName = profile?.display_name || user.email?.split("@")[0] || "นักเรียน";
-      const nextPoints = profile?.total_points ?? Number(localStorage.getItem("scisiam_points") || "0");
-
       setIsLoggedIn(true);
       setRole(nextRole);
       setUserName(nextName);
-      setPoints(nextPoints);
       cacheSciSiamAuth({
         email: user.email,
         role: nextRole,
         displayName: nextName,
-        totalPoints: nextPoints,
       }, { emit: false });
     };
 
-    loadPoints();
     void loadAuthState();
 
     const supabase = isSupabaseConfigured() ? createClient() : null;
@@ -95,15 +79,11 @@ export default function Navbar() {
     }).data.subscription;
     const handleAuthUpdated = () => void loadAuthState();
 
-    window.addEventListener(SCISIAM_POINTS_EVENT, loadPoints);
     window.addEventListener(SCISIAM_AUTH_EVENT, handleAuthUpdated);
-    window.addEventListener("storage", loadPoints);
     window.addEventListener("storage", handleAuthUpdated);
     
     return () => {
-      window.removeEventListener(SCISIAM_POINTS_EVENT, loadPoints);
       window.removeEventListener(SCISIAM_AUTH_EVENT, handleAuthUpdated);
-      window.removeEventListener("storage", loadPoints);
       window.removeEventListener("storage", handleAuthUpdated);
       authSubscription?.unsubscribe();
     };
@@ -143,7 +123,7 @@ export default function Navbar() {
             items.push({
               id: key,
               title: "รับรางวัลภารกิจ! 💎",
-              message: `คุณได้เคลมแต้มรางวัลจากภารกิจสำเร็จแล้ว`,
+              message: "คุณปลดล็อกรางวัลจากภารกิจสำเร็จแล้ว",
               type: "mission",
             });
           }
@@ -154,10 +134,8 @@ export default function Navbar() {
 
     checkNotifications();
     window.addEventListener("storage", checkNotifications);
-    window.addEventListener(SCISIAM_POINTS_EVENT, checkNotifications);
     return () => {
       window.removeEventListener("storage", checkNotifications);
-      window.removeEventListener(SCISIAM_POINTS_EVENT, checkNotifications);
     };
   }, []);
 
@@ -172,11 +150,9 @@ export default function Navbar() {
     setIsLoggedIn(false);
     setRole("student");
     setUserName("นักเรียน");
-    setPoints(0);
     window.location.href = "/";
   };
 
-  const displayedPoints = isLoggedIn ? points : 0;
   const displayedNotifications = isLoggedIn ? notifications : [];
 
   return (
@@ -192,7 +168,7 @@ export default function Navbar() {
           <Menu className="w-5 h-5" />
         </button>
 
-        <Link href="/" className="group flex min-w-0 cursor-pointer items-center gap-2 select-none sm:gap-2.5">
+        <Link href="/labs" className="group flex min-w-0 cursor-pointer items-center gap-2 select-none sm:gap-2.5">
           <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-xl bg-white shadow-md shadow-blue-500/20 transition-all duration-300 group-hover:scale-105">
             <Image src="/scisiam-logo.png" alt="SciSiam logo" fill sizes="40px" className="object-contain p-0.5" priority />
           </div>
@@ -204,13 +180,6 @@ export default function Navbar() {
 
       {/* Right Navigation Controls */}
       <div className="flex shrink-0 items-center gap-1.5 sm:gap-5">
-        {/* Points/Stars Counter */}
-        <div className="flex min-h-10 shrink-0 cursor-pointer select-none items-center gap-1.5 rounded-full border border-amber-200/50 bg-amber-50 px-2.5 py-1.5 text-amber-700 shadow-xs transition-all duration-300 hover:scale-105 hover:bg-amber-100/70 active:scale-95 sm:px-3">
-          <Sparkles className="h-4 w-4 shrink-0 animate-pulse fill-amber-400 text-amber-500" />
-          <span className="whitespace-nowrap text-xs font-bold sm:text-sm">{displayedPoints} แต้ม</span>
-        </div>
-
-
         {/* Notification Bell */}
         <div className="relative">
           <button

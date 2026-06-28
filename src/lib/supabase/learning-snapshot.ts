@@ -15,22 +15,16 @@ export type LearningRunSnapshot = {
   id: string;
   labId: string;
   title: string;
-  pointsAwarded: number;
-  score: number | null;
   createdAt: string;
 };
 
 export type LearningSnapshot = {
-  points: number;
   completedCount: number;
   completedLabIds: string[];
   recentRuns: LearningRunSnapshot[];
   profile?: {
     displayName: string;
     role: ScisiamUserRole;
-    totalPoints: number;
-    currentLevel: number;
-    xp: number;
   };
 };
 
@@ -73,7 +67,7 @@ const parseLocalTimestamp = (storageKeys: string[]) => {
 
 export function readLocalLearningSnapshot(): LearningSnapshot {
   if (typeof window === "undefined") {
-    return { points: 0, completedCount: 0, completedLabIds: [], recentRuns: [] };
+    return { completedCount: 0, completedLabIds: [], recentRuns: [] };
   }
 
   const completedLabIds: string[] = [];
@@ -88,14 +82,11 @@ export function readLocalLearningSnapshot(): LearningSnapshot {
       id: `local-${lab.labId}`,
       labId: lab.labId,
       title: lab.title,
-      pointsAwarded: 25,
-      score: null,
       createdAt: parseLocalTimestamp(lab.storageKeys),
     });
   });
 
   return {
-    points: Number(window.localStorage.getItem("scisiam_points") || "0"),
     completedCount: completedLabIds.length,
     completedLabIds,
     recentRuns,
@@ -120,16 +111,16 @@ export async function loadSupabaseLearningSnapshot(): Promise<LearningSnapshot |
   const [profileResult, progressResult, runsResult] = await Promise.all([
     supabase
       .from("profiles")
-      .select("display_name, role, total_points, current_level, xp")
+      .select("display_name, role")
       .eq("id", user.id)
       .maybeSingle(),
     supabase
       .from("lab_progress")
-      .select("lab_id, status, points_awarded, completed_at, last_activity_at, last_score")
+      .select("lab_id, status, completed_at, last_activity_at")
       .order("last_activity_at", { ascending: false, nullsFirst: false }),
     supabase
       .from("experiment_runs")
-      .select("id, lab_id, title, score, points_awarded, created_at")
+      .select("id, lab_id, title, created_at")
       .order("created_at", { ascending: false })
       .limit(12),
   ]);
@@ -147,8 +138,6 @@ export async function loadSupabaseLearningSnapshot(): Promise<LearningSnapshot |
         id: run.id,
         labId: run.lab_id,
         title: getTitle(run.lab_id, run.title),
-        pointsAwarded: run.points_awarded,
-        score: run.score,
         createdAt: run.created_at,
       };
     }) ?? [];
@@ -157,9 +146,6 @@ export async function loadSupabaseLearningSnapshot(): Promise<LearningSnapshot |
     ? {
         displayName: profileResult.data.display_name,
         role: profileResult.data.role,
-        totalPoints: profileResult.data.total_points,
-        currentLevel: profileResult.data.current_level,
-        xp: profileResult.data.xp,
       }
     : undefined;
 
@@ -169,14 +155,12 @@ export async function loadSupabaseLearningSnapshot(): Promise<LearningSnapshot |
         email: user.email,
         role: profile.role,
         displayName: profile.displayName,
-        totalPoints: profile.totalPoints,
       },
       { emit: false },
     );
   }
 
   return {
-    points: profile?.totalPoints ?? 0,
     completedCount: completedIds.size,
     completedLabIds: [...completedIds],
     recentRuns,

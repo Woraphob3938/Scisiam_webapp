@@ -16,7 +16,6 @@ import {
   LayoutGrid,
   Play,
   Search,
-  Sparkles,
   Trophy,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
@@ -31,7 +30,7 @@ import {
   type LearningRunSnapshot,
   type LearningSnapshot,
 } from "@/lib/supabase/learning-snapshot";
-import { SCISIAM_AUTH_EVENT, SCISIAM_POINTS_EVENT } from "@/lib/supabase/auth-cache";
+import { SCISIAM_AUTH_EVENT } from "@/lib/supabase/auth-cache";
 
 type CategoryFilter = "All" | "Physics" | "Chemistry" | "Biology" | "Mathematics" | "Foundation";
 
@@ -47,14 +46,11 @@ type HistoryRecord = {
   createdAtLabel: string;
   createdAtMs: number;
   dataPointCount: number | null;
-  pointsAwarded: number;
-  score: number | null;
   source: HistorySource;
   isReady: boolean;
 };
 
 const emptySnapshot: LearningSnapshot = {
-  points: 0,
   completedCount: 0,
   completedLabIds: [],
   recentRuns: [],
@@ -179,8 +175,6 @@ function readLocalHistoryRecords(): HistoryRecord[] {
         createdAtLabel: timestamp ? formatDateTime(timestamp) : "เมื่อไม่นานมานี้",
         createdAtMs,
         dataPointCount: countDataPoints(parsed),
-        pointsAwarded: 25,
-        score: null,
         source: "local" as const,
         isReady: getLabReadiness(lab.id).isReady,
       },
@@ -202,8 +196,6 @@ function mapRunToRecord(run: LearningRunSnapshot): HistoryRecord | null {
     createdAtLabel: formatDateTime(run.createdAt),
     createdAtMs: toTimestampMs(run.createdAt),
     dataPointCount: null,
-    pointsAwarded: run.pointsAwarded,
-    score: run.score,
     source: "cloud",
     isReady: getLabReadiness(run.labId).isReady,
   };
@@ -224,7 +216,9 @@ function sourceText(source: HistorySource) {
   return source === "cloud" ? "บันทึกบนบัญชี" : "บันทึกในเครื่องนี้";
 }
 
-export default function LearningHistoryPage() {
+type LearningHistoryPageProps = { embedded?: boolean };
+
+export default function LearningHistoryPage({ embedded = false }: LearningHistoryPageProps) {
   const { isCollapsed } = useSidebar();
   const [snapshot, setSnapshot] = useState<LearningSnapshot>(emptySnapshot);
   const [records, setRecords] = useState<HistoryRecord[]>([]);
@@ -266,13 +260,11 @@ export default function LearningHistoryPage() {
     void loadHistory();
     window.addEventListener("storage", loadHistory);
     window.addEventListener(SCISIAM_AUTH_EVENT, loadHistory);
-    window.addEventListener(SCISIAM_POINTS_EVENT, loadHistory);
 
     return () => {
       cancelled = true;
       window.removeEventListener("storage", loadHistory);
       window.removeEventListener(SCISIAM_AUTH_EVENT, loadHistory);
-      window.removeEventListener(SCISIAM_POINTS_EVENT, loadHistory);
     };
   }, []);
 
@@ -332,16 +324,16 @@ export default function LearningHistoryPage() {
   const progressPercent = Math.round((completedCount / Math.max(readyLabCount, 1)) * 100);
 
   return (
-    <div className="flex min-h-screen flex-col bg-slate-50 font-sans antialiased selection:bg-blue-600 selection:text-white">
-      <Navbar />
+    <div className={embedded ? "font-sans antialiased" : "flex min-h-screen flex-col bg-slate-50 font-sans antialiased selection:bg-blue-600 selection:text-white"}>
+      {embedded ? null : <Navbar />}
 
-      <div className="hidden lg:block">
+      <div className={embedded ? "hidden" : "hidden lg:block"}>
         <Sidebar activeMenu="ประวัติการเรียนรู้" />
       </div>
 
-      <main
+      <div
         className={`relative z-10 min-w-0 pb-28 transition-[padding-left] duration-300 lg:pb-12 ${
-          isCollapsed ? "lg:pl-[76px]" : "lg:pl-[260px]"
+          embedded ? "" : isCollapsed ? "lg:pl-[76px]" : "lg:pl-[260px]"
         }`}
       >
         <section className="border-b border-slate-200/70 bg-[linear-gradient(180deg,#eff6ff_0%,#ffffff_68%,#f8fafc_100%)] px-4 py-5 sm:px-8 lg:px-10 lg:py-7">
@@ -356,7 +348,7 @@ export default function LearningHistoryPage() {
                   ดูเส้นทางการทดลองของคุณใน SciSiam
                 </h1>
                 <p className="mt-3 max-w-2xl text-sm font-semibold leading-relaxed text-slate-500 sm:text-base">
-                  รวมแล็บที่บันทึกผลแล้ว คะแนนที่ได้รับ และห้องที่ควรทดลองต่อ โดยใช้ข้อมูลจากบัญชีหรือข้อมูลในเครื่องนี้ตามสถานะการใช้งาน
+                  รวมแล็บที่บันทึกผลแล้วและห้องที่ควรทดลองต่อ โดยใช้ข้อมูลจากบัญชีหรือข้อมูลในเครื่องนี้ตามสถานะการใช้งาน
                 </p>
               </div>
 
@@ -378,20 +370,13 @@ export default function LearningHistoryPage() {
               </div>
             </div>
 
-            <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+            <div className="mt-6 grid gap-3 sm:grid-cols-3">
               <SummaryCard
                 icon={FlaskConical}
                 label="แล็บที่บันทึกแล้ว"
                 value={`${completedCount}`}
                 detail={`จากแล็บพร้อมทดลอง ${readyLabCount} ห้อง`}
                 tone="blue"
-              />
-              <SummaryCard
-                icon={Sparkles}
-                label="คะแนนสะสม"
-                value={snapshot.points.toLocaleString("th-TH")}
-                detail={source === "cloud" ? "ข้อมูลจากบัญชี" : "ข้อมูลในเครื่อง"}
-                tone="amber"
               />
               <SummaryCard
                 icon={BarChart3}
@@ -562,7 +547,7 @@ export default function LearningHistoryPage() {
             </section>
           </aside>
         </section>
-      </main>
+      </div>
     </div>
   );
 }
@@ -635,14 +620,6 @@ function HistoryItem({ record }: { record: HistoryRecord }) {
             <span className="rounded-lg bg-slate-50 px-2.5 py-1.5">
               {sourceText(record.source)}
             </span>
-            <span className="rounded-lg bg-amber-50 px-2.5 py-1.5 text-amber-700">
-              +{record.pointsAwarded} คะแนน
-            </span>
-            {record.score !== null ? (
-              <span className="rounded-lg bg-blue-50 px-2.5 py-1.5 text-blue-700">
-                คะแนนผลทดลอง {record.score}/100
-              </span>
-            ) : null}
             {record.dataPointCount !== null ? (
               <span className="rounded-lg bg-purple-50 px-2.5 py-1.5 text-purple-700">
                 ข้อมูล {record.dataPointCount} จุด

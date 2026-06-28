@@ -224,7 +224,6 @@ export default function AuthForm({
           email: normalizedEmail,
           role: profile.role,
           displayName: fullName.trim(),
-          totalPoints: 0,
         });
       } else {
         const { data, error: signInError } = await supabase.auth.signInWithPassword({
@@ -250,7 +249,6 @@ export default function AuthForm({
           email: normalizedEmail,
           role: profile.role,
           displayName: profile.display_name,
-          totalPoints: profile.total_points,
         });
       }
 
@@ -309,7 +307,6 @@ export default function AuthForm({
       role: "teacher",
       displayName: "ครูอรทัย",
       email: "teacher.demo@scisiam.com",
-      totalPoints: 0,
     });
     router.push("/profile");
     router.refresh();
@@ -926,7 +923,7 @@ async function ensureProfile(input: {
   const supabase = createClient();
   const { data: existing } = await supabase
     .from("profiles")
-    .select("display_name, role, total_points")
+    .select("display_name, role")
     .eq("id", input.userId)
     .maybeSingle();
 
@@ -937,7 +934,6 @@ async function ensureProfile(input: {
   const fallbackProfile = {
     display_name: input.displayName,
     role: "student" as const,
-    total_points: 0,
   };
 
   return fallbackProfile;
