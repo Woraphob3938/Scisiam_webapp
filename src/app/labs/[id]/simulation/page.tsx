@@ -111,6 +111,24 @@ const RatesOfChangeSimulation = dynamic(() =>
   import("@/components/labs/simulation/RatesOfChangeSimulation"));
 const OptimizationConstraintsSimulation = dynamic(() =>
   import("@/components/labs/simulation/OptimizationConstraintsSimulation"));
+const AdvancedCalculusOptimizationSimulation = dynamic(() =>
+  import("@/components/labs/simulation/AdvancedCalculusOptimizationSimulation"));
+const LinearAlgebraEigenvectorsSimulation = dynamic(() =>
+  import("@/components/labs/simulation/LinearAlgebraEigenvectorsSimulation"));
+const DifferentialEquationsSimulation = dynamic(() =>
+  import("@/components/labs/simulation/DifferentialEquationsSimulation"));
+const NumericalMethodsSimulation = dynamic(() =>
+  import("@/components/labs/simulation/NumericalMethodsSimulation"));
+const MultivariableCalculusSimulation = dynamic(() =>
+  import("@/components/labs/simulation/MultivariableCalculusSimulation"));
+const StatisticalInferenceSimulation = dynamic(() =>
+  import("@/components/labs/simulation/StatisticalInferenceSimulation"));
+const BayesianReasoningSimulation = dynamic(() =>
+  import("@/components/labs/simulation/BayesianReasoningSimulation"));
+const FourierAnalysisSimulation = dynamic(() =>
+  import("@/components/labs/simulation/FourierAnalysisSimulation"));
+const ComplexPhasorsSimulation = dynamic(() =>
+  import("@/components/labs/simulation/ComplexPhasorsSimulation"));
 const AppliedMathSimulation = dynamic(() =>
   import("@/components/labs/simulation/AppliedMathSimulation"));
 
@@ -175,10 +193,10 @@ function SimulationPlaceholder({ labId }: { labId: string }) {
       gradient: "from-green-600 to-emerald-600 shadow-green-500/10",
     },
     Mathematics: {
-      accent: "text-violet-600",
-      bg: "bg-violet-50/50",
-      border: "border-violet-100",
-      gradient: "from-violet-600 to-indigo-600 shadow-violet-500/10",
+      accent: "text-rose-600",
+      bg: "bg-rose-50/50",
+      border: "border-rose-100",
+      gradient: "from-rose-600 to-red-600 shadow-rose-500/10",
     },
   }[category as "Physics" | "Chemistry" | "Biology" | "Mathematics"] || {
     accent: "text-slate-600",
@@ -316,6 +334,42 @@ export default function SimulationRoomPage() {
 
   if (labId === "optimization-constraints") {
     return <OptimizationConstraintsSimulation />;
+  }
+
+  if (labId === "advanced-calculus-optimization") {
+    return <AdvancedCalculusOptimizationSimulation />;
+  }
+
+  if (labId === "linear-algebra-eigenvectors") {
+    return <LinearAlgebraEigenvectorsSimulation />;
+  }
+
+  if (labId === "differential-equations-lab") {
+    return <DifferentialEquationsSimulation />;
+  }
+
+  if (labId === "numerical-methods-lab") {
+    return <NumericalMethodsSimulation />;
+  }
+
+  if (labId === "multivariable-calculus") {
+    return <MultivariableCalculusSimulation />;
+  }
+
+  if (labId === "statistical-inference") {
+    return <StatisticalInferenceSimulation />;
+  }
+
+  if (labId === "bayesian-reasoning-lab") {
+    return <BayesianReasoningSimulation />;
+  }
+
+  if (labId === "fourier-analysis-signals") {
+    return <FourierAnalysisSimulation />;
+  }
+
+  if (labId === "complex-numbers-phasors") {
+    return <ComplexPhasorsSimulation />;
   }
 
   if (labId === "geometry-measurement") {

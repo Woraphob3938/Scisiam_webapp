@@ -18,7 +18,6 @@ import {
 
 import type { LabData } from "@/components/LabCard";
 import Navbar from "@/components/Navbar";
-import Breadcrumb from "@/components/labs/Breadcrumb";
 import EquipmentList from "@/components/labs/EquipmentList";
 import ExperimentSteps from "@/components/labs/ExperimentSteps";
 import LabHero from "@/components/labs/LabHero";
@@ -78,11 +77,11 @@ const SUBJECT_THEMES: Record<string, SubjectTheme> = {
     subtleSurface: "bg-emerald-50/45",
   },
   Mathematics: {
-    accentBg: "bg-violet-50",
-    accentBorder: "border-violet-100",
-    accentText: "text-violet-700",
-    dot: "bg-violet-500",
-    subtleSurface: "bg-violet-50/45",
+    accentBg: "bg-rose-50",
+    accentBorder: "border-rose-100",
+    accentText: "text-rose-700",
+    dot: "bg-rose-500",
+    subtleSurface: "bg-rose-50/45",
   },
 };
 
@@ -441,10 +440,6 @@ export default function LabDetailLayout({ labId, lab, details }: LabDetailLayout
   return (
     <div className="relative flex min-h-screen flex-col bg-[#f8fafc] pb-[calc(5rem+env(safe-area-inset-bottom))] lg:pb-12">
       <Navbar />
-
-      <div className="hidden w-full max-w-[1440px] select-none px-6 pb-2 pt-6 sm:mx-auto sm:block sm:px-12 md:px-20">
-        <Breadcrumb category={lab.category} title={lab.title} />
-      </div>
 
       <LabHero
         labId={labId}

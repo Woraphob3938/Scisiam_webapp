@@ -66,6 +66,15 @@ export const mathConceptSimulationLabIds = [
   "normal-distribution",
   "rates-of-change",
   "optimization-constraints",
+  "advanced-calculus-optimization",
+  "linear-algebra-eigenvectors",
+  "differential-equations-lab",
+  "numerical-methods-lab",
+  "multivariable-calculus",
+  "statistical-inference",
+  "bayesian-reasoning-lab",
+  "fourier-analysis-signals",
+  "complex-numbers-phasors",
 ] as const;
 
 export type DirectSimulationLabId = (typeof directSimulationLabIds)[number];

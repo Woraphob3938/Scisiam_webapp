@@ -60,6 +60,15 @@ export const LAB_SAVED_EXPERIMENT_KEYS: Record<string, string> = {
   "normal-distribution": "scisiam_saved_normal_distribution_experiment",
   "rates-of-change": "scisiam_saved_rates_of_change_experiment",
   "optimization-constraints": "scisiam_saved_optimization_constraints_experiment",
+  "advanced-calculus-optimization": "scisiam_saved_advanced_calculus_experiment",
+  "linear-algebra-eigenvectors": "scisiam_saved_linear_algebra_experiment",
+  "differential-equations-lab": "scisiam_saved_differential_equations_experiment",
+  "numerical-methods-lab": "scisiam_saved_numerical_methods_experiment",
+  "multivariable-calculus": "scisiam_saved_multivariable_calculus_experiment",
+  "statistical-inference": "scisiam_saved_statistical_inference_experiment",
+  "bayesian-reasoning-lab": "scisiam_saved_bayesian_reasoning_experiment",
+  "fourier-analysis-signals": "scisiam_saved_fourier_analysis_experiment",
+  "complex-numbers-phasors": "scisiam_saved_complex_numbers_experiment",
 };
 
 export function getSavedExperimentKey(labId: string) {

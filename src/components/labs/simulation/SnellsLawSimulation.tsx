@@ -1,17 +1,14 @@
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import { useRouter } from "next/navigation";
 import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";
 import {
   BarChart3,
   CheckCircle2,
-  ChevronRight,
   ClipboardList,
   Compass,
-  Home,
   Pause,
   Play,
   RotateCcw,
@@ -412,20 +409,6 @@ export default function SnellsLawSimulation() {
 
       <main className="mx-auto w-full max-w-[1440px] px-4 py-6 sm:px-12 md:px-20">
         <div className="flex flex-col gap-5">
-          {/* Breadcrumb */}
-          <div className="flex flex-wrap items-center gap-2 text-xs font-bold text-slate-500">
-            <Link href="/" className="inline-flex items-center gap-1.5 text-slate-400 hover:text-blue-600">
-              <Home className="h-3.5 w-3.5" />
-              หน้าแรก
-            </Link>
-            <ChevronRight className="h-3.5 w-3.5 text-slate-300" />
-            <Link href="/labs?category=Physics" className="text-blue-600 hover:text-blue-700">Physics</Link>
-            <ChevronRight className="h-3.5 w-3.5 text-slate-300" />
-            <Link href="/labs/snells-law" className="text-slate-700 hover:text-blue-700">Snell&apos;s Law Lab</Link>
-            <ChevronRight className="h-3.5 w-3.5 text-slate-300" />
-            <span className="text-slate-800">Simulator</span>
-          </div>
-
           {/* Banner Details */}
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:items-start">
             <section className="space-y-5 lg:col-span-9">
