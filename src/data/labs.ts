@@ -590,7 +590,7 @@ export const labsData: LabData[] = [
     title: "Advanced Calculus & Optimization",
     category: "Mathematics",
     gradeLevel: "อุดมศึกษา",
-    status: "ยังสร้างไม่เสร็จ",
+    status: "",
     description: "ศึกษาลิมิต อนุพันธ์ อินทิกรัล และการหาค่าเหมาะที่สุดหลายรูปแบบ เพื่อวิเคราะห์แบบจำลองเชิงปริมาณระดับอุดมศึกษา"
   },
   {
@@ -598,7 +598,7 @@ export const labsData: LabData[] = [
     title: "Linear Algebra & Eigenvectors",
     category: "Mathematics",
     gradeLevel: "อุดมศึกษา",
-    status: "ยังสร้างไม่เสร็จ",
+    status: "",
     description: "สำรวจเวกเตอร์ เมทริกซ์ การแปลงเชิงเส้น eigenvalues และ eigenvectors ที่ใช้ในฟิสิกส์ ข้อมูล และแบบจำลองเชิงคำนวณ"
   },
   {
@@ -606,7 +606,7 @@ export const labsData: LabData[] = [
     title: "Differential Equations Lab",
     category: "Mathematics",
     gradeLevel: "อุดมศึกษา",
-    status: "ยังสร้างไม่เสร็จ",
+    status: "",
     description: "วิเคราะห์สมการเชิงอนุพันธ์ที่อธิบายการเปลี่ยนแปลงต่อเวลา เช่น การเติบโต การสั่น การเย็นตัว และระบบพลวัต"
   },
   {
@@ -614,7 +614,7 @@ export const labsData: LabData[] = [
     title: "Numerical Methods Lab",
     category: "Mathematics",
     gradeLevel: "อุดมศึกษา",
-    status: "ยังสร้างไม่เสร็จ",
+    status: "",
     description: "ทดลองวิธีคำนวณเชิงตัวเลข เช่น root finding, interpolation, numerical integration และ error analysis สำหรับโจทย์ที่แก้ตรง ๆ ยาก"
   },
   {
@@ -622,7 +622,7 @@ export const labsData: LabData[] = [
     title: "Multivariable Calculus",
     category: "Mathematics",
     gradeLevel: "อุดมศึกษา",
-    status: "ยังสร้างไม่เสร็จ",
+    status: "",
     description: "สำรวจฟังก์ชันหลายตัวแปร gradient, partial derivatives, contour maps และพื้นผิวสามมิติที่ใช้วิเคราะห์ระบบหลายปัจจัย"
   },
   {
@@ -630,7 +630,7 @@ export const labsData: LabData[] = [
     title: "Statistical Inference",
     category: "Mathematics",
     gradeLevel: "อุดมศึกษา",
-    status: "ยังสร้างไม่เสร็จ",
+    status: "",
     description: "เรียนรู้การประมาณค่า ช่วงความเชื่อมั่น hypothesis testing และ p-value เพื่อสรุปผลจากข้อมูลตัวอย่างอย่างมีเหตุผล"
   },
   {
@@ -638,7 +638,7 @@ export const labsData: LabData[] = [
     title: "Bayesian Reasoning Lab",
     category: "Mathematics",
     gradeLevel: "อุดมศึกษา",
-    status: "ยังสร้างไม่เสร็จ",
+    status: "",
     description: "ใช้ Bayes' theorem เพื่อปรับความเชื่อจากหลักฐานใหม่ วิเคราะห์ prior, likelihood และ posterior ในสถานการณ์ข้อมูลไม่แน่นอน"
   },
   {
@@ -646,7 +646,7 @@ export const labsData: LabData[] = [
     title: "Fourier Analysis & Signals",
     category: "Mathematics",
     gradeLevel: "อุดมศึกษา",
-    status: "ยังสร้างไม่เสร็จ",
+    status: "",
     description: "แยกสัญญาณเป็นองค์ประกอบความถี่ด้วยแนวคิด Fourier series และ transform เพื่อเชื่อมกับคลื่น เสียง ภาพ และข้อมูลเซนเซอร์"
   },
   {
@@ -654,7 +654,7 @@ export const labsData: LabData[] = [
     title: "Complex Numbers & Phasors",
     category: "Mathematics",
     gradeLevel: "อุดมศึกษา",
-    status: "ยังสร้างไม่เสร็จ",
+    status: "",
     description: "สำรวจจำนวนเชิงซ้อน ระนาบเชิงซ้อน polar form และ phasors สำหรับอธิบายการหมุน คลื่น และวงจรไฟฟ้ากระแสสลับ"
   },
   {

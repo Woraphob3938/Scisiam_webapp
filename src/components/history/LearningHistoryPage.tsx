@@ -116,7 +116,7 @@ const categoryBarTone: Record<Exclude<CategoryFilter, "All">, string> = {
   Physics: "bg-blue-500",
   Chemistry: "bg-purple-500",
   Biology: "bg-emerald-500",
-  Mathematics: "bg-violet-500",
+  Mathematics: "bg-rose-500",
   Foundation: "bg-sky-500",
 };
 

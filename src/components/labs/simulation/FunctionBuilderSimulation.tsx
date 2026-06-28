@@ -514,8 +514,8 @@ export default function FunctionBuilderSimulation() {
             onClick={() => applyPreset(presetMode)}
             className={`rounded-xl border px-3 py-2 text-xs font-black transition ${
               mode === presetMode
-                ? "border-violet-200 bg-violet-600 text-white shadow-sm"
-                : "border-violet-100 bg-violet-50 text-violet-700 hover:bg-violet-100"
+                ? "border-rose-200 bg-rose-600 text-white shadow-sm"
+                : "border-rose-100 bg-rose-50 text-rose-700 hover:bg-rose-100"
             }`}
           >
             {MODE_LABELS[presetMode]}
@@ -531,7 +531,7 @@ export default function FunctionBuilderSimulation() {
       </div>
 
       <div className="grid grid-cols-3 gap-2 pt-1">
-        <button type="button" onClick={handleAddLog} className="col-span-2 inline-flex items-center justify-center gap-2 rounded-xl bg-violet-600 px-3 py-2.5 text-xs font-black text-white shadow-sm hover:bg-violet-700">
+        <button type="button" onClick={handleAddLog} className="col-span-2 inline-flex items-center justify-center gap-2 rounded-xl bg-rose-600 px-3 py-2.5 text-xs font-black text-white shadow-sm hover:bg-rose-700">
           <Save className="h-4 w-4" />
           Log function
         </button>
@@ -552,7 +552,7 @@ export default function FunctionBuilderSimulation() {
         scale {formatNumber(scale)}
         <input type="range" min="-4" max="4" step="0.25" value={scale} onChange={(event) => setScale(Number(event.target.value))} className="mt-2 h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-slate-200 accent-violet-600" />
       </label>
-      <button type="button" onClick={handleAddLog} className="min-h-11 rounded-xl bg-violet-600 px-3 py-2 text-xs font-black text-white hover:bg-violet-700">
+      <button type="button" onClick={handleAddLog} className="min-h-11 rounded-xl bg-rose-600 px-3 py-2 text-xs font-black text-white hover:bg-rose-700">
         Log f(x) {formatNumber(output)}
       </button>
     </div>

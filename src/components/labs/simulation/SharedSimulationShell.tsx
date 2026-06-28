@@ -13,10 +13,8 @@ import {
   Beaker,
   BookOpen,
   CheckCircle2,
-  ChevronRight,
   ChevronsDown,
   ChevronsUp,
-  Home,
   Info,
   ListChecks,
   LucideIcon,
@@ -160,7 +158,8 @@ export default function SharedSimulationShell({
   showSaveButton = true,
   onSave,
 }: SharedSimulationShellProps) {
-  const tone = accentClasses[accent];
+  const resolvedAccent = category === "Mathematics" ? "rose" : accent;
+  const tone = accentClasses[resolvedAccent];
   const stageShellRef = useRef<HTMLElement | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
   const [controlsOpen, setControlsOpen] = useState(false);
@@ -307,10 +306,13 @@ export default function SharedSimulationShell({
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(59,130,246,0.18),transparent_30%),radial-gradient(circle_at_80%_20%,rgba(16,185,129,0.14),transparent_28%)]" />
       <div className={`absolute inset-px bg-slate-100 ${isExpanded ? "" : "rounded-[22px]"}`} />
 
-      <div className="absolute left-5 right-5 top-5 z-20 flex flex-wrap items-start justify-between gap-3">
-        <div className="min-w-0 max-w-[calc(100%-64px)] rounded-2xl border border-white/70 bg-white/92 px-4 py-3 shadow-lg shadow-slate-900/10 backdrop-blur-md sm:max-w-none">
+      <div className="absolute left-5 right-5 top-5 z-20 flex flex-wrap items-start justify-between gap-3 pointer-events-none">
+        <div className="min-w-0 max-w-[calc(100%-64px)] rounded-2xl border border-white/70 bg-white/92 px-4 py-3 shadow-lg shadow-slate-900/10 backdrop-blur-md sm:max-w-none pointer-events-auto">
           <div className="mb-1 flex flex-wrap items-center gap-2">
-            <Link href={`/labs/${labId}`} className="inline-flex items-center gap-1 text-[11px] font-black text-slate-500 hover:text-slate-900">
+            <Link
+              href={`/labs/${labId}`}
+              className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-black text-slate-700 shadow-sm transition-colors hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-1"
+            >
               <ArrowLeft className="h-3.5 w-3.5" />
               รายละเอียดแล็บ
             </Link>
@@ -320,7 +322,7 @@ export default function SharedSimulationShell({
           <h1 className="max-w-[720px] text-lg font-black leading-relaxed text-slate-950 sm:text-2xl">{title}</h1>
         </div>
 
-        <div className="flex items-start gap-3">
+        <div className="flex items-start gap-3 pointer-events-auto">
           {showLiveMetrics && (
             <div data-testid="simulation-stage-metrics" className="hidden w-[320px] shrink-0 xl:block">
               {liveMetricsCard}
@@ -338,8 +340,8 @@ export default function SharedSimulationShell({
         </div>
       </div>
 
-      {showLiveMetrics && <div className="absolute right-5 top-[148px] z-20 sm:hidden">
-        <div className="inline-flex max-w-[180px] items-center gap-2 rounded-2xl border border-white/70 bg-white/92 px-3 py-2 text-[11px] font-black text-slate-900 shadow-lg shadow-slate-900/10 backdrop-blur-md">
+      {showLiveMetrics && <div className="absolute right-5 top-[148px] z-20 sm:hidden pointer-events-none">
+        <div className="inline-flex max-w-[180px] items-center gap-2 rounded-2xl border border-white/70 bg-white/92 px-3 py-2 text-[11px] font-black text-slate-900 shadow-lg shadow-slate-900/10 backdrop-blur-md pointer-events-auto">
           <BarChart3 className={`h-3.5 w-3.5 ${tone.text}`} />
           <span className="truncate">{metrics[0]?.label}: {metrics[0]?.value}</span>
         </div>
@@ -443,19 +445,6 @@ export default function SharedSimulationShell({
 
       <main className="mx-auto w-full max-w-[1440px] px-4 py-6 sm:px-12 md:px-20">
         <div className="flex flex-col gap-6">
-          <div className="flex flex-wrap items-center gap-2 text-xs font-bold text-slate-500">
-            <Link href="/" className="inline-flex items-center gap-1.5 text-slate-400 hover:text-blue-600">
-              <Home className="h-3.5 w-3.5" />
-              หน้าแรก
-            </Link>
-            <ChevronRight className="h-3.5 w-3.5 text-slate-300" />
-            <Link href={`/labs?category=${encodeURIComponent(category)}`} className={`${tone.text} hover:opacity-80`}>{category}</Link>
-            <ChevronRight className="h-3.5 w-3.5 text-slate-300" />
-            <Link href={`/labs/${labId}`} className="text-slate-700 hover:text-slate-900">{title}</Link>
-            <ChevronRight className="h-3.5 w-3.5 text-slate-300" />
-            <span className="text-slate-800">Simulator</span>
-          </div>
-
           {simulationStage}
 
           {showInfoTabs && <section className="space-y-4">

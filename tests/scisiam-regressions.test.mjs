@@ -135,18 +135,12 @@ test("remaining draft mathematics labs have details but are not registered as si
   const labCard = readProjectFile("src/components/LabCard.tsx");
 
   const draftMathLabIds = [
-    "advanced-calculus-optimization",
-    "linear-algebra-eigenvectors",
-    "differential-equations-lab",
-    "numerical-methods-lab",
-    "multivariable-calculus",
-    "statistical-inference",
-    "bayesian-reasoning-lab",
-    "fourier-analysis-signals",
-    "complex-numbers-phasors",
+    "vector-fields-gradients",
+    "discrete-graph-theory",
+    "mathematical-modeling-lab",
   ];
 
-  assert.equal(draftMathLabIds.length, 9);
+  assert.equal(draftMathLabIds.length, 3);
   assert.match(readiness, /แล็บนี้ยังสร้างไม่เสร็จ/);
   assert.doesNotMatch(labCard, /disabled=\{!readiness\.isReady\}[\s\S]*onViewDetails/);
 
@@ -218,22 +212,13 @@ test("university mathematics labs are detail-only placeholders", () => {
   const labCard = readProjectFile("src/components/LabCard.tsx");
 
   const universityLabIds = [
-    "advanced-calculus-optimization",
-    "linear-algebra-eigenvectors",
-    "differential-equations-lab",
-    "numerical-methods-lab",
-    "multivariable-calculus",
-    "statistical-inference",
-    "bayesian-reasoning-lab",
-    "fourier-analysis-signals",
-    "complex-numbers-phasors",
     "vector-fields-gradients",
     "discrete-graph-theory",
     "mathematical-modeling-lab",
   ];
   const handleViewDetails = labsPage.match(/const handleViewDetails = \(id: string\) => \{[\s\S]*?\n  \};/)?.[0] ?? "";
 
-  assert.equal(universityLabIds.length, 12);
+  assert.equal(universityLabIds.length, 3);
   assert.match(labsPage, /{ id: "อุดมศึกษา", label: "อุดมศึกษา" }/);
   assert.match(labCard, /export type GradeLevel = .*"อุดมศึกษา"/);
   assert.doesNotMatch(handleViewDetails, /isLabReady/);

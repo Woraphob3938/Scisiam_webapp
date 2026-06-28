@@ -498,7 +498,7 @@ export default function CenterVariabilitySimulation() {
       </div>
 
       <div className="grid grid-cols-4 gap-2 pt-1">
-        <button type="button" onClick={handleAddSnapshot} className="col-span-2 inline-flex items-center justify-center gap-2 rounded-xl bg-violet-600 px-3 py-2.5 text-xs font-black text-white shadow-sm hover:bg-violet-700">
+        <button type="button" onClick={handleAddSnapshot} className="col-span-2 inline-flex items-center justify-center gap-2 rounded-xl bg-rose-600 px-3 py-2.5 text-xs font-black text-white shadow-sm hover:bg-rose-700">
           <Save className="h-4 w-4" />
           Log snapshot
         </button>
@@ -522,7 +522,7 @@ export default function CenterVariabilitySimulation() {
         value {selectedValue}
         <input type="range" min="0" max="20" step="1" value={selectedValue} onChange={(event) => updateValue(selectedIndex, Number(event.target.value))} className="mt-2 h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-slate-200 accent-cyan-600" />
       </label>
-      <button type="button" onClick={handleAddSnapshot} className="min-h-11 rounded-xl bg-violet-600 px-3 py-2 text-xs font-black text-white hover:bg-violet-700">
+      <button type="button" onClick={handleAddSnapshot} className="min-h-11 rounded-xl bg-rose-600 px-3 py-2 text-xs font-black text-white hover:bg-rose-700">
         Log mean {formatNumber(stats.mean)}
       </button>
     </div>

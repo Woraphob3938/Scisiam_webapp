@@ -1229,8 +1229,11 @@ export default function LabHero({
 
   const chemistryTone = category === "Chemistry" || isPeriodicTable || isAcidBase || isBoylesLaw || isCharlesLaw || isIdealGas || isLeChateliers || isBeerLambert || isHesssLaw || isGalvanicCell || isChemicalKinetics || isSolubilityProduct || isAvogadrosLaw || isElectrolysis || isColligative;
   const readiness = getLabReadiness(labId);
-  const iconClass = isMathematics ? "bg-indigo-600 shadow-indigo-500/20" : isBiology ? "bg-emerald-600 shadow-emerald-500/20" : chemistryTone ? "bg-violet-600 shadow-violet-500/20" : "bg-blue-600 shadow-blue-500/20";
-  const badgeClass = isMathematics ? "bg-indigo-50 text-indigo-700 border-indigo-100" : isBiology ? "bg-emerald-50 text-emerald-700 border-emerald-100" : chemistryTone ? "bg-violet-50 text-violet-700 border-violet-100" : "bg-blue-50 text-blue-700 border-blue-100";
+  const iconClass = isMathematics ? "bg-rose-600 shadow-rose-500/20" : isBiology ? "bg-emerald-600 shadow-emerald-500/20" : chemistryTone ? "bg-violet-600 shadow-violet-500/20" : "bg-blue-600 shadow-blue-500/20";
+  const badgeClass = isMathematics ? "bg-rose-50 text-rose-700 border-rose-100" : isBiology ? "bg-emerald-50 text-emerald-700 border-emerald-100" : chemistryTone ? "bg-violet-50 text-violet-700 border-violet-100" : "bg-blue-50 text-blue-700 border-blue-100";
+  const primaryButtonClass = isMathematics
+    ? "bg-rose-600 hover:bg-rose-700 focus-visible:ring-rose-500 shadow-rose-600/10"
+    : "bg-blue-600 hover:bg-blue-700 focus-visible:ring-blue-500 shadow-blue-600/10";
 
   return (
     <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-12 md:px-20 py-3 select-none">
@@ -1284,7 +1287,7 @@ export default function LabHero({
             <button
               onClick={onStartExperiment}
               aria-label={`เริ่มทำการทดลองห้องแล็บ ${title}`}
-              className="flex items-center justify-center gap-2 py-3 px-7 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold transition-all duration-200 active:scale-95 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500 focus:outline-none cursor-pointer shadow-sm shadow-blue-600/10"
+              className={`flex items-center justify-center gap-2 rounded-xl px-7 py-3 text-sm font-bold text-white shadow-sm transition-all duration-200 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${primaryButtonClass}`}
             >
               <Play className="w-4 h-4 fill-white" />
               <span>{readiness.isReady ? "เริ่มทดลอง" : "ดูสถานะการจัดทำ"}</span>
@@ -1293,7 +1296,7 @@ export default function LabHero({
             {/* Back Button */}
             <Link
               href="/labs"
-              className="flex items-center justify-center gap-1.5 py-2 px-3 text-xs font-bold text-slate-500 hover:text-slate-700 transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-blue-500 rounded-xl focus:outline-none sm:py-3"
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 shadow-sm transition-colors hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-2"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>กลับไปหน้ารายชื่อห้องแล็บ</span>
