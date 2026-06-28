@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Eye, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { getLabReadiness } from "@/data/labReadiness";
 import {
   PushPullForcesSVG,
@@ -71,6 +71,7 @@ export type GradeLevel = "ประถม" | "มัธยมต้น" | "ม�
 export interface LabData {
   id: string;
   title: string;
+  thaiTitle: string;
   category: "Physics" | "Chemistry" | "Biology" | "Mathematics" | "Foundation";
   gradeLevel: GradeLevel;
   status: "ว่าง" | string;
@@ -79,7 +80,6 @@ export interface LabData {
 
 interface LabCardProps {
   lab: LabData;
-  onViewDetails?: (id: string) => void;
   onEnterRoom?: (id: string) => void;
 }
 
@@ -1517,7 +1517,6 @@ const StefanBoltzmannSVG = () => (
 
 export default function LabCard({
   lab,
-  onViewDetails,
   onEnterRoom,
 }: LabCardProps) {
   // Setup color styling depending on category
@@ -1847,33 +1846,22 @@ export default function LabCard({
           </span>
         </div>
 
-        {/* Title */}
-        <h3 className="mb-2 line-clamp-1 text-lg font-extrabold leading-[1.45] tracking-normal text-slate-900 transition-colors group-hover:text-slate-950">
-          {lab.title}
+        {/* Titles */}
+        <h3 className="line-clamp-1 text-lg font-extrabold leading-[1.45] tracking-normal text-slate-900">
+          {lab.thaiTitle}
         </h3>
+        <p className="mt-0.5 line-clamp-1 text-xs font-bold leading-relaxed text-slate-400">
+          {lab.title}
+        </p>
 
         {/* Description */}
-        <p className="mb-5 line-clamp-2 text-xs font-semibold leading-relaxed text-slate-500 sm:text-sm">
+        <p className="mb-5 mt-2 line-clamp-2 text-xs font-semibold leading-relaxed text-slate-500 sm:text-sm">
           {lab.description}
         </p>
       </div>
 
-      {/* Card Action Buttons */}
-      <div className="mt-auto grid grid-cols-2 gap-3">
-        <button
-          type="button"
-          onClick={() => onViewDetails?.(lab.id)}
-          aria-label={`ดูรายละเอียด ${lab.title}`}
-          className={`
-            flex min-h-11 select-none items-center justify-center gap-1.5 rounded-xl border px-3 py-2.5 text-xs font-bold
-            transition-all duration-200 active:scale-[0.98] focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100
-            ${themeColors.btnOutline} cursor-pointer
-          `}
-        >
-          <Eye className="h-4 w-4" />
-          <span>รายละเอียด</span>
-        </button>
-
+      {/* Card action */}
+      <div className="mt-auto w-full">
         <button
           type="button"
           disabled={!readiness.isReady}
@@ -1885,7 +1873,7 @@ export default function LabCard({
               : `ห้องทดลอง ${lab.title} ยังไม่พร้อมใช้งาน`
           }
           className={`
-            flex min-h-11 select-none items-center justify-center gap-1.5 rounded-xl px-3 py-2.5 text-xs font-bold
+            flex min-h-11 w-full select-none items-center justify-center gap-1.5 rounded-xl px-3 py-2.5 text-xs font-bold
             transition-all duration-200 active:scale-[0.98] focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100
             ${
               readiness.isReady

@@ -152,11 +152,6 @@ function LabsContent() {
     sessionStorage.setItem(LABS_RETURN_STATE_KEY, JSON.stringify(state));
   }, [searchQuery, selectedCategory, selectedGradeLevel, showAllLabs]);
 
-  const handleViewDetails = (id: string) => {
-    saveReturnState();
-    router.push(`/labs/${id}`);
-  };
-
   const handleEnterRoom = (id: string) => {
     if (!isLabReady(id)) return;
     saveReturnState();
@@ -286,7 +281,6 @@ function LabsContent() {
                   <LabCard
                     key={lab.id}
                     lab={lab}
-                    onViewDetails={handleViewDetails}
                     onEnterRoom={handleEnterRoom}
                   />
                 ))}

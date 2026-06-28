@@ -3,6 +3,7 @@ import type { LabData } from "@/components/LabCard";
 export const labsData: LabData[] = [
   {
     id: "newtons-cooling",
+    thaiTitle: "การเย็นตัวของนิวตัน",
     title: "Newton's law of cooling",
     category: "Physics",
     gradeLevel: "มัธยมต้น",
@@ -11,6 +12,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "ohms-law",
+    thaiTitle: "กฎของโอห์ม",
     title: "Ohm's Law & DC Circuits",
     category: "Physics",
     gradeLevel: "มัธยมต้น",
@@ -19,6 +21,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "hookes-law",
+    thaiTitle: "กฎของฮุค",
     title: "Hooke's Law of Elasticity",
     category: "Physics",
     gradeLevel: "มัธยมต้น",
@@ -27,6 +30,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "snells-law",
+    thaiTitle: "การหักเหของแสง",
     title: "Snell's Law of Refraction",
     category: "Physics",
     gradeLevel: "มัธยมต้น",
@@ -35,6 +39,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "ideal-gas-law",
+    thaiTitle: "แก๊สอุดมคติ",
     title: "Ideal Gas Law Simulation",
     category: "Physics",
     gradeLevel: "มัธยมปลาย",
@@ -43,6 +48,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "newtons-second-law",
+    thaiTitle: "กฎการเคลื่อนที่ข้อสอง",
     title: "Newton's Second Law of Motion",
     category: "Physics",
     gradeLevel: "มัธยมต้น",
@@ -51,6 +57,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "momentum-conservation",
+    thaiTitle: "การอนุรักษ์โมเมนตัม",
     title: "Conservation of Linear Momentum",
     category: "Physics",
     gradeLevel: "มัธยมปลาย",
@@ -59,6 +66,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "faradays-law",
+    thaiTitle: "การเหนี่ยวนำแม่เหล็กไฟฟ้า",
     title: "Faraday's Electromagnetic Induction",
     category: "Physics",
     gradeLevel: "มัธยมปลาย",
@@ -67,6 +75,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "bernoullis-principle",
+    thaiTitle: "หลักแบร์นูลลี",
     title: "Bernoulli's Principle & Fluid Dynamics",
     category: "Physics",
     gradeLevel: "มัธยมปลาย",
@@ -75,6 +84,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "photoelectric-effect",
+    thaiTitle: "ปรากฏการณ์โฟโตอิเล็กทริก",
     title: "Einstein's Photoelectric Effect",
     category: "Physics",
     gradeLevel: "มัธยมปลาย",
@@ -83,6 +93,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "keplers-laws",
+    thaiTitle: "กฎข้อสามของเคปเลอร์",
     title: "Kepler's Third Law of Planetary Motion",
     category: "Physics",
     gradeLevel: "มัธยมปลาย",
@@ -91,6 +102,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "stefan-boltzmann",
+    thaiTitle: "การแผ่รังสีวัตถุดำ",
     title: "Stefan-Boltzmann Law of Blackbody Radiation",
     category: "Physics",
     gradeLevel: "มัธยมปลาย",
@@ -99,6 +111,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "push-pull-forces",
+    thaiTitle: "แรงผลักและแรงดึง",
     title: "Push & Pull Forces",
     category: "Physics",
     gradeLevel: "ประถม",
@@ -107,6 +120,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "light-and-shadows",
+    thaiTitle: "แสงและเงา",
     title: "Light and Shadows",
     category: "Physics",
     gradeLevel: "ประถม",
@@ -115,6 +129,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "sound-vibrations",
+    thaiTitle: "การสั่นของเสียง",
     title: "Sound Vibrations",
     category: "Physics",
     gradeLevel: "ประถม",
@@ -123,6 +138,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "simple-circuits",
+    thaiTitle: "วงจรไฟฟ้าอย่างง่าย",
     title: "Simple Circuits",
     category: "Physics",
     gradeLevel: "ประถม",
@@ -131,6 +147,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "floating-and-sinking",
+    thaiTitle: "การลอยและการจม",
     title: "Floating and Sinking",
     category: "Physics",
     gradeLevel: "ประถม",
@@ -139,6 +156,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "magnet-exploration",
+    thaiTitle: "สำรวจแม่เหล็ก",
     title: "Magnet Exploration",
     category: "Physics",
     gradeLevel: "ประถม",
@@ -147,6 +165,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "acid-base-titration",
+    thaiTitle: "การไทเทรตกรด-เบส",
     title: "Acid-Base Titration Lab",
     category: "Chemistry",
     gradeLevel: "มัธยมปลาย",
@@ -155,6 +174,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "periodic-table",
+    thaiTitle: "ตารางธาตุ",
     title: "Periodic Table Lab",
     category: "Foundation",
     gradeLevel: "มัธยมต้น",
@@ -163,6 +183,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "boyles-law",
+    thaiTitle: "กฎของบอยล์",
     title: "Boyle's Gas Law Lab",
     category: "Chemistry",
     gradeLevel: "มัธยมต้น",
@@ -171,6 +192,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "charles-law",
+    thaiTitle: "กฎของชาร์ลส์",
     title: "Charles's Temperature-Volume Lab",
     category: "Chemistry",
     gradeLevel: "มัธยมปลาย",
@@ -179,6 +201,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "le-chateliers-principle",
+    thaiTitle: "การเลื่อนสมดุลเคมี",
     title: "Chemical Equilibrium Shift",
     category: "Chemistry",
     gradeLevel: "มัธยมปลาย",
@@ -187,6 +210,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "beer-lambert-law",
+    thaiTitle: "สเปกโทรโฟโตเมตรี",
     title: "Spectrophotometry & Concentration",
     category: "Chemistry",
     gradeLevel: "มัธยมปลาย",
@@ -195,6 +219,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "hesss-law",
+    thaiTitle: "กฎของเฮสส์",
     title: "Hess's Law & Calorimetry",
     category: "Chemistry",
     gradeLevel: "มัธยมปลาย",
@@ -203,6 +228,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "galvanic-cell",
+    thaiTitle: "เซลล์กัลวานิก",
     title: "Galvanic Cells & Voltage",
     category: "Chemistry",
     gradeLevel: "มัธยมปลาย",
@@ -211,6 +237,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "chemical-kinetics",
+    thaiTitle: "อัตราการเกิดปฏิกิริยา",
     title: "Chemical Reaction Rates",
     category: "Chemistry",
     gradeLevel: "มัธยมปลาย",
@@ -219,6 +246,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "solubility-product",
+    thaiTitle: "ค่าการละลาย",
     title: "Solubility Product Constant",
     category: "Chemistry",
     gradeLevel: "มัธยมปลาย",
@@ -227,6 +255,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "avogadros-law",
+    thaiTitle: "ปริมาตรโมลของแก๊ส",
     title: "Avogadro's Molar Volume",
     category: "Chemistry",
     gradeLevel: "มัธยมปลาย",
@@ -235,6 +264,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "electrolysis-lab",
+    thaiTitle: "อิเล็กโทรลิซิส",
     title: "Electrolysis & Metal Plating",
     category: "Chemistry",
     gradeLevel: "มัธยมปลาย",
@@ -243,6 +273,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "colligative-properties",
+    thaiTitle: "สมบัติคอลลิเกทีฟ",
     title: "Colligative Properties Lab",
     category: "Chemistry",
     gradeLevel: "มัธยมปลาย",
@@ -251,6 +282,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "states-of-matter",
+    thaiTitle: "สถานะของสสาร",
     title: "States of Matter",
     category: "Chemistry",
     gradeLevel: "ประถม",
@@ -259,6 +291,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "mixing-and-separating",
+    thaiTitle: "การผสมและแยกสาร",
     title: "Mixing and Separating",
     category: "Chemistry",
     gradeLevel: "ประถม",
@@ -267,6 +300,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "dissolving-solutions",
+    thaiTitle: "การละลายและสารละลาย",
     title: "Dissolving and Solutions",
     category: "Chemistry",
     gradeLevel: "ประถม",
@@ -275,6 +309,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "acids-bases-around-us",
+    thaiTitle: "กรด-เบสรอบตัว",
     title: "Acids and Bases Around Us",
     category: "Chemistry",
     gradeLevel: "ประถม",
@@ -283,6 +318,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "heating-cooling-materials",
+    thaiTitle: "การร้อนและเย็นของวัสดุ",
     title: "Heating and Cooling Materials",
     category: "Chemistry",
     gradeLevel: "ประถม",
@@ -291,6 +327,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "physical-chemical-changes",
+    thaiTitle: "การเปลี่ยนแปลงกายภาพและเคมี",
     title: "Physical vs Chemical Changes",
     category: "Chemistry",
     gradeLevel: "ประถม",
@@ -299,6 +336,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "photosynthesis-rate",
+    thaiTitle: "อัตราการสังเคราะห์ด้วยแสง",
     title: "Photosynthesis Rate Chamber",
     category: "Biology",
     gradeLevel: "ประถม",
@@ -307,6 +345,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "mendels-inheritance",
+    thaiTitle: "พันธุศาสตร์เมนเดล",
     title: "Mendelian Genetics Lab",
     category: "Biology",
     gradeLevel: "มัธยมต้น",
@@ -315,6 +354,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "mitosis-division",
+    thaiTitle: "ไมโทซิสและวัฏจักรเซลล์",
     title: "Mitosis & Cell Cycle",
     category: "Biology",
     gradeLevel: "มัธยมต้น",
@@ -323,6 +363,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "cell-osmosis",
+    thaiTitle: "ออสโมซิส",
     title: "Osmosis & Plasmolysis",
     category: "Biology",
     gradeLevel: "มัธยมต้น",
@@ -331,6 +372,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "enzyme-kinetics",
+    thaiTitle: "การทำงานของเอนไซม์",
     title: "Enzyme Catalysis Lab",
     category: "Biology",
     gradeLevel: "มัธยมปลาย",
@@ -339,6 +381,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "dna-extraction",
+    thaiTitle: "การสกัดดีเอ็นเอ",
     title: "DNA Extraction Chamber",
     category: "Biology",
     gradeLevel: "มัธยมต้น",
@@ -347,6 +390,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "cellular-respiration",
+    thaiTitle: "การหายใจระดับเซลล์",
     title: "Cellular Respiration Lab",
     category: "Biology",
     gradeLevel: "มัธยมปลาย",
@@ -355,6 +399,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "plant-transpiration",
+    thaiTitle: "การคายน้ำของพืช",
     title: "Plant Transpiration Potometer",
     category: "Biology",
     gradeLevel: "มัธยมต้น",
@@ -363,6 +408,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "natural-selection",
+    thaiTitle: "การคัดเลือกโดยธรรมชาติ",
     title: "Natural Selection Simulator",
     category: "Biology",
     gradeLevel: "มัธยมต้น",
@@ -371,6 +417,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "blood-typing",
+    thaiTitle: "การตรวจหมู่เลือด",
     title: "Blood Typing & Agglutination",
     category: "Biology",
     gradeLevel: "มัธยมปลาย",
@@ -379,6 +426,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "food-chain",
+    thaiTitle: "โซ่อาหารและนิเวศวิทยา",
     title: "Food Chain & Ecology",
     category: "Biology",
     gradeLevel: "ประถม",
@@ -387,6 +435,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "heart-rate",
+    thaiTitle: "ระบบหัวใจและหลอดเลือด",
     title: "Cardiovascular System Lab",
     category: "Biology",
     gradeLevel: "ประถม",
@@ -395,6 +444,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "graphing-lines",
+    thaiTitle: "กราฟเส้นตรง",
     title: "Graphing Lines & Slope",
     category: "Mathematics",
     gradeLevel: "มัธยมต้น",
@@ -403,6 +453,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "ratio-and-proportion",
+    thaiTitle: "อัตราส่วนและสัดส่วน",
     title: "Ratio & Proportion Lab",
     category: "Mathematics",
     gradeLevel: "ประถม",
@@ -411,6 +462,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "vector-addition",
+    thaiTitle: "การบวกเวกเตอร์",
     title: "Vector Addition Lab",
     category: "Mathematics",
     gradeLevel: "มัธยมปลาย",
@@ -419,6 +471,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "center-and-variability",
+    thaiTitle: "ค่ากลางและการกระจาย",
     title: "Center & Variability",
     category: "Mathematics",
     gradeLevel: "มัธยมต้น",
@@ -427,6 +480,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "curve-fitting",
+    thaiTitle: "การฟิตเส้นแนวโน้ม",
     title: "Curve Fitting & Trend Lines",
     category: "Mathematics",
     gradeLevel: "มัธยมปลาย",
@@ -435,6 +489,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "function-builder",
+    thaiTitle: "สร้างฟังก์ชัน",
     title: "Function Builder",
     category: "Mathematics",
     gradeLevel: "มัธยมต้น",
@@ -443,6 +498,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "probability-simulation",
+    thaiTitle: "ความน่าจะเป็น",
     title: "Probability & Random Trials",
     category: "Mathematics",
     gradeLevel: "มัธยมต้น",
@@ -451,6 +507,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "trigonometry-waves",
+    thaiTitle: "ตรีโกณมิติและคลื่น",
     title: "Trigonometry & Waves",
     category: "Mathematics",
     gradeLevel: "มัธยมปลาย",
@@ -459,6 +516,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "systems-of-equations",
+    thaiTitle: "ระบบสมการ",
     title: "Systems of Equations",
     category: "Mathematics",
     gradeLevel: "มัธยมต้น",
@@ -467,6 +525,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "geometry-measurement",
+    thaiTitle: "การวัดเรขาคณิต",
     title: "Geometry Measurement Lab",
     category: "Mathematics",
     gradeLevel: "ประถม",
@@ -475,6 +534,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "exponential-growth-decay",
+    thaiTitle: "การเติบโตและสลายตัว",
     title: "Exponential Growth & Decay",
     category: "Mathematics",
     gradeLevel: "มัธยมปลาย",
@@ -483,6 +543,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "data-sampling-error",
+    thaiTitle: "ความคลาดเคลื่อนจากการสุ่ม",
     title: "Sampling & Measurement Error",
     category: "Mathematics",
     gradeLevel: "มัธยมต้น",
@@ -491,6 +552,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "quadratic-projectiles",
+    thaiTitle: "ฟังก์ชันกำลังสองและวิถีโพรเจกไทล์",
     title: "Quadratic Functions & Projectiles",
     category: "Mathematics",
     gradeLevel: "มัธยมต้น",
@@ -499,6 +561,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "logarithm-scales",
+    thaiTitle: "ลอการิทึมและสเกลวิทยาศาสตร์",
     title: "Logarithms & Scientific Scales",
     category: "Mathematics",
     gradeLevel: "มัธยมปลาย",
@@ -507,6 +570,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "unit-conversion",
+    thaiTitle: "การแปลงหน่วย",
     title: "Unit Conversion & Dimensional Analysis",
     category: "Mathematics",
     gradeLevel: "มัธยมต้น",
@@ -515,6 +579,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "matrix-transformations",
+    thaiTitle: "การแปลงเมทริกซ์",
     title: "Matrix Transformations",
     category: "Mathematics",
     gradeLevel: "มัธยมปลาย",
@@ -523,6 +588,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "sequences-series",
+    thaiTitle: "ลำดับและอนุกรม",
     title: "Sequences & Series Lab",
     category: "Mathematics",
     gradeLevel: "มัธยมต้น",
@@ -531,6 +597,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "inequalities-feasible-regions",
+    thaiTitle: "อสมการและพื้นที่คำตอบ",
     title: "Inequalities & Feasible Regions",
     category: "Mathematics",
     gradeLevel: "มัธยมปลาย",
@@ -539,6 +606,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "transformations-symmetry",
+    thaiTitle: "การแปลงและสมมาตร",
     title: "Transformations & Symmetry",
     category: "Mathematics",
     gradeLevel: "ประถม",
@@ -547,6 +615,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "angles-circles",
+    thaiTitle: "มุมและวงกลม",
     title: "Angles & Circles Lab",
     category: "Mathematics",
     gradeLevel: "มัธยมต้น",
@@ -555,6 +624,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "combinatorics-counting",
+    thaiTitle: "หลักการนับ",
     title: "Combinatorics & Counting",
     category: "Mathematics",
     gradeLevel: "มัธยมปลาย",
@@ -563,6 +633,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "normal-distribution",
+    thaiTitle: "การแจกแจงปกติ",
     title: "Normal Distribution Lab",
     category: "Mathematics",
     gradeLevel: "มัธยมปลาย",
@@ -571,6 +642,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "rates-of-change",
+    thaiTitle: "อัตราการเปลี่ยนแปลง",
     title: "Rates of Change Lab",
     category: "Mathematics",
     gradeLevel: "มัธยมปลาย",
@@ -579,6 +651,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "optimization-constraints",
+    thaiTitle: "การหาค่าเหมาะที่สุด",
     title: "Optimization & Constraints",
     category: "Mathematics",
     gradeLevel: "มัธยมปลาย",
@@ -587,6 +660,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "advanced-calculus-optimization",
+    thaiTitle: "แคลคูลัสขั้นสูง",
     title: "Advanced Calculus & Optimization",
     category: "Mathematics",
     gradeLevel: "อุดมศึกษา",
@@ -595,6 +669,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "linear-algebra-eigenvectors",
+    thaiTitle: "พีชคณิตเชิงเส้น",
     title: "Linear Algebra & Eigenvectors",
     category: "Mathematics",
     gradeLevel: "อุดมศึกษา",
@@ -603,6 +678,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "differential-equations-lab",
+    thaiTitle: "สมการเชิงอนุพันธ์",
     title: "Differential Equations Lab",
     category: "Mathematics",
     gradeLevel: "อุดมศึกษา",
@@ -611,6 +687,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "numerical-methods-lab",
+    thaiTitle: "วิธีเชิงตัวเลข",
     title: "Numerical Methods Lab",
     category: "Mathematics",
     gradeLevel: "อุดมศึกษา",
@@ -619,6 +696,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "multivariable-calculus",
+    thaiTitle: "แคลคูลัสหลายตัวแปร",
     title: "Multivariable Calculus",
     category: "Mathematics",
     gradeLevel: "อุดมศึกษา",
@@ -627,6 +705,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "statistical-inference",
+    thaiTitle: "อนุมานเชิงสถิติ",
     title: "Statistical Inference",
     category: "Mathematics",
     gradeLevel: "อุดมศึกษา",
@@ -635,6 +714,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "bayesian-reasoning-lab",
+    thaiTitle: "การให้เหตุผลแบบเบย์",
     title: "Bayesian Reasoning Lab",
     category: "Mathematics",
     gradeLevel: "อุดมศึกษา",
@@ -643,6 +723,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "fourier-analysis-signals",
+    thaiTitle: "การวิเคราะห์ฟูเรียร์",
     title: "Fourier Analysis & Signals",
     category: "Mathematics",
     gradeLevel: "อุดมศึกษา",
@@ -651,6 +732,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "complex-numbers-phasors",
+    thaiTitle: "จำนวนเชิงซ้อนและเฟเซอร์",
     title: "Complex Numbers & Phasors",
     category: "Mathematics",
     gradeLevel: "อุดมศึกษา",
@@ -659,30 +741,34 @@ export const labsData: LabData[] = [
   },
   {
     id: "vector-fields-gradients",
+    thaiTitle: "สนามเวกเตอร์และเกรเดียนต์",
     title: "Vector Fields & Gradients",
     category: "Mathematics",
     gradeLevel: "อุดมศึกษา",
-    status: "ยังสร้างไม่เสร็จ",
+    status: "",
     description: "อ่านสนามเวกเตอร์ gradient, divergence และ curl เพื่อทำความเข้าใจการไหล สนามแรง และการเปลี่ยนแปลงในพื้นที่ต่อเนื่อง"
   },
   {
     id: "discrete-graph-theory",
+    thaiTitle: "คณิตศาสตร์ไม่ต่อเนื่อง",
     title: "Discrete Mathematics & Graph Theory",
     category: "Mathematics",
     gradeLevel: "อุดมศึกษา",
-    status: "ยังสร้างไม่เสร็จ",
+    status: "",
     description: "ศึกษากราฟ โหนด เส้นเชื่อม เส้นทาง เครือข่าย และตรรกะเชิงไม่ต่อเนื่องที่ใช้ในข้อมูล คอมพิวเตอร์ และระบบซับซ้อน"
   },
   {
     id: "mathematical-modeling-lab",
+    thaiTitle: "แบบจำลองทางคณิตศาสตร์",
     title: "Mathematical Modeling Lab",
     category: "Mathematics",
     gradeLevel: "อุดมศึกษา",
-    status: "ยังสร้างไม่เสร็จ",
+    status: "",
     description: "สร้างแบบจำลองคณิตศาสตร์จากปัญหาจริง กำหนดสมมติฐาน ตัวแปร พารามิเตอร์ และตรวจสอบผลลัพธ์กับข้อมูลหรือข้อจำกัด"
   },
   {
     id: "quantum-tunneling",
+    thaiTitle: "การทะลุผ่านเชิงควอนตัม",
     title: "Quantum Tunneling",
     category: "Physics",
     gradeLevel: "อุดมศึกษา",
@@ -691,6 +777,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "michelson-interferometer",
+    thaiTitle: "อินเตอร์เฟอโรมิเตอร์ไมเคิลสัน",
     title: "Michelson Interferometer",
     category: "Physics",
     gradeLevel: "อุดมศึกษา",
@@ -699,6 +786,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "zeeman-effect",
+    thaiTitle: "ปรากฏการณ์ซีแมน",
     title: "Zeeman Effect",
     category: "Physics",
     gradeLevel: "อุดมศึกษา",
@@ -707,6 +795,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "superconductivity-meissner",
+    thaiTitle: "สภาพนำยิ่งยวด",
     title: "Superconductivity & Meissner Effect",
     category: "Physics",
     gradeLevel: "อุดมศึกษา",
@@ -715,6 +804,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "bragg-diffraction",
+    thaiTitle: "การเลี้ยวเบนแบบแบรกก์",
     title: "Bragg Diffraction",
     category: "Physics",
     gradeLevel: "อุดมศึกษา",
@@ -723,6 +813,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "relativistic-kinematics",
+    thaiTitle: "จลนศาสตร์สัมพัทธภาพ",
     title: "Relativistic Kinematics",
     category: "Physics",
     gradeLevel: "อุดมศึกษา",
@@ -731,6 +822,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "nmr-spectroscopy",
+    thaiTitle: "สเปกโทรสโกปีเอ็นเอ็มอาร์",
     title: "NMR Spectroscopy",
     category: "Chemistry",
     gradeLevel: "อุดมศึกษา",
@@ -739,6 +831,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "xps-spectroscopy",
+    thaiTitle: "สเปกโทรสโกปีเอ็กซ์พีเอส",
     title: "XPS Spectroscopy",
     category: "Chemistry",
     gradeLevel: "อุดมศึกษา",
@@ -747,6 +840,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "hplc-chromatography",
+    thaiTitle: "โครมาโทกราฟีเอชพีแอลซี",
     title: "HPLC Chromatography",
     category: "Chemistry",
     gradeLevel: "อุดมศึกษา",
@@ -755,6 +849,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "transition-metal-complexes",
+    thaiTitle: "สารเชิงซ้อนโลหะแทรนซิชัน",
     title: "Transition Metal Complexes",
     category: "Chemistry",
     gradeLevel: "อุดมศึกษา",
@@ -763,6 +858,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "eis-electrochemistry",
+    thaiTitle: "อิมพีแดนซ์ไฟฟ้าเคมี",
     title: "Electrochemical Impedance Spectroscopy",
     category: "Chemistry",
     gradeLevel: "อุดมศึกษา",
@@ -771,6 +867,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "quantum-chemistry-orbitals",
+    thaiTitle: "ออร์บิทัลเคมีควอนตัม",
     title: "Quantum Chemistry Orbitals",
     category: "Chemistry",
     gradeLevel: "อุดมศึกษา",
@@ -779,6 +876,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "pcr-gel-electrophoresis",
+    thaiTitle: "พีซีอาร์และเจลอิเล็กโทรโฟรีซิส",
     title: "PCR & Gel Electrophoresis",
     category: "Biology",
     gradeLevel: "อุดมศึกษา",
@@ -787,6 +885,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "crispr-gene-editing",
+    thaiTitle: "การตัดต่อยีนคริสเปอร์",
     title: "CRISPR-Cas9 Gene Editing",
     category: "Biology",
     gradeLevel: "อุดมศึกษา",
@@ -795,6 +894,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "recombinant-dna-transformation",
+    thaiTitle: "ดีเอ็นเอลูกผสม",
     title: "Recombinant DNA & Transformation",
     category: "Biology",
     gradeLevel: "อุดมศึกษา",
@@ -803,6 +903,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "flow-cytometry-cycle",
+    thaiTitle: "โฟลว์ไซโตเมทรี",
     title: "Flow Cytometry Cell Analysis",
     category: "Biology",
     gradeLevel: "อุดมศึกษา",
@@ -811,6 +912,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "western-blotting",
+    thaiTitle: "เวสเทิร์นบลอต",
     title: "Western Blotting Protein Detection",
     category: "Biology",
     gradeLevel: "อุดมศึกษา",
@@ -819,6 +921,7 @@ export const labsData: LabData[] = [
   },
   {
     id: "metabolic-pathway-flux",
+    thaiTitle: "ฟลักซ์เมแทบอลิซึม",
     title: "Metabolic Pathway Flux Analysis",
     category: "Biology",
     gradeLevel: "อุดมศึกษา",
