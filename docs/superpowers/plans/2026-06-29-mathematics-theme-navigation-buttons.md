@@ -112,7 +112,12 @@ const badgeClass = isMathematics
     : chemistryTone
       ? "bg-violet-50 text-violet-700 border-violet-100"
       : "bg-blue-50 text-blue-700 border-blue-100";
+const primaryButtonClass = isMathematics
+  ? "bg-rose-600 hover:bg-rose-700 focus-visible:ring-rose-500 shadow-rose-600/10"
+  : "bg-blue-600 hover:bg-blue-700 focus-visible:ring-blue-500 shadow-blue-600/10";
 ```
+
+Apply `primaryButtonClass` to the existing start button so the Mathematics detail primary action is also pink.
 
 Use this class on the existing `/labs` link:
 
