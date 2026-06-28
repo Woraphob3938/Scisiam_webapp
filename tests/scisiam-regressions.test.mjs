@@ -128,28 +128,8 @@ test("mathematics lab detail heroes use lab-specific SVG variants", () => {
 });
 
 test("remaining draft mathematics labs have details but are not registered as simulations", () => {
-  const labs = readProjectFile("src/data/labs.ts");
-  const details = readProjectFile("src/data/labDetails.ts");
-  const registry = readProjectFile("src/data/labSimulationRegistry.ts");
-  const readiness = readProjectFile("src/data/labReadiness.ts");
-  const labCard = readProjectFile("src/components/LabCard.tsx");
-
-  const draftMathLabIds = [
-    "vector-fields-gradients",
-    "discrete-graph-theory",
-    "mathematical-modeling-lab",
-  ];
-
-  assert.equal(draftMathLabIds.length, 3);
-  assert.match(readiness, /แล็บนี้ยังสร้างไม่เสร็จ/);
-  assert.doesNotMatch(labCard, /disabled=\{!readiness\.isReady\}[\s\S]*onViewDetails/);
-
-  for (const labId of draftMathLabIds) {
-    assert.match(labs, new RegExp(`id: "${labId}"[\\s\\S]*?category: "Mathematics"`), `${labId} should be listed as Mathematics`);
-    assert.match(labs, new RegExp(`id: "${labId}"[\\s\\S]*?status: "ยังสร้างไม่เสร็จ"`), `${labId} should be marked unfinished`);
-    assert.match(details, new RegExp(`"${labId}": createMathConceptDetails`), `${labId} should have detail data`);
-    assert.doesNotMatch(registry, new RegExp(`"${labId}"`), `${labId} should not be ready for simulation`);
-  }
+  const draftMathLabIds = [];
+  assert.equal(draftMathLabIds.length, 0);
 });
 
 test("applied mathematics labs have routed interactive SVG simulations", () => {
@@ -204,32 +184,29 @@ test("applied mathematics labs have routed interactive SVG simulations", () => {
   }
 });
 
-test("university mathematics labs are detail-only placeholders", () => {
+test("university mathematics labs are now ready interactive simulations", () => {
   const labs = readProjectFile("src/data/labs.ts");
   const details = readProjectFile("src/data/labDetails.ts");
   const registry = readProjectFile("src/data/labSimulationRegistry.ts");
-  const labsPage = readProjectFile("src/app/labs/page.tsx");
-  const labCard = readProjectFile("src/components/LabCard.tsx");
+  const savedRegistry = readProjectFile("src/data/labSavedExperiments.ts");
+  const route = readProjectFile("src/app/labs/[id]/simulation/page.tsx");
 
   const universityLabIds = [
     "vector-fields-gradients",
     "discrete-graph-theory",
     "mathematical-modeling-lab",
   ];
-  const handleViewDetails = labsPage.match(/const handleViewDetails = \(id: string\) => \{[\s\S]*?\n  \};/)?.[0] ?? "";
 
   assert.equal(universityLabIds.length, 3);
-  assert.match(labsPage, /{ id: "อุดมศึกษา", label: "อุดมศึกษา" }/);
-  assert.match(labCard, /export type GradeLevel = .*"อุดมศึกษา"/);
-  assert.doesNotMatch(handleViewDetails, /isLabReady/);
-  assert.match(labCard, /disabled=\{!readiness\.isReady\}[\s\S]*onClick=\{\(\) => onEnterRoom\?\.\(lab\.id\)\}/);
 
   for (const labId of universityLabIds) {
     assert.match(labs, new RegExp(`id: "${labId}"[\\s\\S]*?category: "Mathematics"`), `${labId} should be listed as Mathematics`);
     assert.match(labs, new RegExp(`id: "${labId}"[\\s\\S]*?gradeLevel: "อุดมศึกษา"`), `${labId} should be university level`);
-    assert.match(labs, new RegExp(`id: "${labId}"[\\s\\S]*?status: "ยังสร้างไม่เสร็จ"`), `${labId} should be marked unfinished`);
+    assert.match(labs, new RegExp(`id: "${labId}"[\\s\\S]*?status: ""`), `${labId} should be marked ready`);
     assert.match(details, new RegExp(`"${labId}": createMathConceptDetails`), `${labId} should have detail data`);
-    assert.doesNotMatch(registry, new RegExp(`"${labId}"`), `${labId} should not be ready for simulation`);
+    assert.match(registry, new RegExp(`"${labId}"`), `${labId} should be ready for simulation`);
+    assert.match(savedRegistry, new RegExp(`"${labId}"\\s*:`), `${labId} should have a saved experiment key`);
+    assert.match(route, new RegExp(`labId === "${labId}"`), `${labId} should route to its simulation component`);
   }
 });
 

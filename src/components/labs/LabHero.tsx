@@ -1229,11 +1229,11 @@ export default function LabHero({
 
   const chemistryTone = category === "Chemistry" || isPeriodicTable || isAcidBase || isBoylesLaw || isCharlesLaw || isIdealGas || isLeChateliers || isBeerLambert || isHesssLaw || isGalvanicCell || isChemicalKinetics || isSolubilityProduct || isAvogadrosLaw || isElectrolysis || isColligative;
   const readiness = getLabReadiness(labId);
-  const iconClass = isMathematics ? "bg-rose-600 shadow-rose-500/20" : isBiology ? "bg-emerald-600 shadow-emerald-500/20" : chemistryTone ? "bg-violet-600 shadow-violet-500/20" : "bg-blue-600 shadow-blue-500/20";
-  const badgeClass = isMathematics ? "bg-rose-50 text-rose-700 border-rose-100" : isBiology ? "bg-emerald-50 text-emerald-700 border-emerald-100" : chemistryTone ? "bg-violet-50 text-violet-700 border-violet-100" : "bg-blue-50 text-blue-700 border-blue-100";
+  const iconClass = isMathematics ? "bg-pink-200 text-pink-900 shadow-pink-200/40" : isBiology ? "bg-emerald-600 text-white shadow-emerald-500/20" : chemistryTone ? "bg-violet-600 text-white shadow-violet-500/20" : "bg-blue-600 text-white shadow-blue-500/20";
+  const badgeClass = isMathematics ? "bg-pink-50 text-pink-900 border-pink-200" : isBiology ? "bg-emerald-50 text-emerald-700 border-emerald-100" : chemistryTone ? "bg-violet-50 text-violet-700 border-violet-100" : "bg-blue-50 text-blue-700 border-blue-100";
   const primaryButtonClass = isMathematics
-    ? "bg-rose-600 hover:bg-rose-700 focus-visible:ring-rose-500 shadow-rose-600/10"
-    : "bg-blue-600 hover:bg-blue-700 focus-visible:ring-blue-500 shadow-blue-600/10";
+    ? "bg-pink-200 hover:bg-pink-300 text-pink-900 focus-visible:ring-pink-300 shadow-pink-200/40"
+    : "bg-blue-600 hover:bg-blue-700 text-white focus-visible:ring-blue-500 shadow-blue-600/10";
 
   return (
     <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-12 md:px-20 py-3 select-none">
@@ -1244,7 +1244,7 @@ export default function LabHero({
           {/* Header row with Atom indicator box and Subject Tags */}
           <div className="flex flex-wrap items-center gap-2.5 mb-2.5 sm:mb-3">
             {/* Physics Logo Icon */}
-            <div className={`w-9 h-9 rounded-xl text-white flex items-center justify-center shadow-sm sm:h-10 sm:w-10 sm:rounded-2xl ${iconClass}`}>
+            <div className={`w-9 h-9 rounded-xl flex items-center justify-center shadow-sm sm:h-10 sm:w-10 sm:rounded-2xl ${iconClass}`}>
               <HeroIcon className="w-5 h-5" />
             </div>
 
@@ -1287,7 +1287,7 @@ export default function LabHero({
             <button
               onClick={onStartExperiment}
               aria-label={`เริ่มทำการทดลองห้องแล็บ ${title}`}
-              className={`flex items-center justify-center gap-2 rounded-xl px-7 py-3 text-sm font-bold text-white shadow-sm transition-all duration-200 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${primaryButtonClass}`}
+              className={`flex items-center justify-center gap-2 rounded-xl px-7 py-3 text-sm font-bold shadow-sm transition-all duration-200 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${primaryButtonClass}`}
             >
               <Play className="w-4 h-4 fill-white" />
               <span>{readiness.isReady ? "เริ่มทดลอง" : "ดูสถานะการจัดทำ"}</span>

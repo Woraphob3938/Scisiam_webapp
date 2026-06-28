@@ -12,7 +12,7 @@ const categoriesList = [
   { id: "Physics" as Category, name: "ฟิสิกส์", icon: Atom, color: "indigo", imagePath: "/images/categories/physics.png" },
   { id: "Chemistry" as Category, name: "เคมี", icon: Beaker, color: "purple", imagePath: "/images/categories/chemistry.png" },
   { id: "Biology" as Category, name: "ชีววิทยา", icon: Leaf, color: "green", imagePath: "/images/categories/biology.png" },
-  { id: "Mathematics" as Category, name: "คณิตศาสตร์", icon: Calculator, color: "rose", imagePath: null },
+  { id: "Mathematics" as Category, name: "คณิตศาสตร์", icon: Calculator, color: "pink", imagePath: null },
 ];
 
 const activeColorClasses: Record<string, string> = {
@@ -22,7 +22,7 @@ const activeColorClasses: Record<string, string> = {
   purple: "border-purple-200 bg-purple-50/80 text-purple-700 shadow-sm shadow-purple-500/5",
   green: "border-green-200 bg-green-50/80 text-green-700 shadow-sm shadow-green-500/5",
   violet: "border-violet-200 bg-violet-50/80 text-violet-700 shadow-sm shadow-violet-500/5",
-  rose: "border-rose-200 bg-rose-50/80 text-rose-700 shadow-sm shadow-rose-500/5",
+  pink: "border-pink-200 bg-pink-50/80 text-pink-900 shadow-sm shadow-pink-200/40",
 };
 
 interface CategoryFilterProps {
@@ -75,7 +75,7 @@ export default function CategoryFilter({
                   className={`hidden h-4 w-4 sm:block ${
                     isActive
                       ? category.id === "Mathematics"
-                        ? "text-rose-600"
+                        ? "text-pink-700"
                         : "text-white"
                       : "text-slate-400"
                   }`}

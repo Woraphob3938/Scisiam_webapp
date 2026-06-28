@@ -75,6 +75,9 @@ export const mathConceptSimulationLabIds = [
   "bayesian-reasoning-lab",
   "fourier-analysis-signals",
   "complex-numbers-phasors",
+  "vector-fields-gradients",
+  "discrete-graph-theory",
+  "mathematical-modeling-lab",
 ] as const;
 
 export type DirectSimulationLabId = (typeof directSimulationLabIds)[number];

@@ -759,7 +759,7 @@ export default function NormalDistributionSimulation() {
                 <button
                   onClick={() => handleDropBalls(ballsCount)}
                   disabled={isSimulatingGalton}
-                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-rose-600 px-4 py-2.5 text-sm font-black text-white shadow-md transition-all hover:bg-rose-700 active:scale-98 disabled:pointer-events-none disabled:opacity-50"
+                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-pink-200 px-4 py-2.5 text-sm font-black text-pink-900 shadow-md transition-all hover:bg-pink-300 active:scale-98 disabled:pointer-events-none disabled:opacity-50"
                 >
                   <Play className="h-4 w-4" />
                   {isSimulatingGalton ? "กำลังปล่อย..." : "ปล่อยลูกบอล"}

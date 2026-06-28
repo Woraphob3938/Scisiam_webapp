@@ -36,7 +36,7 @@ export interface SimulationStep {
 }
 
 interface SharedSimulationShellProps {
-  accent: "blue" | "cyan" | "emerald" | "orange" | "rose" | "violet";
+  accent: "blue" | "cyan" | "emerald" | "orange" | "pink" | "rose" | "violet";
   labId: string;
   category: string;
   title: string;
@@ -72,7 +72,7 @@ const accentClasses = {
     border: "border-blue-100",
     soft: "bg-blue-50 text-blue-700 border-blue-100",
     text: "text-blue-600",
-    button: "bg-blue-600 hover:bg-blue-700",
+    button: "bg-blue-600 text-white hover:bg-blue-700",
     ring: "#2563eb",
   },
   cyan: {
@@ -80,7 +80,7 @@ const accentClasses = {
     border: "border-cyan-100",
     soft: "bg-cyan-50 text-cyan-700 border-cyan-100",
     text: "text-cyan-600",
-    button: "bg-cyan-600 hover:bg-cyan-700",
+    button: "bg-cyan-600 text-white hover:bg-cyan-700",
     ring: "#0891b2",
   },
   emerald: {
@@ -88,7 +88,7 @@ const accentClasses = {
     border: "border-emerald-100",
     soft: "bg-emerald-50 text-emerald-700 border-emerald-100",
     text: "text-emerald-600",
-    button: "bg-emerald-600 hover:bg-emerald-700",
+    button: "bg-emerald-600 text-white hover:bg-emerald-700",
     ring: "#10b981",
   },
   orange: {
@@ -96,7 +96,7 @@ const accentClasses = {
     border: "border-orange-100",
     soft: "bg-orange-50 text-orange-700 border-orange-100",
     text: "text-orange-600",
-    button: "bg-orange-500 hover:bg-orange-600",
+    button: "bg-orange-500 text-white hover:bg-orange-600",
     ring: "#f97316",
   },
   rose: {
@@ -104,15 +104,23 @@ const accentClasses = {
     border: "border-rose-100",
     soft: "bg-rose-50 text-rose-700 border-rose-100",
     text: "text-rose-600",
-    button: "bg-rose-600 hover:bg-rose-700",
+    button: "bg-rose-600 text-white hover:bg-rose-700",
     ring: "#e11d48",
+  },
+  pink: {
+    icon: "bg-pink-200 text-pink-900",
+    border: "border-pink-200",
+    soft: "bg-pink-50 text-pink-900 border-pink-200",
+    text: "text-pink-800",
+    button: "bg-pink-200 text-pink-900 hover:bg-pink-300",
+    ring: "#f9a8d4",
   },
   violet: {
     icon: "bg-violet-600 text-white",
     border: "border-violet-100",
     soft: "bg-violet-50 text-violet-700 border-violet-100",
     text: "text-violet-600",
-    button: "bg-violet-600 hover:bg-violet-700",
+    button: "bg-violet-600 text-white hover:bg-violet-700",
     ring: "#7c3aed",
   },
 };
@@ -158,7 +166,7 @@ export default function SharedSimulationShell({
   showSaveButton = true,
   onSave,
 }: SharedSimulationShellProps) {
-  const resolvedAccent = category === "Mathematics" ? "rose" : accent;
+  const resolvedAccent = category === "Mathematics" ? "pink" : accent;
   const tone = accentClasses[resolvedAccent];
   const stageShellRef = useRef<HTMLElement | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -273,7 +281,7 @@ export default function SharedSimulationShell({
               {showSaveButton && onSave && (
                 <button
                   onClick={onSave}
-                  className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-xs font-black text-white shadow-sm ${tone.button}`}
+                  className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-xs font-black shadow-sm ${tone.button}`}
                 >
                   <Save className="h-4 w-4" />
                   บันทึกผลการทดลอง

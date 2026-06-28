@@ -464,7 +464,7 @@ export default function GraphingLinesSimulation() {
       </div>
 
       <div className="grid grid-cols-4 gap-2 pt-1">
-        <button type="button" onClick={handleAddPoint} className="col-span-2 inline-flex items-center justify-center gap-2 rounded-xl bg-rose-600 px-3 py-2.5 text-xs font-black text-white shadow-sm hover:bg-rose-700">
+        <button type="button" onClick={handleAddPoint} className="col-span-2 inline-flex items-center justify-center gap-2 rounded-xl bg-pink-200 px-3 py-2.5 text-xs font-black text-pink-900 shadow-sm hover:bg-pink-300">
           <Save className="h-4 w-4" />
           บันทึกจุด
         </button>
@@ -488,7 +488,7 @@ export default function GraphingLinesSimulation() {
         b {formatNumber(intercept)}
         <input type="range" min="-6" max="6" step="0.5" value={intercept} onChange={(event) => setIntercept(Number(event.target.value))} className="mt-2 h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-slate-200 accent-amber-500" />
       </label>
-      <button type="button" onClick={handleAddPoint} className="min-h-11 rounded-xl bg-rose-600 px-3 py-2 text-xs font-black text-white hover:bg-rose-700">
+      <button type="button" onClick={handleAddPoint} className="min-h-11 rounded-xl bg-pink-200 px-3 py-2 text-xs font-black text-pink-900 hover:bg-pink-300">
         บันทึกจุด ({formatNumber(probeX)}, {formatNumber(probeY)})
       </button>
     </div>

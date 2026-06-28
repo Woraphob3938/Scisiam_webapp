@@ -463,7 +463,7 @@ export default function ProbabilitySimulation() {
                 }}
                 className={`py-2 rounded-lg text-xs font-black transition cursor-pointer ${
                   trialType === "Coin"
-                    ? "bg-rose-600 text-white shadow-sm"
+                    ? "bg-pink-200 text-pink-900 shadow-sm"
                     : "bg-white border border-slate-200 text-slate-655 hover:bg-slate-50"
                 }`}
               >
@@ -480,7 +480,7 @@ export default function ProbabilitySimulation() {
                 }}
                 className={`py-2 rounded-lg text-xs font-black transition cursor-pointer ${
                   trialType === "Dice"
-                    ? "bg-rose-600 text-white shadow-sm"
+                    ? "bg-pink-200 text-pink-900 shadow-sm"
                     : "bg-white border border-slate-200 text-slate-655 hover:bg-slate-50"
                 }`}
               >
@@ -515,7 +515,7 @@ export default function ProbabilitySimulation() {
             <button
               onClick={handleStartStop}
               className={`col-span-2 inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-xs font-black text-white shadow-sm ${
-                isAutoRunning ? "bg-slate-700" : "bg-rose-600 hover:bg-rose-700"
+                isAutoRunning ? "bg-slate-700 text-white" : "bg-pink-200 text-pink-900 hover:bg-pink-300"
               }`}
             >
               {isAutoRunning ? <Pause className="h-4 w-4 fill-white stroke-none" /> : <Play className="h-4 w-4 fill-white stroke-none" />}

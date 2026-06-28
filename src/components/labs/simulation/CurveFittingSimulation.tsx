@@ -568,7 +568,7 @@ export default function CurveFittingSimulation() {
       </div>
 
       <div className="grid grid-cols-2 gap-2">
-        <button type="button" onClick={() => setMode("linear")} className={`rounded-xl border px-3 py-2 text-xs font-black ${mode === "linear" ? "border-rose-200 bg-rose-600 text-white" : "border-rose-100 bg-rose-50 text-rose-700"}`}>
+        <button type="button" onClick={() => setMode("linear")} className={`rounded-xl border px-3 py-2 text-xs font-black ${mode === "linear" ? "border-pink-200 bg-pink-200 text-pink-900" : "border-pink-100 bg-pink-50 text-pink-900"}`}>
           linear trend line
         </button>
         <button type="button" onClick={() => setMode("quadratic")} className={`rounded-xl border px-3 py-2 text-xs font-black ${mode === "quadratic" ? "border-cyan-200 bg-cyan-600 text-white" : "border-cyan-100 bg-cyan-50 text-cyan-700"}`}>
@@ -581,7 +581,7 @@ export default function CurveFittingSimulation() {
       <ControlSlider label="y coordinate" icon={Sliders} value={selectedPoint.y} min={Y_MIN} max={Y_MAX} step={0.5} tone="orange" onChange={(value) => updatePoint(selectedIndex, { y: value })} />
 
       <div className="grid grid-cols-4 gap-2 pt-1">
-        <button type="button" onClick={handleAddLog} className="col-span-2 inline-flex items-center justify-center gap-2 rounded-xl bg-rose-600 px-3 py-2.5 text-xs font-black text-white shadow-sm hover:bg-rose-700">
+        <button type="button" onClick={handleAddLog} className="col-span-2 inline-flex items-center justify-center gap-2 rounded-xl bg-pink-200 px-3 py-2.5 text-xs font-black text-pink-900 shadow-sm hover:bg-pink-300">
           <Save className="h-4 w-4" />
           Log model
         </button>
@@ -602,14 +602,14 @@ export default function CurveFittingSimulation() {
         <input type="range" min={Y_MIN} max={Y_MAX} step="0.5" value={selectedPoint.y} onChange={(event) => updatePoint(selectedIndex, { y: Number(event.target.value) })} className="mt-2 h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-slate-200 accent-violet-600" />
       </label>
       <div className="grid grid-cols-2 gap-2">
-        <button type="button" onClick={() => setMode("linear")} className={`rounded-xl px-3 py-2 text-xs font-black ${mode === "linear" ? "bg-rose-600 text-white" : "bg-rose-50 text-rose-700"}`}>
+        <button type="button" onClick={() => setMode("linear")} className={`rounded-xl px-3 py-2 text-xs font-black ${mode === "linear" ? "bg-pink-200 text-pink-900" : "bg-pink-50 text-pink-900"}`}>
           linear
         </button>
         <button type="button" onClick={() => setMode("quadratic")} className={`rounded-xl px-3 py-2 text-xs font-black ${mode === "quadratic" ? "bg-cyan-600 text-white" : "bg-cyan-50 text-cyan-700"}`}>
           quad
         </button>
       </div>
-      <button type="button" onClick={handleAddLog} className="min-h-11 rounded-xl bg-rose-600 px-3 py-2 text-xs font-black text-white hover:bg-rose-700">
+      <button type="button" onClick={handleAddLog} className="min-h-11 rounded-xl bg-pink-200 px-3 py-2 text-xs font-black text-pink-900 hover:bg-pink-300">
         Log R^2 {formatNumber(fit.rSquared)}
       </button>
     </div>

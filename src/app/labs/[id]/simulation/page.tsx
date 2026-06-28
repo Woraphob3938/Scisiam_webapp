@@ -131,6 +131,12 @@ const ComplexPhasorsSimulation = dynamic(() =>
   import("@/components/labs/simulation/ComplexPhasorsSimulation"));
 const AppliedMathSimulation = dynamic(() =>
   import("@/components/labs/simulation/AppliedMathSimulation"));
+const VectorFieldsGradientsSimulation = dynamic(() =>
+  import("@/components/labs/simulation/VectorFieldsGradientsSimulation"));
+const DiscreteGraphTheorySimulation = dynamic(() =>
+  import("@/components/labs/simulation/DiscreteGraphTheorySimulation"));
+const MathematicalModelingSimulation = dynamic(() =>
+  import("@/components/labs/simulation/MathematicalModelingSimulation"));
 
 const simulationComponents: Record<DirectSimulationLabId, React.ComponentType> = {
   "newtons-cooling": NewtonsCoolingSimulation,
@@ -370,6 +376,18 @@ export default function SimulationRoomPage() {
 
   if (labId === "complex-numbers-phasors") {
     return <ComplexPhasorsSimulation />;
+  }
+
+  if (labId === "vector-fields-gradients") {
+    return <VectorFieldsGradientsSimulation />;
+  }
+
+  if (labId === "discrete-graph-theory") {
+    return <DiscreteGraphTheorySimulation />;
+  }
+
+  if (labId === "mathematical-modeling-lab") {
+    return <MathematicalModelingSimulation />;
   }
 
   if (labId === "geometry-measurement") {

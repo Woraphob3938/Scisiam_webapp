@@ -587,7 +587,7 @@ export default function RatioProportionSimulation() {
       <ControlSlider label="Given value c" icon={Target} value={targetA} min={2} max={48} step={1} tone="amber" onChange={setTargetA} />
 
       <div className="grid grid-cols-4 gap-2 pt-1">
-        <button type="button" onClick={handleAddLog} className="col-span-2 inline-flex items-center justify-center gap-2 rounded-xl bg-rose-600 px-3 py-2.5 text-xs font-black text-white shadow-sm hover:bg-rose-700">
+        <button type="button" onClick={handleAddLog} className="col-span-2 inline-flex items-center justify-center gap-2 rounded-xl bg-pink-200 px-3 py-2.5 text-xs font-black text-pink-900 shadow-sm hover:bg-pink-300">
           <Save className="h-4 w-4" />
           Log ratio
         </button>
@@ -611,7 +611,7 @@ export default function RatioProportionSimulation() {
         scale x{scaleFactor}
         <input type="range" min="1" max="8" step="1" value={scaleFactor} onChange={(event) => setScaleFactor(Number(event.target.value))} className="mt-2 h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-slate-200 accent-cyan-600" />
       </label>
-      <button type="button" onClick={handleAddLog} className="min-h-11 rounded-xl bg-rose-600 px-3 py-2 text-xs font-black text-white hover:bg-rose-700">
+      <button type="button" onClick={handleAddLog} className="min-h-11 rounded-xl bg-pink-200 px-3 py-2 text-xs font-black text-pink-900 hover:bg-pink-300">
         Log {formatNumber(scaledA)}:{formatNumber(scaledB)}
       </button>
     </div>

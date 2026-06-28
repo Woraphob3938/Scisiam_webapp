@@ -69,6 +69,9 @@ export const LAB_SAVED_EXPERIMENT_KEYS: Record<string, string> = {
   "bayesian-reasoning-lab": "scisiam_saved_bayesian_reasoning_experiment",
   "fourier-analysis-signals": "scisiam_saved_fourier_analysis_experiment",
   "complex-numbers-phasors": "scisiam_saved_complex_numbers_experiment",
+  "vector-fields-gradients": "scisiam_saved_vector_fields_experiment",
+  "discrete-graph-theory": "scisiam_saved_discrete_graph_experiment",
+  "mathematical-modeling-lab": "scisiam_saved_math_modeling_experiment",
 };
 
 export function getSavedExperimentKey(labId: string) {
