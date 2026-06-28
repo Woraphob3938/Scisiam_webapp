@@ -74,3 +74,11 @@ test("Active application flows contain no scoring system", () => {
     /gradeScore|บันทึกคะแนน|ได้คะแนน/,
   );
 });
+
+test("Supabase keeps historical scoring columns dormant", () => {
+  const migration = read("supabase/migrations/20260628232320_disable_scoring.sql");
+  assert.match(migration, /coalesce\(p_summary,[\s\S]*?null,\s*0,\s*p_duration_seconds/i);
+  assert.match(migration, /best_score,[\s\S]*?last_score,[\s\S]*?points_awarded[\s\S]*?null,\s*null,\s*0/i);
+  assert.match(migration, /update\s+public\.mission_definitions[\s\S]*?points_reward\s*=\s*0/i);
+  assert.doesNotMatch(migration, /total_points\s*=\s*total_points\s*\+/i);
+});

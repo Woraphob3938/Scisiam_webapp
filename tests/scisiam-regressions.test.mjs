@@ -303,12 +303,15 @@ test("lab detail layout avoids a duplicate bottom start CTA", () => {
   assert.match(source, /<LabHero[\s\S]*onStartExperiment=\{handleStartExperiment\}/);
 });
 
-test("learning history has its own route and uses shared progress sources", () => {
+test("learning history redirects into profile and uses shared progress sources", () => {
   const pagePath = join(rootDir, "src/app/history/page.tsx");
   const componentPath = join(rootDir, "src/components/history/LearningHistoryPage.tsx");
 
   assert.equal(existsSync(pagePath), true, "history route should exist");
   assert.equal(existsSync(componentPath), true, "history page component should exist");
+
+  const route = readProjectFile("src/app/history/page.tsx");
+  assert.match(route, /redirect\("\/profile\?tab=history"\)/);
 
   const source = readProjectFile("src/components/history/LearningHistoryPage.tsx");
   assert.match(source, /loadSupabaseLearningSnapshot/);
@@ -317,15 +320,15 @@ test("learning history has its own route and uses shared progress sources", () =
   assert.doesNotMatch(source, /Math\.random/);
 });
 
-test("learning history is reachable from desktop and mobile navigation", () => {
+test("learning history is reachable from the profile tabs", () => {
   const sidebar = readProjectFile("src/components/Sidebar.tsx");
   const mobileTabBar = readProjectFile("src/components/MobileTabBar.tsx");
   const profile = readProjectFile("src/app/profile/page.tsx");
 
-  assert.match(sidebar, /href: "\/history"/);
-  assert.match(mobileTabBar, /href: "\/history"/);
-  assert.match(mobileTabBar, /pathname === "\/history"/);
-  assert.match(profile, /href="\/history"/);
+  assert.doesNotMatch(sidebar, /href: "\/history"/);
+  assert.doesNotMatch(mobileTabBar, /href: "\/history"/);
+  assert.match(profile, /<LearningHistoryPage embedded/);
+  assert.match(profile, /id: "history", label: "ประวัติการเรียนรู้"/);
   assert.doesNotMatch(profile, /ระบบบันทึกประวัติการทำแล็บทั้งหมดกำลังเตรียมการเชื่อมต่อ Supabase/);
 });
 
@@ -730,6 +733,7 @@ test("local Supabase migrations mirror the deployed migration history", () => {
     "20260602200551",
     "20260602202721",
     "20260611083451",
+    "20260628232320",
   ];
 
   assert.deepEqual(
@@ -843,10 +847,8 @@ test("profile authentication cannot leave the page on an infinite loading state"
   );
 });
 
-test("home progress uses the shared learning snapshot instead of counting storage keys", () => {
+test("home redirects directly to the lab listing", () => {
   const source = readProjectFile("src/app/page.tsx");
 
-  assert.match(source, /readLocalLearningSnapshot/);
-  assert.match(source, /loadSupabaseLearningSnapshot/);
-  assert.doesNotMatch(source, /key\?\.startsWith\("scisiam_saved_"\)/);
+  assert.match(source, /redirect\("\/labs"\)/);
 });
