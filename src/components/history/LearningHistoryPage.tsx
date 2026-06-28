@@ -33,7 +33,7 @@ import {
 } from "@/lib/supabase/learning-snapshot";
 import { SCISIAM_AUTH_EVENT, SCISIAM_POINTS_EVENT } from "@/lib/supabase/auth-cache";
 
-type CategoryFilter = "All" | "Physics" | "Chemistry" | "Biology" | "Mathematics";
+type CategoryFilter = "All" | "Physics" | "Chemistry" | "Biology" | "Mathematics" | "Foundation";
 
 type HistorySource = "cloud" | "local";
 
@@ -96,6 +96,12 @@ const categoryFilters: Array<{
     shortLabel: "คณิตศาสตร์",
     tone: "border-violet-100 bg-violet-50 text-violet-700",
   },
+  {
+    id: "Foundation",
+    label: "Foundation",
+    shortLabel: "ความรู้พื้นฐาน",
+    tone: "border-sky-100 bg-sky-50 text-sky-700",
+  },
 ];
 
 const categoryLabels: Record<Exclude<CategoryFilter, "All">, string> = {
@@ -103,6 +109,7 @@ const categoryLabels: Record<Exclude<CategoryFilter, "All">, string> = {
   Chemistry: "เคมี",
   Biology: "ชีววิทยา",
   Mathematics: "คณิตศาสตร์",
+  Foundation: "ความรู้พื้นฐาน",
 };
 
 const categoryBarTone: Record<Exclude<CategoryFilter, "All">, string> = {
@@ -110,6 +117,7 @@ const categoryBarTone: Record<Exclude<CategoryFilter, "All">, string> = {
   Chemistry: "bg-purple-500",
   Biology: "bg-emerald-500",
   Mathematics: "bg-violet-500",
+  Foundation: "bg-sky-500",
 };
 
 function formatDateTime(value: string) {

@@ -98,6 +98,54 @@ export const labsData: LabData[] = [
     description: "ศึกษาอัตราการแผ่รังสีความร้อนของวัตถุดำและอัตราการสูญเสียพลังงานที่แปรผันตามอุณหภูมิสัมบูรณ์ยกกำลังสี่"
   },
   {
+    id: "push-pull-forces",
+    title: "Push & Pull Forces",
+    category: "Physics",
+    gradeLevel: "ประถม",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "สำรวจแรงผลัก แรงดึง ทิศทางของแรง และผลต่อการเคลื่อนที่ของวัตถุผ่านสถานการณ์ง่าย ๆ ในชีวิตประจำวัน"
+  },
+  {
+    id: "light-and-shadows",
+    title: "Light and Shadows",
+    category: "Physics",
+    gradeLevel: "ประถม",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "เรียนรู้การเดินทางของแสง การเกิดเงา ความโปร่งใสของวัสดุ และการเปลี่ยนขนาดเงาเมื่อระยะห่างเปลี่ยน"
+  },
+  {
+    id: "sound-vibrations",
+    title: "Sound Vibrations",
+    category: "Physics",
+    gradeLevel: "ประถม",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "สังเกตว่าเสียงเกิดจากการสั่น เปรียบเทียบความดัง ความสูงต่ำของเสียง และการส่งผ่านเสียงในวัสดุต่าง ๆ"
+  },
+  {
+    id: "simple-circuits",
+    title: "Simple Circuits",
+    category: "Physics",
+    gradeLevel: "ประถม",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "ต่อวงจรไฟฟ้าอย่างง่ายด้วยแบตเตอรี่ สายไฟ หลอดไฟ และสวิตช์ เพื่อดูเงื่อนไขที่ทำให้ไฟติดหรือดับ"
+  },
+  {
+    id: "floating-and-sinking",
+    title: "Floating and Sinking",
+    category: "Physics",
+    gradeLevel: "ประถม",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "ทดลองเปรียบเทียบวัตถุที่ลอยและจม สังเกตผลของวัสดุ รูปร่าง และความหนาแน่นต่อการลอยตัวในน้ำ"
+  },
+  {
+    id: "magnet-exploration",
+    title: "Magnet Exploration",
+    category: "Physics",
+    gradeLevel: "ประถม",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "สำรวจแรงแม่เหล็ก ขั้วเหนือ-ใต้ การดูดและผลัก และวัสดุที่แม่เหล็กดึงดูดได้หรือไม่ได้"
+  },
+  {
     id: "acid-base-titration",
     title: "Acid-Base Titration Lab",
     category: "Chemistry",
@@ -108,7 +156,7 @@ export const labsData: LabData[] = [
   {
     id: "periodic-table",
     title: "Periodic Table Lab",
-    category: "Chemistry",
+    category: "Foundation",
     gradeLevel: "มัธยมต้น",
     status: "",
     description: "สำรวจตารางธาตุแบบ 3D เรียนรู้เลขอะตอม สัญลักษณ์ มวลอะตอม คาบ หมู่ และหมวดธาตุหลัก 7 หมู่"
@@ -200,6 +248,54 @@ export const labsData: LabData[] = [
     gradeLevel: "มัธยมปลาย",
     status: "",
     description: "ศึกษาการลดลงของจุดเยือกแข็งและการเพิ่มขึ้นของจุดเดือดของตัวทำละลายเมื่อเติมตัวละลายที่ระเหยยาก"
+  },
+  {
+    id: "states-of-matter",
+    title: "States of Matter",
+    category: "Chemistry",
+    gradeLevel: "ประถม",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "สำรวจของแข็ง ของเหลว และแก๊ส ผ่านการสังเกตรูปร่าง ปริมาตร การไหล และการเปลี่ยนสถานะอย่างง่าย"
+  },
+  {
+    id: "mixing-and-separating",
+    title: "Mixing and Separating",
+    category: "Chemistry",
+    gradeLevel: "ประถม",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "ทดลองผสมวัสดุและแยกสารด้วยการกรอง ร่อน แม่เหล็ก หรือการตกตะกอน เพื่อเข้าใจว่าสารผสมแยกได้หลายวิธี"
+  },
+  {
+    id: "dissolving-solutions",
+    title: "Dissolving and Solutions",
+    category: "Chemistry",
+    gradeLevel: "ประถม",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "สังเกตการละลายของสารในน้ำ เปรียบเทียบตัวละลาย ตัวทำละลาย อุณหภูมิ และการคนที่มีผลต่อการละลาย"
+  },
+  {
+    id: "acids-bases-around-us",
+    title: "Acids and Bases Around Us",
+    category: "Chemistry",
+    gradeLevel: "ประถม",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "รู้จักกรดและเบสรอบตัวผ่านอินดิเคเตอร์สีธรรมชาติ สังเกตความเปลี่ยนแปลงอย่างปลอดภัยโดยไม่ใช้สารอันตราย"
+  },
+  {
+    id: "heating-cooling-materials",
+    title: "Heating and Cooling Materials",
+    category: "Chemistry",
+    gradeLevel: "ประถม",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "สำรวจผลของความร้อนและความเย็นต่อวัสดุ เช่น การละลาย การแข็งตัว การขยายตัว และการเปลี่ยนแปลงที่ย้อนกลับได้"
+  },
+  {
+    id: "physical-chemical-changes",
+    title: "Physical vs Chemical Changes",
+    category: "Chemistry",
+    gradeLevel: "ประถม",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "แยกการเปลี่ยนแปลงทางกายภาพกับทางเคมีจากหลักฐานง่าย ๆ เช่น สี กลิ่น ฟอง แสง ความร้อน หรือสารใหม่ที่เกิดขึ้น"
   },
   {
     id: "photosynthesis-rate",
@@ -344,6 +440,390 @@ export const labsData: LabData[] = [
     gradeLevel: "มัธยมต้น",
     status: "",
     description: "ประกอบฟังก์ชันจาก input-output, table, graph และ rule เพื่อให้เห็นว่าการเปลี่ยนตัวแปรส่งผลต่อผลลัพธ์อย่างไร"
+  },
+  {
+    id: "probability-simulation",
+    title: "Probability & Random Trials",
+    category: "Mathematics",
+    gradeLevel: "มัธยมต้น",
+    status: "",
+    description: "ทดลองสุ่มเหรียญ ลูกเต๋า และเหตุการณ์หลายขั้นตอน เพื่อเปรียบเทียบความน่าจะเป็นเชิงทฤษฎีกับความถี่สัมพัทธ์จากข้อมูลจริง"
+  },
+  {
+    id: "trigonometry-waves",
+    title: "Trigonometry & Waves",
+    category: "Mathematics",
+    gradeLevel: "มัธยมปลาย",
+    status: "",
+    description: "เชื่อมไซน์ โคไซน์ แอมพลิจูด คาบ และเฟส กับคลื่น แสง เสียง และการสั่นในแล็บวิทยาศาสตร์"
+  },
+  {
+    id: "systems-of-equations",
+    title: "Systems of Equations",
+    category: "Mathematics",
+    gradeLevel: "มัธยมต้น",
+    status: "",
+    description: "แก้ระบบสมการจากกราฟ ตาราง และสถานการณ์จริง เพื่อหาจุดตัดที่แทนเงื่อนไขสองอย่างเกิดพร้อมกัน"
+  },
+  {
+    id: "geometry-measurement",
+    title: "Geometry Measurement Lab",
+    category: "Mathematics",
+    gradeLevel: "ประถม",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "ฝึกวัดความยาว พื้นที่ ปริมาตร มุม และความคลาดเคลื่อนจากการวัด เพื่อเตรียมอ่านข้อมูลในแล็บอย่างแม่นยำ"
+  },
+  {
+    id: "exponential-growth-decay",
+    title: "Exponential Growth & Decay",
+    category: "Mathematics",
+    gradeLevel: "มัธยมปลาย",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "สำรวจการเพิ่มและลดแบบทวีคูณ เช่น การเย็นตัว การสลายตัว การเพิ่มจำนวนประชากร และครึ่งชีวิต"
+  },
+  {
+    id: "data-sampling-error",
+    title: "Sampling & Measurement Error",
+    category: "Mathematics",
+    gradeLevel: "มัธยมต้น",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "เรียนรู้การสุ่มตัวอย่าง ขนาดตัวอย่าง ความคลาดเคลื่อน และความน่าเชื่อถือของผลทดลองจากข้อมูลที่วัดซ้ำ"
+  },
+  {
+    id: "quadratic-projectiles",
+    title: "Quadratic Functions & Projectiles",
+    category: "Mathematics",
+    gradeLevel: "มัธยมต้น",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "ใช้พาราโบลา จุดยอด และรากของสมการกำลังสอง เพื่ออ่านเส้นทางการเคลื่อนที่และกราฟที่มีค่าสูงสุดหรือต่ำสุด"
+  },
+  {
+    id: "logarithm-scales",
+    title: "Logarithms & Scientific Scales",
+    category: "Mathematics",
+    gradeLevel: "มัธยมปลาย",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "ทำความเข้าใจลอการิทึมและสเกลทางวิทยาศาสตร์ เช่น pH เดซิเบล ความสว่าง และข้อมูลที่เปลี่ยนหลายลำดับขั้น"
+  },
+  {
+    id: "unit-conversion",
+    title: "Unit Conversion & Dimensional Analysis",
+    category: "Mathematics",
+    gradeLevel: "มัธยมต้น",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "ฝึกแปลงหน่วย ตรวจมิติ และใช้ factor-label method เพื่อป้องกันข้อผิดพลาดก่อนคำนวณผลแล็บ"
+  },
+  {
+    id: "matrix-transformations",
+    title: "Matrix Transformations",
+    category: "Mathematics",
+    gradeLevel: "มัธยมปลาย",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "สำรวจเมทริกซ์ การหมุน การยืด การสะท้อน และการแปลงพิกัดที่ใช้ในเวกเตอร์ กราฟิก และแบบจำลองข้อมูล"
+  },
+  {
+    id: "sequences-series",
+    title: "Sequences & Series Lab",
+    category: "Mathematics",
+    gradeLevel: "มัธยมต้น",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "สร้างลำดับเลขคณิต ลำดับเรขาคณิต และผลรวมอนุกรม เพื่ออ่านรูปแบบการเพิ่มทีละขั้นหรือเพิ่มเป็นอัตราส่วน"
+  },
+  {
+    id: "inequalities-feasible-regions",
+    title: "Inequalities & Feasible Regions",
+    category: "Mathematics",
+    gradeLevel: "มัธยมปลาย",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "วาดอสมการบนระนาบพิกัดและอ่านพื้นที่คำตอบ เพื่อใช้วิเคราะห์ข้อจำกัดของทรัพยากร เวลา หรือช่วงค่าที่ปลอดภัย"
+  },
+  {
+    id: "transformations-symmetry",
+    title: "Transformations & Symmetry",
+    category: "Mathematics",
+    gradeLevel: "ประถม",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "ทดลองเลื่อน หมุน สะท้อน ขยาย และดูสมมาตรของรูป เพื่อเชื่อมเรขาคณิตกับลวดลาย โมเลกุล และภาพข้อมูล"
+  },
+  {
+    id: "angles-circles",
+    title: "Angles & Circles Lab",
+    category: "Mathematics",
+    gradeLevel: "มัธยมต้น",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "วัดมุม รัศมี เส้นรอบวง ส่วนโค้ง และองศา เพื่อใช้กับวงกลม การหมุน และการอ่านทิศทางในระบบพิกัด"
+  },
+  {
+    id: "combinatorics-counting",
+    title: "Combinatorics & Counting",
+    category: "Mathematics",
+    gradeLevel: "มัธยมปลาย",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "นับวิธีจัดเรียง เลือกชุดข้อมูล และสร้าง sample space ด้วยหลักการคูณ permutation และ combination"
+  },
+  {
+    id: "normal-distribution",
+    title: "Normal Distribution Lab",
+    category: "Mathematics",
+    gradeLevel: "มัธยมปลาย",
+    status: "",
+    description: "สำรวจโค้งปกติ ค่าเฉลี่ย ส่วนเบี่ยงเบนมาตรฐาน และ z-score เพื่ออ่านข้อมูลการวัดจำนวนมากในงานทดลอง"
+  },
+  {
+    id: "rates-of-change",
+    title: "Rates of Change Lab",
+    category: "Mathematics",
+    gradeLevel: "มัธยมปลาย",
+    status: "",
+    description: "เปรียบเทียบอัตราการเปลี่ยนแปลงเฉลี่ยและเฉพาะจุดจากกราฟ เพื่อเชื่อมกับความเร็ว อัตราปฏิกิริยา และความชันสัมผัส"
+  },
+  {
+    id: "optimization-constraints",
+    title: "Optimization & Constraints",
+    category: "Mathematics",
+    gradeLevel: "มัธยมปลาย",
+    status: "",
+    description: "ตั้งเป้าหมายและข้อจำกัดเพื่อหาค่าสูงสุดหรือต่ำสุด เช่น ใช้วัสดุน้อยที่สุด ได้ผลผลิตมากที่สุด หรือควบคุมความเสี่ยง"
+  },
+  {
+    id: "advanced-calculus-optimization",
+    title: "Advanced Calculus & Optimization",
+    category: "Mathematics",
+    gradeLevel: "อุดมศึกษา",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "ศึกษาลิมิต อนุพันธ์ อินทิกรัล และการหาค่าเหมาะที่สุดหลายรูปแบบ เพื่อวิเคราะห์แบบจำลองเชิงปริมาณระดับอุดมศึกษา"
+  },
+  {
+    id: "linear-algebra-eigenvectors",
+    title: "Linear Algebra & Eigenvectors",
+    category: "Mathematics",
+    gradeLevel: "อุดมศึกษา",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "สำรวจเวกเตอร์ เมทริกซ์ การแปลงเชิงเส้น eigenvalues และ eigenvectors ที่ใช้ในฟิสิกส์ ข้อมูล และแบบจำลองเชิงคำนวณ"
+  },
+  {
+    id: "differential-equations-lab",
+    title: "Differential Equations Lab",
+    category: "Mathematics",
+    gradeLevel: "อุดมศึกษา",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "วิเคราะห์สมการเชิงอนุพันธ์ที่อธิบายการเปลี่ยนแปลงต่อเวลา เช่น การเติบโต การสั่น การเย็นตัว และระบบพลวัต"
+  },
+  {
+    id: "numerical-methods-lab",
+    title: "Numerical Methods Lab",
+    category: "Mathematics",
+    gradeLevel: "อุดมศึกษา",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "ทดลองวิธีคำนวณเชิงตัวเลข เช่น root finding, interpolation, numerical integration และ error analysis สำหรับโจทย์ที่แก้ตรง ๆ ยาก"
+  },
+  {
+    id: "multivariable-calculus",
+    title: "Multivariable Calculus",
+    category: "Mathematics",
+    gradeLevel: "อุดมศึกษา",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "สำรวจฟังก์ชันหลายตัวแปร gradient, partial derivatives, contour maps และพื้นผิวสามมิติที่ใช้วิเคราะห์ระบบหลายปัจจัย"
+  },
+  {
+    id: "statistical-inference",
+    title: "Statistical Inference",
+    category: "Mathematics",
+    gradeLevel: "อุดมศึกษา",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "เรียนรู้การประมาณค่า ช่วงความเชื่อมั่น hypothesis testing และ p-value เพื่อสรุปผลจากข้อมูลตัวอย่างอย่างมีเหตุผล"
+  },
+  {
+    id: "bayesian-reasoning-lab",
+    title: "Bayesian Reasoning Lab",
+    category: "Mathematics",
+    gradeLevel: "อุดมศึกษา",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "ใช้ Bayes' theorem เพื่อปรับความเชื่อจากหลักฐานใหม่ วิเคราะห์ prior, likelihood และ posterior ในสถานการณ์ข้อมูลไม่แน่นอน"
+  },
+  {
+    id: "fourier-analysis-signals",
+    title: "Fourier Analysis & Signals",
+    category: "Mathematics",
+    gradeLevel: "อุดมศึกษา",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "แยกสัญญาณเป็นองค์ประกอบความถี่ด้วยแนวคิด Fourier series และ transform เพื่อเชื่อมกับคลื่น เสียง ภาพ และข้อมูลเซนเซอร์"
+  },
+  {
+    id: "complex-numbers-phasors",
+    title: "Complex Numbers & Phasors",
+    category: "Mathematics",
+    gradeLevel: "อุดมศึกษา",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "สำรวจจำนวนเชิงซ้อน ระนาบเชิงซ้อน polar form และ phasors สำหรับอธิบายการหมุน คลื่น และวงจรไฟฟ้ากระแสสลับ"
+  },
+  {
+    id: "vector-fields-gradients",
+    title: "Vector Fields & Gradients",
+    category: "Mathematics",
+    gradeLevel: "อุดมศึกษา",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "อ่านสนามเวกเตอร์ gradient, divergence และ curl เพื่อทำความเข้าใจการไหล สนามแรง และการเปลี่ยนแปลงในพื้นที่ต่อเนื่อง"
+  },
+  {
+    id: "discrete-graph-theory",
+    title: "Discrete Mathematics & Graph Theory",
+    category: "Mathematics",
+    gradeLevel: "อุดมศึกษา",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "ศึกษากราฟ โหนด เส้นเชื่อม เส้นทาง เครือข่าย และตรรกะเชิงไม่ต่อเนื่องที่ใช้ในข้อมูล คอมพิวเตอร์ และระบบซับซ้อน"
+  },
+  {
+    id: "mathematical-modeling-lab",
+    title: "Mathematical Modeling Lab",
+    category: "Mathematics",
+    gradeLevel: "อุดมศึกษา",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "สร้างแบบจำลองคณิตศาสตร์จากปัญหาจริง กำหนดสมมติฐาน ตัวแปร พารามิเตอร์ และตรวจสอบผลลัพธ์กับข้อมูลหรือข้อจำกัด"
+  },
+  {
+    id: "quantum-tunneling",
+    title: "Quantum Tunneling",
+    category: "Physics",
+    gradeLevel: "อุดมศึกษา",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "ศึกษาพฤติกรรมความน่าจะเป็นของการทะลุผ่านสิ่งกีดขวางศักย์ (Potential Barrier) ของแพ็กเกจคลื่นตามสมการชโรดิงเจอร์"
+  },
+  {
+    id: "michelson-interferometer",
+    title: "Michelson Interferometer",
+    category: "Physics",
+    gradeLevel: "อุดมศึกษา",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "จำลองการแทรกสอดของแสงเพื่อวัดความยาวคลื่นของแสงเลเซอร์และการเปลี่ยนแปลงเฟสจากการเลื่อนของกระจกเงา"
+  },
+  {
+    id: "zeeman-effect",
+    title: "Zeeman Effect",
+    category: "Physics",
+    gradeLevel: "อุดมศึกษา",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "สังเกตการแยกออกของระดับพลังงานอะตอมภายใต้สนามแม่เหล็กภายนอกและศึกษาการเปลี่ยนสถานะของสปิน"
+  },
+  {
+    id: "superconductivity-meissner",
+    title: "Superconductivity & Meissner Effect",
+    category: "Physics",
+    gradeLevel: "อุดมศึกษา",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "ศึกษาการสูญเสียความต้านทานไฟฟ้าที่อุณหภูมิต่ำวิกฤตและการขับสนามแม่เหล็กออกจากตัวนำยิ่งยวด"
+  },
+  {
+    id: "bragg-diffraction",
+    title: "Bragg Diffraction",
+    category: "Physics",
+    gradeLevel: "อุดมศึกษา",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "จำลองการเลี้ยวเบนของรังสีเอกซ์ผ่านโครงผลึกสามมิติเพื่อหาโครงสร้างอะตอมและระยะห่างระหว่างระนาบผลึก"
+  },
+  {
+    id: "relativistic-kinematics",
+    title: "Relativistic Kinematics",
+    category: "Physics",
+    gradeLevel: "อุดมศึกษา",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "จำลองการเคลื่อนที่ด้วยความเร็วใกล้แสงเพื่อศึกษาผลของการยืดออกของเวลา การหดตัวของความยาว และความสัมพันธ์ของมวล-พลังงาน"
+  },
+  {
+    id: "nmr-spectroscopy",
+    title: "NMR Spectroscopy",
+    category: "Chemistry",
+    gradeLevel: "อุดมศึกษา",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "วิเคราะห์โครงสร้างโมเลกุลสารอินทรีย์ผ่านระดับการดูดกลืนพลังงานคลื่นวิทยุของสปินนิวเคลียสภายใต้สนามแม่เหล็กแรงสูง"
+  },
+  {
+    id: "xps-spectroscopy",
+    title: "XPS Spectroscopy",
+    category: "Chemistry",
+    gradeLevel: "อุดมศึกษา",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "วิเคราะห์พลังงานยึดเหนี่ยว (Binding Energy) ของอิเล็กตรอนในวงโคจรชั้นในเพื่อตรวจสอบสมบัติพื้นผิวและสถานะออกซิเดชันของสาร"
+  },
+  {
+    id: "hplc-chromatography",
+    title: "HPLC Chromatography",
+    category: "Chemistry",
+    gradeLevel: "อุดมศึกษา",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "จำลองการแยกสารผสมในคอลัมน์ด้วยเฟสเคลื่อนที่ที่เป็นของเหลวภายใต้ความดันสูงและการตรวจวัดเชิงปริมาณ"
+  },
+  {
+    id: "transition-metal-complexes",
+    title: "Transition Metal Complexes",
+    category: "Chemistry",
+    gradeLevel: "อุดมศึกษา",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "ศึกษาการสปลิตของ d-orbital และสีของสารประกอบเชิงซ้อนภายใต้ลิแกนด์ที่ส่งผลต่อค่าพลังงาน Crystal Field Splitting"
+  },
+  {
+    id: "eis-electrochemistry",
+    title: "Electrochemical Impedance Spectroscopy",
+    category: "Chemistry",
+    gradeLevel: "อุดมศึกษา",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "วิเคราะห์พฤติกรรมการถ่ายโอนประจุและความต้านทานไฟฟ้าเคมีที่ขั้วเชื่อมต่อ (Electrode Interface) ในช่วงความถี่ต่าง ๆ"
+  },
+  {
+    id: "quantum-chemistry-orbitals",
+    title: "Quantum Chemistry Orbitals",
+    category: "Chemistry",
+    gradeLevel: "อุดมศึกษา",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "จำลองรูปร่างและการกระจายตัวของอิเล็กตรอนในออร์บิทัลโมเลกุล (HOMO/LUMO) ตามวิธีคำนวณแบบ LCAO-MO"
+  },
+  {
+    id: "pcr-gel-electrophoresis",
+    title: "PCR & Gel Electrophoresis",
+    category: "Biology",
+    gradeLevel: "อุดมศึกษา",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "จำลองการเพิ่มจำนวนดีเอ็นเอในเครื่อง Thermal Cycler และการแยกขนาดเศษดีเอ็นเอบนเจลอะกาโรส"
+  },
+  {
+    id: "crispr-gene-editing",
+    title: "CRISPR-Cas9 Gene Editing",
+    category: "Biology",
+    gradeLevel: "อุดมศึกษา",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "จำลองการออกแบบ guide RNA (gRNA) เพื่อชี้เป้าหมายและตัดแต่งยีนเฉพาะเจาะจงในจีโนมของสิ่งมีชีวิต"
+  },
+  {
+    id: "recombinant-dna-transformation",
+    title: "Recombinant DNA & Transformation",
+    category: "Biology",
+    gradeLevel: "อุดมศึกษา",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "จำลองการเชื่อมต่อยีนเป้าหมายเข้ากับพลาสมิดเวกเตอร์และการเหนี่ยวนำเข้าสู่แบคทีเรีย E. coli"
+  },
+  {
+    id: "flow-cytometry-cycle",
+    title: "Flow Cytometry Cell Analysis",
+    category: "Biology",
+    gradeLevel: "อุดมศึกษา",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "จำลองการนับและวิเคราะห์ลักษณะทางแสงของเซลล์เดี่ยวเพื่อจำแนกสัดส่วนเซลล์ในระยะ G1, S, และ G2/M"
+  },
+  {
+    id: "western-blotting",
+    title: "Western Blotting Protein Detection",
+    category: "Biology",
+    gradeLevel: "อุดมศึกษา",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "จำลองการแยกโปรตีนด้วยกระแสไฟฟ้าบนเจล SDS-PAGE การโอนย้ายไปยังแผ่นเมมเบรน และการตรวจวัดด้วยแอนติบอดีจำเพาะ"
+  },
+  {
+    id: "metabolic-pathway-flux",
+    title: "Metabolic Pathway Flux Analysis",
+    category: "Biology",
+    gradeLevel: "อุดมศึกษา",
+    status: "ยังสร้างไม่เสร็จ",
+    description: "ศึกษาการควบคุมและอัตราการไหลของสารเจือปนผ่านวัฏจักร TCA และวิถีไกลโคไลซิสภายใต้สภาวะสารอาหารต่าง ๆ"
   }
 ];
 

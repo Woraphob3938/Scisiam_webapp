@@ -99,7 +99,7 @@ function HookesGraph({
 
           {/* Axes lines */}
           <line x1="30" y1="100" x2="180" y2="100" stroke="rgba(255,255,255,0.15)" strokeWidth="1" />
-          
+
           {/* X-axis metrics */}
           <text x="30" y="108" fill="#94a3b8" fontSize="6.5" fontWeight="bold" textAnchor="middle">0</text>
           <text x="67.5" y="108" fill="#94a3b8" fontSize="6.5" fontWeight="bold" textAnchor="middle">0.05</text>
@@ -223,87 +223,228 @@ function SpringScene({
   extension: number;
   force: number;
 }) {
+  // Slotted weights stacking logic
+  const renderWeights = () => {
+    if (hangingMass <= 0) return null;
+    const weightsCount = Math.floor(hangingMass / 100);
+    const remainder = hangingMass % 100;
+    const list = [];
+
+    // Bottom of the spring hook is massBlockY. The hanger vertical rod extends from massBlockY.
+    // Flange is at massBlockY + 42. Weights stack upwards from y = massBlockY + 42.
+    let currentY = massBlockY + 42;
+
+    for (let i = 0; i < weightsCount; i++) {
+      currentY -= 6.5; // height of block (6px) + spacing (0.5px)
+      list.push(
+        <g key={`w-${i}`} filter="url(#dropShadow)">
+          {/* Slotted weight disc */}
+          <rect x="157" y={currentY} width="36" height="6" rx="1.5" fill="url(#massGrad)" stroke="#78350f" strokeWidth="1" />
+          {/* Center slot indicator */}
+          <rect x="173" y={currentY} width="4" height="6" fill="#1e293b" opacity="0.35" />
+          {/* Label */}
+          <text x="175" y={currentY + 5} fill="#78350f" fontSize="4.5" fontWeight="950" textAnchor="middle">100g</text>
+        </g>
+      );
+    }
+
+    if (remainder > 0) {
+      const remHeight = Math.max(2, (remainder / 100) * 6);
+      currentY -= (remHeight + 0.5);
+      list.push(
+        <g key="w-rem" filter="url(#dropShadow)">
+          <rect x="160" y={currentY} width="30" height={remHeight} rx="1" fill="url(#massGrad)" stroke="#78350f" strokeWidth="0.75" />
+          <rect x="174" y={currentY} width="2" height={remHeight} fill="#1e293b" opacity="0.35" />
+          <text x="175" y={currentY + remHeight - 1.5} fill="#78350f" fontSize="4" fontWeight="950" textAnchor="middle">{remainder}g</text>
+        </g>
+      );
+    }
+    return list;
+  };
+
   return (
-    <div className="relative flex h-full min-h-[258px] items-center justify-center overflow-hidden rounded-2xl border border-violet-100 bg-[linear-gradient(135deg,#fcfaff_0%,#f5f0ff_48%,#fdfcff_100%)]">
-      <div className="absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:18px_18px] opacity-35" />
-      <div className="absolute left-5 top-5 rounded-2xl border border-white/70 bg-white/75 px-3 py-2 text-left shadow-sm backdrop-blur">
-        <p className="text-[10px] font-black uppercase text-violet-600">spring load status</p>
-        <p className="mt-0.5 text-xs font-bold text-slate-600">
-          {hangingMass > 0 ? "Spring Loaded" : "No Load"}
+    <div className="relative flex h-full min-h-[280px] items-center justify-center overflow-hidden rounded-2xl border border-blue-100 bg-[linear-gradient(135deg,#f8fbff_0%,#eefcff_48%,#fff7fb_100%)] p-4">
+      {/* Tech grid overlay */}
+      <div className="absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:16px_16px] opacity-40" />
+
+      {/* Ambient glows */}
+      <div className="absolute -left-20 -top-20 w-80 h-80 rounded-full bg-violet-500/5 blur-[80px]" />
+      <div className="absolute -right-20 -bottom-20 w-80 h-80 rounded-full bg-cyan-500/5 blur-[80px]" />
+
+      <div className="absolute left-5 top-5 rounded-xl border border-slate-200 bg-white/75 px-3 py-1.5 text-left shadow-sm backdrop-blur-md">
+        <p className="text-[9px] font-black uppercase tracking-wider text-violet-600">spring elastic stage</p>
+        <p className="mt-0.5 text-xs font-black text-slate-700">
+          {hangingMass > 0 ? "สปริงมีภาระน้ำหนัก" : "สปริงสมดุล (ไร้แรงถ่วง)"}
         </p>
       </div>
 
-      <svg className="relative z-10 w-full max-w-[280px] h-56" viewBox="0 0 300 220">
+      <svg className="relative z-10 w-full max-w-[280px] h-56 select-none" viewBox="0 0 300 220">
         <defs>
           {/* Metallic stand gradients */}
           <linearGradient id="metalGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#f1f5f9" />
-            <stop offset="30%" stopColor="#cbd5e1" />
-            <stop offset="70%" stopColor="#94a3b8" />
-            <stop offset="100%" stopColor="#475569" />
+            <stop offset="0%" stopColor="#cbd5e1" />
+            <stop offset="25%" stopColor="#f8fafc" />
+            <stop offset="50%" stopColor="#94a3b8" />
+            <stop offset="85%" stopColor="#475569" />
+            <stop offset="100%" stopColor="#1e293b" />
           </linearGradient>
           <linearGradient id="standBaseGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#64748b" />
-            <stop offset="100%" stopColor="#334155" />
+            <stop offset="0%" stopColor="#475569" />
+            <stop offset="100%" stopColor="#0f172a" />
           </linearGradient>
-          
-          {/* Spring gradient (3D effect) */}
+
+          {/* Spring gradient (Metallic Purple) */}
           <linearGradient id="springGrad" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" stopColor="#d8b4fe" />
-            <stop offset="50%" stopColor="#a855f7" />
-            <stop offset="100%" stopColor="#6b21a8" />
+            <stop offset="35%" stopColor="#c084fc" />
+            <stop offset="70%" stopColor="#8b5cf6" />
+            <stop offset="100%" stopColor="#4c1d95" />
           </linearGradient>
-          
-          {/* Mass block gradient */}
-          <linearGradient id="massGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#fbbf24" />
-            <stop offset="40%" stopColor="#f59e0b" />
-            <stop offset="100%" stopColor="#b45309" />
+
+          {/* Laboratory Brass Weight disc gradient */}
+          <linearGradient id="massGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#d97706" />
+            <stop offset="25%" stopColor="#fde047" />
+            <stop offset="75%" stopColor="#ca8a04" />
+            <stop offset="100%" stopColor="#78350f" />
           </linearGradient>
 
           {/* Professional shadow */}
           <filter id="dropShadow" x="-20%" y="-20%" width="140%" height="140%">
-            <feDropShadow dx="1.5" dy="3" stdDeviation="2.5" floodColor="#1e1b4b" floodOpacity="0.18" />
+            <feDropShadow dx="1.5" dy="4" stdDeviation="2.5" floodColor="#020617" floodOpacity="0.4" />
+          </filter>
+          <filter id="laserGlow" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur stdDeviation="1" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
           </filter>
         </defs>
 
         {/* Retort stand base & bars */}
-        <rect x="140" y="5" width="20" height="15" rx="3" fill="url(#standBaseGrad)" />
-        <line x1="100" y1="20" x2="200" y2="20" stroke="url(#metalGrad)" strokeWidth="3" strokeLinecap="round" />
-        <rect x="146" y="20" width="8" height="195" rx="2" fill="url(#metalGrad)" />
-        <rect x="120" y="210" width="60" height="8" rx="3" fill="url(#standBaseGrad)" />
+        {/* Vertical steel rod (moved to left x = 100) */}
+        <rect x="96" y="20" width="8" height="185" rx="1.5" fill="url(#metalGrad)" />
+        {/* Horizontal steel arm extending to spring holder (y = 25) */}
+        <line x1="90" y1="25" x2="185" y2="25" stroke="url(#metalGrad)" strokeWidth="4.5" strokeLinecap="round" />
+        {/* Joint clamp holding horizontal arm to vertical rod */}
+        <rect x="93" y="20" width="14" height="10" rx="2" fill="#1e293b" stroke="#334155" strokeWidth="1" />
+        {/* Bottom heavy stand base */}
+        <rect x="70" y="202" width="60" height="10" rx="3" fill="url(#standBaseGrad)" filter="url(#dropShadow)" />
 
-        {/* Spring coil path */}
-        <path d={springPath} stroke="url(#springGrad)" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+        {/* Hook connecting spring to horizontals rod */}
+        <path d="M 175 25 L 175 35" stroke="#475569" strokeWidth="2.5" fill="none" strokeLinecap="round" />
 
-        {/* Mass block with drop shadow */}
-        {hangingMass > 0 && (
-          <g filter="url(#dropShadow)" className="transition-opacity duration-300">
-            <rect x="130" y={massBlockY} width="40" height="28" rx="5" fill="url(#massGrad)" stroke="#78350f" strokeWidth="1" />
-            <text x="150" y={massBlockY + 18} fill="#ffffff" fontSize="9" fontWeight="900" textAnchor="middle">{hangingMass}g</text>
-          </g>
-        )}
+        {/* Spring coil path (centered at x = 175) */}
+        <path d={springPath} stroke="url(#springGrad)" strokeWidth="3.2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
 
-        {/* Extension measurement arrow (Cyan indicators) */}
-        <line x1="200" y1={20 + 60} x2="200" y2={massBlockY} stroke="#0891b2" strokeWidth="1" strokeDasharray="3 2" />
-        <text x="215" y={(20 + 60 + massBlockY) / 2 + 3} fill="#0891b2" fontSize="7.5" fontWeight="900">x = {(extension * 100).toFixed(2)} cm</text>
+        {/* Slotted Weight Hanger Hook */}
+        <g stroke="#94a3b8" strokeWidth="2" fill="none" strokeLinecap="round">
+          {/* Top Hook loop */}
+          <path d={`M 175 ${massBlockY} L 175 ${massBlockY + 12}`} />
+          {/* Center rod */}
+          <line x1="175" y1={massBlockY + 12} x2="175" y2={massBlockY + 42} />
+          {/* Bottom support plate flange */}
+          <rect x="160" y={massBlockY + 41} width="30" height="2.5" fill="#334155" stroke="none" rx="0.5" />
+        </g>
 
-        {/* Force arrow (Red indicators) */}
-        {hangingMass > 0 && (
-          <g className="transition-opacity duration-300">
-            <line x1="110" y1={massBlockY + 28} x2="110" y2={massBlockY + 28 + Math.min(force * 8, 40)} stroke="#e11d48" strokeWidth="2.2" strokeLinecap="round" />
-            <polygon points={`106,${massBlockY + 28 + Math.min(force * 8, 40)} 114,${massBlockY + 28 + Math.min(force * 8, 40)} 110,${massBlockY + 34 + Math.min(force * 8, 40)}`} fill="#e11d48" />
-            <text x="92" y={massBlockY + 36 + Math.min(force * 8, 40)} fill="#e11d48" fontSize="7.5" fontWeight="900" textAnchor="middle">F = {force.toFixed(2)}N</text>
-          </g>
-        )}
+        {/* Slotted weights stack */}
+        {renderWeights()}
 
-        {/* Ruler marks along the side */}
-        {[0, 2, 4, 6, 8, 10].map((cm) => (
+        {/* Ruler Base (wood/metal style on right) */}
+        <rect x="220" y="70" width="22" height="142" fill="url(#metalGrad)" stroke="#475569" strokeWidth="1" filter="url(#dropShadow)" />
+        <rect x="222" y="72" width="18" height="138" fill="#f8fafc" rx="1" />
+        <text x="231" y="80" fill="#94a3b8" fontSize="4.5" fontWeight="black" textAnchor="middle">cm</text>
+        {/* Ruler Ticks every cm (0 to 15cm) */}
+        {Array.from({ length: 16 }).map((_, cm) => (
           <g key={cm}>
-            <line x1="235" y1={20 + 60 + cm * 8} x2="242" y2={20 + 60 + cm * 8} stroke="#475569" strokeWidth="1" />
-            <text x="248" y={20 + 60 + cm * 8 + 2.5} fill="#64748b" fontSize="6.5" fontWeight="900">{cm}cm</text>
+            <line
+              x1="222"
+              y1={86 + cm * 8}
+              x2={cm % 5 === 0 ? 232 : cm % 2 === 0 ? 228 : 226}
+              y2={86 + cm * 8}
+              stroke="#334155"
+              strokeWidth={cm % 5 === 0 ? 1 : 0.5}
+            />
+            {cm % 5 === 0 && (
+              <text x="235" y={86 + cm * 8 + 2} fill="#334155" fontSize="5.5" fontWeight="bold" fontFamily="monospace" textAnchor="middle">{cm}</text>
+            )}
           </g>
         ))}
+
+        {/* Slide pointer needle attached to spring bottom */}
+        <line x1="175" y1={massBlockY} x2="220" y2={massBlockY} stroke="#0891b2" strokeWidth="1.2" strokeDasharray="2 1.5" opacity="0.9" />
+        <polygon points={`220,${massBlockY} 215,${massBlockY - 3.5} 215,${massBlockY + 3.5}`} fill="#0891b2" filter="url(#laserGlow)" />
+
+        {/* Extension digital overlay text */}
+        <rect x="188" y={massBlockY - 14} width="28" height="10" rx="3" fill="#ffffff" stroke="#0891b2" strokeWidth="0.8" opacity="0.9" />
+        <text x="202" y={massBlockY - 6.5} fill="#0891b2" fontSize="5.5" fontWeight="black" fontFamily="monospace" textAnchor="middle">
+          {(extension * 100).toFixed(2)}
+        </text>
+
+        {/* Force Gravity Vector Arrow (Red) pulling down */}
+        {hangingMass > 0 && (
+          <g className="transition-opacity duration-300">
+            <line
+              x1="175"
+              y1={massBlockY + 44}
+              x2="175"
+              y2={massBlockY + 44 + Math.min(force * 7, 30)}
+              stroke="#f43f5e"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              filter="url(#laserGlow)"
+            />
+            <polygon
+              points={`171,${massBlockY + 44 + Math.min(force * 7, 30)} 179,${massBlockY + 44 + Math.min(force * 7, 30)} 175,${massBlockY + 49 + Math.min(force * 7, 30)}`}
+              fill="#f43f5e"
+              filter="url(#laserGlow)"
+            />
+            <text
+              x="175"
+              y={massBlockY + 59 + Math.min(force * 7, 30)}
+              fill="#e11d48"
+              fontSize="7.5"
+              fontWeight="black"
+              fontFamily="monospace"
+              textAnchor="middle"
+            >
+              F_g={force.toFixed(2)}N
+            </text>
+          </g>
+        )}
+
+        {/* Spring Restoring Force Vector Arrow (Purple) pulling up */}
+        {hangingMass > 0 && (
+          <g className="transition-opacity duration-300">
+            <line
+              x1="175"
+              y1={massBlockY}
+              x2="175"
+              y2={massBlockY - Math.min(force * 7, 30)}
+              stroke="#a855f7"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              filter="url(#laserGlow)"
+            />
+            <polygon
+              points={`171,${massBlockY - Math.min(force * 7, 30)} 179,${massBlockY - Math.min(force * 7, 30)} 175,${massBlockY - 5 - Math.min(force * 7, 30)}`}
+              fill="#a855f7"
+              filter="url(#laserGlow)"
+            />
+            <text
+              x="175"
+              y={massBlockY - 10 - Math.min(force * 7, 30)}
+              fill="#7c3aed"
+              fontSize="7.5"
+              fontWeight="black"
+              fontFamily="monospace"
+              textAnchor="middle"
+            >
+              F_s=-kx
+            </text>
+          </g>
+        )}
       </svg>
     </div>
   );
@@ -340,7 +481,7 @@ export default function HookesLawSimulation() {
   const extensionRef = useRef(extension);
   const questProgressRef = useRef(questProgress);
   const questSuccessRef = useRef(questSuccess);
-  
+
   // Physics Refs
   const velocityRef = useRef(0);
   const animatedExtensionRef = useRef(extension);
@@ -354,7 +495,7 @@ export default function HookesLawSimulation() {
   // Spring Damped Harmonic Oscillation loop
   useEffect(() => {
     let animationFrameId: number;
-    
+
     const updateSpringPhysics = () => {
       const targetExtension = extension;
       const k = springConstant;
@@ -364,7 +505,7 @@ export default function HookesLawSimulation() {
       // Force calculations
       const fGravity = (hangingMass === 0) ? 0 : m * g;
       const fSpring = -k * animatedExtensionRef.current;
-      
+
       // Underdamped calculation (zeta = 0.15 is pleasant bounce)
       const criticalDamping = 2 * Math.sqrt(k * m);
       const dampingCoefficient = criticalDamping * 0.15;
@@ -505,25 +646,28 @@ export default function HookesLawSimulation() {
   const springExtPx = Math.min(animatedExtension * springPixelsPerMeter, 120);
   const totalSpringLength = springRestLength + springExtPx;
 
-  // Generate smooth 3D-looking bezier spring coil path
+  // Define massBlockY first because springPath depends on it to connect directly.
+  // massBlockY is 26 + totalSpringLength. At rest (totalSpringLength = 60), it is 86, aligning perfectly with tick 0 on ruler.
+  const massBlockY = 26 + totalSpringLength;
+
+  // Generate smooth 3D-looking bezier spring coil path ending directly at massBlockY (hanger top)
   const springPath = useMemo(() => {
     const coils = 12;
-    const amplitude = 14;
-    const segLen = (totalSpringLength - 15) / coils;
-    let d = `M 150 20 L 150 30`; // top straight wire hook
+    const amplitude = 12;
+    const startY = 35;
+    const endY = massBlockY - 10;
+    const segLen = (endY - startY) / coils;
+    let d = `M 175 25 L 175 ${startY}`;
     for (let i = 0; i < coils; i++) {
-      const yStart = 30 + i * segLen;
+      const yStart = startY + i * segLen;
       const yMid = yStart + segLen / 2;
       const yEnd = yStart + segLen;
-      // Beautiful rounded bezier loops
-      d += ` C ${150 - amplitude} ${yStart} ${150 - amplitude} ${yMid} 150 ${yMid}`;
-      d += ` C ${150 + amplitude} ${yMid} ${150 + amplitude} ${yEnd} 150 ${yEnd}`;
+      d += ` C ${175 - amplitude} ${yStart} ${175 - amplitude} ${yMid} 175 ${yMid}`;
+      d += ` C ${175 + amplitude} ${yMid} ${175 + amplitude} ${yEnd} 175 ${yEnd}`;
     }
-    d += ` L 150 ${totalSpringLength}`; // bottom straight wire hook
+    d += ` L 175 ${massBlockY}`; // straight hook directly to massBlockY
     return d;
-  }, [totalSpringLength]);
-
-  const massBlockY = 20 + totalSpringLength;
+  }, [massBlockY]);
 
   const controls = (
     <div className="space-y-4">

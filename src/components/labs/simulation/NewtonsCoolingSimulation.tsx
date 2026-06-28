@@ -37,6 +37,7 @@ interface ViewportProps {
   ambientTemp: number;
   coolingConstant: number;
   isHeaterOn: boolean;
+  isRunning: boolean;
 }
 
 function CoolingViewport({
@@ -44,6 +45,7 @@ function CoolingViewport({
   ambientTemp,
   coolingConstant,
   isHeaterOn,
+  isRunning,
 }: ViewportProps) {
   // Dynamic Liquid Color
   const getLiquidColor = (temp: number) => {
@@ -85,138 +87,200 @@ function CoolingViewport({
     coolingConstant >= 0.22 ? "ถ่ายเทเร็วมาก" : coolingConstant >= 0.16 ? "มีลมพัด" : "อากาศนิ่ง";
 
   return (
-    <div className="bg-slate-50 border border-slate-200/50 rounded-2xl relative h-full min-h-0 overflow-hidden flex items-center justify-center">
-      {/* Subtle Grid Pattern Overlay */}
-      <div className="absolute inset-0 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:16px_16px] opacity-50" />
+    <div className="relative flex h-full min-h-[300px] items-center justify-center overflow-hidden rounded-2xl border border-blue-100 bg-[linear-gradient(135deg,#f8fbff_0%,#eefcff_48%,#fff7fb_100%)] p-4">
+      {/* Dynamic tech grid background */}
+      <div className="absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:16px_16px] opacity-40" />
+
+      {/* Ambient glows based on state */}
+      <div className="absolute -left-20 -top-20 w-80 h-80 rounded-full bg-blue-500/5 blur-[80px]" />
+      <div className="absolute -right-20 -bottom-20 w-80 h-80 rounded-full bg-rose-500/5 blur-[80px]" />
+      {isHeaterOn && (
+        <div className="absolute -bottom-20 left-1/3 w-80 h-80 rounded-full bg-orange-500/5 blur-[80px]" />
+      )}
 
       {/* Environmental Info Panel (Left Overlay) */}
-      <div className="absolute top-4 left-4 bg-white/85 backdrop-blur-md p-4 rounded-2xl border border-slate-200/60 text-left text-xs sm:text-sm text-slate-600 font-bold space-y-2 shadow-sm z-10">
-        <span className="text-xs font-black text-indigo-500 uppercase tracking-wide block mb-1">
-          สภาพแวดล้อม
+      <div className="absolute top-4 left-4 bg-white/75 backdrop-blur-md p-3.5 rounded-2xl border border-slate-200 text-left text-xs sm:text-sm text-slate-700 font-bold space-y-1.5 shadow-sm z-10">
+        <span className="text-[10px] font-black text-indigo-600 uppercase tracking-widest block mb-0.5">
+          environmental chamber
         </span>
-        <div className="flex items-center gap-2">
-          <Snowflake className="w-4 h-4 text-blue-400" />
+        <div className="flex items-center gap-2 text-slate-700">
+          <Snowflake className="w-4 h-4 text-blue-500" />
           <span>{environmentLabel}</span>
         </div>
-        <div className="flex items-center gap-2">
-          <Wind className="w-4 h-4 text-slate-400" />
+        <div className="flex items-center gap-2 text-slate-700">
+          <Wind className="w-4 h-4 text-cyan-600" />
           <span>{airflowLabel}</span>
         </div>
       </div>
 
       {/* Ice / Ambient Cooler Display (Bottom Left Overlay) */}
-      <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-md p-3 rounded-2xl border border-slate-200/60 flex items-center gap-3 shadow-sm z-10">
+      <div className="absolute bottom-4 left-4 bg-white/75 backdrop-blur-md p-2.5 rounded-2xl border border-slate-200 flex items-center gap-3 shadow-sm z-10">
         <div className="text-right select-none">
-          <span className="text-[10px] font-black text-slate-400 block -mb-0.5">AMBIENT</span>
-          <span className="text-base sm:text-lg font-extrabold text-blue-600">{ambientTemp.toFixed(1)}°C</span>
+          <span className="text-[9px] font-black text-slate-400 block -mb-0.5 tracking-wider">AMBIENT</span>
+          <span className="text-base sm:text-lg font-extrabold text-blue-600 font-mono">{ambientTemp.toFixed(1)}°C</span>
         </div>
         <svg className="w-8 h-8 animate-pulse" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12,2 L3,6 L12,10 L21,6 Z" fill="#bae6fd" />
-          <path d="M3,6 L12,10 L12,20 L3,16 Z" fill="#93c5fd" opacity="0.8" />
-          <path d="M12,10 L21,6 L21,16 L12,20 Z" fill="#60a5fa" opacity="0.9" />
+          <path d="M12,2 L3,6 L12,10 L21,6 Z" fill="#38bdf8" opacity="0.3" />
+          <path d="M3,6 L12,10 L12,20 L3,16 Z" fill="#0284c7" opacity="0.6" />
+          <path d="M12,10 L21,6 L21,16 L12,20 Z" fill="#0369a1" opacity="0.8" />
         </svg>
       </div>
 
       {/* Active Science Visual SVGs */}
-      <svg className="w-full h-full max-w-[300px] sm:max-w-[620px]" viewBox="0 0 260 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg className="relative z-10 w-full h-full max-w-[300px] sm:max-w-[620px] select-none" viewBox="0 0 260 220" fill="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <linearGradient id="coolingLiquid" x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0%" stopColor={liquidColor} stopOpacity="0.92" />
-            <stop offset="58%" stopColor={liquidColor} stopOpacity="0.78" />
-            <stop offset="100%" stopColor="#7f1d1d" stopOpacity="0.38" />
+            <stop offset="0%" stopColor={liquidColor} stopOpacity="0.95" />
+            <stop offset="45%" stopColor={liquidColor} stopOpacity="0.75" />
+            <stop offset="100%" stopColor="#450a0a" stopOpacity="0.5" />
           </linearGradient>
           <linearGradient id="glassSurface" x1="0" x2="1" y1="0" y2="0">
-            <stop offset="0%" stopColor="#e0f2fe" stopOpacity="0.18" />
-            <stop offset="45%" stopColor="#ffffff" stopOpacity="0.62" />
-            <stop offset="100%" stopColor="#bfdbfe" stopOpacity="0.22" />
+            <stop offset="0%" stopColor="#ffffff" stopOpacity="0.15" />
+            <stop offset="20%" stopColor="#ffffff" stopOpacity="0.3" />
+            <stop offset="50%" stopColor="#ffffff" stopOpacity="0" />
+            <stop offset="85%" stopColor="#38bdf8" stopOpacity="0.2" />
+            <stop offset="100%" stopColor="#ffffff" stopOpacity="0.05" />
           </linearGradient>
           <linearGradient id="steel" x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0%" stopColor="#64748b" />
+            <stop offset="0%" stopColor="#94a3b8" />
+            <stop offset="25%" stopColor="#cbd5e1" />
+            <stop offset="65%" stopColor="#475569" />
             <stop offset="100%" stopColor="#1e293b" />
           </linearGradient>
-          <filter id="labShadow" x="-30%" y="-30%" width="160%" height="160%">
-            <feDropShadow dx="0" dy="8" stdDeviation="6" floodColor="#0f172a" floodOpacity="0.18" />
+          <linearGradient id="mercuryGrad" x1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="#fda4af" />
+            <stop offset="40%" stopColor="#f43f5e" />
+            <stop offset="100%" stopColor="#9f1239" />
+          </linearGradient>
+          <filter id="labShadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="6" stdDeviation="4.5" floodColor="#020617" floodOpacity="0.65" />
+          </filter>
+          <filter id="laserGlow" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur stdDeviation="2.5" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
           </filter>
         </defs>
 
-        <rect x="18" y="170" width="224" height="14" rx="7" fill="#dbeafe" opacity="0.55" />
-        <ellipse cx="130" cy="183" rx="98" ry="15" fill="#94a3b8" opacity="0.16" />
+        {/* Ambient base platform shadows */}
+        <ellipse cx="130" cy="183" rx="98" ry="15" fill="#020617" opacity="0.45" />
 
-        <g opacity="0.4">
-          <path d="M36 70 C55 55 74 55 92 69" stroke="#bfdbfe" strokeWidth="2" strokeLinecap="round" />
-          <path d="M175 74 C191 59 207 61 222 75" stroke="#bfdbfe" strokeWidth="2" strokeLinecap="round" />
-        </g>
+        {/* Dynamic environmental airflow particles */}
+        {coolingConstant >= 0.16 && (
+          <g className="animate-pulse" opacity="0.35">
+            <path d="M30 65 C55 50 74 50 92 65" stroke="#38bdf8" strokeWidth="2.5" strokeLinecap="round" strokeDasharray="3 4" />
+            <path d="M175 69 C191 54 207 56 222 70" stroke="#38bdf8" strokeWidth="2.5" strokeLinecap="round" strokeDasharray="3 4" />
+          </g>
+        )}
 
+        {/* Hot / Cold outer radiation waves */}
         {currentTemp > ambientTemp + 8 && (
-          <g className="animate-pulse" opacity="0.72">
-            <path d="M54 92 C37 88 35 74 48 66" stroke="#60a5fa" strokeWidth="2.2" strokeLinecap="round" strokeDasharray="4 5" />
-            <path d="M204 102 C226 99 226 80 212 72" stroke="#60a5fa" strokeWidth="2.2" strokeLinecap="round" strokeDasharray="4 5" />
-            <path d="M84 38 C74 27 83 16 96 22" stroke="#93c5fd" strokeWidth="2" strokeLinecap="round" strokeDasharray="3 5" />
+          <g className="animate-pulse" opacity="0.65">
+            <path d="M50 92 C32 88 30 74 44 66" stroke="#fb7185" strokeWidth="1.8" strokeLinecap="round" strokeDasharray="4 6" />
+            <path d="M210 102 C230 99 230 80 216 72" stroke="#fb7185" strokeWidth="1.8" strokeLinecap="round" strokeDasharray="4 6" />
           </g>
         )}
 
+        {/* Induction Heating Plate Base */}
         <g filter="url(#labShadow)">
-          <rect x="70" y="158" width="120" height="16" rx="4" fill="url(#steel)" />
-          <rect x="82" y="152" width="96" height="7" rx="2" fill={isHeaterOn ? "#fb7185" : "#475569"} className="transition-all duration-300" />
-          <rect x="97" y="163" width="8" height="2" rx="1" fill="#94a3b8" />
-          <rect x="156" y="163" width="8" height="2" rx="1" fill="#94a3b8" />
+          {/* Main housing */}
+          <rect x="68" y="156" width="124" height="18" rx="5" fill="url(#steel)" stroke="#334155" strokeWidth="1.5" />
+          {/* Induction element top plate */}
+          <rect x="74" y="151" width="112" height="6" rx="2" fill={isHeaterOn ? "#b91c1c" : "#1e293b"} className="transition-all duration-500" />
+          <ellipse cx="130" cy="151" rx="50" ry="2" fill={isHeaterOn ? "#f43f5e" : "#020617"} opacity="0.8" />
+          {/* Control LEDs */}
+          <circle cx="84" cy="165" r="1.5" fill={isHeaterOn ? "#ef4444" : "#475569"} />
+          <circle cx="92" cy="165" r="1.5" fill={isRunning ? "#22c55e" : "#475569"} />
         </g>
 
-        {/* Heating plate / stand Base */}
+        {/* Heating Induction Coil Glow Effects */}
         {isHeaterOn && (
-          <g className="animate-pulse" filter="url(#labShadow)">
-            <path d="M100,152 C96,143 104,135 110,142 C115,135 124,143 120,152 Z" fill="#f97316" />
-            <path d="M123,152 C118,140 128,128 136,139 C143,130 153,141 148,152 Z" fill="#ef4444" />
-            <path d="M132,152 C129,145 135,138 139,143 C143,139 149,145 146,152 Z" fill="#facc15" />
+          <g className="animate-pulse" opacity="0.85">
+            {/* Red-hot spiral glows */}
+            <ellipse cx="130" cy="151" rx="42" ry="3" fill="none" stroke="#f97316" strokeWidth="1.8" filter="url(#laserGlow)" />
+            <ellipse cx="130" cy="151" rx="26" ry="1.8" fill="none" stroke="#ef4444" strokeWidth="1.5" filter="url(#laserGlow)" />
+
+            {/* Heat conduction rays */}
+            <path d="M100,146 Q96,134 104,122" stroke="#f97316" strokeWidth="1.5" strokeLinecap="round" opacity="0.7" />
+            <path d="M130,144 Q135,130 128,118" stroke="#ef4444" strokeWidth="1.8" strokeLinecap="round" opacity="0.8" />
+            <path d="M160,146 Q156,134 164,122" stroke="#facc15" strokeWidth="1.5" strokeLinecap="round" opacity="0.7" />
           </g>
         )}
-        
-        {/* Beaker Container */}
-        <path d="M82,55 L82,144 C82,150 87,154 93,154 L166,154 C172,154 177,150 177,144 L177,55" fill="url(#glassSurface)" stroke="#94a3b8" strokeWidth="2.5" strokeLinecap="round" />
+
+        {/* Beaker Container (Pyrex look) */}
+        <path d="M82,50 L82,143 C82,149 87,153 93,153 L167,153 C173,153 178,149 178,143 L178,50" fill="url(#glassSurface)" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" filter="url(#labShadow)" />
         {/* Beaker scale marks */}
-        <line x1="163" y1="78" x2="170" y2="78" stroke="#94a3b8" strokeWidth="1.5" />
-        <line x1="156" y1="98" x2="170" y2="98" stroke="#94a3b8" strokeWidth="1.5" />
-        <line x1="163" y1="118" x2="170" y2="118" stroke="#94a3b8" strokeWidth="1.5" />
-        <line x1="156" y1="138" x2="170" y2="138" stroke="#94a3b8" strokeWidth="1.5" />
-        
-        {/* Beaker Top Flange */}
-        <path d="M78,55 C78,55 88,52 96,52 C104,52 154,52 164,52 C172,52 181,55 181,55" stroke="#94a3b8" strokeWidth="3" strokeLinecap="round" />
+        <line x1="164" y1="74" x2="171" y2="74" stroke="#64748b" strokeWidth="1.2" />
+        <line x1="157" y1="94" x2="171" y2="94" stroke="#64748b" strokeWidth="1.5" />
+        <line x1="164" y1="114" x2="171" y2="114" stroke="#64748b" strokeWidth="1.2" />
+        <line x1="157" y1="134" x2="171" y2="134" stroke="#64748b" strokeWidth="1.5" strokeLinecap="round" />
 
-        {/* Liquid */}
-        <path d="M85,90 L85,143 C85,147 89,151 94,151 L165,151 C170,151 174,147 174,143 L174,90 Z" fill="url(#coolingLiquid)" className="transition-all duration-500" />
-        <path d="M86,90 C104,86 152,86 173,90" stroke="#fecaca" strokeWidth="2" opacity="0.75" />
-        {[99, 116, 139, 158].map((x, index) => (
-          <circle key={x} cx={x} cy={122 + (index % 2) * 15} r="1.8" fill="#fee2e2" opacity="0.75" />
+        {/* Beaker Top Lip Flange */}
+        <path d="M77,50 C77,50 88,47 96,47 C104,47 156,47 164,47 C172,47 183,50 183,50" stroke="#94a3b8" strokeWidth="2.5" strokeLinecap="round" />
+
+        {/* Volumetric Liquid */}
+        <path d="M85,86 L85,142 C85,146 89,150 94,150 L166,150 C171,150 175,146 175,142 L175,86 Z" fill="url(#coolingLiquid)" className="transition-all duration-500" />
+        {/* Liquid Surface Meniscus */}
+        <ellipse cx="130" cy="86" rx="45" ry="4.5" fill={liquidColor} opacity="0.85" stroke="#ffffff" strokeWidth="0.5" />
+        {/* Convection Bubbles */}
+        {[97, 114, 137, 158].map((x, index) => (
+          <circle key={x} cx={x} cy={118 + (index % 2) * 16} r="1.5" fill="#fecaca" opacity="0.55" className="animate-pulse" />
         ))}
-        <path d="M97 98 C111 107 111 136 96 144" stroke="#ffffff" strokeWidth="2.2" opacity="0.28" strokeLinecap="round" />
-        
-        {/* Steam effects for hot temps */}
-        {currentTemp > 50 && (
-          <g className="animate-pulse">
-            <path d="M106,42 Q111,31 106,20" stroke="#cbd5e1" strokeWidth="1.8" strokeLinecap="round" opacity="0.62" />
-            <path d="M130,40 Q137,27 130,16" stroke="#cbd5e1" strokeWidth="2.2" strokeLinecap="round" opacity="0.58" />
-            <path d="M154,42 Q150,31 156,21" stroke="#cbd5e1" strokeWidth="1.8" strokeLinecap="round" opacity="0.62" />
+        {/* Glass reflection highlight overlay */}
+        <path d="M96 92 C108 101 108 132 96 142" stroke="#ffffff" strokeWidth="2.2" opacity="0.2" strokeLinecap="round" />
+
+        {/* Animated steam columns for hot liquid */}
+        {currentTemp > 45 && (
+          <g className="animate-pulse" opacity="0.65">
+            <path d="M106,38 Q111,25 105,12 T 110 -2" fill="none" stroke="#cbd5e1" strokeWidth="1.5" strokeLinecap="round" />
+            <path d="M130,36 Q137,22 129,8 T 134 -6" fill="none" stroke="#f1f5f9" strokeWidth="2" strokeLinecap="round" />
+            <path d="M154,38 Q150,25 156,13 T 150 -1" fill="none" stroke="#cbd5e1" strokeWidth="1.5" strokeLinecap="round" />
           </g>
         )}
 
-        {/* Thermometer Stand Clamp holding the thermometer */}
-        <line x1="187" y1="40" x2="187" y2="155" stroke="#64748b" strokeWidth="2.5" />
-        <path d="M187,50 L144,50" stroke="#334155" strokeWidth="3.5" />
-        <path d="M150 28 C184 24 199 31 207 49" stroke="#64748b" strokeWidth="2" strokeLinecap="round" fill="none" />
-        <rect x="188" y="27" width="54" height="34" rx="8" fill="#0f172a" />
-        <rect x="193" y="32" width="44" height="24" rx="5" fill="#dcfce7" />
-        <text x="215" y="45" textAnchor="middle" fontSize="9" fontWeight="800" fill="#065f46">{currentTemp.toFixed(1)}°C</text>
-        <text x="215" y="54" textAnchor="middle" fontSize="4.5" fontWeight="700" fill="#047857">k {coolingConstant.toFixed(3)}</text>
+        {/* Retort Stand Support Rod & Clamps */}
+        <line x1="187" y1="40" x2="187" y2="155" stroke="url(#steel)" strokeWidth="3" />
+        {/* Horizontal Clamp bracket holding thermometer */}
+        <path d="M187,50 L142,50" stroke="#334155" strokeWidth="3" />
+        <rect x="139" y="47" width="5" height="6" fill="#0f172a" rx="0.5" />
 
-        {/* Thermometer */}
-        <g transform="translate(120, 22)">
-          {/* Glass Tube */}
-          <rect x="5" y="0" width="8" height="110" rx="4" fill="rgba(255, 255, 255, 0.85)" stroke="#64748b" strokeWidth="1.5" />
-          {/* Bulb */}
-          <circle cx="9" cy="115" r="9" fill="#ef4444" stroke="#64748b" strokeWidth="1.5" />
-          <circle cx="9" cy="115" r="7" fill="#ef4444" />
-          {/* Dynamic mercury level */}
-          <rect x="8" y={105 - mercuryHeight} width="2" height={mercuryHeight} fill="#ef4444" className="transition-all duration-500" />
+        {/* Digital Micro-Controller Instrument Panel */}
+        <g transform="translate(191, 16)" filter="url(#labShadow)">
+          <rect x="0" y="0" width="58" height="42" rx="6" fill="#020617" stroke="#1e293b" strokeWidth="1.8" />
+          {/* LED screen background */}
+          <rect x="4" y="4" width="50" height="20" rx="4" fill="#042f1a" />
+          {/* Labeled overlay */}
+          <text x="29" y="9" fill="#22c55e" fontSize="5" fontWeight="black" fontFamily="monospace" textAnchor="middle" letterSpacing="0.2">TEMPERATURE</text>
+          <text x="29" y="20" fill="#4ade80" fontSize="10" fontWeight="950" fontFamily="monospace" textAnchor="middle" filter="url(#laserGlow)">
+            {currentTemp.toFixed(1)}°C
+          </text>
+          {/* Status readouts below LED */}
+          <rect x="4" y="27" width="23" height="11" rx="2" fill="#0f172a" />
+          <text x="15" y="34" fill="#64748b" fontSize="4.5" fontWeight="bold" fontFamily="monospace" textAnchor="middle">
+            k:{coolingConstant.toFixed(3)}
+          </text>
+          <rect x="31" y="27" width="23" height="11" rx="2" fill="#0f172a" />
+          <text x="42" y="34" fill={isHeaterOn ? "#f43f5e" : "#3b82f6"} fontSize="4" fontWeight="black" fontFamily="sans-serif" textAnchor="middle">
+            {isHeaterOn ? "HEATING" : "DECAY"}
+          </text>
+        </g>
+
+        {/* Lab Thermometer */}
+        <g transform="translate(122, 16)">
+          {/* Glass tube housing */}
+          <rect x="5" y="0" width="7" height="112" rx="3.5" fill="rgba(255, 255, 255, 0.15)" stroke="#94a3b8" strokeWidth="1" />
+          {/* Thermometer scale graduation markings */}
+          {Array.from({ length: 6 }).map((_, i) => (
+            <line key={i} x1="5" y1={15 + i * 15} x2="8" y2={15 + i * 15} stroke="#64748b" strokeWidth="0.5" />
+          ))}
+          {/* Mercury liquid column bulb */}
+          <circle cx="8.5" cy="115" r="8" fill="url(#mercuryGrad)" stroke="#64748b" strokeWidth="1.2" filter="url(#dropShadow)" />
+          <circle cx="8.5" cy="115" r="5.5" fill="url(#mercuryGrad)" />
+          <circle cx="6.5" cy="113" r="1.5" fill="#ffffff" opacity="0.6" />
+          {/* Mercury fluid level line */}
+          <rect x="7.5" y={105 - mercuryHeight} width="2" height={mercuryHeight} fill="url(#mercuryGrad)" className="transition-all duration-500" />
         </g>
       </svg>
     </div>
@@ -528,7 +592,7 @@ export default function NewtonsCoolingSimulation() {
           const coolingAmount = coolingConstantRef.current * (currentTempRef.current - ambientTempRef.current) * (deltaSeconds / 60);
           nextTemp = Math.max(ambientTempRef.current, currentTempRef.current - coolingAmount);
         }
-        
+
         setCurrentTemp(nextTemp);
         currentTempRef.current = nextTemp;
 
@@ -537,7 +601,7 @@ export default function NewtonsCoolingSimulation() {
           const nextQuestProg = Math.min(20, questProgressRef.current + deltaSeconds);
           setQuestProgress(nextQuestProg);
           questProgressRef.current = nextQuestProg;
-          
+
           if (nextQuestProg >= 20 && !questSuccessRef.current) {
             setQuestSuccess(true);
             questSuccessRef.current = true;
@@ -596,21 +660,21 @@ export default function NewtonsCoolingSimulation() {
   const handleReset = () => {
     setIsRunning(false);
     isRunningRef.current = false;
-    
+
     setIsHeaterOn(false);
     isHeaterOnRef.current = false;
-    
+
     setQuestProgress(0);
     questProgressRef.current = 0;
-    
+
     setElapsedSeconds(0);
     elapsedSecondsRef.current = 0;
-    
+
     setCurrentTemp(initialTemp);
     currentTempRef.current = initialTemp;
-    
+
     setDataPoints([]);
-    
+
     setLastLoggedTime(0);
     lastLoggedTimeRef.current = 0;
   };
@@ -660,7 +724,7 @@ export default function NewtonsCoolingSimulation() {
     const content = dataPoints
       .map(p => `เวลา: ${p.time.toFixed(1)} นาที | อุณหภูมิ: ${p.temp.toFixed(1)}°C | อุณหภูมิแวดล้อม: ${p.ambient.toFixed(1)}°C`)
       .join("\n");
-    
+
     try {
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(content)
@@ -700,7 +764,7 @@ export default function NewtonsCoolingSimulation() {
       alert("ไม่พบข้อมูลการทดลองสำหรับบันทึกผล! กรุณากดเริ่มทดลองและเก็บบันทึกข้อมูลก่อน");
       return;
     }
-    
+
     const experimentData = {
       labId,
       timestamp: new Date().toLocaleString("th-TH"),
@@ -709,7 +773,7 @@ export default function NewtonsCoolingSimulation() {
       coolingConstant,
       dataPoints,
     };
-    
+
     await saveExperimentAndSync({
       localStorageKey: "scisiam_saved_cooling_experiment",
       localPayload: experimentData,
@@ -1022,6 +1086,7 @@ export default function NewtonsCoolingSimulation() {
           ambientTemp={ambientTemp}
           coolingConstant={coolingConstant}
           isHeaterOn={isHeaterOn}
+          isRunning={isRunning}
         />
       }
       controlsTitle="แผงควบคุมอุณหภูมิ"

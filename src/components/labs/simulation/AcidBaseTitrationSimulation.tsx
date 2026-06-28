@@ -328,7 +328,7 @@ export default function AcidBaseTitrationSimulation() {
               หน้าแรก
             </Link>
             <ChevronRight className="h-3.5 w-3.5 text-slate-300" />
-            <Link href="/?category=Chemistry" className="text-cyan-600 hover:text-cyan-700">Chemistry</Link>
+            <Link href="/labs?category=Chemistry" className="text-cyan-600 hover:text-cyan-700">Chemistry</Link>
             <ChevronRight className="h-3.5 w-3.5 text-slate-300" />
             <Link href="/labs/acid-base-titration" className="text-slate-700 hover:text-cyan-700">Acid-Base Titration Lab</Link>
             <ChevronRight className="h-3.5 w-3.5 text-slate-300" />

@@ -42,9 +42,11 @@ test("saved experiment registry covers every ready simulation lab", () => {
 
   const directBlock = registry.match(/export const directSimulationLabIds = \[([\s\S]*?)\] as const;/)?.[1] ?? "";
   const chemistryBlock = registry.match(/export const chemistryConceptSimulationLabIds = \[([\s\S]*?)\] as const;/)?.[1] ?? "";
+  const mathBlock = registry.match(/export const mathConceptSimulationLabIds = \[([\s\S]*?)\] as const;/)?.[1] ?? "";
   const readyLabIds = [
     ...directBlock.matchAll(/"([^"]+)"/g),
     ...chemistryBlock.matchAll(/"([^"]+)"/g),
+    ...mathBlock.matchAll(/"([^"]+)"/g),
   ].map((match) => match[1]);
 
   for (const labId of readyLabIds) {
@@ -123,6 +125,212 @@ test("mathematics lab detail heroes use lab-specific SVG variants", () => {
   assert.match(source, /data-testid=\{`math-hero-\$\{variant\}`\}/);
   assert.match(source, /<MathConceptHeroIllustration labId=\{labId\} \/>/);
   assert.doesNotMatch(source, /isMathematics \? \(\s*<MathConceptHeroIllustration \/>/);
+});
+
+test("remaining draft mathematics labs have details but are not registered as simulations", () => {
+  const labs = readProjectFile("src/data/labs.ts");
+  const details = readProjectFile("src/data/labDetails.ts");
+  const registry = readProjectFile("src/data/labSimulationRegistry.ts");
+  const readiness = readProjectFile("src/data/labReadiness.ts");
+  const labCard = readProjectFile("src/components/LabCard.tsx");
+
+  const draftMathLabIds = [
+    "advanced-calculus-optimization",
+    "linear-algebra-eigenvectors",
+    "differential-equations-lab",
+    "numerical-methods-lab",
+    "multivariable-calculus",
+    "statistical-inference",
+    "bayesian-reasoning-lab",
+    "fourier-analysis-signals",
+    "complex-numbers-phasors",
+  ];
+
+  assert.equal(draftMathLabIds.length, 9);
+  assert.match(readiness, /แล็บนี้ยังสร้างไม่เสร็จ/);
+  assert.doesNotMatch(labCard, /disabled=\{!readiness\.isReady\}[\s\S]*onViewDetails/);
+
+  for (const labId of draftMathLabIds) {
+    assert.match(labs, new RegExp(`id: "${labId}"[\\s\\S]*?category: "Mathematics"`), `${labId} should be listed as Mathematics`);
+    assert.match(labs, new RegExp(`id: "${labId}"[\\s\\S]*?status: "ยังสร้างไม่เสร็จ"`), `${labId} should be marked unfinished`);
+    assert.match(details, new RegExp(`"${labId}": createMathConceptDetails`), `${labId} should have detail data`);
+    assert.doesNotMatch(registry, new RegExp(`"${labId}"`), `${labId} should not be ready for simulation`);
+  }
+});
+
+test("applied mathematics labs have routed interactive SVG simulations", () => {
+  const registry = readProjectFile("src/data/labSimulationRegistry.ts");
+  const savedRegistry = readProjectFile("src/data/labSavedExperiments.ts");
+  const route = readProjectFile("src/app/labs/[id]/simulation/page.tsx");
+  const simulation = readProjectFile("src/components/labs/simulation/AppliedMathSimulation.tsx");
+
+  const appliedMathLabIds = [
+    "geometry-measurement",
+    "exponential-growth-decay",
+    "data-sampling-error",
+    "quadratic-projectiles",
+    "logarithm-scales",
+    "unit-conversion",
+    "matrix-transformations",
+    "sequences-series",
+    "inequalities-feasible-regions",
+    "transformations-symmetry",
+    "angles-circles",
+    "combinatorics-counting",
+  ];
+
+  assert.match(route, /AppliedMathSimulation/);
+  assert.match(simulation, /<SharedSimulationShell/);
+  assert.match(simulation, /<svg viewBox="0 0 640 420"/);
+  assert.match(simulation, /saveExperimentAndSync/);
+  assert.match(simulation, /Geometry Measurement Lab/);
+  assert.match(simulation, /Exponential Growth & Decay/);
+  assert.match(simulation, /Sampling & Measurement Error/);
+  assert.match(simulation, /Quadratic Functions & Projectiles/);
+  assert.match(simulation, /Logarithms & Scientific Scales/);
+  assert.match(simulation, /Unit Conversion & Dimensional Analysis/);
+  assert.match(simulation, /Matrix Transformations/);
+  assert.match(simulation, /Sequences & Series Lab/);
+  assert.match(simulation, /Inequalities & Feasible Regions/);
+  assert.match(simulation, /Transformations & Symmetry/);
+  assert.match(simulation, /Angles & Circles Lab/);
+  assert.match(simulation, /Combinatorics & Counting/);
+  assert.match(simulation, /function MatrixStage/);
+  assert.match(simulation, /function SequencesStage/);
+  assert.match(simulation, /function InequalitiesStage/);
+  assert.match(simulation, /function SymmetryStage/);
+  assert.match(simulation, /function CirclesStage/);
+  assert.match(simulation, /function CombinatoricsStage/);
+
+  for (const labId of appliedMathLabIds) {
+    assert.match(registry, new RegExp(`"${labId}"`), `${labId} should be marked ready for simulation`);
+    assert.match(savedRegistry, new RegExp(`"${labId}"\\s*:`), `${labId} should have a saved experiment key`);
+    assert.match(route, new RegExp(`labId === "${labId}"`), `${labId} should route to AppliedMathSimulation`);
+    assert.match(simulation, new RegExp(`"${labId}"`), `${labId} should have a configured SVG simulation`);
+  }
+});
+
+test("university mathematics labs are detail-only placeholders", () => {
+  const labs = readProjectFile("src/data/labs.ts");
+  const details = readProjectFile("src/data/labDetails.ts");
+  const registry = readProjectFile("src/data/labSimulationRegistry.ts");
+  const labsPage = readProjectFile("src/app/labs/page.tsx");
+  const labCard = readProjectFile("src/components/LabCard.tsx");
+
+  const universityLabIds = [
+    "advanced-calculus-optimization",
+    "linear-algebra-eigenvectors",
+    "differential-equations-lab",
+    "numerical-methods-lab",
+    "multivariable-calculus",
+    "statistical-inference",
+    "bayesian-reasoning-lab",
+    "fourier-analysis-signals",
+    "complex-numbers-phasors",
+    "vector-fields-gradients",
+    "discrete-graph-theory",
+    "mathematical-modeling-lab",
+  ];
+  const handleViewDetails = labsPage.match(/const handleViewDetails = \(id: string\) => \{[\s\S]*?\n  \};/)?.[0] ?? "";
+
+  assert.equal(universityLabIds.length, 12);
+  assert.match(labsPage, /{ id: "อุดมศึกษา", label: "อุดมศึกษา" }/);
+  assert.match(labCard, /export type GradeLevel = .*"อุดมศึกษา"/);
+  assert.doesNotMatch(handleViewDetails, /isLabReady/);
+  assert.match(labCard, /disabled=\{!readiness\.isReady\}[\s\S]*onClick=\{\(\) => onEnterRoom\?\.\(lab\.id\)\}/);
+
+  for (const labId of universityLabIds) {
+    assert.match(labs, new RegExp(`id: "${labId}"[\\s\\S]*?category: "Mathematics"`), `${labId} should be listed as Mathematics`);
+    assert.match(labs, new RegExp(`id: "${labId}"[\\s\\S]*?gradeLevel: "อุดมศึกษา"`), `${labId} should be university level`);
+    assert.match(labs, new RegExp(`id: "${labId}"[\\s\\S]*?status: "ยังสร้างไม่เสร็จ"`), `${labId} should be marked unfinished`);
+    assert.match(details, new RegExp(`"${labId}": createMathConceptDetails`), `${labId} should have detail data`);
+    assert.doesNotMatch(registry, new RegExp(`"${labId}"`), `${labId} should not be ready for simulation`);
+  }
+});
+
+test("elementary physics and chemistry labs are detail-only placeholders", () => {
+  const labs = readProjectFile("src/data/labs.ts");
+  const details = readProjectFile("src/data/labDetails.ts");
+  const registry = readProjectFile("src/data/labSimulationRegistry.ts");
+  const labsPage = readProjectFile("src/app/labs/page.tsx");
+  const labCard = readProjectFile("src/components/LabCard.tsx");
+
+  const elementaryLabs = [
+    ["push-pull-forces", "Physics"],
+    ["light-and-shadows", "Physics"],
+    ["sound-vibrations", "Physics"],
+    ["simple-circuits", "Physics"],
+    ["floating-and-sinking", "Physics"],
+    ["magnet-exploration", "Physics"],
+    ["states-of-matter", "Chemistry"],
+    ["mixing-and-separating", "Chemistry"],
+    ["dissolving-solutions", "Chemistry"],
+    ["acids-bases-around-us", "Chemistry"],
+    ["heating-cooling-materials", "Chemistry"],
+    ["physical-chemical-changes", "Chemistry"],
+  ];
+  const handleViewDetails = labsPage.match(/const handleViewDetails = \(id: string\) => \{[\s\S]*?\n  \};/)?.[0] ?? "";
+
+  assert.equal(elementaryLabs.length, 12);
+  assert.doesNotMatch(handleViewDetails, /isLabReady/);
+  assert.match(labCard, /disabled=\{!readiness\.isReady\}[\s\S]*onClick=\{\(\) => onEnterRoom\?\.\(lab\.id\)\}/);
+
+  for (const [labId, category] of elementaryLabs) {
+    assert.match(labs, new RegExp(`id: "${labId}"[\\s\\S]*?category: "${category}"`), `${labId} should be listed as ${category}`);
+    assert.match(labs, new RegExp(`id: "${labId}"[\\s\\S]*?gradeLevel: "ประถม"`), `${labId} should be elementary level`);
+    assert.match(labs, new RegExp(`id: "${labId}"[\\s\\S]*?status: "ยังสร้างไม่เสร็จ"`), `${labId} should be marked unfinished`);
+    assert.match(details, new RegExp(`"${labId}": createDraftElementaryScienceDetails`), `${labId} should have detail data`);
+    assert.doesNotMatch(registry, new RegExp(`"${labId}"`), `${labId} should not be ready for simulation`);
+  }
+});
+
+test("university science labs use English titles and shared detail SVGs", () => {
+  const labs = readProjectFile("src/data/labs.ts");
+  const labCard = readProjectFile("src/components/LabCard.tsx");
+  const labHero = readProjectFile("src/components/labs/LabHero.tsx");
+
+  const universityScienceLabs = [
+    ["quantum-tunneling", "Physics", "Quantum Tunneling", "QuantumTunnelingSVG"],
+    ["michelson-interferometer", "Physics", "Michelson Interferometer", "MichelsonInterferometerSVG"],
+    ["zeeman-effect", "Physics", "Zeeman Effect", "ZeemanEffectSVG"],
+    ["superconductivity-meissner", "Physics", "Superconductivity & Meissner Effect", "SuperconductivityMeissnerSVG"],
+    ["bragg-diffraction", "Physics", "Bragg Diffraction", "BraggDiffractionSVG"],
+    ["relativistic-kinematics", "Physics", "Relativistic Kinematics", "RelativisticKinematicsSVG"],
+    ["nmr-spectroscopy", "Chemistry", "NMR Spectroscopy", "NmrSpectroscopySVG"],
+    ["xps-spectroscopy", "Chemistry", "XPS Spectroscopy", "XpsSpectroscopySVG"],
+    ["hplc-chromatography", "Chemistry", "HPLC Chromatography", "HplcChromatographySVG"],
+    ["transition-metal-complexes", "Chemistry", "Transition Metal Complexes", "TransitionMetalComplexesSVG"],
+    ["eis-electrochemistry", "Chemistry", "Electrochemical Impedance Spectroscopy", "EisElectrochemistrySVG"],
+    ["quantum-chemistry-orbitals", "Chemistry", "Quantum Chemistry Orbitals", "QuantumChemistryOrbitalsSVG"],
+    ["pcr-gel-electrophoresis", "Biology", "PCR & Gel Electrophoresis", "PcrGelElectrophoresisSVG"],
+    ["crispr-gene-editing", "Biology", "CRISPR-Cas9 Gene Editing", "CrisprGeneEditingSVG"],
+    ["recombinant-dna-transformation", "Biology", "Recombinant DNA & Transformation", "RecombinantDnaTransformationSVG"],
+    ["flow-cytometry-cycle", "Biology", "Flow Cytometry Cell Analysis", "FlowCytometrySVG"],
+    ["western-blotting", "Biology", "Western Blotting Protein Detection", "WesternBlottingSVG"],
+    ["metabolic-pathway-flux", "Biology", "Metabolic Pathway Flux Analysis", "MetabolicPathwayFluxSVG"],
+  ];
+
+  assert.match(labHero, /const isBiology = category === "Biology"/);
+  assert.match(labHero, /const chemistryTone = category === "Chemistry"/);
+
+  for (const [labId, category, title, component] of universityScienceLabs) {
+    assert.match(labs, new RegExp(`id: "${labId}"[\\s\\S]*?title: "${title}"`), `${labId} should use an English title`);
+    assert.match(labs, new RegExp(`id: "${labId}"[\\s\\S]*?category: "${category}"`), `${labId} should stay in ${category}`);
+    assert.match(labs, new RegExp(`id: "${labId}"[\\s\\S]*?gradeLevel: "อุดมศึกษา"`), `${labId} should stay university level`);
+    assert.match(labCard, new RegExp(`case "${labId}":[\\s\\S]*?return <${component} \\/>;`), `${labId} card should use ${component}`);
+    assert.match(labHero, new RegExp(`labId === "${labId}" \\? \\([\\s\\S]*?<${component} className="w-full h-full" \\/>`), `${labId} detail hero should match its card SVG`);
+  }
+});
+
+test("labs page summarizes filtered lab readiness", () => {
+  const labsPage = readProjectFile("src/app/labs/page.tsx");
+
+  assert.match(labsPage, /const unfinishedLabs = useMemo/);
+  assert.match(labsPage, /filteredLabs\.filter\(\(lab\) => !isLabReady\(lab\.id\)\)/);
+  assert.match(labsPage, /const readyFilteredLabCount = filteredLabs\.length - unfinishedLabs\.length/);
+  assert.match(labsPage, /แล็บในมุมมองนี้ \{filteredLabs\.length\} แล็บ/);
+  assert.match(labsPage, /เหลือแล็บที่ยังไม่เสร็จ \{unfinishedLabs\.length\} แล็บ/);
+  assert.match(labsPage, /unfinishedLabs\.map\(\(lab\) =>/);
 });
 
 test("lab detail layout avoids a duplicate bottom start CTA", () => {
@@ -234,7 +442,7 @@ test("simulation route code-splits heavy lab implementations", () => {
   );
 });
 
-test("shared simulation shell places live metrics inside the stage content area", () => {
+test("shared simulation shell overlays live metrics without shrinking the stage", () => {
   const source = readProjectFile("src/components/labs/simulation/SharedSimulationShell.tsx");
 
   assert.doesNotMatch(source, /showLiveMetrics && <div className="hidden sm:block">\{liveMetricsCard\}<\/div>/);
@@ -242,10 +450,11 @@ test("shared simulation shell places live metrics inside the stage content area"
   assert.match(source, /data-testid="simulation-stage-scene"/);
   assert.match(source, /data-testid="simulation-stage-metrics"/);
   assert.doesNotMatch(source, /xl:grid-cols-\[minmax\(0,1fr\)_320px\]/);
+  assert.doesNotMatch(source, /xl:mr-\[336px\]/);
+  assert.match(source, /\? "fixed inset-0 z-\[100\] h-screen min-h-screen w-screen rounded-none border-0 shadow-none"/);
   assert.match(source, /data-testid="simulation-stage-content"[\s\S]*className="relative h-full/);
-  assert.match(source, /data-testid="simulation-stage-scene"[\s\S]*className=\{`h-full min-h-0/);
-  assert.match(source, /showLiveMetrics \? "xl:mr-\[336px\]" : ""/);
-  assert.match(source, /<aside data-testid="simulation-stage-metrics" className="pointer-events-none absolute right-3 top-3 z-20 hidden w-\[320px\] max-w-\[calc\(100%-24px\)\] xl:block">/);
+  assert.match(source, /data-testid="simulation-stage-scene"[\s\S]*className="h-full min-h-0 overflow-hidden rounded-\[18px\]"/);
+  assert.match(source, /data-testid="simulation-stage-metrics" className="hidden w-\[320px\] shrink-0 xl:block"/);
   assert.match(source, /drawerSummary \?\? \(showLiveMetrics && liveMetricsCard\)/);
 });
 

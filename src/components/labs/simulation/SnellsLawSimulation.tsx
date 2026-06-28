@@ -419,7 +419,7 @@ export default function SnellsLawSimulation() {
               หน้าแรก
             </Link>
             <ChevronRight className="h-3.5 w-3.5 text-slate-300" />
-            <Link href="/?category=Physics" className="text-blue-600 hover:text-blue-700">Physics</Link>
+            <Link href="/labs?category=Physics" className="text-blue-600 hover:text-blue-700">Physics</Link>
             <ChevronRight className="h-3.5 w-3.5 text-slate-300" />
             <Link href="/labs/snells-law" className="text-slate-700 hover:text-blue-700">Snell&apos;s Law Lab</Link>
             <ChevronRight className="h-3.5 w-3.5 text-slate-300" />

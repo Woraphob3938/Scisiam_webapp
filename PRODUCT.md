@@ -8,6 +8,8 @@ product
 
 SciSiam serves Thai secondary-school students and science teachers. Students use it to find a lab, understand the concept, adjust variables, observe simulated results, read graphs and tables, save progress, and ask SciSiam AI Tutor for guided help. Teachers use it as a classroom demonstration tool, a guided practice surface, and a future way to monitor learning activity.
 
+The catalog spans Physics, Chemistry, Biology, and Mathematics, with a Foundation entry that introduces core ideas across subjects. Not every lab has a ready simulation yet; readiness is shown honestly so students and teachers always know what they can actually run.
+
 The near-term context is a competition-ready educational product: judges should be able to open it, understand the value quickly, and complete a believable demo flow without blank pages or broken lab routes. The long-term ambition is broader public use: SciSiam should mature into a real web, PC, and mobile learning app that anyone can download or access safely.
 
 ## Product Purpose
@@ -32,7 +34,7 @@ It should also avoid misleading readiness: unsupported labs must not route to th
 
 1. Learning first: prioritize the experiment, variables, formulas, graphs, and next action over decoration.
 2. Calm density: show enough information for learning, but group it so students can scan without fatigue.
-3. Science-specific clarity: each lab needs visuals, equipment, theory, and simulation states that match the actual topic.
+3. Science-specific clarity: each lab needs visuals, equipment, theory, and simulation states that match the actual topic — including mathematics labs where the "apparatus" is a function, graph, or geometric object rather than physical equipment.
 4. Trust through correctness: routes, units, formulas, saved data, AI behavior, and readiness labels must be honest and consistent.
 5. Progressive ambition: build for the competition demo now while keeping decisions compatible with future web, PC, and mobile deployment.
 

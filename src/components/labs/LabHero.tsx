@@ -4,6 +4,68 @@ import React from "react";
 import Link from "next/link";
 import { Atom, Calculator, CircuitBoard, FlaskConical, Gauge, Play, ArrowLeft, Snowflake, Thermometer, Leaf, Dna, Microscope, Weight, Sliders, Zap, Sun } from "lucide-react";
 import { getLabReadiness } from "@/data/labReadiness";
+import {
+  PushPullForcesSVG,
+  LightShadowsSVG,
+  SoundVibrationsSVG,
+  SimpleCircuitsSVG,
+  FloatingSinkingSVG,
+  MagnetExplorationSVG,
+  StatesOfMatterSVG,
+  MixingSeparatingSVG,
+  DissolvingSolutionsSVG,
+  AcidsBasesSVG,
+  HeatingCoolingSVG,
+  PhysicalChemicalSVG,
+  ProbabilitySVG,
+  TrigoWavesSVG,
+  SystemsEquationsSVG,
+  GeometryMeasurementSVG,
+  ExponentialGrowthDecaySVG,
+  DataSamplingErrorSVG,
+  QuadraticProjectilesSVG,
+  LogarithmScalesSVG,
+  UnitConversionSVG,
+  MatrixTransformationsSVG,
+  SequencesSeriesSVG,
+  InequalitiesFeasibleSVG,
+  TransformationsSymmetrySVG,
+  AnglesCirclesSVG,
+  CombinatoricsCountingSVG,
+  NormalDistributionSVG,
+  RatesOfChangeSVG,
+  OptimizationConstraintsSVG,
+  AdvancedCalculusSVG,
+  LinearAlgebraSVG,
+  DifferentialEquationsSVG,
+  NumericalMethodsSVG,
+  MultivariableCalculusSVG,
+  StatisticalInferenceSVG,
+  BayesianReasoningSVG,
+  FourierAnalysisSVG,
+  ComplexNumbersPhasorsSVG,
+  VectorFieldsGradientsSVG,
+  DiscreteGraphTheorySVG,
+  MathematicalModelingSVG,
+  QuantumTunnelingSVG,
+  MichelsonInterferometerSVG,
+  ZeemanEffectSVG,
+  SuperconductivityMeissnerSVG,
+  BraggDiffractionSVG,
+  RelativisticKinematicsSVG,
+  NmrSpectroscopySVG,
+  XpsSpectroscopySVG,
+  HplcChromatographySVG,
+  TransitionMetalComplexesSVG,
+  EisElectrochemistrySVG,
+  QuantumChemistryOrbitalsSVG,
+  PcrGelElectrophoresisSVG,
+  CrisprGeneEditingSVG,
+  RecombinantDnaTransformationSVG,
+  FlowCytometrySVG,
+  WesternBlottingSVG,
+  MetabolicPathwayFluxSVG
+} from "@/components/labs/UnfinishedLabSVGs";
 
 interface LabHeroProps {
   labId: string;
@@ -156,7 +218,7 @@ const SnellsHeroIllustration = () => (
     <path d="M68 70 L122 120" stroke="#ef4444" strokeWidth="5" strokeLinecap="round" className="animate-pulse" />
     {/* Refracted Beam */}
     <path d="M122 120 L156 180" stroke="#f43f5e" strokeWidth="5" strokeLinecap="round" />
-    
+
     {/* Reflected Beam (subtle) */}
     <path d="M122 120 L176 70" stroke="#ef4444" strokeWidth="2.5" strokeLinecap="round" opacity="0.35" />
 
@@ -704,84 +766,272 @@ const MathConceptHeroIllustration = ({ labId }: { labId: string }) => {
 
   return (
     <svg data-testid={`math-hero-${variant}`} className="h-full w-full" viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <circle cx="122" cy="124" r="76" fill="#ddd6fe" opacity="0.42" filter="blur(30px)" />
-      <circle cx="122" cy="124" r="54" fill="#faf5ff" opacity="0.9" />
+      <defs>
+        <linearGradient id="math-bg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#f8fafc" />
+          <stop offset="100%" stopColor="#ede9fe" stopOpacity="0.4" />
+        </linearGradient>
+        <filter id="math-shadow" x="-10%" y="-10%" width="120%" height="120%">
+          <feDropShadow dx="2" dy="4" stdDeviation="2.5" floodColor="#0f172a" floodOpacity="0.15" />
+        </filter>
+        <linearGradient id="glh-line-grad" x1="0" y1="1" x2="1" y2="0">
+          <stop offset="0%" stopColor="#4f46e5" />
+          <stop offset="100%" stopColor="#06b6d4" />
+        </linearGradient>
+        <linearGradient id="rph-mix-1" x1="0" y1="1" x2="0" y2="0">
+          <stop offset="0%" stopColor="#7c3aed" />
+          <stop offset="100%" stopColor="#a855f7" />
+        </linearGradient>
+        <linearGradient id="rph-mix-2" x1="0" y1="1" x2="0" y2="0">
+          <stop offset="0%" stopColor="#06b6d4" />
+          <stop offset="100%" stopColor="#34d399" />
+        </linearGradient>
+        <linearGradient id="vah-a-grad" x1="0" y1="1" x2="1" y2="0">
+          <stop offset="0%" stopColor="#7c3aed" />
+          <stop offset="100%" stopColor="#a78bfa" />
+        </linearGradient>
+        <linearGradient id="vah-b-grad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#06b6d4" />
+          <stop offset="100%" stopColor="#34d399" />
+        </linearGradient>
+        <linearGradient id="vah-r-grad" x1="0" y1="1" x2="1" y2="0">
+          <stop offset="0%" stopColor="#f97316" />
+          <stop offset="100%" stopColor="#ef4444" />
+        </linearGradient>
+        <linearGradient id="cvh-box-grad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#7c3aed" stopOpacity="0.15" />
+          <stop offset="100%" stopColor="#4f46e5" stopOpacity="0.45" />
+        </linearGradient>
+        <linearGradient id="cfh-line-grad" x1="0" y1="1" x2="1" y2="0">
+          <stop offset="0%" stopColor="#4f46e5" />
+          <stop offset="100%" stopColor="#ec4899" />
+        </linearGradient>
+        <linearGradient id="fbh-in-grad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#06b6d4" />
+          <stop offset="100%" stopColor="#3b82f6" />
+        </linearGradient>
+        <linearGradient id="fbh-out-grad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#f97316" />
+          <stop offset="100%" stopColor="#ef4444" />
+        </linearGradient>
+        <linearGradient id="fbh-box-grad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#7c3aed" />
+          <stop offset="100%" stopColor="#4f46e5" />
+        </linearGradient>
+      </defs>
+
+      <circle cx="120" cy="120" r="85" fill="#ddd6fe" opacity="0.3" filter="blur(24px)" />
 
       {variant === "ratio-and-proportion" ? (
-        <g transform="translate(43 55)">
-          <rect x="0" y="0" width="154" height="104" rx="22" fill="#ffffff" stroke="#c4b5fd" strokeWidth="4" />
-          <rect x="24" y="27" width="42" height="16" rx="8" fill="#7c3aed" />
-          <rect x="24" y="51" width="63" height="16" rx="8" fill="#06b6d4" />
-          <rect x="89" y="25" width="40" height="40" rx="13" fill="#ecfeff" stroke="#bae6fd" strokeWidth="3" />
-          <text x="109" y="49" fill="#0891b2" fontSize="15" fontWeight="900" textAnchor="middle">x4</text>
-          <text x="47" y="84" fill="#0f172a" fontSize="17" fontWeight="900" textAnchor="middle">2:3</text>
-          <text x="120" y="84" fill="#0f172a" fontSize="17" fontWeight="900" textAnchor="middle">8:12</text>
+        <g transform="translate(20 20)">
+          <rect x="0" y="0" width="200" height="200" rx="24" fill="url(#math-bg)" stroke="#cbd5e1" strokeWidth="2" />
+
+          {/* Left Beaker */}
+          <g transform="translate(35, 40)">
+            <rect x="0" y="0" width="36" height="100" rx="6" fill="#ffffff" stroke="#94a3b8" strokeWidth="2" />
+            <path d="M2,38 H34 V98 H2 Z" fill="url(#rph-mix-1)" opacity="0.8" />
+            <path d="M2,62 H34 V98 H2 Z" fill="url(#rph-mix-2)" opacity="0.85" />
+            {[20, 40, 60, 80].map(y => (
+              <line key={y} x1="2" y1={y} x2="10" y2={y} stroke="#cbd5e1" strokeWidth="1.5" />
+            ))}
+            <text x="18" y="122" fill="#475569" fontSize="12" fontWeight="bold" textAnchor="middle">2:3</text>
+          </g>
+
+          {/* Right Beaker */}
+          <g transform="translate(129, 40)">
+            <rect x="0" y="0" width="36" height="100" rx="6" fill="#ffffff" stroke="#94a3b8" strokeWidth="2" />
+            <path d="M2,38 H34 V98 H2 Z" fill="url(#rph-mix-1)" opacity="0.8" />
+            <path d="M2,62 H34 V98 H2 Z" fill="url(#rph-mix-2)" opacity="0.85" />
+            {[20, 40, 60, 80].map(y => (
+              <line key={y} x1="2" y1={y} x2="10" y2={y} stroke="#cbd5e1" strokeWidth="1.5" />
+            ))}
+            <text x="18" y="122" fill="#475569" fontSize="12" fontWeight="bold" textAnchor="middle">8:12</text>
+          </g>
+
+          {/* Dotted Scale Arc */}
+          <path d="M76,80 Q100,50 124,80" stroke="#7c3aed" strokeWidth="2" strokeDasharray="4 3" strokeLinecap="round" fill="none" />
+          <path d="M124,80 L117,75 M124,80 L120,86" stroke="#7c3aed" strokeWidth="2" strokeLinecap="round" />
+
+          <g transform="translate(85, 40)" filter="url(#math-shadow)">
+            <rect width="30" height="18" rx="9" fill="#ecfeff" stroke="#bae6fd" />
+            <text x="15" y="12" fill="#0891b2" fontSize="9" fontWeight="black" textAnchor="middle">x4</text>
+          </g>
         </g>
       ) : variant === "vector-addition" ? (
-        <g transform="translate(45 44)">
-          <rect x="0" y="0" width="150" height="122" rx="22" fill="#ffffff" stroke="#c4b5fd" strokeWidth="4" />
-          <path d="M26 96H132M40 106V20" stroke="#e2e8f0" strokeWidth="2.5" strokeLinecap="round" />
-          <path d="M40 91L96 52" stroke="#7c3aed" strokeWidth="8" strokeLinecap="round" />
-          <path d="M96 52L118 43L107 66Z" fill="#7c3aed" />
-          <path d="M96 52L122 81" stroke="#06b6d4" strokeWidth="8" strokeLinecap="round" />
-          <path d="M122 81L129 105L106 92Z" fill="#06b6d4" />
-          <path d="M40 91L122 81" stroke="#f97316" strokeWidth="6" strokeLinecap="round" strokeDasharray="7 6" />
-          <path d="M122 81L140 70L135 93Z" fill="#f97316" />
-          <text x="72" y="53" fill="#6d28d9" fontSize="13" fontWeight="900">A</text>
-          <text x="128" y="79" fill="#0891b2" fontSize="13" fontWeight="900">B</text>
-          <text x="78" y="92" fill="#ea580c" fontSize="13" fontWeight="900">R</text>
+        <g transform="translate(20 20)">
+          <rect x="0" y="0" width="200" height="200" rx="24" fill="url(#math-bg)" stroke="#cbd5e1" strokeWidth="2" />
+
+          {/* Coordinate grid */}
+          <g stroke="#f1f5f9" strokeWidth="1">
+            {[40, 60, 80, 100, 120, 140, 160].map(c => (
+              <React.Fragment key={c}>
+                <line x1={c} y1="0" x2={c} y2="200" />
+                <line x1="0" y1={c} x2="200" y2={c} />
+              </React.Fragment>
+            ))}
+          </g>
+          <line x1="20" y1="150" x2="180" y2="150" stroke="#94a3b8" strokeWidth="2" />
+          <line x1="40" y1="20" x2="40" y2="180" stroke="#94a3b8" strokeWidth="2" />
+
+          {/* Vector A */}
+          <path d="M40,150 L120,80" stroke="url(#vah-a-grad)" strokeWidth="6" strokeLinecap="round" filter="url(#math-shadow)" />
+          <path d="M120,80 L108,79 M120,80 L115,92" stroke="#7c3aed" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+
+          {/* Vector B */}
+          <path d="M120,80 L170,130" stroke="url(#vah-b-grad)" strokeWidth="6" strokeLinecap="round" filter="url(#math-shadow)" />
+          <path d="M170,130 L158,128 M170,130 L166,118" stroke="#0891b2" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+
+          {/* Resultant vector R */}
+          <path d="M40,150 L170,130" stroke="url(#vah-r-grad)" strokeWidth="4" strokeDasharray="6 4" strokeLinecap="round" filter="url(#math-shadow)" />
+          <path d="M170,130 L159,134 M170,130 L162,122" stroke="#ef4444" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+
+          <text x="75" y="105" fill="#6d28d9" fontSize="13" fontWeight="bold">A</text>
+          <text x="150" y="98" fill="#0891b2" fontSize="13" fontWeight="bold">B</text>
+          <text x="105" y="165" fill="#e53e3e" fontSize="13" fontWeight="bold">R</text>
         </g>
       ) : variant === "center-and-variability" ? (
-        <g transform="translate(42 52)">
-          <rect x="0" y="0" width="156" height="112" rx="22" fill="#ffffff" stroke="#c4b5fd" strokeWidth="4" />
-          <path d="M22 64H134" stroke="#94a3b8" strokeWidth="3" strokeLinecap="round" />
-          {([36, 53, 53, 72, 91, 91, 110, 127] as const).map((x, index) => (
-            <circle key={`${x}-${index}`} cx={x} cy={index % 2 === 0 ? 52 : 40} r="7" fill="#0891b2" stroke="#ffffff" strokeWidth="3" />
+        <g transform="translate(20 20)">
+          <rect x="0" y="0" width="200" height="200" rx="24" fill="url(#math-bg)" stroke="#cbd5e1" strokeWidth="2" />
+          <line x1="20" y1="130" x2="180" y2="130" stroke="#94a3b8" strokeWidth="2.5" strokeLinecap="round" />
+          {[30, 50, 70, 90, 110, 130, 150, 170].map(x => (
+            <line key={x} x1={x} y1="130" x2={x} y2="137" stroke="#94a3b8" strokeWidth="2" />
           ))}
-          <path d="M37 88H119M52 80V96M104 80V96" stroke="#475569" strokeWidth="4" strokeLinecap="round" />
-          <rect x="61" y="77" width="34" height="22" rx="7" fill="#f5f3ff" stroke="#7c3aed" strokeWidth="3" />
-          <path d="M78 77V99" stroke="#7c3aed" strokeWidth="4" strokeLinecap="round" />
-          <text x="46" y="25" fill="#6d28d9" fontSize="12" fontWeight="900" textAnchor="middle">mean</text>
-          <text x="116" y="25" fill="#0891b2" fontSize="12" fontWeight="900" textAnchor="middle">IQR</text>
+
+          {/* Dots distribution */}
+          {[
+            [30, 120], [50, 120], [70, 120], [90, 120], [110, 120], [130, 120], [150, 120], [170, 120],
+            [70, 110], [90, 110], [110, 110], [130, 110], [90, 100], [110, 100], [110, 90]
+          ].map(([x, y], idx) => (
+            <circle key={idx} cx={x} cy={y} r="5.5" fill="#06b6d4" stroke="#ffffff" strokeWidth="1.5" />
+          ))}
+
+          {/* Whiskers */}
+          <line x1="50" y1="55" x2="150" y2="55" stroke="#4f46e5" strokeWidth="2.5" strokeLinecap="round" />
+          <line x1="50" y1="45" x2="50" y2="65" stroke="#4f46e5" strokeWidth="2.5" />
+          <line x1="150" y1="45" x2="150" y2="65" stroke="#4f46e5" strokeWidth="2.5" />
+
+          <g filter="url(#math-shadow)">
+            <rect x="80" y="38" width="60" height="34" rx="4" fill="url(#cvh-box-grad)" stroke="#7c3aed" strokeWidth="2.5" />
+            {/* Median line */}
+            <line x1="110" y1="38" x2="110" y2="72" stroke="#7c3aed" strokeWidth="3" />
+          </g>
+
+          {/* IQR brace */}
+          <path d="M80,32 H140" stroke="#7c3aed" strokeWidth="1.5" />
+          <path d="M80,29 V35 M140,29 V35" stroke="#7c3aed" strokeWidth="1.5" />
+          <text x="110" y="24" fill="#6d28d9" fontSize="10" fontWeight="black" textAnchor="middle">IQR</text>
         </g>
       ) : variant === "curve-fitting" ? (
-        <g transform="translate(42 42)">
-          <rect x="0" y="0" width="156" height="126" rx="22" fill="#ffffff" stroke="#c4b5fd" strokeWidth="4" />
-          <path d="M24 101H132M32 108V22" stroke="#e2e8f0" strokeWidth="3" strokeLinecap="round" />
-          <path d="M32 92C55 80 73 70 90 59C109 47 121 39 137 27" stroke="#7c3aed" strokeWidth="7" strokeLinecap="round" />
-          {([[38, 88], [59, 77], [80, 65], [103, 52], [124, 42], [136, 29]] as const).map(([x, y]) => (
-            <g key={`${x}-${y}`}>
-              <path d={`M${x} ${y}V${y + 15}`} stroke="#f97316" strokeWidth="3" strokeDasharray="4 4" />
-              <circle cx={x} cy={y} r="7" fill="#7c3aed" stroke="#ffffff" strokeWidth="3" />
-            </g>
+        <g transform="translate(20 20)">
+          <rect x="0" y="0" width="200" height="200" rx="24" fill="url(#math-bg)" stroke="#cbd5e1" strokeWidth="2" />
+
+          <g stroke="#f1f5f9" strokeWidth="1">
+            {[40, 60, 80, 100, 120, 140, 160].map(c => (
+              <React.Fragment key={c}>
+                <line x1={c} y1="0" x2={c} y2="200" />
+                <line x1="0" y1={c} x2="200" y2={c} />
+              </React.Fragment>
+            ))}
+          </g>
+
+          <line x1="30" y1="160" x2="170" y2="160" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" />
+          <line x1="40" y1="30" x2="40" y2="170" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" />
+
+          {/* Residual dash lines */}
+          {[
+            [55, 140, 130],
+            [75, 110, 118],
+            [95, 112, 103],
+            [115, 80, 86],
+            [135, 62, 68],
+            [155, 48, 50]
+          ].map(([x, y1, y2], idx) => (
+            <line key={idx} x1={x} y1={y1} x2={x} y2={y2} stroke="#f97316" strokeWidth="2" strokeDasharray="3 3" />
           ))}
-          <text x="115" y="101" fill="#0891b2" fontSize="13" fontWeight="900" textAnchor="middle">R2</text>
+
+          {/* Regression Curve */}
+          <path d="M40,140 C80,125 120,95 160,50" stroke="url(#cfh-line-grad)" strokeWidth="5" strokeLinecap="round" fill="none" filter="url(#math-shadow)" />
+
+          {/* Points */}
+          {[
+            [55, 140], [75, 110], [95, 112], [115, 80], [135, 62], [155, 48]
+          ].map(([x, y], idx) => (
+            <circle key={idx} cx={x} cy={y} r="6" fill="#06b6d4" stroke="#ffffff" strokeWidth="2" />
+          ))}
         </g>
       ) : variant === "function-builder" ? (
-        <g transform="translate(28 50)">
-          <rect x="0" y="27" width="48" height="42" rx="13" fill="#ecfeff" stroke="#bae6fd" strokeWidth="3" />
-          <text x="24" y="53" fill="#0891b2" fontSize="17" fontWeight="900" textAnchor="middle">x</text>
-          <path d="M55 48H74" stroke="#cbd5e1" strokeWidth="5" strokeLinecap="round" />
-          <path d="M68 39L78 48L68 57" stroke="#cbd5e1" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
-          <rect x="82" y="10" width="70" height="76" rx="20" fill="#7c3aed" />
-          <text x="117" y="38" fill="#ffffff" fontSize="13" fontWeight="900" textAnchor="middle">rule</text>
-          <text x="117" y="60" fill="#ffffff" fontSize="17" fontWeight="900" textAnchor="middle">f(x)</text>
-          <path d="M160 48H178" stroke="#cbd5e1" strokeWidth="5" strokeLinecap="round" />
-          <path d="M172 39L182 48L172 57" stroke="#cbd5e1" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
-          <rect x="186" y="27" width="44" height="42" rx="13" fill="#fff7ed" stroke="#fed7aa" strokeWidth="3" />
-          <text x="208" y="53" fill="#ea580c" fontSize="17" fontWeight="900" textAnchor="middle">y</text>
-          <path d="M74 107C93 101 106 96 124 99C140 102 153 93 168 91" stroke="#06b6d4" strokeWidth="4" strokeLinecap="round" />
+        <g transform="translate(20 20)">
+          <rect x="0" y="0" width="200" height="200" rx="24" fill="url(#math-bg)" stroke="#cbd5e1" strokeWidth="2" />
+
+          {/* Input x */}
+          <g transform="translate(20, 80)" filter="url(#math-shadow)">
+            <rect width="36" height="36" rx="10" fill="#ffffff" stroke="#06b6d4" strokeWidth="2" />
+            <text x="18" y="24" fill="#0891b2" fontSize="15" fontWeight="black" textAnchor="middle">x</text>
+          </g>
+
+          {/* Input path */}
+          <path d="M62,98 L82,98" stroke="url(#fbh-in-grad)" strokeWidth="4" strokeLinecap="round" />
+          <path d="M82,98 L76,92 M82,98 L76,104" stroke="#3b82f6" strokeWidth="4" strokeLinecap="round" />
+
+          {/* Function Processor */}
+          <g transform="translate(88, 55)" filter="url(#math-shadow)">
+            <rect width="44" height="66" rx="12" fill="url(#fbh-box-grad)" stroke="#c4b5fd" strokeWidth="2" />
+            <rect x="6" y="8" width="32" height="20" rx="6" fill="#1e1b4b" />
+            <text x="22" y="22" fill="#38bdf8" fontSize="11" fontWeight="bold" textAnchor="middle">f(x)</text>
+
+            <circle cx="13" cy="42" r="3.5" fill="#34d399" />
+            <circle cx="22" cy="42" r="3.5" fill="#fbbf24" />
+            <circle cx="31" cy="42" r="3.5" fill="#f87171" />
+            <line x1="8" y1="52" x2="36" y2="52" stroke="#ffffff" strokeWidth="2" opacity="0.4" />
+          </g>
+
+          {/* Output path */}
+          <path d="M138,98 L158,98" stroke="url(#fbh-out-grad)" strokeWidth="4" strokeLinecap="round" />
+          <path d="M158,98 L152,92 M158,98 L152,104" stroke="#ef4444" strokeWidth="4" strokeLinecap="round" />
+
+          {/* Output y */}
+          <g transform="translate(164, 80)" filter="url(#math-shadow)">
+            <rect width="36" height="36" rx="10" fill="#ffffff" stroke="#f97316" strokeWidth="2" />
+            <text x="18" y="24" fill="#ea580c" fontSize="15" fontWeight="black" textAnchor="middle">y</text>
+          </g>
+
+          {/* Equation display */}
+          <rect x="40" y="150" width="120" height="20" rx="8" fill="#f8fafc" stroke="#e2e8f0" strokeWidth="1.5" />
+          <text x="100" y="164" fill="#475569" fontSize="10" fontWeight="bold" textAnchor="middle">Equation: y = 2x + 1</text>
         </g>
       ) : (
-        <g transform="translate(42 42)">
-          <rect x="0" y="0" width="150" height="138" rx="20" fill="#ffffff" stroke="#c4b5fd" strokeWidth="4" />
-          <path d="M26 18V114M12 100H132" stroke="#cbd5e1" strokeWidth="3.5" strokeLinecap="round" />
-          <path d="M26 82H132M26 64H132M26 46H132M44 18V100M62 18V100M80 18V100M98 18V100M116 18V100" stroke="#ede9fe" strokeWidth="2" />
-          <path d="M26 90L132 27" stroke="#7c3aed" strokeWidth="6" strokeLinecap="round" />
-          <path d="M78 60H118V38" stroke="#f97316" strokeWidth="4" strokeLinecap="round" strokeDasharray="7 6" />
-          <circle cx="26" cy="90" r="6" fill="#f59e0b" />
-          <circle cx="78" cy="60" r="7" fill="#7c3aed" />
-          <circle cx="132" cy="27" r="6" fill="#10b981" />
+        <g transform="translate(20 20)">
+          <rect x="0" y="0" width="200" height="200" rx="24" fill="url(#math-bg)" stroke="#cbd5e1" strokeWidth="2" />
+
+          <g stroke="#f1f5f9" strokeWidth="1">
+            {[40, 60, 80, 100, 120, 140, 160].map(c => (
+              <React.Fragment key={c}>
+                <line x1={c} y1="0" x2={c} y2="200" />
+                <line x1="0" y1={c} x2="200" y2={c} />
+              </React.Fragment>
+            ))}
+          </g>
+
+          <line x1="20" y1="150" x2="180" y2="150" stroke="#94a3b8" strokeWidth="2" />
+          <line x1="40" y1="20" x2="40" y2="180" stroke="#94a3b8" strokeWidth="2" />
+
+          {/* Slope Triangle */}
+          <path d="M100,100H150V50" stroke="#f97316" strokeWidth="3" strokeDasharray="4 3" strokeLinecap="round" strokeLinejoin="round" />
+
+          {/* Linear Line */}
+          <line x1="30" y1="135" x2="170" y2="30" stroke="url(#glh-line-grad)" strokeWidth="5" strokeLinecap="round" filter="url(#math-shadow)" />
+
+          {/* Highlighted Intercept Points */}
+          <circle cx="40" cy="127" r="6" fill="#3b82f6" stroke="#ffffff" strokeWidth="2" />
+          <circle cx="100" cy="100" r="5" fill="#a78bfa" stroke="#ffffff" strokeWidth="2" />
+          <circle cx="150" cy="50" r="5" fill="#10b981" stroke="#ffffff" strokeWidth="2" />
+
+          <text x="48" y="123" fill="#1e3a8a" fontSize="10" fontWeight="bold">b</text>
+
+          <g transform="translate(108, 108)">
+            <rect width="52" height="18" rx="8" fill="#fff7ed" stroke="#fed7aa" strokeWidth="1" />
+            <text x="26" y="12" fill="#ea580c" fontSize="8" fontWeight="black" textAnchor="middle">rise/run</text>
+          </g>
         </g>
       )}
 
@@ -955,7 +1205,7 @@ export default function LabHero({
   const isStefanBoltzmann = labId === "stefan-boltzmann";
   const isMathematics = category === "Mathematics" || mathConceptLabIds.has(labId);
 
-  const isBiology = isPhotosynthesis || isMendelian || isMitosis;
+  const isBiology = category === "Biology" || isPhotosynthesis || isMendelian || isMitosis;
   const HeroIcon = isHookesLaw ? Weight
     : isMathematics ? Calculator
     : isOhmsLaw ? CircuitBoard
@@ -977,7 +1227,7 @@ export default function LabHero({
     : isStefanBoltzmann ? Sun
     : Atom;
 
-  const chemistryTone = isPeriodicTable || isAcidBase || isBoylesLaw || isCharlesLaw || isIdealGas || isLeChateliers || isBeerLambert || isHesssLaw || isGalvanicCell || isChemicalKinetics || isSolubilityProduct || isAvogadrosLaw || isElectrolysis || isColligative;
+  const chemistryTone = category === "Chemistry" || isPeriodicTable || isAcidBase || isBoylesLaw || isCharlesLaw || isIdealGas || isLeChateliers || isBeerLambert || isHesssLaw || isGalvanicCell || isChemicalKinetics || isSolubilityProduct || isAvogadrosLaw || isElectrolysis || isColligative;
   const readiness = getLabReadiness(labId);
   const iconClass = isMathematics ? "bg-indigo-600 shadow-indigo-500/20" : isBiology ? "bg-emerald-600 shadow-emerald-500/20" : chemistryTone ? "bg-violet-600 shadow-violet-500/20" : "bg-blue-600 shadow-blue-500/20";
   const badgeClass = isMathematics ? "bg-indigo-50 text-indigo-700 border-indigo-100" : isBiology ? "bg-emerald-50 text-emerald-700 border-emerald-100" : chemistryTone ? "bg-violet-50 text-violet-700 border-violet-100" : "bg-blue-50 text-blue-700 border-blue-100";
@@ -1022,6 +1272,12 @@ export default function LabHero({
             {description}
           </p>
 
+          {!readiness.isReady && (
+            <p className="mb-4 max-w-2xl rounded-xl border border-amber-100 bg-amber-50 px-3 py-2 text-sm font-bold leading-relaxed text-amber-700">
+              {readiness.description}
+            </p>
+          )}
+
           {/* Buttons Row */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3.5 w-full sm:w-auto">
             {/* Start Lab Button */}
@@ -1031,7 +1287,7 @@ export default function LabHero({
               className="flex items-center justify-center gap-2 py-3 px-7 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold transition-all duration-200 active:scale-95 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500 focus:outline-none cursor-pointer shadow-sm shadow-blue-600/10"
             >
               <Play className="w-4 h-4 fill-white" />
-              <span>เริ่มทดลอง</span>
+              <span>{readiness.isReady ? "เริ่มทดลอง" : "ดูสถานะการจัดทำ"}</span>
             </button>
 
             {/* Back Button */}
@@ -1047,7 +1303,127 @@ export default function LabHero({
 
         {/* Right Side: High-Fidelity SVG Experiment Illustration */}
         <div className="relative -mt-1 flex h-28 w-28 shrink-0 select-none items-center justify-center opacity-95 sm:mt-0 sm:h-52 sm:w-52 lg:h-56 lg:w-56">
-          {isOhmsLaw ? (
+          {labId === "push-pull-forces" ? (
+            <PushPullForcesSVG className="w-full h-full" />
+          ) : labId === "light-and-shadows" ? (
+            <LightShadowsSVG className="w-full h-full" />
+          ) : labId === "sound-vibrations" ? (
+            <SoundVibrationsSVG className="w-full h-full" />
+          ) : labId === "simple-circuits" ? (
+            <SimpleCircuitsSVG className="w-full h-full" />
+          ) : labId === "floating-and-sinking" ? (
+            <FloatingSinkingSVG className="w-full h-full" />
+          ) : labId === "magnet-exploration" ? (
+            <MagnetExplorationSVG className="w-full h-full" />
+          ) : labId === "states-of-matter" ? (
+            <StatesOfMatterSVG className="w-full h-full" />
+          ) : labId === "mixing-and-separating" ? (
+            <MixingSeparatingSVG className="w-full h-full" />
+          ) : labId === "dissolving-solutions" ? (
+            <DissolvingSolutionsSVG className="w-full h-full" />
+          ) : labId === "acids-bases-around-us" ? (
+            <AcidsBasesSVG className="w-full h-full" />
+          ) : labId === "heating-cooling-materials" ? (
+            <HeatingCoolingSVG className="w-full h-full" />
+          ) : labId === "physical-chemical-changes" ? (
+            <PhysicalChemicalSVG className="w-full h-full" />
+          ) : labId === "probability-simulation" ? (
+            <ProbabilitySVG className="w-full h-full" />
+          ) : labId === "trigonometry-waves" ? (
+            <TrigoWavesSVG className="w-full h-full" />
+          ) : labId === "systems-of-equations" ? (
+            <SystemsEquationsSVG className="w-full h-full" />
+          ) : labId === "geometry-measurement" ? (
+            <GeometryMeasurementSVG className="w-full h-full" />
+          ) : labId === "exponential-growth-decay" ? (
+            <ExponentialGrowthDecaySVG className="w-full h-full" />
+          ) : labId === "data-sampling-error" ? (
+            <DataSamplingErrorSVG className="w-full h-full" />
+          ) : labId === "quadratic-projectiles" ? (
+            <QuadraticProjectilesSVG className="w-full h-full" />
+          ) : labId === "logarithm-scales" ? (
+            <LogarithmScalesSVG className="w-full h-full" />
+          ) : labId === "unit-conversion" ? (
+            <UnitConversionSVG className="w-full h-full" />
+          ) : labId === "matrix-transformations" ? (
+            <MatrixTransformationsSVG className="w-full h-full" />
+          ) : labId === "sequences-series" ? (
+            <SequencesSeriesSVG className="w-full h-full" />
+          ) : labId === "inequalities-feasible-regions" ? (
+            <InequalitiesFeasibleSVG className="w-full h-full" />
+          ) : labId === "transformations-symmetry" ? (
+            <TransformationsSymmetrySVG className="w-full h-full" />
+          ) : labId === "angles-circles" ? (
+            <AnglesCirclesSVG className="w-full h-full" />
+          ) : labId === "combinatorics-counting" ? (
+            <CombinatoricsCountingSVG className="w-full h-full" />
+          ) : labId === "normal-distribution" ? (
+            <NormalDistributionSVG className="w-full h-full" />
+          ) : labId === "rates-of-change" ? (
+            <RatesOfChangeSVG className="w-full h-full" />
+          ) : labId === "optimization-constraints" ? (
+            <OptimizationConstraintsSVG className="w-full h-full" />
+          ) : labId === "advanced-calculus-optimization" ? (
+            <AdvancedCalculusSVG className="w-full h-full" />
+          ) : labId === "linear-algebra-eigenvectors" ? (
+            <LinearAlgebraSVG className="w-full h-full" />
+          ) : labId === "differential-equations-lab" ? (
+            <DifferentialEquationsSVG className="w-full h-full" />
+          ) : labId === "numerical-methods-lab" ? (
+            <NumericalMethodsSVG className="w-full h-full" />
+          ) : labId === "multivariable-calculus" ? (
+            <MultivariableCalculusSVG className="w-full h-full" />
+          ) : labId === "statistical-inference" ? (
+            <StatisticalInferenceSVG className="w-full h-full" />
+          ) : labId === "bayesian-reasoning-lab" ? (
+            <BayesianReasoningSVG className="w-full h-full" />
+          ) : labId === "fourier-analysis-signals" ? (
+            <FourierAnalysisSVG className="w-full h-full" />
+          ) : labId === "complex-numbers-phasors" ? (
+            <ComplexNumbersPhasorsSVG className="w-full h-full" />
+          ) : labId === "vector-fields-gradients" ? (
+            <VectorFieldsGradientsSVG className="w-full h-full" />
+          ) : labId === "discrete-graph-theory" ? (
+            <DiscreteGraphTheorySVG className="w-full h-full" />
+          ) : labId === "mathematical-modeling-lab" ? (
+            <MathematicalModelingSVG className="w-full h-full" />
+          ) : labId === "quantum-tunneling" ? (
+            <QuantumTunnelingSVG className="w-full h-full" />
+          ) : labId === "michelson-interferometer" ? (
+            <MichelsonInterferometerSVG className="w-full h-full" />
+          ) : labId === "zeeman-effect" ? (
+            <ZeemanEffectSVG className="w-full h-full" />
+          ) : labId === "superconductivity-meissner" ? (
+            <SuperconductivityMeissnerSVG className="w-full h-full" />
+          ) : labId === "bragg-diffraction" ? (
+            <BraggDiffractionSVG className="w-full h-full" />
+          ) : labId === "relativistic-kinematics" ? (
+            <RelativisticKinematicsSVG className="w-full h-full" />
+          ) : labId === "nmr-spectroscopy" ? (
+            <NmrSpectroscopySVG className="w-full h-full" />
+          ) : labId === "xps-spectroscopy" ? (
+            <XpsSpectroscopySVG className="w-full h-full" />
+          ) : labId === "hplc-chromatography" ? (
+            <HplcChromatographySVG className="w-full h-full" />
+          ) : labId === "transition-metal-complexes" ? (
+            <TransitionMetalComplexesSVG className="w-full h-full" />
+          ) : labId === "eis-electrochemistry" ? (
+            <EisElectrochemistrySVG className="w-full h-full" />
+          ) : labId === "quantum-chemistry-orbitals" ? (
+            <QuantumChemistryOrbitalsSVG className="w-full h-full" />
+          ) : labId === "pcr-gel-electrophoresis" ? (
+            <PcrGelElectrophoresisSVG className="w-full h-full" />
+          ) : labId === "crispr-gene-editing" ? (
+            <CrisprGeneEditingSVG className="w-full h-full" />
+          ) : labId === "recombinant-dna-transformation" ? (
+            <RecombinantDnaTransformationSVG className="w-full h-full" />
+          ) : labId === "flow-cytometry-cycle" ? (
+            <FlowCytometrySVG className="w-full h-full" />
+          ) : labId === "western-blotting" ? (
+            <WesternBlottingSVG className="w-full h-full" />
+          ) : labId === "metabolic-pathway-flux" ? (
+            <MetabolicPathwayFluxSVG className="w-full h-full" />
+          ) : isOhmsLaw ? (
             <OhmsHeroIllustration />
           ) : isHookesLaw ? (
             <HookesHeroIllustration />
@@ -1260,26 +1636,74 @@ export default function LabHero({
             </svg>
           ) : isPeriodicTable ? (
             <svg className="h-full w-full" viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-              <circle cx="122" cy="124" r="74" fill="#ddd6fe" opacity="0.42" filter="blur(30px)" />
-              <circle cx="122" cy="124" r="52" fill="#faf5ff" opacity="0.9" />
-              <g transform="translate(34, 48)">
-                {([
-                  ["H", "1", 0, 0, "#10b981"], ["He", "2", 152, 0, "#8b5cf6"],
-                  ["Li", "3", 0, 34, "#f43f5e"], ["Be", "4", 32, 34, "#f97316"], ["B", "5", 104, 34, "#f59e0b"], ["C", "6", 136, 34, "#10b981"], ["N", "7", 168, 34, "#10b981"],
-                  ["Na", "11", 0, 68, "#f43f5e"], ["Mg", "12", 32, 68, "#f97316"], ["Al", "13", 104, 68, "#6366f1"], ["Si", "14", 136, 68, "#f59e0b"], ["P", "15", 168, 68, "#10b981"],
-                  ["K", "19", 0, 102, "#f43f5e"], ["Ca", "20", 32, 102, "#f97316"], ["Fe", "26", 72, 102, "#0ea5e9"], ["Cu", "29", 104, 102, "#0ea5e9"], ["Zn", "30", 136, 102, "#0ea5e9"], ["Kr", "36", 168, 102, "#8b5cf6"],
-                ] as const).map(([symbol, number, x, y, color]) => (
-                  <g key={symbol} transform={`translate(${x}, ${y})`}>
-                    <rect x="0" y="0" width="28" height="28" rx="7" fill={color} opacity="0.95" />
-                    <text x="4" y="9" fill="#ffffff" fontSize="6" fontWeight="900">{number}</text>
-                    <text x="14" y="21" fill="#ffffff" fontSize="11" fontWeight="900" textAnchor="middle">{symbol}</text>
-                  </g>
-                ))}
+              <defs>
+                <linearGradient id="pth-h-grad" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stopColor="#ef4444" />
+                  <stop offset="100%" stopColor="#b91c1c" />
+                </linearGradient>
+                <linearGradient id="pth-he-grad" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stopColor="#8b5cf6" />
+                  <stop offset="100%" stopColor="#5b21b6" />
+                </linearGradient>
+                <linearGradient id="pth-li-grad" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stopColor="#3b82f6" />
+                  <stop offset="100%" stopColor="#1d4ed8" />
+                </linearGradient>
+                <linearGradient id="pth-bg-grad" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stopColor="#f8fafc" />
+                  <stop offset="100%" stopColor="#f3e8ff" stopOpacity="0.4" />
+                </linearGradient>
+                <filter id="pth-shadow" x="-10%" y="-10%" width="120%" height="120%">
+                  <feDropShadow dx="2" dy="4" stdDeviation="2.5" floodColor="#0f172a" floodOpacity="0.15" />
+                </filter>
+              </defs>
+
+              <circle cx="120" cy="120" r="85" fill="#f3e8ff" opacity="0.3" filter="blur(20px)" />
+              <rect x="20" y="20" width="200" height="200" rx="24" fill="url(#pth-bg-grad)" stroke="#ddd6fe" strokeWidth="2" />
+
+              {/* Bohr Atom Orbits */}
+              <g transform="translate(90, 120)" opacity="0.9">
+                <circle cx="0" cy="0" r="50" stroke="#a78bfa" strokeWidth="2" strokeDasharray="4 4" />
+                <ellipse cx="0" cy="0" rx="35" ry="18" stroke="#60a5fa" strokeWidth="1.5" transform="rotate(35)" />
+                <ellipse cx="0" cy="0" rx="35" ry="18" stroke="#34d399" strokeWidth="1.5" transform="rotate(-35)" />
+
+                {/* Nucleus */}
+                <circle cx="0" cy="0" r="10" fill="#7c3aed" />
+                <circle cx="-5" cy="3" r="7.5" fill="#f59e0b" opacity="0.9" />
+                <circle cx="4" cy="-3" r="7.5" fill="#3b82f6" opacity="0.9" />
+                <circle cx="1" cy="5" r="7" fill="#ef4444" opacity="0.95" />
+
+                {/* Orbiting Electrons */}
+                <circle cx="28" cy="-41" r="5.5" fill="#38bdf8" stroke="#ffffff" strokeWidth="1.5" />
+                <circle cx="-29" cy="20" r="5.5" fill="#34d399" stroke="#ffffff" strokeWidth="1.5" />
+                <circle cx="31" cy="18" r="5" fill="#f43f5e" stroke="#ffffff" strokeWidth="1.5" />
               </g>
-              <g transform="translate(62, 178)">
-                <rect x="0" y="0" width="116" height="36" rx="15" fill="#ffffff" stroke="#ddd6fe" strokeWidth="2" />
-                <text x="58" y="15" fill="#64748b" fontSize="9" fontWeight="800" textAnchor="middle">Periodic Table</text>
-                <text x="58" y="29" fill="#7c3aed" fontSize="13" fontWeight="900" textAnchor="middle">Z = p⁺</text>
+
+              {/* Elements Stack */}
+              <g transform="translate(145, 45)">
+                {/* Lithium element card */}
+                <g transform="translate(32, 48)" filter="url(#pth-shadow)">
+                  <rect width="40" height="40" rx="10" fill="url(#pth-li-grad)" stroke="#bfdbfe" strokeWidth="1.5" />
+                  <text x="8" y="12" fill="#93c5fd" fontSize="9" fontWeight="bold">3</text>
+                  <text x="20" y="29" fill="#ffffff" fontSize="15" fontWeight="900" textAnchor="middle">Li</text>
+                </g>
+                {/* Helium element card */}
+                <g transform="translate(16, 20)" filter="url(#pth-shadow)">
+                  <rect width="40" height="40" rx="10" fill="url(#pth-he-grad)" stroke="#ddd6fe" strokeWidth="1.5" />
+                  <text x="8" y="12" fill="#c084fc" fontSize="9" fontWeight="bold">2</text>
+                  <text x="20" y="29" fill="#ffffff" fontSize="15" fontWeight="900" textAnchor="middle">He</text>
+                </g>
+                {/* Hydrogen element card */}
+                <g transform="translate(0, -8)" filter="url(#pth-shadow)">
+                  <rect width="40" height="40" rx="10" fill="url(#pth-h-grad)" stroke="#fecaca" strokeWidth="1.5" />
+                  <text x="8" y="12" fill="#fca5a5" fontSize="9" fontWeight="bold">1</text>
+                  <text x="20" y="29" fill="#ffffff" fontSize="15" fontWeight="900" textAnchor="middle">H</text>
+                </g>
+              </g>
+
+              <g transform="translate(55, 178)">
+                <rect x="0" y="0" width="130" height="28" rx="14" fill="#ffffff" stroke="#ddd6fe" strokeWidth="1.5" />
+                <text x="65" y="18" fill="#7c3aed" fontSize="11" fontWeight="black" textAnchor="middle">Z = Atomic Number</text>
               </g>
             </svg>
           ) : isAcidBase ? (
@@ -1343,11 +1767,11 @@ export default function LabHero({
               <path d="M10,35 L40,50 L40,90 L10,75 Z" fill="#93c5fd" opacity="0.8" />
               {/* Isometric Right */}
               <path d="M40,50 L70,35 L70,75 L40,90 Z" fill="#60a5fa" opacity="0.9" />
-              
+
               {/* Glare and highlights on ice cube */}
               <path d="M40,52 L14,39 M40,52 L66,39" stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round" opacity="0.7" />
               <path d="M40,24 L20,34" stroke="#ffffff" strokeWidth="1.5" strokeLinecap="round" opacity="0.6" />
-              
+
               {/* Water puddle/droplet at the bottom */}
               <path d="M2,82 Q30,95 72,88 Q88,86 78,80 Q55,72 6,78 Z" fill="#e0f2fe" opacity="0.6" />
             </g>
@@ -1359,13 +1783,13 @@ export default function LabHero({
               {/* Thermometer bulb at base */}
               <circle cx="25" cy="148" r="18" fill="#ef4444" stroke="#cbd5e1" strokeWidth="3" />
               <circle cx="25" cy="148" r="15" fill="#ef4444" />
-              
+
               {/* Active low temperature liquid column */}
               <rect x="23" y="100" width="4" height="45" fill="#ef4444" />
-              
+
               {/* Glare line */}
               <path d="M22,18 L22,130" stroke="#ffffff" strokeWidth="1.5" opacity="0.5" strokeLinecap="round" />
-              
+
               {/* Calibration notches */}
               <line x1="32" y1="30" x2="37" y2="30" stroke="#94a3b8" strokeWidth="2" />
               <line x1="32" y1="45" x2="37" y2="45" stroke="#ef4444" strokeWidth="2" />

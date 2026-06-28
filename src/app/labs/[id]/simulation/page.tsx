@@ -99,6 +99,20 @@ const CurveFittingSimulation = dynamic(() =>
   import("@/components/labs/simulation/CurveFittingSimulation"));
 const FunctionBuilderSimulation = dynamic(() =>
   import("@/components/labs/simulation/FunctionBuilderSimulation"));
+const ProbabilitySimulation = dynamic(() =>
+  import("@/components/labs/simulation/ProbabilitySimulation"));
+const TrigonometryWavesSimulation = dynamic(() =>
+  import("@/components/labs/simulation/TrigonometryWavesSimulation"));
+const SystemsEquationsSimulation = dynamic(() =>
+  import("@/components/labs/simulation/SystemsEquationsSimulation"));
+const NormalDistributionSimulation = dynamic(() =>
+  import("@/components/labs/simulation/NormalDistributionSimulation"));
+const RatesOfChangeSimulation = dynamic(() =>
+  import("@/components/labs/simulation/RatesOfChangeSimulation"));
+const OptimizationConstraintsSimulation = dynamic(() =>
+  import("@/components/labs/simulation/OptimizationConstraintsSimulation"));
+const AppliedMathSimulation = dynamic(() =>
+  import("@/components/labs/simulation/AppliedMathSimulation"));
 
 const simulationComponents: Record<DirectSimulationLabId, React.ComponentType> = {
   "newtons-cooling": NewtonsCoolingSimulation,
@@ -210,7 +224,7 @@ function SimulationPlaceholder({ labId }: { labId: string }) {
         <p className="mb-8 text-sm font-semibold leading-relaxed text-slate-500">
           {isInvalid
             ? "ขออภัย ไม่พบห้องแล็บวิทยาศาสตร์ที่คุณกำลังเรียกดูในระบบ SciSiam กรุณาตรวจสอบเส้นทางหรือรหัสแล็บใหม่อีกครั้ง"
-            : "ห้องทดลองและระบบ Simulation นี้อยู่ระหว่างการพัฒนาเนื้อหาเพื่อให้สอดคล้องกับวัตถุประสงค์การเรียนรู้ตามหลักสูตรอย่างถูกต้องสมบูรณ์แบบ"}
+            : "แล็บนี้ยังสร้างไม่เสร็จ: ห้องทดลองจำลองอยู่ระหว่างการพัฒนาให้ตรงกับวัตถุประสงค์การเรียนรู้และหัวข้อแล็บนี้"}
         </p>
 
         {/* Action Buttons */}
@@ -278,6 +292,78 @@ export default function SimulationRoomPage() {
 
   if (labId === "function-builder") {
     return <FunctionBuilderSimulation />;
+  }
+
+  if (labId === "probability-simulation") {
+    return <ProbabilitySimulation />;
+  }
+
+  if (labId === "trigonometry-waves") {
+    return <TrigonometryWavesSimulation />;
+  }
+
+  if (labId === "systems-of-equations") {
+    return <SystemsEquationsSimulation />;
+  }
+
+  if (labId === "normal-distribution") {
+    return <NormalDistributionSimulation />;
+  }
+
+  if (labId === "rates-of-change") {
+    return <RatesOfChangeSimulation />;
+  }
+
+  if (labId === "optimization-constraints") {
+    return <OptimizationConstraintsSimulation />;
+  }
+
+  if (labId === "geometry-measurement") {
+    return <AppliedMathSimulation labId={labId} />;
+  }
+
+  if (labId === "exponential-growth-decay") {
+    return <AppliedMathSimulation labId={labId} />;
+  }
+
+  if (labId === "data-sampling-error") {
+    return <AppliedMathSimulation labId={labId} />;
+  }
+
+  if (labId === "quadratic-projectiles") {
+    return <AppliedMathSimulation labId={labId} />;
+  }
+
+  if (labId === "logarithm-scales") {
+    return <AppliedMathSimulation labId={labId} />;
+  }
+
+  if (labId === "unit-conversion") {
+    return <AppliedMathSimulation labId={labId} />;
+  }
+
+  if (labId === "matrix-transformations") {
+    return <AppliedMathSimulation labId={labId} />;
+  }
+
+  if (labId === "sequences-series") {
+    return <AppliedMathSimulation labId={labId} />;
+  }
+
+  if (labId === "inequalities-feasible-regions") {
+    return <AppliedMathSimulation labId={labId} />;
+  }
+
+  if (labId === "transformations-symmetry") {
+    return <AppliedMathSimulation labId={labId} />;
+  }
+
+  if (labId === "angles-circles") {
+    return <AppliedMathSimulation labId={labId} />;
+  }
+
+  if (labId === "combinatorics-counting") {
+    return <AppliedMathSimulation labId={labId} />;
   }
 
   if (isMathConceptSimulationLabId(labId)) {

@@ -78,7 +78,7 @@ function MomentumGraph({
         <svg className="w-full h-full min-h-[174px]" viewBox="0 0 200 120" fill="none">
           {/* Reference line for 0 momentum */}
           <line x1="15" y1="60" x2="185" y2="60" stroke="rgba(255,255,255,0.25)" strokeWidth="1" />
-          
+
           {/* Grid lines */}
           <line x1="15" y1="22.5" x2="185" y2="22.5" stroke="rgba(255,255,255,0.05)" strokeWidth="1" strokeDasharray="2 2" />
           <line x1="15" y1="97.5" x2="185" y2="97.5" stroke="rgba(255,255,255,0.05)" strokeWidth="1" strokeDasharray="2 2" />
@@ -441,7 +441,7 @@ export default function MomentumConservationSimulation() {
 
         // Auto-stop if both carts are stopped or reach ends of track
         if (collided && (
-          (currentV1 === 0 && currentV2 === 0) || 
+          (currentV1 === 0 && currentV2 === 0) ||
           (x1 <= 0.21 && x2 + cartWidthPhysical >= 9.79) ||
           (currentV1 <= 0 && x1 <= 0.21 && currentV2 >= 0 && x2 + cartWidthPhysical >= 9.79)
         )) {
@@ -600,114 +600,438 @@ export default function MomentumConservationSimulation() {
 
   const timeLabel = `${Math.floor(elapsedSeconds).toString().padStart(2, "0")}:${Math.floor((elapsedSeconds % 1) * 100).toString().padStart(2, "0")}`;
 
+  // Wheel rotation angles (in radians) based on position
+  // 1 meter of travel ≈ 5 radians of rotation
+  const angle1 = (cart1X * 5) % (2 * Math.PI);
+  const angle2 = (cart2X * 5) % (2 * Math.PI);
+
+  // Dynamic collision point
+  const collisionX = toSvgX((cart1X + cartWidthPhysical + cart2X) / 2);
+
   const scene = (
-    <div className="relative flex h-full min-h-[258px] items-center justify-center overflow-hidden rounded-2xl border border-violet-100 bg-[linear-gradient(135deg,#fcfaff_0%,#f5f3ff_48%,#fdfaff_100%)]">
-      {/* Dynamic collision flash */}
+    <div className="relative flex h-full min-h-[280px] items-center justify-center overflow-hidden rounded-2xl border border-blue-100 bg-[linear-gradient(135deg,#f8fbff_0%,#eefcff_48%,#fff7fb_100%)] p-4">
+      {/* Dynamic tech grid background */}
+      <div className="absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:16px_16px] opacity-40" />
+
+      {/* Futuristic ambient background glows */}
+      <div className="absolute -left-20 -top-20 w-80 h-80 rounded-full bg-blue-500/5 blur-[80px]" />
+      <div className="absolute -right-20 -top-20 w-80 h-80 rounded-full bg-rose-500/5 blur-[80px]" />
       {collisionEvent && (
-        <div className="absolute inset-0 bg-violet-400/25 z-0 animate-ping" />
+        <div className="absolute inset-0 bg-amber-500/5 z-0 animate-pulse duration-75" />
       )}
-      <div className="absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:18px_18px] opacity-35" />
-      
-      {/* Live metrics overlay */}
-      <div className="absolute left-5 top-5 rounded-2xl border border-white/70 bg-white/75 px-3 py-2 text-left shadow-sm backdrop-blur">
-        <p className="text-[10px] font-black uppercase text-violet-600">collision simulator</p>
-        <p className="mt-0.5 text-xs font-bold text-slate-600">
-          {!hasCollided ? "Approaching Collision" : "Post-Collision State"}
+
+      {/* Live status badge */}
+      <div className="absolute left-5 top-5 rounded-xl border border-slate-200 bg-white/75 px-3 py-1.5 text-left shadow-sm backdrop-blur-md">
+        <div className="flex items-center gap-2">
+          <span className={`h-2 w-2 rounded-full ${isRunning ? "bg-green-500 animate-ping" : hasCollided ? "bg-amber-500" : "bg-blue-500"}`} />
+          <p className="text-[9px] font-black uppercase tracking-wider text-violet-650">collision stage v1.2</p>
+        </div>
+        <p className="mt-0.5 text-xs font-black text-slate-700">
+          {!hasCollided ? "รางระดับพลังงานจลน์" : "หลังเกิดการชนเชิงเส้น"}
         </p>
       </div>
 
-      <svg className="relative z-10 w-full max-w-[500px] h-48 select-none" viewBox="0 0 560 200">
-        {/* Track wood guard rails */}
-        <rect x="25" y="145" width="510" height="20" rx="3" fill="#8c6239" stroke="#5c3f19" strokeWidth="2.5" />
-        
-        {/* Track lines ticks */}
-        {Array.from({ length: 11 }).map((_, i) => (
-          <line
-            key={i}
-            x1={toSvgX(i)}
-            y1="145"
-            x2={toSvgX(i)}
-            y2="157"
-            stroke="#ffffff"
-            strokeWidth="1.5"
-            opacity="0.7"
-          />
-        ))}
+      <svg className="relative z-10 w-full max-w-[520px] h-52 select-none" viewBox="0 0 560 200">
+        <defs>
+          {/* Gradients */}
+          <linearGradient id="metalTrackGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#94a3b8" />
+            <stop offset="20%" stopColor="#f1f5f9" />
+            <stop offset="40%" stopColor="#64748b" />
+            <stop offset="80%" stopColor="#334155" />
+            <stop offset="100%" stopColor="#1e293b" />
+          </linearGradient>
 
-        {/* Speed indicators texts */}
-        <g transform="translate(30, 20)">
-          <rect x="0" y="0" width="100" height="32" rx="10" fill="#ffffff" stroke="#ddd6fe" strokeWidth="1.5" />
-          <text x="50" y="13" fill="#64748b" fontSize="6.5" fontWeight="black" textAnchor="middle">CART 1 SPEED</text>
-          <text x="50" y="26" fill="#3b82f6" fontSize="11" fontWeight="black" textAnchor="middle">
-            {(hasCollided ? v1 : u1).toFixed(2)} m/s
+          <linearGradient id="railGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#ffffff" />
+            <stop offset="50%" stopColor="#94a3b8" />
+            <stop offset="100%" stopColor="#475569" />
+          </linearGradient>
+
+          <linearGradient id="cart1Grad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#60a5fa" />
+            <stop offset="40%" stopColor="#3b82f6" />
+            <stop offset="100%" stopColor="#1d4ed8" />
+          </linearGradient>
+
+          <linearGradient id="cart2Grad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#f43f5e" />
+            <stop offset="40%" stopColor="#e11d48" />
+            <stop offset="100%" stopColor="#9f1239" />
+          </linearGradient>
+
+          <linearGradient id="weightSteel" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="#64748b" />
+            <stop offset="25%" stopColor="#cbd5e1" />
+            <stop offset="75%" stopColor="#475569" />
+            <stop offset="100%" stopColor="#1e293b" />
+          </linearGradient>
+
+          <linearGradient id="weightBrass" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="#d97706" />
+            <stop offset="25%" stopColor="#fde047" />
+            <stop offset="75%" stopColor="#ca8a04" />
+            <stop offset="100%" stopColor="#78350f" />
+          </linearGradient>
+
+          <linearGradient id="wheelHubGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#ffffff" />
+            <stop offset="50%" stopColor="#cbd5e1" />
+            <stop offset="100%" stopColor="#475569" />
+          </linearGradient>
+
+          <linearGradient id="vector1Grad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.2" />
+            <stop offset="100%" stopColor="#60a5fa" stopOpacity="0.9" />
+          </linearGradient>
+
+          <linearGradient id="vector2Grad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="#e11d48" stopOpacity="0.2" />
+            <stop offset="100%" stopColor="#fb7185" stopOpacity="0.9" />
+          </linearGradient>
+
+          <radialGradient id="collisionGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#fef08a" stopOpacity="1" />
+            <stop offset="35%" stopColor="#f97316" stopOpacity="0.8" />
+            <stop offset="70%" stopColor="#dc2626" stopOpacity="0.3" />
+            <stop offset="100%" stopColor="#dc2626" stopOpacity="0" />
+          </radialGradient>
+
+          {/* Filters */}
+          <filter id="dropShadow" x="-20%" y="-20%" width="140%" height="150%">
+            <feDropShadow dx="0" dy="5" stdDeviation="3.5" floodColor="#020617" floodOpacity="0.6" />
+          </filter>
+
+          <filter id="laserGlow" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur stdDeviation="1.5" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+
+        {/* Ambient Grid Floor */}
+        <line x1="20" y1="185" x2="540" y2="185" stroke="#cbd5e1" strokeWidth="1" />
+        <line x1="20" y1="192" x2="540" y2="192" stroke="#94a3b8" strokeWidth="1" />
+
+        {/* Support Pillar Legs */}
+        {/* Left Stand */}
+        <path d="M 30 145 L 20 185 L 40 185 Z" fill="#334155" stroke="#1e293b" strokeWidth="1.5" />
+        <rect x="15" y="185" width="30" height="4" rx="1" fill="#0f172a" />
+        {/* Right Stand */}
+        <path d="M 530 145 L 520 185 L 540 185 Z" fill="#334155" stroke="#1e293b" strokeWidth="1.5" />
+        <rect x="515" y="185" width="30" height="4" rx="1" fill="#0f172a" />
+
+        {/* Laser Gate Sensors (Photo-gates) */}
+        {/* Left Gate (x = 2.0m) */}
+        <g transform="translate(136, 60)">
+          <path d="M -5 85 L -5 0 L 10 0 L 10 12 L 0 12 L 0 85 Z" fill="#1e293b" stroke="#334155" strokeWidth="1" />
+          <circle cx="2.5" cy="6" r="2.5" fill={isRunning ? "#22c55e" : "#ef4444"} filter="url(#laserGlow)" />
+          {/* Laser beam */}
+          <line x1="2.5" y1="12" x2="2.5" y2="85" stroke="#ef4444" strokeWidth="1" strokeDasharray="3 3" opacity={isRunning ? 0.8 : 0.35} filter="url(#laserGlow)" />
+        </g>
+        {/* Right Gate (x = 8.0m) */}
+        <g transform="translate(424, 60)">
+          <path d="M -5 85 L -5 0 L 10 0 L 10 12 L 0 12 L 0 85 Z" fill="#1e293b" stroke="#334155" strokeWidth="1" />
+          <circle cx="2.5" cy="6" r="2.5" fill={isRunning ? "#22c55e" : "#ef4444"} filter="url(#laserGlow)" />
+          {/* Laser beam */}
+          <line x1="2.5" y1="12" x2="2.5" y2="85" stroke="#ef4444" strokeWidth="1" strokeDasharray="3 3" opacity={isRunning ? 0.8 : 0.35} filter="url(#laserGlow)" />
+        </g>
+
+        {/* Main Aluminum Air Track Rail */}
+        <rect x="20" y="145" width="520" height="14" rx="3" fill="url(#metalTrackGrad)" filter="url(#dropShadow)" />
+        <rect x="25" y="142" width="510" height="3" fill="url(#railGrad)" rx="1" />
+
+        {/* Scale Metric Ticks & Distance Labels */}
+        {Array.from({ length: 21 }).map((_, i) => {
+          const tickX = toSvgX(i * 0.5);
+          const isMajor = i % 2 === 0;
+          return (
+            <g key={i}>
+              <line
+                x1={tickX}
+                y1="145"
+                x2={tickX}
+                y2={isMajor ? "156" : "151"}
+                stroke={isMajor ? "#475569" : "#94a3b8"}
+                strokeWidth={isMajor ? "1.5" : "1"}
+                opacity={isMajor ? "0.9" : "0.7"}
+              />
+              {isMajor && (
+                <text
+                  x={tickX}
+                  y="166"
+                  fill="#64748b"
+                  fontSize="6.5"
+                  fontWeight="bold"
+                  fontFamily="monospace"
+                  textAnchor="middle"
+                >
+                  {(i * 0.5).toFixed(1)}m
+                </text>
+              )}
+            </g>
+          );
+        })}
+
+        {/* Magnetic End Buffer Springs */}
+        {/* Left Bumper */}
+        <rect x="20" y="132" width="6" height="13" fill="#334155" rx="1" />
+        <path d="M 26 135 Q 31 133 30 138 T 34 138" fill="none" stroke="#94a3b8" strokeWidth="1.5" />
+        {/* Right Bumper */}
+        <rect x="534" y="132" width="6" height="13" fill="#334155" rx="1" />
+        <path d="M 534 135 Q 529 133 530 138 T 526 138" fill="none" stroke="#94a3b8" strokeWidth="1.5" />
+
+        {/* Instrument Panels (Speed readouts inside SVG canvas) */}
+        {/* Speed Board 1 (Blue Panel) */}
+        <g transform="translate(30, 16)" filter="url(#dropShadow)">
+          <rect x="0" y="0" width="105" height="34" rx="8" fill="#0f172a" stroke="#1e293b" strokeWidth="2" />
+          <rect x="2" y="2" width="101" height="11" rx="6" fill="#1d4ed8" opacity="0.15" />
+          <text x="52" y="10" fill="#3b82f6" fontSize="6" fontWeight="black" fontFamily="monospace" textAnchor="middle" letterSpacing="0.5">VELOCITY C1</text>
+          <text x="52" y="27" fill="#60a5fa" fontSize="13" fontWeight="950" fontFamily="monospace" textAnchor="middle" filter="url(#laserGlow)">
+            {(hasCollided ? v1 : u1).toFixed(2)} <tspan fontSize="8">m/s</tspan>
           </text>
         </g>
-        <g transform="translate(430, 20)">
-          <rect x="0" y="0" width="100" height="32" rx="10" fill="#ffffff" stroke="#ddd6fe" strokeWidth="1.5" />
-          <text x="50" y="13" fill="#64748b" fontSize="6.5" fontWeight="black" textAnchor="middle">CART 2 SPEED</text>
-          <text x="50" y="26" fill="#ef4444" fontSize="11" fontWeight="black" textAnchor="middle">
-            {(hasCollided ? v2 : u2).toFixed(2)} m/s
+        {/* Speed Board 2 (Rose Panel) */}
+        <g transform="translate(425, 16)" filter="url(#dropShadow)">
+          <rect x="0" y="0" width="105" height="34" rx="8" fill="#0f172a" stroke="#1e293b" strokeWidth="2" />
+          <rect x="2" y="2" width="101" height="11" rx="6" fill="#e11d48" opacity="0.15" />
+          <text x="52" y="10" fill="#f43f5e" fontSize="6" fontWeight="black" fontFamily="monospace" textAnchor="middle" letterSpacing="0.5">VELOCITY C2</text>
+          <text x="52" y="27" fill="#fb7185" fontSize="13" fontWeight="950" fontFamily="monospace" textAnchor="middle" filter="url(#laserGlow)">
+            {(hasCollided ? v2 : u2).toFixed(2)} <tspan fontSize="8">m/s</tspan>
           </text>
         </g>
 
-        {/* Cart 1 (Blue/Violet) */}
-        <g transform={`translate(${c1SvgX}, 90)`}>
-          <rect x="0" y="0" width={widthSvg} height="35" rx="5" fill="#3b82f6" stroke="#1d4ed8" strokeWidth="2.5" />
-          {/* Load box representing mass */}
-          <rect x={12} y="-12" width={widthSvg - 24} height="12" rx="2" fill="#93c5fd" stroke="#1d4ed8" strokeWidth="1.5" />
-          <text x={widthSvg / 2} y="-2" fill="#1e3a8a" fontSize="8.5" fontWeight="950" textAnchor="middle">{m1.toFixed(1)} kg</text>
-          
-          {/* Wheels */}
-          <circle cx="12" cy="40" r="7" fill="#1e293b" stroke="#0f172a" strokeWidth="1.5" />
-          <circle cx="12" cy="40" r="2.5" fill="#ffffff" />
-          <circle cx={widthSvg - 12} cy="40" r="7" fill="#1e293b" stroke="#0f172a" strokeWidth="1.5" />
-          <circle cx={widthSvg - 12} cy="40" r="2.5" fill="#ffffff" />
-
-          {/* Velocity arrow vector */}
+        {/* Cart 1 (Blue) */}
+        <g transform={`translate(${c1SvgX}, 98)`} filter="url(#dropShadow)">
+          {/* Custom vector speed arrow */}
           {!hasCollided && u1 !== 0 && (
-            <path
-              d={`M ${widthSvg / 2} -22 L ${widthSvg / 2 + u1 * 12} -22 ${
-                u1 > 0 ? `l -5 -4 v 8 z` : `l 5 -4 v 8 z`
-              }`}
-              fill="#2563eb"
-            />
+            <g>
+              <line
+                x1={widthSvg / 2}
+                y1="-22"
+                x2={widthSvg / 2 + u1 * 14}
+                y2="-22"
+                stroke="url(#vector1Grad)"
+                strokeWidth="4"
+                strokeLinecap="round"
+              />
+              <path
+                d={u1 > 0
+                  ? `M ${widthSvg / 2 + u1 * 14} -22 L ${widthSvg / 2 + u1 * 14 - 5} -25 L ${widthSvg / 2 + u1 * 14 + 1} -22 L ${widthSvg / 2 + u1 * 14 - 5} -19 Z`
+                  : `M ${widthSvg / 2 + u1 * 14} -22 L ${widthSvg / 2 + u1 * 14 + 5} -25 L ${widthSvg / 2 + u1 * 14 - 1} -22 L ${widthSvg / 2 + u1 * 14 + 5} -19 Z`
+                }
+                fill="#3b82f6"
+              />
+              <text x={widthSvg / 2 + u1 * 7} y="-28" fill="#2563eb" fontSize="7.5" fontWeight="black" fontFamily="monospace" textAnchor="middle">
+                {u1 > 0 ? "+" : ""}{u1.toFixed(1)}
+              </text>
+            </g>
           )}
-          <text x={widthSvg / 2} y="22" fill="#ffffff" fontSize="9" fontWeight="black" textAnchor="middle">Cart 1</text>
-        </g>
 
-        {/* Cart 2 (Red/Orange) */}
-        <g transform={`translate(${c2SvgX}, 90)`}>
-          <rect x="0" y="0" width={widthSvg} height="35" rx="5" fill="#ef4444" stroke="#b91c1c" strokeWidth="2.5" />
-          {/* Load box representing mass */}
-          <rect x={12} y="-12" width={widthSvg - 24} height="12" rx="2" fill="#fca5a5" stroke="#b91c1c" strokeWidth="1.5" />
-          <text x={widthSvg / 2} y="-2" fill="#7f1d1d" fontSize="8.5" fontWeight="950" textAnchor="middle">{m2.toFixed(1)} kg</text>
-          
-          {/* Wheels */}
-          <circle cx="12" cy="40" r="7" fill="#1e293b" stroke="#0f172a" strokeWidth="1.5" />
-          <circle cx="12" cy="40" r="2.5" fill="#ffffff" />
-          <circle cx={widthSvg - 12} cy="40" r="7" fill="#1e293b" stroke="#0f172a" strokeWidth="1.5" />
-          <circle cx={widthSvg - 12} cy="40" r="2.5" fill="#ffffff" />
-
-          {/* Velocity arrow vector */}
-          {!hasCollided && u2 !== 0 && (
-            <path
-              d={`M ${widthSvg / 2} -22 L ${widthSvg / 2 + u2 * 12} -22 ${
-                u2 > 0 ? `l -5 -4 v 8 z` : `l 5 -4 v 8 z`
-              }`}
-              fill="#dc2626"
-            />
+          {/* Cart Bumper Hook */}
+          {collisionType === "Elastic" ? (
+            // Elastic wire bumper loop
+            <path d={`M ${widthSvg} 14 Q ${widthSvg + 6} 8 ${widthSvg} 22`} fill="none" stroke="#94a3b8" strokeWidth="2.5" strokeLinecap="round" />
+          ) : (
+            // Inelastic velcro needle lock
+            <rect x={widthSvg} y="15" width="4" height="4" fill="#64748b" stroke="#1e293b" strokeWidth="1" />
           )}
-          <text x={widthSvg / 2} y="22" fill="#ffffff" fontSize="9" fontWeight="black" textAnchor="middle">Cart 2</text>
-        </g>
 
-        {/* Shock/Flash star at collision point */}
-        {collisionEvent && (
-          <path
-            d={`M ${toSvgX((cart1X + cartWidthPhysical + cart2X) / 2)} 100 l 5 -15 l 10 10 l 15 -15 l -10 25 l 15 10 l -25 5 l -10 15 l -5 -20 l -15 5 z`}
-            fill="#eab308"
-            stroke="#f97316"
-            strokeWidth="1.5"
+          {/* Cart chassis body */}
+          <rect x="0" y="5" width={widthSvg} height="30" rx="6" fill="url(#cart1Grad)" stroke="#1d4ed8" strokeWidth="2" />
+
+          {/* LED Active Strip */}
+          <rect x="6" y="19" width={widthSvg - 12} height="3" rx="1.5" fill="#020617" />
+          <rect
+            x="8"
+            y="20"
+            width={widthSvg - 16}
+            height="1"
+            rx="0.5"
+            fill={hasCollided ? "#f59e0b" : isRunning ? "#22c55e" : "#3b82f6"}
+            filter="url(#laserGlow)"
           />
+
+          {/* Tray and Stacked Weights */}
+          <rect x="7" y="4" width={widthSvg - 14} height="2" fill="#1e293b" />
+          {Array.from({ length: Math.round(m1 * 2) }).map((_, weightIdx) => {
+            const slabH = 3.5;
+            const slabY = 4 - (weightIdx + 1) * slabH;
+            return (
+              <rect
+                key={weightIdx}
+                x="9"
+                y={slabY}
+                width={widthSvg - 18}
+                height={slabH - 0.5}
+                rx="1"
+                fill="url(#weightSteel)"
+                stroke="#334155"
+                strokeWidth="0.5"
+              />
+            );
+          })}
+          <text x={widthSvg / 2} y="-1" fill="#1e3a8a" fontSize="8" fontWeight="black" fontFamily="sans-serif" textAnchor="middle">
+            {m1.toFixed(1)} kg
+          </text>
+
+          {/* Wheels with rotation lines */}
+          {/* Left Wheel */}
+          <g transform={`translate(12, 35)`}>
+            <circle cx="0" cy="0" r="8" fill="#1e293b" stroke="#0f172a" strokeWidth="1" />
+            <circle cx="0" cy="0" r="5.5" fill="url(#wheelHubGrad)" />
+            <line
+              x1={-5 * Math.cos(angle1)}
+              y1={-5 * Math.sin(angle1)}
+              x2={5 * Math.cos(angle1)}
+              y2={5 * Math.sin(angle1)}
+              stroke="#334155"
+              strokeWidth="1.5"
+            />
+            <circle cx="0" cy="0" r="1.5" fill="#f8fafc" />
+          </g>
+          {/* Right Wheel */}
+          <g transform={`translate(${widthSvg - 12}, 35)`}>
+            <circle cx="0" cy="0" r="8" fill="#1e293b" stroke="#0f172a" strokeWidth="1" />
+            <circle cx="0" cy="0" r="5.5" fill="url(#wheelHubGrad)" />
+            <line
+              x1={-5 * Math.cos(angle1)}
+              y1={-5 * Math.sin(angle1)}
+              x2={5 * Math.cos(angle1)}
+              y2={5 * Math.sin(angle1)}
+              stroke="#334155"
+              strokeWidth="1.5"
+            />
+            <circle cx="0" cy="0" r="1.5" fill="#f8fafc" />
+          </g>
+
+          <text x={widthSvg / 2} y="28" fill="#ffffff" opacity="0.9" fontSize="8.5" fontWeight="950" textAnchor="middle">C1</text>
+        </g>
+
+        {/* Cart 2 (Red) */}
+        <g transform={`translate(${c2SvgX}, 98)`} filter="url(#dropShadow)">
+          {/* Custom vector speed arrow */}
+          {!hasCollided && u2 !== 0 && (
+            <g>
+              <line
+                x1={widthSvg / 2}
+                y1="-22"
+                x2={widthSvg / 2 + u2 * 14}
+                y2="-22"
+                stroke="url(#vector2Grad)"
+                strokeWidth="4"
+                strokeLinecap="round"
+              />
+              <path
+                d={u2 > 0
+                  ? `M ${widthSvg / 2 + u2 * 14} -22 L ${widthSvg / 2 + u2 * 14 - 5} -25 L ${widthSvg / 2 + u2 * 14 + 1} -22 L ${widthSvg / 2 + u2 * 14 - 5} -19 Z`
+                  : `M ${widthSvg / 2 + u2 * 14} -22 L ${widthSvg / 2 + u2 * 14 + 5} -25 L ${widthSvg / 2 + u2 * 14 - 1} -22 L ${widthSvg / 2 + u2 * 14 + 5} -19 Z`
+                }
+                fill="#e11d48"
+              />
+              <text x={widthSvg / 2 + u2 * 7} y="-28" fill="#db2777" fontSize="7.5" fontWeight="black" fontFamily="monospace" textAnchor="middle">
+                {u2 > 0 ? "+" : ""}{u2.toFixed(1)}
+              </text>
+            </g>
+          )}
+
+          {/* Cart Bumper Hook */}
+          {collisionType === "Elastic" ? (
+            // Elastic wire bumper loop
+            <path d={`M 0 14 Q -6 8 0 22`} fill="none" stroke="#94a3b8" strokeWidth="2.5" strokeLinecap="round" />
+          ) : (
+            // Inelastic velcro socket lock
+            <rect x="-4" y="15" width="4" height="4" fill="#334155" stroke="#1e293b" strokeWidth="1" />
+          )}
+
+          {/* Cart chassis body */}
+          <rect x="0" y="5" width={widthSvg} height="30" rx="6" fill="url(#cart2Grad)" stroke="#b91c1c" strokeWidth="2" />
+
+          {/* LED Active Strip */}
+          <rect x="6" y="19" width={widthSvg - 12} height="3" rx="1.5" fill="#020617" />
+          <rect
+            x="8"
+            y="20"
+            width={widthSvg - 16}
+            height="1"
+            rx="0.5"
+            fill={hasCollided ? "#f59e0b" : isRunning ? "#22c55e" : "#e11d48"}
+            filter="url(#laserGlow)"
+          />
+
+          {/* Tray and Stacked Weights */}
+          <rect x="7" y="4" width={widthSvg - 14} height="2" fill="#1e293b" />
+          {Array.from({ length: Math.round(m2 * 2) }).map((_, weightIdx) => {
+            const slabH = 3.5;
+            const slabY = 4 - (weightIdx + 1) * slabH;
+            return (
+              <rect
+                key={weightIdx}
+                x="9"
+                y={slabY}
+                width={widthSvg - 18}
+                height={slabH - 0.5}
+                rx="1"
+                fill="url(#weightBrass)"
+                stroke="#78350f"
+                strokeWidth="0.5"
+              />
+            );
+          })}
+          <text x={widthSvg / 2} y="-1" fill="#78350f" fontSize="8" fontWeight="black" fontFamily="sans-serif" textAnchor="middle">
+            {m2.toFixed(1)} kg
+          </text>
+
+          {/* Wheels with rotation lines */}
+          {/* Left Wheel */}
+          <g transform={`translate(12, 35)`}>
+            <circle cx="0" cy="0" r="8" fill="#1e293b" stroke="#0f172a" strokeWidth="1" />
+            <circle cx="0" cy="0" r="5.5" fill="url(#wheelHubGrad)" />
+            <line
+              x1={-5 * Math.cos(angle2)}
+              y1={-5 * Math.sin(angle2)}
+              x2={5 * Math.cos(angle2)}
+              y2={5 * Math.sin(angle2)}
+              stroke="#334155"
+              strokeWidth="1.5"
+            />
+            <circle cx="0" cy="0" r="1.5" fill="#f8fafc" />
+          </g>
+          {/* Right Wheel */}
+          <g transform={`translate(${widthSvg - 12}, 35)`}>
+            <circle cx="0" cy="0" r="8" fill="#1e293b" stroke="#0f172a" strokeWidth="1" />
+            <circle cx="0" cy="0" r="5.5" fill="url(#wheelHubGrad)" />
+            <line
+              x1={-5 * Math.cos(angle2)}
+              y1={-5 * Math.sin(angle2)}
+              x2={5 * Math.cos(angle2)}
+              y2={5 * Math.sin(angle2)}
+              stroke="#334155"
+              strokeWidth="1.5"
+            />
+            <circle cx="0" cy="0" r="1.5" fill="#f8fafc" />
+          </g>
+
+          <text x={widthSvg / 2} y="28" fill="#ffffff" opacity="0.9" fontSize="8.5" fontWeight="950" textAnchor="middle">C2</text>
+        </g>
+
+        {/* Dynamic Collision Energy Ripples & Shockwave */}
+        {collisionEvent && (
+          <g>
+            <circle cx={collisionX} cy="133" r="32" fill="url(#collisionGlow)" />
+            <circle cx={collisionX} cy="133" r="18" fill="url(#collisionGlow)" />
+
+            {/* Plasma particle rays */}
+            <path
+              d={`M ${collisionX} 133 L ${collisionX - 16} 113 M ${collisionX} 133 L ${collisionX + 16} 113 M ${collisionX} 133 L ${collisionX - 22} 133 M ${collisionX} 133 L ${collisionX + 22} 133 M ${collisionX} 133 L ${collisionX - 10} 148 M ${collisionX} 133 L ${collisionX + 10} 148`}
+              stroke="#fde047"
+              strokeWidth="2"
+              strokeLinecap="round"
+              filter="url(#laserGlow)"
+            />
+          </g>
         )}
       </svg>
     </div>
@@ -725,8 +1049,8 @@ export default function MomentumConservationSimulation() {
           }}
           disabled={isRunning}
           className={`px-3 py-1.5 rounded-xl text-xs font-extrabold border cursor-pointer active:scale-95 transition-all ${
-            collisionType === "Elastic" 
-              ? "bg-cyan-500 border-cyan-600 text-white shadow-xs" 
+            collisionType === "Elastic"
+              ? "bg-cyan-500 border-cyan-600 text-white shadow-xs"
               : "bg-orange-500 border-orange-600 text-white shadow-xs"
           }`}
         >

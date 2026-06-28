@@ -346,7 +346,7 @@ export default function NewtonsSecondLawSimulation() {
               หน้าแรก
             </Link>
             <ChevronRight className="h-3.5 w-3.5 text-slate-300" />
-            <Link href="/?category=Physics" className="text-violet-600 hover:text-violet-750">Physics</Link>
+            <Link href="/labs?category=Physics" className="text-violet-600 hover:text-violet-750">Physics</Link>
             <ChevronRight className="h-3.5 w-3.5 text-slate-300" />
             <Link href="/labs/newtons-second-law" className="text-slate-700 hover:text-violet-700">Newton&apos;s Second Law Lab</Link>
             <ChevronRight className="h-3.5 w-3.5 text-slate-300" />

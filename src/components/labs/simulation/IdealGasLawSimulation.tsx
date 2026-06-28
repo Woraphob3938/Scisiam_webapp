@@ -753,7 +753,7 @@ export default function IdealGasLawSimulation() {
               หน้าแรก
             </Link>
             <ChevronRight className="h-3.5 w-3.5 text-slate-300" />
-            <Link href="/?category=Chemistry" className="text-emerald-600 hover:text-emerald-750">Chemistry</Link>
+            <Link href="/labs?category=Chemistry" className="text-emerald-600 hover:text-emerald-750">Chemistry</Link>
             <ChevronRight className="h-3.5 w-3.5 text-slate-300" />
             <Link href="/labs/ideal-gas-law" className="text-slate-700 hover:text-emerald-700">Ideal Gas Law Lab</Link>
             <ChevronRight className="h-3.5 w-3.5 text-slate-300" />
