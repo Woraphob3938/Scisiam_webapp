@@ -8,7 +8,6 @@ import {
   ChevronRight,
   ClipboardCheck,
   Download,
-  FileSpreadsheet,
   FileText,
   GraduationCap,
   Pencil,
@@ -35,7 +34,6 @@ export interface TeacherSubmission {
   room: string;
   lab: string;
   status: string;
-  score?: string;
   time: string;
   deadline?: string;
 }
@@ -73,8 +71,8 @@ interface TeacherDashboardProps {
   onCreateClassroom: () => void;
   onAssignExperiment: (room?: string) => void;
   onReviewReport: (review: TeacherReview) => void;
-  onGradeReport: (review: TeacherReview) => void;
-  onDownload: (format: "PDF" | "Excel") => void;
+  onSendFeedback: (review: TeacherReview) => void;
+  onDownload: (format: "PDF") => void;
 }
 
 type ClassroomStatus = "live" | "due" | "idle";
@@ -150,7 +148,7 @@ export default function TeacherDashboard({
   onCreateClassroom,
   onAssignExperiment,
   onReviewReport,
-  onGradeReport,
+  onSendFeedback,
   onDownload,
 }: TeacherDashboardProps) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -377,7 +375,7 @@ export default function TeacherDashboard({
           }}
           onAssignExperiment={onAssignExperiment}
           onReviewReport={onReviewReport}
-          onGradeReport={onGradeReport}
+          onSendFeedback={onSendFeedback}
           onShowAllReviews={() => onTabChange("reviews")}
         />
       ) : null}
@@ -392,7 +390,7 @@ export default function TeacherDashboard({
         <ReviewsTab
           pendingReviews={pendingReviews}
           onReviewReport={onReviewReport}
-          onGradeReport={onGradeReport}
+          onSendFeedback={onSendFeedback}
         />
       ) : null}
     </div>
@@ -420,7 +418,7 @@ interface OverviewTabProps {
   onResetFilters: () => void;
   onAssignExperiment: (room?: string) => void;
   onReviewReport: (review: TeacherReview) => void;
-  onGradeReport: (review: TeacherReview) => void;
+  onSendFeedback: (review: TeacherReview) => void;
   onShowAllReviews: () => void;
 }
 
@@ -437,7 +435,7 @@ function OverviewTab({
   onResetFilters,
   onAssignExperiment,
   onReviewReport,
-  onGradeReport,
+  onSendFeedback,
   onShowAllReviews,
 }: OverviewTabProps) {
   return (
@@ -643,11 +641,11 @@ function OverviewTab({
       </div>
 
       <aside className="space-y-7" aria-label="ข้อมูลที่ต้องติดตาม">
-        <section aria-labelledby="grading-queue-title">
+          <section aria-labelledby="review-queue-title">
           <div className="mb-3 flex items-end justify-between gap-3">
             <div>
-              <h2 id="grading-queue-title" className="text-lg font-extrabold leading-[1.4] text-slate-900">
-                รอตรวจและให้คะแนน
+              <h2 id="review-queue-title" className="text-lg font-extrabold leading-[1.4] text-slate-900">
+                รอตรวจและส่งคำแนะนำ
               </h2>
               <p className="mt-1 text-xs font-medium leading-relaxed text-slate-500">เรียงจากงานที่ส่งล่าสุด</p>
             </div>
@@ -683,10 +681,10 @@ function OverviewTab({
                   </button>
                   <button
                     type="button"
-                    onClick={() => onGradeReport(review)}
+                    onClick={() => onSendFeedback(review)}
                     className="min-h-9 flex-1 rounded-lg bg-blue-600 text-xs font-bold text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                   >
-                    ให้คะแนน
+                    ส่งคำแนะนำ
                   </button>
                 </div>
               </div>
@@ -734,7 +732,7 @@ function SubmissionsTab({ submissions }: { submissions: TeacherSubmission[] }) {
           {submissions.map((submission) => (
             <div
               key={submission.id}
-              className="grid gap-3 px-4 py-4 transition-colors hover:bg-slate-50/70 md:grid-cols-[minmax(0,1fr)_220px_110px_120px]"
+              className="grid gap-3 px-4 py-4 transition-colors hover:bg-slate-50/70 md:grid-cols-[minmax(0,1fr)_minmax(180px,260px)_120px]"
             >
               <div className="min-w-0">
                 <p className="truncate text-sm font-bold text-slate-800">{submission.name}</p>
@@ -743,10 +741,6 @@ function SubmissionsTab({ submissions }: { submissions: TeacherSubmission[] }) {
               <div className="min-w-0">
                 <p className="text-xs font-semibold text-slate-500">การทดลอง</p>
                 <p className="mt-1 truncate text-sm font-bold text-slate-700">{submission.lab}</p>
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-slate-500">คะแนน</p>
-                <p className="mt-1 text-sm font-bold text-slate-700">{submission.score ?? "-"}</p>
               </div>
               <div className="md:text-right">
                 <span className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-bold ${submissionStatusClasses(submission.status)}`}>
@@ -766,7 +760,7 @@ function StatsTab({
   onDownload,
 }: {
   classroomRows: ClassroomRow[];
-  onDownload: (format: "PDF" | "Excel") => void;
+  onDownload: (format: "PDF") => void;
 }) {
   return (
     <div className="grid gap-7 xl:grid-cols-[minmax(0,1fr)_320px]">
@@ -816,17 +810,6 @@ function StatsTab({
               <span className="mt-0.5 block text-xs font-medium text-slate-500">สำหรับสรุปผลรายสัปดาห์</span>
             </span>
           </button>
-          <button
-            type="button"
-            onClick={() => onDownload("Excel")}
-            className="flex min-h-14 w-full items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 text-left transition-colors hover:border-blue-200 hover:bg-blue-50/40 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <FileSpreadsheet className="h-5 w-5 shrink-0 text-emerald-600" />
-            <span>
-              <span className="block text-sm font-bold text-slate-800">ตารางคะแนน Excel</span>
-              <span className="mt-0.5 block text-xs font-medium text-slate-500">สำหรับวิเคราะห์ข้อมูลรายบุคคล</span>
-            </span>
-          </button>
         </div>
       </aside>
     </div>
@@ -836,11 +819,11 @@ function StatsTab({
 function ReviewsTab({
   pendingReviews,
   onReviewReport,
-  onGradeReport,
+  onSendFeedback,
 }: {
   pendingReviews: TeacherReview[];
   onReviewReport: (review: TeacherReview) => void;
-  onGradeReport: (review: TeacherReview) => void;
+  onSendFeedback: (review: TeacherReview) => void;
 }) {
   return (
     <section aria-labelledby="pending-reviews-title">
@@ -849,7 +832,7 @@ function ReviewsTab({
           รายงานรอการตรวจ
         </h2>
         <p className="mt-1 text-sm font-medium leading-relaxed text-slate-500">
-          ตรวจผลการทดลอง ให้คะแนน และส่งคำแนะนำกลับไปยังนักเรียน
+          ตรวจผลการทดลองและส่งคำแนะนำกลับไปยังนักเรียน
         </p>
       </div>
 
@@ -884,10 +867,10 @@ function ReviewsTab({
                 </button>
                 <button
                   type="button"
-                  onClick={() => onGradeReport(review)}
+                  onClick={() => onSendFeedback(review)}
                   className="min-h-10 flex-1 rounded-xl bg-blue-600 text-sm font-bold text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                 >
-                  ให้คะแนน
+                  ส่งคำแนะนำ
                 </button>
               </div>
             </article>

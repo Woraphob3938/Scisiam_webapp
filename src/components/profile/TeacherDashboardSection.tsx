@@ -59,10 +59,10 @@ export default function TeacherDashboardSection() {
 
   // Demo student submissions for teacher presentation mode.
   const [submissions, setSubmissions] = useState<TeacherSubmission[]>([
-    { id: 1, name: "ด.ช. ณัฐพล มณีเนตร", room: "ม.4/1", lab: "Newton's Law of Cooling", status: "ส่งแล้ว", score: "10/10", time: "10 นาทีที่แล้ว" },
+    { id: 1, name: "ด.ช. ณัฐพล มณีเนตร", room: "ม.4/1", lab: "Newton's Law of Cooling", status: "ส่งแล้ว", time: "10 นาทีที่แล้ว" },
     { id: 2, name: "ด.ญ. อริศรา บุญส่ง", room: "ม.4/1", lab: "Hooke's Law of Elasticity", status: "กำลังทำ", time: "25 นาทีที่แล้ว" },
     { id: 3, name: "ด.ช. เกียรติศักดิ์ อุดม", room: "ม.4/2", lab: "Ohm's Law & DC Circuits", status: "ค้างส่ง", deadline: "วันนี้!", time: "1 วันที่แล้ว" },
-    { id: 4, name: "ด.ญ. กัญญารัตน์ สีขาว", room: "ม.5/1", lab: "Newton's Law of Cooling", status: "ส่งแล้ว", score: "9.5/10", time: "2 ชั่วโมงที่แล้ว" },
+    { id: 4, name: "ด.ญ. กัญญารัตน์ สีขาว", room: "ม.5/1", lab: "Newton's Law of Cooling", status: "ส่งแล้ว", time: "2 ชั่วโมงที่แล้ว" },
     { id: 5, name: "ด.ช. พีรพงษ์ แก้วมณี", room: "ม.5/2", lab: "Hooke's Law of Elasticity", status: "กำลังทำ", time: "3 ชั่วโมงที่แล้ว" },
   ]);
 
@@ -77,8 +77,8 @@ export default function TeacherDashboardSection() {
   // Demo teacher activities timeline for teacher presentation mode.
   const [teacherActivities, setTeacherActivities] = useState<TeacherActivity[]>([
     { id: 1, time: "13:00 น.", title: 'มอบหมายงาน "Hooke\'s Law of Elasticity" ให้ห้อง ม.4/1 และ ม.4/2', type: "assign" },
-    { id: 2, time: "11:15 น.", title: 'ตรวจรายงานจำลองการทดลอง "Newton\'s Law of Cooling" ของ ม.5/1 (15 รายงาน)', type: "grade" },
-    { id: 3, time: "09:30 น.", title: 'ดาวน์โหลดสรุปรายงานผลคะแนนของห้อง ม.5/2 เป็นไฟล์ Excel', type: "download" },
+    { id: 2, time: "11:15 น.", title: 'ตรวจรายงานจำลองการทดลอง "Newton\'s Law of Cooling" ของ ม.5/1 (15 รายงาน)', type: "review" },
+    { id: 3, time: "09:30 น.", title: 'ดาวน์โหลดสรุปความก้าวหน้าของห้อง ม.5/2 เป็นไฟล์ PDF', type: "download" },
     { id: 4, time: "วานนี้", title: 'สร้างห้องเรียนใหม่ "ห้องเรียนวิชาฟิสิกส์เพิ่มเติม ม.5/2"', type: "classroom" },
     { id: 5, time: "2 วันที่แล้ว", title: 'อัปโหลดคู่มือแล็บ "Ohm\'s Law & DC Circuits"', type: "upload" },
   ]);
@@ -92,8 +92,7 @@ export default function TeacherDashboardSection() {
   const [assignRoom, setAssignRoom] = useState("ม.4/1");
 
   const [activeReview, setActiveReview] = useState<TeacherReview | null>(null);
-  const [gradeScore, setGradeScore] = useState("9");
-  const [gradeFeedback, setGradeFeedback] = useState("ทำการทดลองได้เรียบร้อยและบันทึกผลได้แม่นยำดีมาก");
+  const [reviewFeedback, setReviewFeedback] = useState("ทำการทดลองได้เรียบร้อยและบันทึกผลได้แม่นยำดีมาก");
   const [viewingReport, setViewingReport] = useState<TeacherReview | null>(null);
 
   const handleSaveTeacherName = () => {
@@ -142,7 +141,7 @@ export default function TeacherDashboardSection() {
     showToast(`มอบหมายการทดลอง "${assignLab}" เรียบร้อย! 🧪`, "success");
   };
 
-  const handleGradeStudent = (e: React.FormEvent) => {
+  const handleSendFeedback = (e: React.FormEvent) => {
     e.preventDefault();
     if (!activeReview) return;
     const newSub = {
@@ -151,20 +150,19 @@ export default function TeacherDashboardSection() {
       room: activeReview.room,
       lab: activeReview.lab,
       status: "ส่งแล้ว",
-      score: `${gradeScore}/10`,
       time: "เมื่อสักครู่"
     };
     setSubmissions([newSub, ...submissions]);
     setPendingReviews(pendingReviews.filter(p => p.id !== activeReview.id));
     setTeacherActivities([
-      { id: Date.now(), time: "เมื่อสักครู่", title: `ประเมินผลรายงานของ ${activeReview.name} (${activeReview.room}): ได้คะแนน ${gradeScore}/10`, type: "grade" },
+      { id: Date.now(), time: "เมื่อสักครู่", title: `ส่งคำแนะนำรายงานของ ${activeReview.name} (${activeReview.room})`, type: "review" },
       ...teacherActivities
     ]);
     setActiveReview(null);
-    showToast(`บันทึกคะแนน ด.ช./ด.ญ. สำเร็จ! 🎓`, "success");
+    showToast("ส่งคำแนะนำให้นักเรียนเรียบร้อยแล้ว", "success");
   };
 
-  const handleDownload = (format: "PDF" | "Excel") => {
+  const handleDownload = (format: "PDF") => {
     showToast(`กำลังสร้างรายงานสรุปในรูปแบบ ${format}... 📄`, "info");
     setTimeout(() => {
       showToast(`ดาวน์โหลดรายงาน (${format}) สำเร็จ! 💾`, "success");
@@ -196,9 +194,8 @@ export default function TeacherDashboardSection() {
           setIsAssignModalOpen(true);
         }}
         onReviewReport={setViewingReport}
-        onGradeReport={(review) => {
-          setGradeScore("9");
-          setGradeFeedback("บันทึกข้อมูลได้ดี มีความเข้าใจในการทดลอง");
+        onSendFeedback={(review) => {
+          setReviewFeedback("บันทึกข้อมูลได้ดี มีความเข้าใจในการทดลอง");
           setActiveReview(review);
         }}
         onDownload={handleDownload}
@@ -338,25 +335,12 @@ export default function TeacherDashboardSection() {
               <p className="text-xs font-bold text-slate-500">บทเรียน: {activeReview.lab}</p>
             </div>
             
-            <form onSubmit={handleGradeStudent} className="mt-4 space-y-4">
+            <form onSubmit={handleSendFeedback} className="mt-4 space-y-4">
               <div>
-                <label className="block text-xs font-bold text-slate-500 mb-1.5 select-none">คะแนนการประเมิน (เต็ม 10)</label>
-                <input
-                  type="number"
-                  min="0"
-                  max="10"
-                  step="0.5"
-                  required
-                  value={gradeScore}
-                  onChange={(e) => setGradeScore(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 bg-slate-50/50 font-bold"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-500 mb-1.5 select-none">ความคิดเห็นและคำชี้แนะเพิ่มเติม</label>
+                <label className="block text-xs font-bold text-slate-500 mb-1.5 select-none">ความคิดเห็นและคำแนะนำ</label>
                 <textarea
-                  value={gradeFeedback}
-                  onChange={(e) => setGradeFeedback(e.target.value)}
+                  value={reviewFeedback}
+                  onChange={(e) => setReviewFeedback(e.target.value)}
                   rows={3}
                   className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 bg-slate-50/50 leading-relaxed font-bold"
                   placeholder="เขียนความคิดเห็นของคุณครู..."
@@ -374,7 +358,7 @@ export default function TeacherDashboardSection() {
                   type="submit"
                   className="flex-1 py-2.5 bg-orange-600 hover:bg-orange-700 text-white font-extrabold rounded-2xl text-xs transition-colors cursor-pointer shadow-md shadow-orange-600/20"
                 >
-                  บันทึกคะแนน
+                  ส่งคำแนะนำ
                 </button>
               </div>
             </form>
@@ -447,13 +431,12 @@ export default function TeacherDashboardSection() {
               <button
                 onClick={() => {
                   setViewingReport(null);
-                  setGradeScore("9.5");
-                  setGradeFeedback("สรุปรายงานผลการทดลองและประเมินผลตัวแปรฟิสิกส์ได้อย่างแม่นยำดีเลิศ");
+                  setReviewFeedback("สรุปรายงานผลการทดลองและประเมินผลตัวแปรฟิสิกส์ได้อย่างแม่นยำดีเลิศ");
                   setActiveReview(viewingReport);
                 }}
                 className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-extrabold rounded-2xl text-xs transition-colors cursor-pointer shadow-md shadow-blue-600/20 select-none"
               >
-                ให้คะแนน
+                ส่งคำแนะนำ
               </button>
             </div>
           </div>
