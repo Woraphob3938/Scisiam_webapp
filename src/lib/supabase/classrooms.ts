@@ -102,7 +102,7 @@ export async function getClassroom(id: string): Promise<ClassroomDetail> {
     throw new Error(CLASSROOM_ACCESS_ERROR);
   }
 
-  return loadClassroomDetailById(supabase, userId, id.trim());
+  return loadClassroomDetailById(supabase, userId, validateClassroomId(id));
 }
 
 export async function createClassroom(input: CreateClassroomInput): Promise<ClassroomDetail> {
@@ -178,9 +178,10 @@ export async function joinClassroom(code: string): Promise<ClassroomDetail> {
 export async function getClassroomJoinCode(id: string): Promise<string | null> {
   const supabase = createClient();
   await requireCurrentUserId(supabase);
+  const classroomId = validateClassroomId(id);
 
   const { data, error } = await supabase.rpc("get_classroom_join_code", {
-    p_classroom_id: id.trim(),
+    p_classroom_id: classroomId,
   });
 
   if (error) {
@@ -193,9 +194,10 @@ export async function getClassroomJoinCode(id: string): Promise<string | null> {
 export async function getClassroomMembers(id: string): Promise<ClassroomMember[]> {
   const supabase = createClient();
   await requireCurrentUserId(supabase);
+  const classroomId = validateClassroomId(id);
 
   const { data, error } = await supabase.rpc("get_classroom_members", {
-    p_classroom_id: id.trim(),
+    p_classroom_id: classroomId,
   });
 
   if (error) {
@@ -350,7 +352,17 @@ function isGradeLevel(value: string | null | undefined): value is GradeLevel {
 }
 
 function normalizeClassroomCode(code: string) {
-  return code.replace(/\s+/g, "").toUpperCase();
+  return code.replace(/[^A-Z0-9]+/gi, "").toUpperCase();
+}
+
+function validateClassroomId(id: string) {
+  const normalizedId = id.trim();
+
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(normalizedId)) {
+    throw new Error(CLASSROOM_ACCESS_ERROR);
+  }
+
+  return normalizedId;
 }
 
 function readRpcClassroomId(value: Json | null): string | null {

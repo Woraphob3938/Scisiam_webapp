@@ -76,8 +76,41 @@ test("classroom client uses RPC writes and the SciSiam lab catalog", () => {
   assert.match(source, /labsById/);
   assert.match(source, /rpc\("create_classroom"/);
   assert.match(source, /rpc\("join_classroom"/);
+  assert.match(source, /rpc\("get_classroom_join_code"/);
+  assert.match(source, /rpc\("get_classroom_members"/);
   assert.doesNotMatch(
     source,
     /\.from\("classroom_(?:members|labs)"\)[\s\S]*?\.insert\(/,
+  );
+});
+
+test("classroom client strips non-alphanumeric characters from join codes before RPC", () => {
+  const source = fs.readFileSync(
+    path.join(root, "src", "lib", "supabase", "classrooms.ts"),
+    "utf8"
+  );
+
+  assert.match(
+    source,
+    /function normalizeClassroomCode\(code: string\)\s*\{\s*return code\.replace\(\/\[\^A-Z0-9\]\+\/gi,\s*""\)\.toUpperCase\(\);?\s*\}/
+  );
+});
+
+test("classroom client rejects malformed classroom ids before hitting Supabase", () => {
+  const source = fs.readFileSync(
+    path.join(root, "src", "lib", "supabase", "classrooms.ts"),
+    "utf8"
+  );
+
+  assert.match(source, /const CLASSROOM_ACCESS_ERROR = "ไม่พบห้องเรียนหรือคุณไม่มีสิทธิ์เข้าถึง";/);
+  assert.match(
+    source,
+    /function validateClassroomId\(id: string\)\s*\{\s*const normalizedId = id\.trim\(\);\s*if \(!\/\^\[0-9a-f\]\{8\}-\[0-9a-f\]\{4\}-\[1-5\]\[0-9a-f\]\{3\}-\[89ab\]\[0-9a-f\]\{3\}-\[0-9a-f\]\{12\}\$\/i\.test\(normalizedId\)\) \{\s*throw new Error\(CLASSROOM_ACCESS_ERROR\);/s
+  );
+
+  const validationCalls = source.match(/validateClassroomId\(id\)/g) ?? [];
+  assert.ok(
+    validationCalls.length >= 3,
+    "expected malformed-id validation in getClassroom, getClassroomJoinCode, and getClassroomMembers"
   );
 });
