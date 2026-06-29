@@ -685,7 +685,7 @@ function ScienceIntro({ mode }: { mode: AuthMode }) {
       <div className="relative z-10 flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <span className="relative h-12 w-12 shrink-0 overflow-hidden rounded-2xl bg-white shadow-lg shadow-blue-500/15 ring-1 ring-slate-200">
-            <Image src="/scisiam-logo.png" alt="SciSiam logo" fill sizes="48px" className="object-contain p-0.5" priority />
+            <Image src="/ai-oon-logo.png" alt="โลโก้ SciSiam น้องไออุ่น" fill sizes="48px" className="object-contain p-0.5" priority />
           </span>
           <span className="grid gap-0.5">
             <strong className="text-xl font-extrabold leading-[1.1] text-blue-600">
@@ -757,7 +757,7 @@ function MobileIntro() {
       <div className="flex items-center justify-between gap-3">
         <div className="flex min-w-0 items-center gap-3">
           <span className="relative h-10 w-10 shrink-0 overflow-hidden rounded-[13px] bg-white shadow-md shadow-blue-500/20">
-            <Image src="/scisiam-logo.png" alt="SciSiam logo" fill sizes="40px" className="object-contain p-0.5" priority />
+            <Image src="/ai-oon-logo.png" alt="โลโก้ SciSiam น้องไออุ่น" fill sizes="40px" className="object-contain p-0.5" priority />
           </span>
           <span className="grid min-w-0 gap-0.5">
             <strong className="text-lg font-extrabold leading-[1.1] text-blue-600">

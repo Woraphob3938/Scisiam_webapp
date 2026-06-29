@@ -88,7 +88,7 @@ export default function ResetPasswordForm({
     <section className="w-full max-w-[460px] rounded-[28px] border border-white/80 bg-white/95 p-5 shadow-[0_24px_80px_rgba(15,23,42,0.13)] ring-1 ring-slate-200/70 backdrop-blur sm:p-7">
       <header className="mb-6 flex items-center gap-3">
         <span className="relative h-11 w-11 shrink-0 overflow-hidden rounded-[14px] bg-white shadow-md shadow-blue-500/15 ring-1 ring-slate-200">
-          <Image src="/scisiam-logo.png" alt="SciSiam logo" fill sizes="44px" className="object-contain p-0.5" priority />
+          <Image src="/ai-oon-logo.png" alt="โลโก้ SciSiam น้องไออุ่น" fill sizes="44px" className="object-contain p-0.5" priority />
         </span>
         <div>
           <p className="text-lg font-extrabold leading-[1.2] text-blue-600">SciSiam</p>

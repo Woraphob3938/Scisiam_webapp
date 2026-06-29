@@ -22,8 +22,8 @@ export default async function VerifyEmailLinkPage({
         <header className="mb-6 flex items-center gap-3">
           <span className="relative h-11 w-11 shrink-0 overflow-hidden rounded-[14px] bg-white shadow-md shadow-blue-500/15 ring-1 ring-slate-200">
             <Image
-              src="/scisiam-logo.png"
-              alt="SciSiam logo"
+              src="/ai-oon-logo.png"
+              alt="โลโก้ SciSiam น้องไออุ่น"
               fill
               sizes="44px"
               className="object-contain p-0.5"

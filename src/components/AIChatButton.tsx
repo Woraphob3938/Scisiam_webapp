@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
-  Bot,
   FlaskConical,
   Loader2,
   Send,
@@ -307,13 +307,19 @@ export default function AIChatButton() {
             setIsOpen(true);
           }
         }}
-        className="relative flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 text-white shadow-xl shadow-blue-500/25 transition-all duration-300 hover:bg-blue-700 hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-blue-100 cursor-pointer sm:h-14 sm:w-14"
+        className={`relative flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border shadow-xl shadow-blue-500/25 transition-all duration-300 hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-blue-100 cursor-pointer sm:h-14 sm:w-14 ${
+          isOpen ? "border-blue-600 bg-blue-600 text-white" : "border-blue-100 bg-white"
+        }`}
         aria-label="เปิด AI ไออุ่น"
         aria-expanded={isOpen}
         aria-haspopup="dialog"
         aria-controls="ai-tutor-dialog"
       >
-        {isOpen ? <X className="h-5.5 w-5.5 sm:h-6.5 sm:w-6.5" /> : <Bot className="h-5.5 w-5.5 sm:h-6.5 sm:w-6.5" />}
+        {isOpen ? (
+          <X className="h-5.5 w-5.5 sm:h-6.5 sm:w-6.5" />
+        ) : (
+          <Image src="/ai-oon.png" alt="" fill sizes="56px" className="object-contain p-1" />
+        )}
         {!isOpen && (
           <span className="absolute right-0.5 top-0.5 flex h-3.5 w-3.5 rounded-full bg-emerald-500 ring-2 ring-white">
             <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping" />

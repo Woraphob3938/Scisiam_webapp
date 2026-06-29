@@ -170,7 +170,7 @@ export default function Navbar() {
 
         <Link href="/labs" className="group flex min-w-0 cursor-pointer items-center gap-2 select-none sm:gap-2.5">
           <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-xl bg-white shadow-md shadow-blue-500/20 transition-all duration-300 group-hover:scale-105">
-            <Image src="/scisiam-logo.png" alt="SciSiam logo" fill sizes="40px" className="object-contain p-0.5" priority />
+            <Image src="/ai-oon-logo.png" alt="โลโก้ SciSiam น้องไออุ่น" fill sizes="40px" className="object-contain p-0.5" priority />
           </div>
           <span className="truncate whitespace-nowrap bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 bg-clip-text text-lg font-bold tracking-tight text-transparent select-none sm:text-xl">
             SciSiam
