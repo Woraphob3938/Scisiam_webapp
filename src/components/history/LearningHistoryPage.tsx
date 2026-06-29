@@ -3,7 +3,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
-  Activity,
   ArrowRight,
   BarChart3,
   BookOpen,
@@ -397,7 +396,7 @@ export default function LearningHistoryPage({ embedded = false }: LearningHistor
         </section>
 
         <section className="mx-auto grid max-w-7xl gap-5 px-4 py-5 sm:px-8 lg:grid-cols-[minmax(0,1fr)_340px] lg:px-10 lg:py-7">
-          <div className="grid gap-5">
+          <div className="grid gap-5 self-start">
             <div className="rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40 sm:p-5">
               <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                 <div className="min-w-0">
@@ -628,17 +627,10 @@ function HistoryItem({ record }: { record: HistoryRecord }) {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-2 sm:flex lg:shrink-0">
-          <Link
-            href={`/labs/${record.labId}`}
-            className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-extrabold leading-[1.45] text-slate-700 transition-colors hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
-          >
-            <Activity className="h-4 w-4" />
-            รายละเอียด
-          </Link>
+        <div className="flex lg:shrink-0">
           <Link
             href={record.isReady ? `/labs/${record.labId}/simulation` : `/labs/${record.labId}`}
-            className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl bg-blue-600 px-3.5 py-2 text-xs font-extrabold leading-[1.45] text-white shadow-md shadow-blue-500/15 transition-colors hover:bg-blue-700 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
+            className="inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-xs font-extrabold leading-[1.45] text-white shadow-md shadow-blue-500/15 transition-colors hover:bg-blue-700 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100 sm:w-auto"
           >
             <Play className="h-4 w-4" />
             ทดลองต่อ

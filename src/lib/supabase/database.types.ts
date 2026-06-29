@@ -270,6 +270,13 @@ export type Database = {
     };
     Views: Record<string, never>;
     Functions: {
+      update_own_profile: {
+        Args: {
+          p_display_name?: string | null;
+          p_avatar_url?: string | null;
+        };
+        Returns: Json;
+      };
       save_experiment_run: {
         Args: {
           p_lab_id: string;
