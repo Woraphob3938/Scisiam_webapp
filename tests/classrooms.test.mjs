@@ -55,3 +55,29 @@ test("classroom RPC fix uses SQL coalesce expressions without schema qualificati
   assert.match(sql, /nullif\([\s\S]+coalesce\(p_description,\s*''\)/i);
   assert.doesNotMatch(sql, /pg_catalog\.(?:coalesce|nullif)/i);
 });
+
+test("classroom client uses RPC writes and the SciSiam lab catalog", () => {
+  const source = fs.readFileSync(
+    path.join(root, "src", "lib", "supabase", "classrooms.ts"),
+    "utf8"
+  );
+
+  for (const name of [
+    "listMyClassrooms",
+    "getClassroom",
+    "createClassroom",
+    "joinClassroom",
+    "getClassroomJoinCode",
+    "getClassroomMembers",
+  ]) {
+    assert.match(source, new RegExp(`export\\s+(?:async\\s+)?function\\s+${name}`));
+  }
+
+  assert.match(source, /labsById/);
+  assert.match(source, /rpc\("create_classroom"/);
+  assert.match(source, /rpc\("join_classroom"/);
+  assert.doesNotMatch(
+    source,
+    /\.from\("classroom_(?:members|labs)"\)[\s\S]*?\.insert\(/,
+  );
+});

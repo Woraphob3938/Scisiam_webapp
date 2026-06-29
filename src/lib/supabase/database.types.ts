@@ -228,6 +228,84 @@ export type Database = {
         };
         Relationships: [];
       };
+      classrooms: {
+        Row: {
+          id: string;
+          creator_id: string;
+          name: string;
+          school_name: string | null;
+          grade_level: string | null;
+          description: string | null;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          creator_id: string;
+          name: string;
+          school_name?: string | null;
+          grade_level?: string | null;
+          description?: string | null;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          creator_id?: string;
+          name?: string;
+          school_name?: string | null;
+          grade_level?: string | null;
+          description?: string | null;
+          is_active?: boolean;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      classroom_members: {
+        Row: {
+          id: string;
+          classroom_id: string;
+          user_id: string;
+          member_role: ScisiamUserRole;
+          joined_at: string;
+        };
+        Insert: {
+          id?: string;
+          classroom_id: string;
+          user_id: string;
+          member_role?: ScisiamUserRole;
+          joined_at?: string;
+        };
+        Update: {
+          classroom_id?: string;
+          user_id?: string;
+          member_role?: ScisiamUserRole;
+          joined_at?: string;
+        };
+        Relationships: [];
+      };
+      classroom_labs: {
+        Row: {
+          classroom_id: string;
+          lab_id: string;
+          position: number;
+          created_at: string;
+        };
+        Insert: {
+          classroom_id: string;
+          lab_id: string;
+          position: number;
+          created_at?: string;
+        };
+        Update: {
+          classroom_id?: string;
+          lab_id?: string;
+          position?: number;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
       ai_usage_events: {
         Row: {
           id: string;
@@ -306,6 +384,40 @@ export type Database = {
           p_max_requests?: number;
         };
         Returns: Json;
+      };
+      create_classroom: {
+        Args: {
+          p_name: string;
+          p_grade_level: string;
+          p_description: string | null;
+          p_lab_ids: string[];
+        };
+        Returns: Json;
+      };
+      join_classroom: {
+        Args: {
+          p_code: string;
+        };
+        Returns: Json;
+      };
+      get_classroom_join_code: {
+        Args: {
+          p_classroom_id: string;
+        };
+        Returns: string | null;
+      };
+      get_classroom_members: {
+        Args: {
+          p_classroom_id: string;
+        };
+        Returns: Array<{
+          user_id: string;
+          display_name: string;
+          avatar_url: string | null;
+          role: ScisiamUserRole;
+          is_creator: boolean;
+          joined_at: string;
+        }>;
       };
     };
     Enums: {
