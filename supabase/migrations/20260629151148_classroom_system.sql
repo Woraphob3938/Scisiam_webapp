@@ -7,15 +7,9 @@ drop policy if exists "Teachers can create own classrooms" on public.classrooms;
 drop policy if exists "Teachers can update own classrooms" on public.classrooms;
 drop policy if exists "Teachers can delete own classrooms" on public.classrooms;
 drop policy if exists "Members and teachers can read memberships" on public.classroom_members;
+drop policy if exists "Users can join or teachers can add members" on public.classroom_members;
 drop policy if exists "Members and teachers can update memberships" on public.classroom_members;
 drop policy if exists "Members and teachers can delete memberships" on public.classroom_members;
-
-do $$
-begin
-  execute 'drop policy if exists "Users can join or teachers can add ' ||
-    'members" on public.classroom_members';
-end;
-$$;
 
 alter table public.classrooms rename column teacher_id to creator_id;
 alter table public.classrooms add column description text;
@@ -25,7 +19,6 @@ alter table public.classrooms add constraint classrooms_description_length
   check (description is null or char_length(description) <= 500);
 alter table public.classrooms add constraint classrooms_grade_level_allowed
   check (grade_level in ('ประถม', 'มัธยมต้น', 'มัธยมปลาย', 'อุดมศึกษา'));
-alter table public.classrooms alter column grade_level set not null;
 
 create table private.classroom_join_codes (
   classroom_id uuid primary key references public.classrooms(id) on delete cascade,
