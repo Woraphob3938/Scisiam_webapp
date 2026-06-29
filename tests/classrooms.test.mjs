@@ -12,6 +12,12 @@ function classroomMigration() {
   return fs.readFileSync(path.join(migrations, files[0]), "utf8");
 }
 
+function classroomRpcFixMigration() {
+  const files = fs.readdirSync(migrations).filter((name) => name.endsWith("_fix_classroom_rpc_coalesce.sql"));
+  assert.equal(files.length, 1, "expected exactly one classroom RPC fix migration");
+  return fs.readFileSync(path.join(migrations, files[0]), "utf8");
+}
+
 test("classroom migration keeps codes private and removes direct joining", () => {
   const sql = classroomMigration();
   assert.match(sql, /private\.classroom_join_codes/i);
@@ -41,4 +47,11 @@ test("classroom labs are ordered and membership-protected", () => {
 test("classroom migration preserves legacy nullable grade levels", () => {
   const sql = classroomMigration();
   assert.doesNotMatch(sql, /alter table public\.classrooms alter column grade_level set not null;/i);
+});
+
+test("classroom RPC fix uses SQL coalesce expressions without schema qualification", () => {
+  const sql = classroomRpcFixMigration();
+  assert.match(sql, /coalesce\(p_name,\s*''\)/i);
+  assert.match(sql, /nullif\([\s\S]+coalesce\(p_description,\s*''\)/i);
+  assert.doesNotMatch(sql, /pg_catalog\.(?:coalesce|nullif)/i);
 });
