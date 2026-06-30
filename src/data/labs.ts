@@ -142,7 +142,7 @@ export const labsData: LabData[] = [
     title: "Simple Circuits",
     category: "Physics",
     gradeLevel: "ประถม",
-    status: "ยังสร้างไม่เสร็จ",
+    status: "",
     description: "ต่อวงจรไฟฟ้าอย่างง่ายด้วยแบตเตอรี่ สายไฟ หลอดไฟ และสวิตช์ เพื่อดูเงื่อนไขที่ทำให้ไฟติดหรือดับ"
   },
   {
@@ -151,7 +151,7 @@ export const labsData: LabData[] = [
     title: "Floating and Sinking",
     category: "Physics",
     gradeLevel: "ประถม",
-    status: "ยังสร้างไม่เสร็จ",
+    status: "",
     description: "ทดลองเปรียบเทียบวัตถุที่ลอยและจม สังเกตผลของวัสดุ รูปร่าง และความหนาแน่นต่อการลอยตัวในน้ำ"
   },
   {
@@ -160,7 +160,7 @@ export const labsData: LabData[] = [
     title: "Magnet Exploration",
     category: "Physics",
     gradeLevel: "ประถม",
-    status: "ยังสร้างไม่เสร็จ",
+    status: "",
     description: "สำรวจแรงแม่เหล็ก ขั้วเหนือ-ใต้ การดูดและผลัก และวัสดุที่แม่เหล็กดึงดูดได้หรือไม่ได้"
   },
   {

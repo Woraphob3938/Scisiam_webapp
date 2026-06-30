@@ -210,6 +210,48 @@ test("university mathematics labs are now ready interactive simulations", () => 
   }
 });
 
+test("elementary physics labs have dedicated interactive simulations", () => {
+  const labs = readProjectFile("src/data/labs.ts");
+  const registry = readProjectFile("src/data/labSimulationRegistry.ts");
+  const savedRegistry = readProjectFile("src/data/labSavedExperiments.ts");
+  const route = readProjectFile("src/app/labs/[id]/simulation/page.tsx");
+  const elementaryPhysicsSimulations = [
+    ["simple-circuits", "SimpleCircuitsSimulation", "calculateSimpleCircuit"],
+    ["floating-and-sinking", "FloatingSinkingSimulation", "calculateBuoyancy"],
+    ["magnet-exploration", "MagnetExplorationSimulation", "calculateMagneticInteraction"],
+  ];
+
+  for (const [labId, component, modelFunction] of elementaryPhysicsSimulations) {
+    const componentPath = `src/components/labs/simulation/${component}.tsx`;
+
+    assert.match(
+      labs,
+      new RegExp(`id: "${labId}"[\\s\\S]*?status: ""`),
+      `${labId} should be marked ready`,
+    );
+    assert.match(registry, new RegExp(`"${labId}"`), `${labId} should be a direct simulation`);
+    assert.match(savedRegistry, new RegExp(`"${labId}"\\s*:`), `${labId} should have a save key`);
+    assert.ok(existsSync(join(rootDir, componentPath)), `${componentPath} should exist`);
+
+    const simulation = readProjectFile(componentPath);
+    assert.match(
+      route,
+      new RegExp(`const ${component} = dynamic\\([\\s\\S]*?${component}`),
+      `${component} should be dynamically imported`,
+    );
+    assert.match(
+      route,
+      new RegExp(`"${labId}": ${component}`),
+      `${labId} should map to ${component}`,
+    );
+    assert.match(simulation, /<SharedSimulationShell/);
+    assert.match(simulation, /saveExperimentAndSync/);
+    assert.match(simulation, /aria-labelledby/);
+    assert.match(simulation, /ภารกิจ/);
+    assert.match(simulation, new RegExp(modelFunction));
+  }
+});
+
 test("elementary physics and chemistry labs are detail-only placeholders", () => {
   const labs = readProjectFile("src/data/labs.ts");
   const details = readProjectFile("src/data/labDetails.ts");
@@ -218,9 +260,6 @@ test("elementary physics and chemistry labs are detail-only placeholders", () =>
   const labCard = readProjectFile("src/components/LabCard.tsx");
 
   const elementaryLabs = [
-    ["simple-circuits", "Physics"],
-    ["floating-and-sinking", "Physics"],
-    ["magnet-exploration", "Physics"],
     ["states-of-matter", "Chemistry"],
     ["mixing-and-separating", "Chemistry"],
     ["dissolving-solutions", "Chemistry"],
@@ -230,7 +269,7 @@ test("elementary physics and chemistry labs are detail-only placeholders", () =>
   ];
   const handleViewDetails = labsPage.match(/const handleViewDetails = \(id: string\) => \{[\s\S]*?\n  \};/)?.[0] ?? "";
 
-  assert.equal(elementaryLabs.length, 9);
+  assert.equal(elementaryLabs.length, 6);
   assert.doesNotMatch(handleViewDetails, /isLabReady/);
   assert.match(labCard, /disabled=\{!readiness\.isReady\}[\s\S]*onClick=\{\(\) => onEnterRoom\?\.\(lab\.id\)\}/);
 

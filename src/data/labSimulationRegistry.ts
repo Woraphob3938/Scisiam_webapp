@@ -39,6 +39,9 @@ export const directSimulationLabIds = [
   "push-pull-forces",
   "light-and-shadows",
   "sound-vibrations",
+  "simple-circuits",
+  "floating-and-sinking",
+  "magnet-exploration",
 ] as const;
 
 export const chemistryConceptSimulationLabIds = [

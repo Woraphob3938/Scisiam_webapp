@@ -155,6 +155,12 @@ const LightShadowsSimulation = dynamic(() =>
   import("@/components/labs/simulation/LightShadowsSimulation"));
 const SoundVibrationsSimulation = dynamic(() =>
   import("@/components/labs/simulation/SoundVibrationsSimulation"));
+const SimpleCircuitsSimulation = dynamic(() =>
+  import("@/components/labs/simulation/SimpleCircuitsSimulation"));
+const FloatingSinkingSimulation = dynamic(() =>
+  import("@/components/labs/simulation/FloatingSinkingSimulation"));
+const MagnetExplorationSimulation = dynamic(() =>
+  import("@/components/labs/simulation/MagnetExplorationSimulation"));
 
 const simulationComponents: Record<DirectSimulationLabId, React.ComponentType> = {
   "newtons-cooling": NewtonsCoolingSimulation,
@@ -197,6 +203,9 @@ const simulationComponents: Record<DirectSimulationLabId, React.ComponentType> =
   "push-pull-forces": PushPullForcesSimulation,
   "light-and-shadows": LightShadowsSimulation,
   "sound-vibrations": SoundVibrationsSimulation,
+  "simple-circuits": SimpleCircuitsSimulation,
+  "floating-and-sinking": FloatingSinkingSimulation,
+  "magnet-exploration": MagnetExplorationSimulation,
 };
 
 function SimulationPlaceholder({ labId }: { labId: string }) {
