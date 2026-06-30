@@ -204,3 +204,29 @@ test("classroom list route authenticates and loads the current user's rooms", ()
   assert.match(source, /ลองใหม่/);
   assert.match(source, /<ClassroomActions placement="desktop" \/>/);
 });
+
+test("classroom workspace loads private room data and exposes three stable tabs", () => {
+  const source = fs.readFileSync(
+    path.join(root, "src", "app", "classrooms", "[id]", "page.tsx"),
+    "utf8"
+  );
+
+  for (const name of ["getClassroom", "getClassroomMembers", "getClassroomJoinCode"]) {
+    assert.match(source, new RegExp(name));
+  }
+
+  assert.match(source, /useParams<\{ id: string \}>\(\)/);
+  assert.match(source, /Promise\.all\(\[\s*getClassroom\(id\),\s*getClassroomMembers\(id\)/s);
+  assert.match(source, /(?:loadedRoom|room)\.isCreator[\s\S]+getClassroomJoinCode\(id\)/);
+  assert.match(source, /room\.labIds[\s\S]+labsById\[id\][\s\S]+filter/s);
+  assert.match(source, /<TabsList/);
+
+  for (const label of ["ห้องแล็บ", "งานของชั้นเรียน", "บุคคล"]) {
+    assert.match(source, new RegExp(label));
+  }
+
+  assert.match(source, /ยังไม่มีงานของชั้นเรียน/);
+  assert.match(source, /href=\{`\/labs\/\$\{lab\.id\}`\}/);
+  assert.match(source, /เข้าห้อง/);
+  assert.match(source, /ไม่พบห้องหรือคุณไม่มีสิทธิ์เข้าถึง/);
+});
