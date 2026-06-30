@@ -18,6 +18,18 @@ function classroomRpcFixMigration() {
   return fs.readFileSync(path.join(migrations, files[0]), "utf8");
 }
 
+function classroomCatalogMigration() {
+  const files = fs.readdirSync(migrations).filter((name) => name.endsWith("_harden_classroom_catalog.sql"));
+  assert.equal(files.length, 1, "expected exactly one classroom catalog hardening migration");
+  return fs.readFileSync(path.join(migrations, files[0]), "utf8");
+}
+
+function classroomCatalogIndexMigration() {
+  const files = fs.readdirSync(migrations).filter((name) => name.endsWith("_add_classroom_lab_fk_index.sql"));
+  assert.equal(files.length, 1, "expected exactly one classroom catalog index migration");
+  return fs.readFileSync(path.join(migrations, files[0]), "utf8");
+}
+
 test("classroom migration keeps codes private and removes direct joining", () => {
   const sql = classroomMigration();
   assert.match(sql, /private\.classroom_join_codes/i);
@@ -54,6 +66,23 @@ test("classroom RPC fix uses SQL coalesce expressions without schema qualificati
   assert.match(sql, /coalesce\(p_name,\s*''\)/i);
   assert.match(sql, /nullif\([\s\S]+coalesce\(p_description,\s*''\)/i);
   assert.doesNotMatch(sql, /pg_catalog\.(?:coalesce|nullif)/i);
+});
+
+test("classroom catalog hardening rejects unknown labs and preserves membership roles", () => {
+  const sql = classroomCatalogMigration();
+  assert.match(sql, /private\.classroom_lab_catalog/i);
+  assert.match(sql, /foreign key\s*\(lab_id\)[\s\S]+references private\.classroom_lab_catalog\(lab_id\)/i);
+  assert.match(sql, /left join private\.classroom_lab_catalog[\s\S]+catalog\.is_active[\s\S]+where catalog\.lab_id is null/i);
+  assert.match(sql, /members\.member_role/i);
+  assert.doesNotMatch(sql, /profiles\.role[\s\S]+members\.joined_at/i);
+
+  const catalogRows = sql.match(/^\s*\('[a-z0-9-]+'\),?$/gm) ?? [];
+  assert.equal(catalogRows.length, 103, "private classroom catalog must mirror all 103 SciSiam labs");
+});
+
+test("classroom lab catalog foreign key has a covering index", () => {
+  const sql = classroomCatalogIndexMigration();
+  assert.match(sql, /create index if not exists classroom_labs_lab_id_idx[\s\S]+public\.classroom_labs\s*\(lab_id\)/i);
 });
 
 test("classroom client uses RPC writes and the SciSiam lab catalog", () => {
@@ -113,6 +142,16 @@ test("classroom client rejects malformed classroom ids before hitting Supabase",
     validationCalls.length >= 3,
     "expected malformed-id validation in getClassroom, getClassroomJoinCode, and getClassroomMembers"
   );
+});
+
+test("classroom member access failures stay neutral during parallel room loading", () => {
+  const source = fs.readFileSync(
+    path.join(root, "src", "lib", "supabase", "classrooms.ts"),
+    "utf8"
+  );
+
+  assert.match(source, /error\.code === "42501" \|\| error\.code === "P0002"/);
+  assert.match(source, /throw new Error\(CLASSROOM_ACCESS_ERROR\)/);
 });
 
 test("classroom action dialog covers create and join flows", () => {

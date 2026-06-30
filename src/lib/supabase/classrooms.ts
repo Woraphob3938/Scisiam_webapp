@@ -201,6 +201,9 @@ export async function getClassroomMembers(id: string): Promise<ClassroomMember[]
   });
 
   if (error) {
+    if (error.code === "42501" || error.code === "P0002") {
+      throw new Error(CLASSROOM_ACCESS_ERROR);
+    }
     throw new Error(error.message);
   }
 
