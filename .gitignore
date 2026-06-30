@@ -48,6 +48,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# Local isolated agent worktrees
+.worktrees/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
