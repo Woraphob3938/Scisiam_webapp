@@ -363,7 +363,7 @@ export default function SimpleCircuitsSimulation() {
               }`}
             >
               <ToggleLeft className="h-4 w-4" />
-              {switchClosed ? "เปิดการไหลของกระแส" : "หยุดการไหลของกระแส"}
+              {switchClosed ? "หยุดการไหลของกระแส" : "เปิดการไหลของกระแส"}
             </button>
           </section>
           <div className="space-y-4">
