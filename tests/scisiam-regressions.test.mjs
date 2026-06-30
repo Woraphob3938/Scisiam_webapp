@@ -218,9 +218,6 @@ test("elementary physics and chemistry labs are detail-only placeholders", () =>
   const labCard = readProjectFile("src/components/LabCard.tsx");
 
   const elementaryLabs = [
-    ["push-pull-forces", "Physics"],
-    ["light-and-shadows", "Physics"],
-    ["sound-vibrations", "Physics"],
     ["simple-circuits", "Physics"],
     ["floating-and-sinking", "Physics"],
     ["magnet-exploration", "Physics"],
@@ -233,7 +230,7 @@ test("elementary physics and chemistry labs are detail-only placeholders", () =>
   ];
   const handleViewDetails = labsPage.match(/const handleViewDetails = \(id: string\) => \{[\s\S]*?\n  \};/)?.[0] ?? "";
 
-  assert.equal(elementaryLabs.length, 12);
+  assert.equal(elementaryLabs.length, 9);
   assert.doesNotMatch(handleViewDetails, /isLabReady/);
   assert.match(labCard, /disabled=\{!readiness\.isReady\}[\s\S]*onClick=\{\(\) => onEnterRoom\?\.\(lab\.id\)\}/);
 
@@ -347,6 +344,69 @@ test("mission rewards must not write real score state directly from the page", (
 });
 
 const finalBiologySimulationLabs = [
+  {
+    id: "push-pull-forces",
+    component: "PushPullForcesSimulation",
+    file: "src/components/labs/simulation/PushPullForcesSimulation.tsx",
+    title: "Push & Pull Forces",
+    saveKey: "scisiam_saved_push_pull_experiment",
+  },
+  {
+    id: "light-and-shadows",
+    component: "LightShadowsSimulation",
+    file: "src/components/labs/simulation/LightShadowsSimulation.tsx",
+    title: "Light and Shadows",
+    saveKey: "scisiam_saved_light_shadows_experiment",
+  },
+  {
+    id: "sound-vibrations",
+    component: "SoundVibrationsSimulation",
+    file: "src/components/labs/simulation/SoundVibrationsSimulation.tsx",
+    title: "Sound Vibrations",
+    saveKey: "scisiam_saved_sound_vibrations_experiment",
+  },
+  {
+    id: "flow-cytometry-cycle",
+    component: "FlowCytometrySimulation",
+    file: "src/components/labs/simulation/FlowCytometrySimulation.tsx",
+    title: "Flow Cytometry Cell Analysis",
+    saveKey: "scisiam_saved_flow_cytometry_experiment",
+  },
+  {
+    id: "western-blotting",
+    component: "WesternBlottingSimulation",
+    file: "src/components/labs/simulation/WesternBlottingSimulation.tsx",
+    title: "Western Blotting Protein Detection",
+    saveKey: "scisiam_saved_western_blotting_experiment",
+  },
+  {
+    id: "metabolic-pathway-flux",
+    component: "MetabolicPathwayFluxSimulation",
+    file: "src/components/labs/simulation/MetabolicPathwayFluxSimulation.tsx",
+    title: "Metabolic Pathway Flux Analysis",
+    saveKey: "scisiam_saved_metabolic_flux_experiment",
+  },
+  {
+    id: "pcr-gel-electrophoresis",
+    component: "PcrGelElectrophoresisSimulation",
+    file: "src/components/labs/simulation/PcrGelElectrophoresisSimulation.tsx",
+    title: "PCR & Gel Electrophoresis",
+    saveKey: "scisiam_saved_pcr_gel_experiment",
+  },
+  {
+    id: "crispr-gene-editing",
+    component: "CrisprGeneEditingSimulation",
+    file: "src/components/labs/simulation/CrisprGeneEditingSimulation.tsx",
+    title: "CRISPR-Cas9 Gene Editing",
+    saveKey: "scisiam_saved_crispr_gene_experiment",
+  },
+  {
+    id: "recombinant-dna-transformation",
+    component: "RecombinantDnaTransformationSimulation",
+    file: "src/components/labs/simulation/RecombinantDnaTransformationSimulation.tsx",
+    title: "Recombinant DNA & Transformation",
+    saveKey: "scisiam_saved_recombinant_dna_experiment",
+  },
   {
     id: "blood-typing",
     component: "BloodTypingAgglutinationSimulation",

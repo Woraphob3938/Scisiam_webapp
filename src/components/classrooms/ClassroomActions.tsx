@@ -385,7 +385,7 @@ export function ClassroomActions({ placement }: ClassroomActionsProps) {
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-hidden p-0 sm:max-w-3xl">
+      <DialogContent className="flex max-h-[calc(100dvh-2rem)] flex-col overflow-hidden p-0 sm:max-w-3xl">
         <DialogHeader className="border-b px-5 pt-5 pb-4 pr-14">
           <div className="flex items-start gap-3">
             {mode !== "menu" && mode !== "created" ? (
@@ -438,8 +438,8 @@ export function ClassroomActions({ placement }: ClassroomActionsProps) {
         ) : null}
 
         {mode === "create" ? (
-          <form className="flex min-h-0 flex-col" onSubmit={handleCreate} noValidate>
-            <div className="flex min-h-0 flex-col gap-5 overflow-y-auto px-5 py-4">
+          <form className="flex min-h-0 flex-1 flex-col" onSubmit={handleCreate} noValidate>
+            <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-5 py-4">
               <p className="text-xs text-muted-foreground">ช่องที่มีเครื่องหมาย * จำเป็นต้องกรอก</p>
               {createErrors.form ? (
                 <p className="rounded-lg bg-destructive/10 px-3 py-2 text-sm leading-relaxed text-destructive" role="alert">
@@ -616,7 +616,7 @@ export function ClassroomActions({ placement }: ClassroomActionsProps) {
               </div>
             </div>
 
-            <DialogFooter className="mx-0 mb-0 rounded-none px-5 py-4">
+            <DialogFooter className="mx-0 mb-0 shrink-0 rounded-none border-t bg-background px-5 py-4">
               <Button type="button" variant="outline" disabled={busy} onClick={() => setMode("menu")}>ยกเลิก</Button>
               <Button type="submit" disabled={busy}>
                 {busy ? <LoaderCircle data-icon="inline-start" className="animate-spin" aria-hidden="true" /> : <Plus data-icon="inline-start" aria-hidden="true" />}
@@ -627,8 +627,8 @@ export function ClassroomActions({ placement }: ClassroomActionsProps) {
         ) : null}
 
         {mode === "join" ? (
-          <form onSubmit={handleJoin} noValidate>
-            <div className="flex flex-col gap-3 px-5 py-5">
+          <form className="flex min-h-0 flex-1 flex-col" onSubmit={handleJoin} noValidate>
+            <div className="flex flex-1 flex-col gap-3 overflow-y-auto px-5 py-5">
               <label htmlFor="classroom-code" className="font-medium">
                 รหัสห้อง <span aria-hidden="true">*</span>
               </label>
@@ -661,7 +661,7 @@ export function ClassroomActions({ placement }: ClassroomActionsProps) {
                 </p>
               ) : null}
             </div>
-            <DialogFooter className="mx-0 mb-0 rounded-none px-5 py-4">
+            <DialogFooter className="mx-0 mb-0 shrink-0 rounded-none border-t bg-background px-5 py-4">
               <Button type="button" variant="outline" disabled={busy} onClick={() => setMode("menu")}>ยกเลิก</Button>
               <Button type="submit" disabled={busy || joinCode.length < 5}>
                 {busy ? <LoaderCircle data-icon="inline-start" className="animate-spin" aria-hidden="true" /> : <DoorOpen data-icon="inline-start" aria-hidden="true" />}

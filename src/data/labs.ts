@@ -115,7 +115,7 @@ export const labsData: LabData[] = [
     title: "Push & Pull Forces",
     category: "Physics",
     gradeLevel: "ประถม",
-    status: "ยังสร้างไม่เสร็จ",
+    status: "",
     description: "สำรวจแรงผลัก แรงดึง ทิศทางของแรง และผลต่อการเคลื่อนที่ของวัตถุผ่านสถานการณ์ง่าย ๆ ในชีวิตประจำวัน"
   },
   {
@@ -124,7 +124,7 @@ export const labsData: LabData[] = [
     title: "Light and Shadows",
     category: "Physics",
     gradeLevel: "ประถม",
-    status: "ยังสร้างไม่เสร็จ",
+    status: "",
     description: "เรียนรู้การเดินทางของแสง การเกิดเงา ความโปร่งใสของวัสดุ และการเปลี่ยนขนาดเงาเมื่อระยะห่างเปลี่ยน"
   },
   {
@@ -133,7 +133,7 @@ export const labsData: LabData[] = [
     title: "Sound Vibrations",
     category: "Physics",
     gradeLevel: "ประถม",
-    status: "ยังสร้างไม่เสร็จ",
+    status: "",
     description: "สังเกตว่าเสียงเกิดจากการสั่น เปรียบเทียบความดัง ความสูงต่ำของเสียง และการส่งผ่านเสียงในวัสดุต่าง ๆ"
   },
   {
@@ -880,7 +880,7 @@ export const labsData: LabData[] = [
     title: "PCR & Gel Electrophoresis",
     category: "Biology",
     gradeLevel: "อุดมศึกษา",
-    status: "ยังสร้างไม่เสร็จ",
+    status: "",
     description: "จำลองการเพิ่มจำนวนดีเอ็นเอในเครื่อง Thermal Cycler และการแยกขนาดเศษดีเอ็นเอบนเจลอะกาโรส"
   },
   {
@@ -889,7 +889,7 @@ export const labsData: LabData[] = [
     title: "CRISPR-Cas9 Gene Editing",
     category: "Biology",
     gradeLevel: "อุดมศึกษา",
-    status: "ยังสร้างไม่เสร็จ",
+    status: "",
     description: "จำลองการออกแบบ guide RNA (gRNA) เพื่อชี้เป้าหมายและตัดแต่งยีนเฉพาะเจาะจงในจีโนมของสิ่งมีชีวิต"
   },
   {
@@ -898,7 +898,7 @@ export const labsData: LabData[] = [
     title: "Recombinant DNA & Transformation",
     category: "Biology",
     gradeLevel: "อุดมศึกษา",
-    status: "ยังสร้างไม่เสร็จ",
+    status: "",
     description: "จำลองการเชื่อมต่อยีนเป้าหมายเข้ากับพลาสมิดเวกเตอร์และการเหนี่ยวนำเข้าสู่แบคทีเรีย E. coli"
   },
   {
@@ -907,7 +907,7 @@ export const labsData: LabData[] = [
     title: "Flow Cytometry Cell Analysis",
     category: "Biology",
     gradeLevel: "อุดมศึกษา",
-    status: "ยังสร้างไม่เสร็จ",
+    status: "",
     description: "จำลองการนับและวิเคราะห์ลักษณะทางแสงของเซลล์เดี่ยวเพื่อจำแนกสัดส่วนเซลล์ในระยะ G1, S, และ G2/M"
   },
   {
@@ -916,7 +916,7 @@ export const labsData: LabData[] = [
     title: "Western Blotting Protein Detection",
     category: "Biology",
     gradeLevel: "อุดมศึกษา",
-    status: "ยังสร้างไม่เสร็จ",
+    status: "",
     description: "จำลองการแยกโปรตีนด้วยกระแสไฟฟ้าบนเจล SDS-PAGE การโอนย้ายไปยังแผ่นเมมเบรน และการตรวจวัดด้วยแอนติบอดีจำเพาะ"
   },
   {
@@ -925,7 +925,7 @@ export const labsData: LabData[] = [
     title: "Metabolic Pathway Flux Analysis",
     category: "Biology",
     gradeLevel: "อุดมศึกษา",
-    status: "ยังสร้างไม่เสร็จ",
+    status: "",
     description: "ศึกษาการควบคุมและอัตราการไหลของสารเจือปนผ่านวัฏจักร TCA และวิถีไกลโคไลซิสภายใต้สภาวะสารอาหารต่าง ๆ"
   }
 ];

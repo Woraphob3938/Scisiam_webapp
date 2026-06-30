@@ -30,6 +30,15 @@ export const directSimulationLabIds = [
   "blood-typing",
   "food-chain",
   "heart-rate",
+  "pcr-gel-electrophoresis",
+  "crispr-gene-editing",
+  "recombinant-dna-transformation",
+  "flow-cytometry-cycle",
+  "western-blotting",
+  "metabolic-pathway-flux",
+  "push-pull-forces",
+  "light-and-shadows",
+  "sound-vibrations",
 ] as const;
 
 export const chemistryConceptSimulationLabIds = [

@@ -137,6 +137,24 @@ const DiscreteGraphTheorySimulation = dynamic(() =>
   import("@/components/labs/simulation/DiscreteGraphTheorySimulation"));
 const MathematicalModelingSimulation = dynamic(() =>
   import("@/components/labs/simulation/MathematicalModelingSimulation"));
+const PcrGelElectrophoresisSimulation = dynamic(() =>
+  import("@/components/labs/simulation/PcrGelElectrophoresisSimulation"));
+const CrisprGeneEditingSimulation = dynamic(() =>
+  import("@/components/labs/simulation/CrisprGeneEditingSimulation"));
+const RecombinantDnaTransformationSimulation = dynamic(() =>
+  import("@/components/labs/simulation/RecombinantDnaTransformationSimulation"));
+const FlowCytometrySimulation = dynamic(() =>
+  import("@/components/labs/simulation/FlowCytometrySimulation"));
+const WesternBlottingSimulation = dynamic(() =>
+  import("@/components/labs/simulation/WesternBlottingSimulation"));
+const MetabolicPathwayFluxSimulation = dynamic(() =>
+  import("@/components/labs/simulation/MetabolicPathwayFluxSimulation"));
+const PushPullForcesSimulation = dynamic(() =>
+  import("@/components/labs/simulation/PushPullForcesSimulation"));
+const LightShadowsSimulation = dynamic(() =>
+  import("@/components/labs/simulation/LightShadowsSimulation"));
+const SoundVibrationsSimulation = dynamic(() =>
+  import("@/components/labs/simulation/SoundVibrationsSimulation"));
 
 const simulationComponents: Record<DirectSimulationLabId, React.ComponentType> = {
   "newtons-cooling": NewtonsCoolingSimulation,
@@ -170,6 +188,15 @@ const simulationComponents: Record<DirectSimulationLabId, React.ComponentType> =
   "blood-typing": BloodTypingAgglutinationSimulation,
   "food-chain": FoodChainEcologySimulation,
   "heart-rate": CardiovascularSystemSimulation,
+  "pcr-gel-electrophoresis": PcrGelElectrophoresisSimulation,
+  "crispr-gene-editing": CrisprGeneEditingSimulation,
+  "recombinant-dna-transformation": RecombinantDnaTransformationSimulation,
+  "flow-cytometry-cycle": FlowCytometrySimulation,
+  "western-blotting": WesternBlottingSimulation,
+  "metabolic-pathway-flux": MetabolicPathwayFluxSimulation,
+  "push-pull-forces": PushPullForcesSimulation,
+  "light-and-shadows": LightShadowsSimulation,
+  "sound-vibrations": SoundVibrationsSimulation,
 };
 
 function SimulationPlaceholder({ labId }: { labId: string }) {
