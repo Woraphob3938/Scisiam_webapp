@@ -163,3 +163,44 @@ test("classroom action dialog keeps one accessible controlled dialog", () => {
   assert.match(source, /spellCheck=\{false\}/);
   assert.match(source, /router\.(?:push|replace)\("\/login"\)/);
 });
+
+test("desktop and sidebar navigation expose classroom actions", () => {
+  const navbar = fs.readFileSync(path.join(root, "src", "components", "Navbar.tsx"), "utf8");
+  const sidebar = fs.readFileSync(path.join(root, "src", "components", "Sidebar.tsx"), "utf8");
+
+  assert.match(navbar, /import \{ ClassroomActions \} from "@\/components\/classrooms\/ClassroomActions"/);
+  assert.match(navbar, /<ClassroomActions placement="desktop" \/>/);
+  assert.ok(
+    navbar.indexOf('<ClassroomActions placement="desktop" />') < navbar.indexOf("{/* Notification Bell */}"),
+    "desktop classroom action should appear immediately before notifications"
+  );
+
+  assert.match(sidebar, /UsersRound/);
+  assert.match(sidebar, /name: "ชั้นเรียน"[\s\S]+href: "\/classrooms"/);
+});
+
+test("mobile navigation uses a centered classroom action in five columns", () => {
+  const source = fs.readFileSync(path.join(root, "src", "components", "MobileTabBar.tsx"), "utf8");
+
+  assert.match(source, /grid-cols-5/);
+  assert.match(source, /<ClassroomActions placement="mobile" \/>/);
+  assert.match(source, /href: "\/classrooms"/);
+  assert.match(source, /pathname\.startsWith\("\/classrooms"\)/);
+  assert.ok(
+    source.indexOf('<ClassroomActions placement="mobile" />') < source.indexOf('href: "/classrooms"'),
+    "mobile classroom action should occupy the center before the classroom link"
+  );
+});
+
+test("classroom list route authenticates and loads the current user's rooms", () => {
+  const source = fs.readFileSync(path.join(root, "src", "app", "classrooms", "page.tsx"), "utf8");
+
+  assert.match(source, /listMyClassrooms/);
+  assert.match(source, /auth\.getUser\(\)/);
+  assert.match(source, /AUTH_CHECK_TIMEOUT_MS\s*=\s*6_000/);
+  assert.match(source, /router\.replace\("\/login\?next=\/classrooms"\)/);
+  assert.match(source, /<Sidebar activeMenu="ชั้นเรียน" \/>/);
+  assert.match(source, /เปิดห้อง/);
+  assert.match(source, /ลองใหม่/);
+  assert.match(source, /<ClassroomActions placement="desktop" \/>/);
+});

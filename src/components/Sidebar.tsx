@@ -5,7 +5,8 @@ import Link from "next/link";
 import { 
   FlaskConical, 
   ClipboardCheck, 
-  User 
+  User,
+  UsersRound,
 } from "lucide-react";
 import { useSidebar } from "@/context/SidebarContext";
 
@@ -22,6 +23,7 @@ export default function Sidebar({ activeMenu, forceCollapsed = false }: SidebarP
   const sidebarMenu = [
     { name: "ห้องแล็บ", icon: FlaskConical, href: "/labs" },
     { name: "ภารกิจนักวิทย์", icon: ClipboardCheck, href: "/missions" },
+    { name: "ชั้นเรียน", icon: UsersRound, href: "/classrooms" },
     { name: "โปรไฟล์", icon: User, href: "/profile" },
   ];
 

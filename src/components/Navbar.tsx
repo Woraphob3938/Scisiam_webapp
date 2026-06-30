@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Bell, ChevronDown, Award, Menu, User } from "lucide-react";
 import { useSidebar } from "@/context/SidebarContext";
 import SettingsModal from "@/components/SettingsModal";
+import { ClassroomActions } from "@/components/classrooms/ClassroomActions";
 import {
   cacheSciSiamAuth,
   clearSciSiamAuthCache,
@@ -180,11 +181,15 @@ export default function Navbar() {
 
       {/* Right Navigation Controls */}
       <div className="flex shrink-0 items-center gap-1.5 sm:gap-5">
+        <div className="hidden lg:block">
+          <ClassroomActions placement="desktop" />
+        </div>
+
         {/* Notification Bell */}
         <div className="relative">
           <button
             onClick={() => setShowNotification(!showNotification)}
-            className="relative rounded-xl p-1.5 text-slate-500 transition-all duration-200 hover:bg-slate-100 hover:text-slate-700 sm:p-2"
+            className="relative flex size-10 items-center justify-center rounded-xl text-slate-500 transition-all duration-200 hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
             aria-label="การแจ้งเตือน"
           >
             <Bell className="w-5 h-5" />
