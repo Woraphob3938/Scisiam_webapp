@@ -114,3 +114,52 @@ test("classroom client rejects malformed classroom ids before hitting Supabase",
     "expected malformed-id validation in getClassroom, getClassroomJoinCode, and getClassroomMembers"
   );
 });
+
+test("classroom action dialog covers create and join flows", () => {
+  const source = fs.readFileSync(
+    path.join(root, "src", "components", "classrooms", "ClassroomActions.tsx"),
+    "utf8"
+  );
+
+  for (const label of [
+    "เข้าร่วมห้อง",
+    "สร้างห้อง",
+    "ชื่อห้อง",
+    "ชั้นปี",
+    "เลือกแล็บ",
+    "รายละเอียดเพิ่มเติม",
+    "คัดลอกรหัส",
+    "แชร์รหัส",
+  ]) {
+    assert.match(source, new RegExp(label));
+  }
+
+  for (const grade of ["ประถม", "มัธยมต้น", "มัธยมปลาย", "อุดมศึกษา"]) {
+    assert.match(source, new RegExp(grade));
+  }
+
+  assert.match(source, /labsData/);
+  assert.match(source, /type ClassroomActionMode = "menu" \| "create" \| "join" \| "created"/);
+  assert.match(source, /placement: "desktop" \| "mobile"/);
+  assert.match(source, /getClassroomJoinCode/);
+  assert.match(source, /navigator\.clipboard\.writeText/);
+  assert.match(source, /navigator\.share/);
+});
+
+test("classroom action dialog keeps one accessible controlled dialog", () => {
+  const source = fs.readFileSync(
+    path.join(root, "src", "components", "classrooms", "ClassroomActions.tsx"),
+    "utf8"
+  );
+
+  assert.match(source, /<Dialog\s+open=\{open\}\s+onOpenChange=\{handleOpenChange\}>/);
+  assert.equal((source.match(/<Dialog\b/g) ?? []).length, 1);
+  assert.match(source, /<DialogTitle/);
+  assert.match(source, /<fieldset/);
+  assert.match(source, /aria-invalid=/);
+  assert.match(source, /aria-describedby=/);
+  assert.match(source, /autoCapitalize="characters"/);
+  assert.match(source, /autoComplete="off"/);
+  assert.match(source, /spellCheck=\{false\}/);
+  assert.match(source, /router\.(?:push|replace)\("\/login"\)/);
+});
