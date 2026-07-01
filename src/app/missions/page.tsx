@@ -8,6 +8,7 @@ import Sidebar from "@/components/Sidebar";
 import { useSidebar } from "@/context/SidebarContext";
 import { loadSupabaseLearningSnapshot, readLocalLearningSnapshot } from "@/lib/supabase/learning-snapshot";
 import { claimMissionReward, loadClaimedMissionIds } from "@/lib/supabase/missions";
+import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 
 interface Mission {
   id: string;
@@ -28,6 +29,7 @@ export default function MissionsPage() {
   const [claimingMissionId, setClaimingMissionId] = useState<string | null>(null);
   const [activeMissionType, setActiveMissionType] = useState<"daily" | "achievement">("daily");
   const [toast, setToast] = useState<{ message: string; type: "success" | "info" | "error" } | null>(null);
+  const [loadingMissions, setLoadingMissions] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
@@ -38,8 +40,26 @@ export default function MissionsPage() {
     };
 
     const loadData = async () => {
-      applySnapshot(readLocalLearningSnapshot());
       try {
+        if (isSupabaseConfigured()) {
+          const {
+            data: { user },
+          } = await createClient().auth.getUser();
+
+          if (user) {
+            const [snapshot, claimedIds] = await Promise.all([
+              loadSupabaseLearningSnapshot(),
+              loadClaimedMissionIds(),
+            ]);
+            if (snapshot) applySnapshot(snapshot);
+            if (!cancelled) {
+              setClaimedMissions(Object.fromEntries(claimedIds.map((id) => [id, true])));
+            }
+            return;
+          }
+        }
+
+        applySnapshot(readLocalLearningSnapshot());
         const [snapshot, claimedIds] = await Promise.all([
           loadSupabaseLearningSnapshot(),
           loadClaimedMissionIds(),
@@ -50,6 +70,9 @@ export default function MissionsPage() {
         }
       } catch (error) {
         console.error("Failed to load mission progress", error);
+        applySnapshot(readLocalLearningSnapshot());
+      } finally {
+        if (!cancelled) setLoadingMissions(false);
       }
     };
 
@@ -202,6 +225,11 @@ export default function MissionsPage() {
           </div>
         </section>
 
+        {loadingMissions ? (
+          <div className="mx-auto grid min-h-[42vh] max-w-7xl place-items-center px-4 py-10 sm:px-8 lg:px-10">
+            <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-100 border-t-blue-600" aria-label="กำลังโหลดภารกิจ" />
+          </div>
+        ) : (
         <section className="mx-auto grid max-w-7xl gap-6 px-4 py-6 sm:px-8 lg:grid-cols-[minmax(0,1fr)_300px] lg:px-10">
           <div>
             <div className="inline-flex rounded-lg border border-slate-200 bg-white p-1" role="tablist" aria-label="ประเภทภารกิจ">
@@ -249,6 +277,7 @@ export default function MissionsPage() {
             <Link href="/labs" className="mt-5 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 text-sm font-extrabold text-white hover:bg-blue-700">ไปหน้าห้องแล็บ<ArrowRight className="h-4 w-4" /></Link>
           </aside>
         </section>
+        )}
       </main>
 
       {toast ? (

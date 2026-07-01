@@ -1,6 +1,6 @@
 "use client";
 
-import type { ElementType } from "react";
+import { useEffect, useState, type ElementType } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ClipboardCheck, FlaskConical, User, UsersRound } from "lucide-react";
@@ -48,7 +48,14 @@ function MobileNavLink({ item, activeItem }: { item: MobileNavItem; activeItem: 
 
 export default function MobileTabBar() {
   const pathname = usePathname();
+  const [mounted, setMounted] = useState(false);
 
+  useEffect(() => {
+    const timer = window.setTimeout(() => setMounted(true), 0);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  if (!mounted) return null;
   if (pathname === "/login" || pathname === "/register") {
     return null;
   }

@@ -35,9 +35,9 @@ export default function CategoryFilter({
   onCategoryChange,
 }: CategoryFilterProps) {
   return (
-    <div className="flex w-full justify-center px-4 pb-5 pt-4 md:pb-6">
-      <div className="w-full max-w-4xl rounded-full border border-slate-200/80 bg-white p-1.5 shadow-sm">
-        <div className="grid grid-cols-3 w-full gap-1.5 sm:grid-cols-6">
+    <div className="flex w-full justify-center px-2 pb-5 pt-4 md:pb-6">
+      <div className="w-full max-w-[calc(100vw-1rem)] overflow-hidden rounded-full border border-slate-200/80 bg-white p-1.5 shadow-sm sm:max-w-4xl">
+        <div className="grid w-full min-w-0 grid-cols-3 gap-1.5 sm:grid-cols-6">
         {categoriesList.map((category) => {
           const Icon = category.icon;
           const isActive = activeCategory === category.id;
@@ -48,7 +48,7 @@ export default function CategoryFilter({
               type="button"
               onClick={() => onCategoryChange(category.id)}
               className={`
-                flex min-h-10 cursor-pointer select-none items-center justify-center gap-1.5 rounded-full border px-2 py-2 text-xs font-bold leading-[1.45] tracking-normal sm:gap-2 sm:px-4 sm:text-sm
+                flex min-h-10 min-w-0 cursor-pointer select-none items-center justify-center gap-1.5 rounded-full border px-1.5 py-2 text-[11px] font-bold leading-[1.45] tracking-normal sm:gap-2 sm:px-4 sm:text-sm
                 transition-all duration-200 active:scale-[0.98] focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100
                 ${
                   isActive
@@ -81,7 +81,7 @@ export default function CategoryFilter({
                   }`}
                 />
               )}
-              <span className="truncate">{category.name}</span>
+              <span className="min-w-0 truncate">{category.name}</span>
             </button>
           );
         })}

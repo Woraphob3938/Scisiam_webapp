@@ -13,10 +13,8 @@ test("Navbar follows profile name and avatar updates", () => {
   assert.match(navbar, /select\("display_name, role, avatar_url"\)/);
   assert.match(navbar, /getProfileAvatarSrc/);
   assert.match(navbar, /src=\{profileAvatarSrc\}/);
-  assert.ok(
-    (profile.match(/dispatchEvent\(new Event\(SCISIAM_AUTH_EVENT\)\)/g) ?? []).length >= 2,
-    "name and avatar saves must both notify shared navigation",
-  );
+  assert.match(profile, /saveProfile/);
+  assert.match(profile, /dispatchEvent\(new Event\(SCISIAM_AUTH_EVENT\)\)/);
 });
 
 test("classroom members expose email and current profile avatar", () => {
@@ -49,4 +47,55 @@ test("AI I-Oon trigger has no green online dot", () => {
   const source = read("src", "components", "AIChatButton.tsx");
   assert.doesNotMatch(source, /bg-emerald-(?:400|500)/);
   assert.doesNotMatch(source, /animate-ping/);
+});
+
+test("profile edits are confirmed or canceled as one draft", () => {
+  const source = read("src", "app", "profile", "page.tsx");
+
+  assert.match(source, /isEditingProfile/);
+  assert.match(source, /handleStartEditProfile/);
+  assert.match(source, /handleCancelEditProfile/);
+  assert.match(source, /saveProfile/);
+  assert.match(source, /ยืนยัน/);
+  assert.match(source, /ยกเลิก/);
+  assert.match(source, /แก้ไขโปรไฟล์/);
+  assert.doesNotMatch(source, /onChange=\{uploadAvatar\}/);
+});
+
+test("missions waits for the correct auth-scoped snapshot before rendering progress", () => {
+  const source = read("src", "app", "missions", "page.tsx");
+
+  assert.match(source, /loadingMissions/);
+  assert.match(source, /auth\.getUser\(\)/);
+  assert.match(source, /if\s*\(user\)\s*\{/);
+  assert.match(source, /setLoadingMissions\(false\)/);
+  assert.ok(
+    source.indexOf("loadSupabaseLearningSnapshot") < source.indexOf("readLocalLearningSnapshot"),
+    "Supabase users should not see local mission progress first",
+  );
+});
+
+test("mobile category filter stays inside the viewport", () => {
+  const source = read("src", "components", "CategoryFilter.tsx");
+
+  assert.match(source, /max-w-\[calc\(100vw-1rem\)\]/);
+  assert.match(source, /overflow-hidden/);
+  assert.match(source, /min-w-0/);
+});
+
+test("navbar notifications do not reuse local lab keys for Supabase accounts", () => {
+  const source = read("src", "components", "Navbar.tsx");
+
+  assert.match(source, /localNotificationMode/);
+  assert.match(source, /setLocalNotificationMode\(false\)/);
+  assert.match(source, /if\s*\(!localNotificationMode\)\s*\{/);
+  assert.match(source, /return;/);
+});
+
+test("mobile tab bar avoids server-client route mismatches", () => {
+  const source = read("src", "components", "MobileTabBar.tsx");
+
+  assert.match(source, /const \[mounted, setMounted\] = useState\(false\)/);
+  assert.match(source, /setTimeout\(\(\) => setMounted\(true\), 0\)/);
+  assert.match(source, /if \(!mounted\) return null/);
 });

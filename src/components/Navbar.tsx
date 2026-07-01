@@ -26,6 +26,7 @@ export default function Navbar() {
   const [userName, setUserName] = useState("นักเรียน");
   const [avatarPath, setAvatarPath] = useState<string | null>(null);
   const [avatarVersion, setAvatarVersion] = useState(0);
+  const [localNotificationMode, setLocalNotificationMode] = useState(false);
   const [notifications, setNotifications] = useState<Array<{ id: string; title: string; message: string; type: string }>>([]);
 
   useEffect(() => {
@@ -35,6 +36,7 @@ export default function Navbar() {
       setUserName(localStorage.getItem("scisiam_user_name") || "นักเรียน");
       setAvatarPath(localStorage.getItem("scisiam_user_avatar"));
       setAvatarVersion(Date.now());
+      setLocalNotificationMode(true);
     };
 
     const loadAuthState = async () => {
@@ -54,6 +56,7 @@ export default function Navbar() {
         setIsLoggedIn(false);
         setUserName("นักเรียน");
         setAvatarPath(null);
+        setLocalNotificationMode(false);
         return;
       }
 
@@ -69,6 +72,7 @@ export default function Navbar() {
       setUserName(nextName);
       setAvatarPath(profile?.avatar_url ?? null);
       setAvatarVersion(Date.now());
+      setLocalNotificationMode(false);
       cacheSciSiamAuth({
         email: user.email,
         role: nextRole,
@@ -98,6 +102,10 @@ export default function Navbar() {
   useEffect(() => {
     const checkNotifications = () => {
       const items: Array<{ id: string; title: string; message: string; type: string }> = [];
+      if (!localNotificationMode) {
+        setNotifications(items);
+        return;
+      }
       
       if (typeof window !== "undefined") {
         const labs = [
@@ -143,7 +151,7 @@ export default function Navbar() {
     return () => {
       window.removeEventListener("storage", checkNotifications);
     };
-  }, []);
+  }, [localNotificationMode]);
 
   const handleSignOut = async () => {
     setShowProfileMenu(false);
@@ -156,6 +164,7 @@ export default function Navbar() {
     setIsLoggedIn(false);
     setUserName("นักเรียน");
     setAvatarPath(null);
+    setLocalNotificationMode(false);
     window.location.href = "/";
   };
 

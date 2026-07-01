@@ -73,10 +73,12 @@ export default function ProfilePage() {
   const [role, setRole] = useState("student");
   const [username, setUsername] = useState("นักเรียน");
   const [draftName, setDraftName] = useState("นักเรียน");
-  const [isEditingName, setIsEditingName] = useState(false);
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [avatarPath, setAvatarPath] = useState<string | null>(null);
   const [avatarVersion, setAvatarVersion] = useState(0);
-  const [profileBusy, setProfileBusy] = useState<"name" | "avatar" | null>(null);
+  const [draftAvatarFile, setDraftAvatarFile] = useState<File | null>(null);
+  const [draftAvatarPreview, setDraftAvatarPreview] = useState<string | null>(null);
+  const [profileBusy, setProfileBusy] = useState<"profile" | null>(null);
   const [profileNotice, setProfileNotice] = useState<{ text: string; error: boolean } | null>(null);
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const [activeStudentTab, setActiveStudentTab] = useState<"overview" | "history" | "rewards">(() => {
@@ -173,38 +175,23 @@ export default function ProfilePage() {
     !isSupabaseConfigured() ||
     (isDemoModeEnabled && localStorage.getItem("scisiam_demo_mode") === "true");
 
-  const saveName = async () => {
-    const nextName = draftName.trim();
-    if (!nextName || nextName.length > 80) {
-      setProfileNotice({ text: "ชื่อต้องมีความยาว 1-80 ตัวอักษร", error: true });
-      return;
-    }
-
-    setProfileBusy("name");
+  const handleStartEditProfile = () => {
+    setDraftName(username);
+    setDraftAvatarFile(null);
+    setDraftAvatarPreview(null);
     setProfileNotice(null);
-    try {
-      if (!usesLocalProfile()) {
-        const { error } = await createClient().rpc("update_own_profile", {
-          p_display_name: nextName,
-          p_avatar_url: null,
-        });
-        if (error) throw error;
-      }
-
-      setUsername(nextName);
-      localStorage.setItem("scisiam_user_name", nextName);
-      window.dispatchEvent(new Event(SCISIAM_AUTH_EVENT));
-      setIsEditingName(false);
-      setProfileNotice({ text: "บันทึกชื่อแล้ว", error: false });
-    } catch (error) {
-      console.error("Failed to update profile name", error);
-      setProfileNotice({ text: "บันทึกชื่อไม่สำเร็จ กรุณาลองอีกครั้ง", error: true });
-    } finally {
-      setProfileBusy(null);
-    }
+    setIsEditingProfile(true);
   };
 
-  const uploadAvatar = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCancelEditProfile = () => {
+    setDraftName(username);
+    setDraftAvatarFile(null);
+    setDraftAvatarPreview(null);
+    setProfileNotice(null);
+    setIsEditingProfile(false);
+  };
+
+  const selectAvatar = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     event.target.value = "";
     if (!file) return;
@@ -214,50 +201,80 @@ export default function ProfilePage() {
       return;
     }
 
-    setProfileBusy("avatar");
+    try {
+      setDraftAvatarFile(file);
+      setDraftAvatarPreview(await readFileAsDataUrl(file));
+      setProfileNotice(null);
+    } catch (error) {
+      console.error("Failed to preview profile avatar", error);
+      setProfileNotice({ text: "อ่านไฟล์รูปไม่สำเร็จ กรุณาลองอีกครั้ง", error: true });
+    }
+  };
+
+  const saveProfile = async () => {
+    const nextName = draftName.trim();
+    if (!nextName || nextName.length > 80) {
+      setProfileNotice({ text: "ชื่อต้องมีความยาว 1-80 ตัวอักษร", error: true });
+      return;
+    }
+
+    setProfileBusy("profile");
     setProfileNotice(null);
     try {
-      let nextAvatarPath: string;
+      let nextAvatarPath = avatarPath;
 
-      if (usesLocalProfile()) {
-        nextAvatarPath = await readFileAsDataUrl(file);
-      } else {
+      if (!usesLocalProfile()) {
         const supabase = createClient();
-        const {
-          data: { user },
-          error: userError,
-        } = await supabase.auth.getUser();
-        if (userError || !user) throw userError || new Error("Authentication required");
+        if (draftAvatarFile) {
+          const {
+            data: { user },
+            error: userError,
+          } = await supabase.auth.getUser();
+          if (userError || !user) throw userError || new Error("Authentication required");
 
-        nextAvatarPath = `${user.id}/avatar`;
-        const { error: uploadError } = await supabase.storage.from("profile-avatars").upload(nextAvatarPath, file, {
-          upsert: true,
-          contentType: file.type,
-          cacheControl: "3600",
-        });
-        if (uploadError) throw uploadError;
+          nextAvatarPath = `${user.id}/avatar`;
+          const { error: uploadError } = await supabase.storage.from("profile-avatars").upload(nextAvatarPath, draftAvatarFile, {
+            upsert: true,
+            contentType: draftAvatarFile.type,
+            cacheControl: "3600",
+          });
+          if (uploadError) throw uploadError;
+        }
 
-        const { error: profileError } = await supabase.rpc("update_own_profile", {
-          p_display_name: null,
-          p_avatar_url: nextAvatarPath,
+        const { error } = await supabase.rpc("update_own_profile", {
+          p_display_name: nextName,
+          p_avatar_url: draftAvatarFile ? nextAvatarPath : null,
         });
-        if (profileError) throw profileError;
+        if (error) throw error;
+      } else {
+        nextAvatarPath = draftAvatarPreview ?? avatarPath;
       }
 
+      setUsername(nextName);
+      setDraftName(nextName);
+      localStorage.setItem("scisiam_user_name", nextName);
       setAvatarPath(nextAvatarPath);
       setAvatarVersion(Date.now());
-      localStorage.setItem("scisiam_user_avatar", nextAvatarPath);
+      if (nextAvatarPath) {
+        localStorage.setItem("scisiam_user_avatar", nextAvatarPath);
+      } else {
+        localStorage.removeItem("scisiam_user_avatar");
+      }
+      setDraftAvatarFile(null);
+      setDraftAvatarPreview(null);
+      setIsEditingProfile(false);
       window.dispatchEvent(new Event(SCISIAM_AUTH_EVENT));
-      setProfileNotice({ text: "เปลี่ยนรูปโปรไฟล์แล้ว", error: false });
+      setProfileNotice({ text: "บันทึกโปรไฟล์แล้ว", error: false });
     } catch (error) {
-      console.error("Failed to update profile avatar", error);
-      setProfileNotice({ text: "เปลี่ยนรูปไม่สำเร็จ กรุณาลองอีกครั้ง", error: true });
+      console.error("Failed to update profile", error);
+      setProfileNotice({ text: "บันทึกโปรไฟล์ไม่สำเร็จ กรุณาลองอีกครั้ง", error: true });
     } finally {
       setProfileBusy(null);
     }
   };
 
   const avatarSrc = useMemo(() => getProfileAvatarSrc(avatarPath, avatarVersion), [avatarPath, avatarVersion]);
+  const visibleAvatarSrc = draftAvatarPreview ?? avatarSrc;
 
   const completedSet = useMemo(() => new Set(completedLabIds), [completedLabIds]);
   const rewards = useMemo(
@@ -330,38 +347,49 @@ export default function ProfilePage() {
                 <div className="flex min-w-0 items-center gap-4">
                   <div className="relative h-20 w-20 shrink-0">
                     <div className="relative h-full w-full overflow-hidden rounded-full border-4 border-white bg-blue-50 shadow-md shadow-slate-200">
-                      <Image src={avatarSrc} alt={`รูปโปรไฟล์ของ ${username}`} fill sizes="80px" className="object-cover" priority unoptimized={avatarSrc.startsWith("data:")} />
+                      <Image src={visibleAvatarSrc} alt={`รูปโปรไฟล์ของ ${username}`} fill sizes="80px" className="object-cover" priority unoptimized={visibleAvatarSrc.startsWith("data:")} />
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => avatarInputRef.current?.click()}
-                      disabled={profileBusy !== null}
-                      className="absolute -bottom-1 -right-1 grid h-9 w-9 place-items-center rounded-full border-2 border-white bg-blue-600 text-white shadow-md transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-400 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
-                      aria-label="เปลี่ยนรูปโปรไฟล์"
-                    >
-                      {profileBusy === "avatar" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
-                    </button>
+                    {isEditingProfile ? (
+                      <button
+                        type="button"
+                        onClick={() => avatarInputRef.current?.click()}
+                        disabled={profileBusy !== null}
+                        className="absolute -bottom-1 -right-1 grid h-9 w-9 place-items-center rounded-full border-2 border-white bg-blue-600 text-white shadow-md transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-400 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
+                        aria-label="เปลี่ยนรูปโปรไฟล์"
+                      >
+                        <Camera className="h-4 w-4" />
+                      </button>
+                    ) : null}
                     <input
                       ref={avatarInputRef}
                       type="file"
                       accept="image/jpeg,image/png,image/webp"
-                      onChange={uploadAvatar}
+                      onChange={selectAvatar}
                       className="sr-only"
                       aria-label="เลือกรูปโปรไฟล์"
                     />
                   </div>
                   <div className="min-w-0">
                     <p className="text-xs font-extrabold text-blue-600">STUDENT PROFILE</p>
-                    {isEditingName ? (
+                    {isEditingProfile ? (
                       <div className="mt-1 flex flex-wrap items-center gap-2">
                         <input value={draftName} onChange={(event) => setDraftName(event.target.value)} maxLength={80} className="min-h-10 min-w-0 rounded-xl border border-blue-200 bg-white px-3 text-lg font-extrabold text-slate-900 outline-none focus:ring-3 focus:ring-blue-100" aria-label="ชื่อที่แสดง" />
-                        <button type="button" onClick={() => void saveName()} disabled={profileBusy !== null} className="grid h-10 w-10 place-items-center rounded-xl bg-blue-600 text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-400" title="บันทึกชื่อ">{profileBusy === "name" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}</button>
-                        <button type="button" onClick={() => setIsEditingName(false)} className="grid h-10 w-10 place-items-center rounded-xl border border-slate-200 bg-white text-slate-500 hover:bg-slate-50" title="ยกเลิก"><X className="h-4 w-4" /></button>
+                        <button type="button" onClick={() => void saveProfile()} disabled={profileBusy !== null} className="inline-flex min-h-10 items-center gap-1.5 rounded-xl bg-blue-600 px-3 text-sm font-extrabold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-400" title="ยืนยัน">
+                          {profileBusy === "profile" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                          ยืนยัน
+                        </button>
+                        <button type="button" onClick={handleCancelEditProfile} disabled={profileBusy !== null} className="inline-flex min-h-10 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 text-sm font-extrabold text-slate-500 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60" title="ยกเลิก">
+                          <X className="h-4 w-4" />
+                          ยกเลิก
+                        </button>
                       </div>
                     ) : (
-                      <div className="mt-1 flex items-center gap-2">
+                      <div className="mt-1 flex flex-wrap items-center gap-2">
                         <h1 className="truncate text-2xl font-extrabold leading-[1.35] text-slate-950 sm:text-3xl">{username}</h1>
-                        <button type="button" onClick={() => setIsEditingName(true)} className="grid h-9 w-9 shrink-0 place-items-center rounded-xl text-slate-400 hover:bg-slate-100 hover:text-blue-600" title="แก้ไขชื่อ"><Pencil className="h-4 w-4" /></button>
+                        <button type="button" onClick={handleStartEditProfile} className="inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-xl border border-blue-100 bg-blue-50 px-3 text-xs font-extrabold text-blue-700 transition-colors hover:bg-blue-100" title="แก้ไขโปรไฟล์">
+                          <Pencil className="h-4 w-4" />
+                          แก้ไขโปรไฟล์
+                        </button>
                       </div>
                     )}
                     <p className="mt-1 text-sm font-semibold text-slate-500">ติดตามการทดลองและรางวัลที่ปลดล็อกแล้ว</p>
