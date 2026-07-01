@@ -1,6 +1,8 @@
 import type { ScisiamUserRole } from "./database.types";
 
 export const SCISIAM_AUTH_EVENT = "scisiam-auth-update";
+export const SCISIAM_REMEMBER_ME_KEY = "scisiam_remember_login";
+export const SCISIAM_REMEMBER_EMAIL_KEY = "scisiam_remember_email";
 
 type CacheAuthInput = {
   email?: string | null;
@@ -48,4 +50,29 @@ export function clearSciSiamAuthCache(options: { emit?: boolean } = {}) {
   if (options.emit ?? true) {
     window.dispatchEvent(new Event(SCISIAM_AUTH_EVENT));
   }
+}
+
+export function getRememberedLogin() {
+  if (typeof window === "undefined") {
+    return { rememberMe: false, email: "" };
+  }
+
+  const rememberMe = localStorage.getItem(SCISIAM_REMEMBER_ME_KEY) === "true";
+  return {
+    rememberMe,
+    email: rememberMe ? localStorage.getItem(SCISIAM_REMEMBER_EMAIL_KEY) || "" : "",
+  };
+}
+
+export function cacheRememberedLogin(email: string, rememberMe: boolean) {
+  if (typeof window === "undefined") return;
+
+  if (rememberMe) {
+    localStorage.setItem(SCISIAM_REMEMBER_ME_KEY, "true");
+    localStorage.setItem(SCISIAM_REMEMBER_EMAIL_KEY, email);
+    return;
+  }
+
+  localStorage.removeItem(SCISIAM_REMEMBER_ME_KEY);
+  localStorage.removeItem(SCISIAM_REMEMBER_EMAIL_KEY);
 }

@@ -56,4 +56,18 @@ test("email signup uses the shared token-hash verification page and returns to l
   assert.match(confirmRoute, /type === "email"/);
   assert.match(confirmRoute, /\/login\?confirmed=success/);
   assert.match(loginPage, /confirmed === "success"/);
+  assert.match(authForm, /router\.replace\("\/login\?registered=success"\)/);
+  assert.match(loginPage, /registered === "success"/);
+  assert.match(loginPage, /สมัครสมาชิกสำเร็จ กรุณาตรวจสอบอีเมลเพื่อยืนยันบัญชี/);
+});
+
+test("SciSiam provides a Thai signup confirmation email template", () => {
+  const templatePath = "supabase/templates/confirmation.html";
+  assert.equal(existsSync(join(rootDir, templatePath)), true);
+
+  const template = readProjectFile(templatePath);
+  assert.match(template, /ยืนยันอีเมล SciSiam/);
+  assert.match(template, /ยืนยันอีเมลของฉัน/);
+  assert.match(template, /\{\{ \.ConfirmationURL \}\}/);
+  assert.doesNotMatch(template, /Confirm your email address/);
 });

@@ -52,3 +52,18 @@ test("Google OAuth loading state resets when returning from browser history", ()
   assert.match(authForm, /window\.removeEventListener\("pageshow",\s*resetOAuthLoading\)/);
   assert.match(authForm, /const resetOAuthLoading = \(\) => setOauthLoading\(false\)/);
 });
+
+test("email login remember me persists the next login email only after success", () => {
+  const authForm = readProjectFile("src/components/auth/AuthForm.tsx");
+  const authCache = readProjectFile("src/lib/supabase/auth-cache.ts");
+
+  assert.match(authForm, /getRememberedLogin/);
+  assert.match(authForm, /setTimeout\(\(\) => \{/);
+  assert.match(authForm, /setRememberMe\(remembered\.rememberMe\)/);
+  assert.match(authForm, /setEmail\(remembered\.email\)/);
+  assert.match(authForm, /cacheRememberedLogin\(normalizedEmail, rememberMe\)/);
+  assert.match(authCache, /SCISIAM_REMEMBER_ME_KEY/);
+  assert.match(authCache, /SCISIAM_REMEMBER_EMAIL_KEY/);
+  assert.match(authCache, /localStorage\.setItem\(SCISIAM_REMEMBER_EMAIL_KEY, email\)/);
+  assert.match(authCache, /localStorage\.removeItem\(SCISIAM_REMEMBER_EMAIL_KEY\)/);
+});

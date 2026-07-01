@@ -1,22 +1,22 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
   ArrowRight,
-  Atom,
-  Beaker,
   Check,
   Eye,
   EyeOff,
-  Leaf,
   Lock,
   Mail,
   ShieldAlert,
   User,
 } from "lucide-react";
-import { cacheSciSiamAuth } from "@/lib/supabase/auth-cache";
+import {
+  cacheRememberedLogin,
+  cacheSciSiamAuth,
+  getRememberedLogin,
+} from "@/lib/supabase/auth-cache";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 
 interface AuthFormProps {
@@ -38,33 +38,6 @@ const roleOptions: Array<{
 }> = [
   { id: "student", title: "นักเรียน", description: "เริ่มบททดลอง" },
   { id: "teacher", title: "คุณครู", description: "จัดการชั้นเรียน" },
-];
-
-const subjectBooks = [
-  {
-    title: "ฟิสิกส์",
-    label: "01",
-    summary: "แรง การเคลื่อนที่ พลังงาน",
-    image: "/images/auth/physics-auth.png",
-    tone: "border-blue-100 bg-blue-50 text-blue-700",
-    icon: Atom,
-  },
-  {
-    title: "เคมี",
-    label: "02",
-    summary: "สารละลาย ปฏิกิริยา สมดุล",
-    image: "/images/auth/chemistry-auth.png",
-    tone: "border-purple-100 bg-purple-50 text-purple-700",
-    icon: Beaker,
-  },
-  {
-    title: "ชีววิทยา",
-    label: "03",
-    summary: "เซลล์ พันธุกรรม สิ่งแวดล้อม",
-    image: "/images/auth/biology-auth.png",
-    tone: "border-emerald-100 bg-emerald-50 text-emerald-700",
-    icon: Leaf,
-  },
 ];
 
 export default function AuthForm({
@@ -102,6 +75,20 @@ export default function AuthForm({
 
     return () => window.removeEventListener("pageshow", resetOAuthLoading);
   }, []);
+
+  useEffect(() => {
+    if (initialMode !== "login") return;
+
+    const timer = window.setTimeout(() => {
+      const remembered = getRememberedLogin();
+      setRememberMe(remembered.rememberMe);
+      if (remembered.email) {
+        setEmail(remembered.email);
+      }
+    }, 0);
+
+    return () => window.clearTimeout(timer);
+  }, [initialMode]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -209,22 +196,18 @@ export default function AuthForm({
           return;
         }
 
-        if (!data.session) {
-          setError("สมัครสำเร็จแล้ว กรุณายืนยันอีเมลก่อนเข้าสู่ระบบ");
-          setLoading(false);
-          return;
+        if (data.session) {
+          await ensureProfile({
+            userId: data.user.id,
+            displayName: fullName.trim(),
+          });
+          await supabase.auth.signOut();
         }
 
-        const profile = await ensureProfile({
-          userId: data.user.id,
-          displayName: fullName.trim(),
-        });
-
-        cacheSciSiamAuth({
-          email: normalizedEmail,
-          role: profile.role,
-          displayName: fullName.trim(),
-        });
+        setLoading(false);
+        router.replace("/login?registered=success");
+        router.refresh();
+        return;
       } else {
         const { data, error: signInError } = await supabase.auth.signInWithPassword({
           email: normalizedEmail,
@@ -250,6 +233,7 @@ export default function AuthForm({
           role: profile.role,
           displayName: profile.display_name,
         });
+        cacheRememberedLogin(normalizedEmail, rememberMe);
       }
 
       setLoading(false);
@@ -314,7 +298,7 @@ export default function AuthForm({
 
   return (
     <section
-      className="mx-auto grid w-full max-w-[1240px] grid-cols-1 gap-5 px-4 py-5 sm:px-6 lg:min-h-[calc(100svh-48px)] lg:grid-cols-[minmax(0,1fr)_minmax(410px,0.78fr)] lg:items-stretch lg:gap-8 lg:px-8 lg:py-6"
+      className="flex min-h-[calc(100svh-24px)] w-full items-center justify-center px-4 py-5 sm:px-6 lg:min-h-[calc(100svh-32px)] lg:px-10 lg:py-8"
       aria-label={
         isForgotPassword
           ? "หน้ากู้คืนรหัสผ่าน SciSiam"
@@ -323,12 +307,8 @@ export default function AuthForm({
             : "หน้าเข้าสู่ระบบ SciSiam"
       }
     >
-      <ScienceIntro mode={mode} />
-
-      <div className="flex min-w-0 items-center justify-center">
-        <div className="grid w-full max-w-[500px] gap-4">
-          <MobileIntro />
-
+      <div className="flex w-full min-w-0 items-center justify-center">
+        <div className="grid w-full max-w-[560px] gap-4">
           <form
             onSubmit={handleSubmit}
             className="w-full rounded-[28px] border border-white/80 bg-white/95 p-4 shadow-[0_24px_80px_rgba(15,23,42,0.12)] ring-1 ring-slate-200/70 backdrop-blur sm:p-6 lg:p-7"
@@ -674,119 +654,6 @@ export default function AuthForm({
 const inputClassName =
   "min-h-11 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-semibold leading-[1.45] text-slate-800 outline-none transition-all placeholder:text-slate-400 hover:border-blue-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100";
 
-function ScienceIntro({ mode }: { mode: AuthMode }) {
-  const isRegister = mode === "register";
-
-  return (
-    <aside className="relative hidden min-w-0 overflow-hidden rounded-[34px] border border-slate-200 bg-white p-7 text-slate-950 shadow-[0_28px_90px_rgba(15,23,42,0.12)] lg:grid lg:content-between">
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(120deg,rgba(37,99,235,0.08),transparent_40%),linear-gradient(180deg,rgba(255,255,255,0.9),transparent_36%)]" />
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-white" />
-
-      <div className="relative z-10 flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <span className="relative h-12 w-12 shrink-0 overflow-hidden rounded-2xl bg-white shadow-lg shadow-blue-500/15 ring-1 ring-slate-200">
-            <Image src="/ai-oon-logo.png" alt="โลโก้ SciSiam น้องไออุ่น" fill sizes="48px" className="object-contain p-0.5" priority />
-          </span>
-          <span className="grid gap-0.5">
-            <strong className="text-xl font-extrabold leading-[1.1] text-blue-600">
-              SciSiam
-            </strong>
-          </span>
-        </div>
-      </div>
-
-      <div className="relative z-10 my-8 grid max-w-2xl gap-5">
-        <h2 className="text-4xl font-extrabold leading-[1.18] tracking-normal text-slate-950 xl:text-5xl">
-          {isRegister
-            ? "สร้างพื้นที่ทดลองวิทยาศาสตร์ที่พร้อมใช้ในชั้นเรียน"
-            : "กลับเข้าสู่ห้องทดลอง แล้วเรียนต่อได้ทันที"}
-        </h2>
-        <p className="max-w-xl text-base font-semibold leading-[1.8] text-slate-600">
-          {isRegister
-            ? "เลือกบทบาทนักเรียนหรือคุณครู เพื่อใช้แล็บ บันทึกความคืบหน้า และจัดการการเรียนรู้ให้ตรงกับห้องเรียนจริง"
-            : "ค้นหาแล็บ ทดลอง บันทึกผล และให้ AI ไออุ่นช่วยทบทวนแนวคิดวิทยาศาสตร์ในจุดเดียว"}
-        </p>
-      </div>
-
-      <div className="relative z-10 grid gap-4">
-        <div className="grid grid-cols-3 gap-3">
-          {subjectBooks.map((subject) => {
-            const Icon = subject.icon;
-            return (
-              <div
-                key={subject.title}
-                className="group overflow-hidden rounded-3xl border border-slate-200 bg-slate-50 p-3 transition-colors hover:bg-white"
-              >
-                <div className="relative mb-3 h-24 overflow-hidden rounded-2xl bg-white/90">
-                  <Image src={subject.image} alt={`${subject.title} illustration`} fill sizes="180px" className="object-cover" />
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className={`grid h-8 w-8 place-items-center rounded-xl border ${subject.tone}`}>
-                    <Icon className="h-4 w-4" />
-                  </span>
-                  <div className="min-w-0">
-                    <span className="block text-[10px] font-extrabold leading-[1.3] text-slate-400">
-                      {subject.label}
-                    </span>
-                    <strong className="block truncate text-sm font-extrabold leading-[1.35] text-slate-950">
-                      {subject.title}
-                    </strong>
-                  </div>
-                </div>
-                <p className="mt-2 text-xs font-semibold leading-relaxed text-slate-500">
-                  {subject.summary}
-                </p>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="relative z-10 grid grid-cols-3 gap-3">
-        <TrustItem title="36 แล็บ" text="ครบฟิสิกส์ เคมี ชีวะ" />
-        <TrustItem title="AI ไออุ่น" text="ช่วยทบทวนแนวคิด" />
-        <TrustItem title="ครู/นักเรียน" text="บทบาทพร้อมใช้งาน" />
-      </div>
-    </aside>
-  );
-}
-
-function MobileIntro() {
-  return (
-    <div className="grid gap-3 rounded-[24px] border border-white/80 bg-white/90 p-3 shadow-lg shadow-slate-200/50 ring-1 ring-slate-200/60 backdrop-blur lg:hidden">
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex min-w-0 items-center gap-3">
-          <span className="relative h-10 w-10 shrink-0 overflow-hidden rounded-[13px] bg-white shadow-md shadow-blue-500/20">
-            <Image src="/ai-oon-logo.png" alt="โลโก้ SciSiam น้องไออุ่น" fill sizes="40px" className="object-contain p-0.5" priority />
-          </span>
-          <span className="grid min-w-0 gap-0.5">
-            <strong className="text-lg font-extrabold leading-[1.1] text-blue-600">
-              SciSiam
-            </strong>
-          </span>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-3 gap-2">
-        {subjectBooks.map((subject) => {
-          const Icon = subject.icon;
-          return (
-            <div
-              key={subject.title}
-              className={`grid min-h-16 content-between rounded-2xl border p-2 ${subject.tone}`}
-            >
-              <Icon className="h-3.5 w-3.5" />
-              <span className="break-words text-[10px] font-extrabold leading-[1.15]">
-                {subject.title}
-              </span>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
 function AuthField({
   id,
   label,
@@ -878,19 +745,6 @@ function GoogleLogo() {
       <path fill="#FBBC05" d="M6.39 13.93A6.02 6.02 0 0 1 6.08 12c0-.67.12-1.32.31-1.93V7.45H3.04A10 10 0 0 0 2 12c0 1.61.39 3.14 1.04 4.55l3.35-2.62Z" />
       <path fill="#EA4335" d="M12 5.94c1.47 0 2.79.5 3.83 1.5l2.87-2.87A9.63 9.63 0 0 0 12 2a10 10 0 0 0-8.96 5.45l3.35 2.62C7.18 7.7 9.39 5.94 12 5.94Z" />
     </svg>
-  );
-}
-
-function TrustItem({ title, text }: { title: string; text: string }) {
-  return (
-    <div className="grid gap-1 border-t border-slate-200 pt-3">
-      <strong className="text-xs font-extrabold leading-[1.45] text-slate-950 sm:text-sm">
-        {title}
-      </strong>
-      <span className="text-[11px] font-semibold leading-relaxed text-slate-500">
-        {text}
-      </span>
-    </div>
   );
 }
 
