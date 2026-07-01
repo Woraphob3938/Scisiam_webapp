@@ -42,6 +42,12 @@ export const directSimulationLabIds = [
   "simple-circuits",
   "floating-and-sinking",
   "magnet-exploration",
+  "quantum-tunneling",
+  "michelson-interferometer",
+  "zeeman-effect",
+  "superconductivity-meissner",
+  "bragg-diffraction",
+  "relativistic-kinematics",
 ] as const;
 
 export const chemistryConceptSimulationLabIds = [

@@ -13,6 +13,7 @@ import {
   SCISIAM_AUTH_EVENT,
 } from "@/lib/supabase/auth-cache";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
+import { getProfileAvatarSrc } from "@/lib/supabase/profile-avatar";
 
 export default function Navbar() {
   const { toggleSidebar } = useSidebar();
@@ -22,16 +23,18 @@ export default function Navbar() {
   
   // Auth state variables
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [role, setRole] = useState("student");
   const [userName, setUserName] = useState("นักเรียน");
+  const [avatarPath, setAvatarPath] = useState<string | null>(null);
+  const [avatarVersion, setAvatarVersion] = useState(0);
   const [notifications, setNotifications] = useState<Array<{ id: string; title: string; message: string; type: string }>>([]);
 
   useEffect(() => {
     const loadAuthStateFromCache = () => {
       const loggedIn = localStorage.getItem("scisiam_logged_in") === "true";
       setIsLoggedIn(loggedIn);
-      setRole(localStorage.getItem("scisiam_user_role") || "student");
       setUserName(localStorage.getItem("scisiam_user_name") || "นักเรียน");
+      setAvatarPath(localStorage.getItem("scisiam_user_avatar"));
+      setAvatarVersion(Date.now());
     };
 
     const loadAuthState = async () => {
@@ -49,26 +52,28 @@ export default function Navbar() {
       if (!user) {
         clearSciSiamAuthCache({ emit: false });
         setIsLoggedIn(false);
-        setRole("student");
         setUserName("นักเรียน");
+        setAvatarPath(null);
         return;
       }
 
       const { data: profile } = await supabase
         .from("profiles")
-        .select("display_name, role")
+        .select("display_name, role, avatar_url")
         .eq("id", user.id)
         .maybeSingle();
 
       const nextRole = profile?.role || "student";
       const nextName = profile?.display_name || user.email?.split("@")[0] || "นักเรียน";
       setIsLoggedIn(true);
-      setRole(nextRole);
       setUserName(nextName);
+      setAvatarPath(profile?.avatar_url ?? null);
+      setAvatarVersion(Date.now());
       cacheSciSiamAuth({
         email: user.email,
         role: nextRole,
         displayName: nextName,
+        avatarUrl: profile?.avatar_url ?? null,
       }, { emit: false });
     };
 
@@ -149,12 +154,13 @@ export default function Navbar() {
 
     clearSciSiamAuthCache();
     setIsLoggedIn(false);
-    setRole("student");
     setUserName("นักเรียน");
+    setAvatarPath(null);
     window.location.href = "/";
   };
 
   const displayedNotifications = isLoggedIn ? notifications : [];
+  const profileAvatarSrc = getProfileAvatarSrc(avatarPath, avatarVersion);
 
   return (
     <>
@@ -243,12 +249,12 @@ export default function Navbar() {
                 className="flex items-center gap-2 hover:bg-slate-50 p-1.5 pr-2.5 rounded-xl transition-all duration-200 select-none cursor-pointer"
               >
                 <div className="relative w-9 h-9 rounded-full bg-blue-50 flex items-center justify-center overflow-hidden ring-2 ring-indigo-50/50 border border-white shrink-0">
-                  <Image src="/student_avatar_3d.png" alt="รูปโปรไฟล์" fill sizes="36px" className="object-cover" />
+                  <Image src={profileAvatarSrc} alt={`รูปโปรไฟล์ของ ${userName}`} fill sizes="36px" className="object-cover" unoptimized={profileAvatarSrc.startsWith("data:")} />
                 </div>
                 <div className="hidden sm:flex flex-col text-left">
                   <span className="text-xs text-slate-400 font-medium">ยินดีต้อนรับ</span>
                   <span className="text-sm font-semibold text-slate-700 -mt-0.5 flex items-center gap-1 leading-normal">
-                    สวัสดี, {role === "teacher" ? "คุณครู" : userName}
+                    สวัสดี, {userName}
                     <ChevronDown className="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600" />
                   </span>
                 </div>

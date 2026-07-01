@@ -43,7 +43,9 @@ export type ClassroomDetail = ClassroomSummary;
 export type ClassroomMember = {
   userId: string;
   displayName: string;
+  email: string | null;
   avatarUrl: string | null;
+  avatarUpdatedAt: string;
   role: ScisiamUserRole;
   isCreator: boolean;
   joinedAt: string;
@@ -343,7 +345,9 @@ function mapClassroomMember(member: ClassroomMemberRpcRow): ClassroomMember {
   return {
     userId: member.user_id,
     displayName: member.display_name,
+    email: member.email,
     avatarUrl: member.avatar_url,
+    avatarUpdatedAt: member.avatar_updated_at,
     role: member.role,
     isCreator: member.is_creator,
     joinedAt: member.joined_at,

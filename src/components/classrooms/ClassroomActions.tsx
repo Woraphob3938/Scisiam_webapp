@@ -366,7 +366,7 @@ export function ClassroomActions({ placement }: ClassroomActionsProps) {
         ? "กรอกรหัสที่ได้รับจากผู้สร้างห้อง"
         : mode === "created"
           ? "แชร์รหัสนี้ให้สมาชิกที่ต้องการเข้าร่วมห้อง"
-          : "เลือกสิ่งที่ต้องการทำ";
+          : "เลือกเข้าร่วมหรือสร้างห้องเรียน";
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -401,7 +401,9 @@ export function ClassroomActions({ placement }: ClassroomActionsProps) {
             ) : null}
             <div className="flex min-w-0 flex-col gap-1">
               <DialogTitle ref={titleRef} tabIndex={-1} className="text-lg leading-relaxed font-semibold outline-none">{title}</DialogTitle>
-              <DialogDescription className="leading-relaxed">{descriptionText}</DialogDescription>
+              <DialogDescription className={cn("leading-relaxed", mode === "menu" && "sr-only")}>
+                {descriptionText}
+              </DialogDescription>
             </div>
           </div>
         </DialogHeader>
@@ -439,7 +441,7 @@ export function ClassroomActions({ placement }: ClassroomActionsProps) {
 
         {mode === "create" ? (
           <form className="flex min-h-0 flex-1 flex-col" onSubmit={handleCreate} noValidate>
-            <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-5 py-4">
+            <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto overscroll-contain px-5 py-4">
               <p className="text-xs text-muted-foreground">ช่องที่มีเครื่องหมาย * จำเป็นต้องกรอก</p>
               {createErrors.form ? (
                 <p className="rounded-lg bg-destructive/10 px-3 py-2 text-sm leading-relaxed text-destructive" role="alert">
@@ -553,7 +555,7 @@ export function ClassroomActions({ placement }: ClassroomActionsProps) {
                 </div>
 
                 <div
-                  className="grid max-h-64 gap-2 overflow-y-auto rounded-lg border border-border p-2 sm:grid-cols-2"
+                  className="grid max-h-64 gap-2 overflow-y-auto overscroll-contain rounded-lg border border-border p-2 sm:grid-cols-2"
                   aria-invalid={Boolean(createErrors.labIds)}
                   aria-describedby={createErrors.labIds ? "classroom-labs-error" : "classroom-labs-help"}
                 >
@@ -628,7 +630,7 @@ export function ClassroomActions({ placement }: ClassroomActionsProps) {
 
         {mode === "join" ? (
           <form className="flex min-h-0 flex-1 flex-col" onSubmit={handleJoin} noValidate>
-            <div className="flex flex-1 flex-col gap-3 overflow-y-auto px-5 py-5">
+            <div className="flex flex-1 flex-col gap-3 overflow-y-auto overscroll-contain px-5 py-5">
               <label htmlFor="classroom-code" className="font-medium">
                 รหัสห้อง <span aria-hidden="true">*</span>
               </label>

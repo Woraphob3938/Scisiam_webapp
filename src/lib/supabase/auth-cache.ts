@@ -6,6 +6,7 @@ type CacheAuthInput = {
   email?: string | null;
   role?: ScisiamUserRole | null;
   displayName?: string | null;
+  avatarUrl?: string | null;
 };
 
 export function cacheSciSiamAuth(
@@ -22,6 +23,14 @@ export function cacheSciSiamAuth(
     localStorage.setItem("scisiam_user_email", input.email);
   }
 
+  if ("avatarUrl" in input) {
+    if (input.avatarUrl) {
+      localStorage.setItem("scisiam_user_avatar", input.avatarUrl);
+    } else {
+      localStorage.removeItem("scisiam_user_avatar");
+    }
+  }
+
   if (options.emit ?? true) {
     window.dispatchEvent(new Event(SCISIAM_AUTH_EVENT));
   }
@@ -34,6 +43,7 @@ export function clearSciSiamAuthCache(options: { emit?: boolean } = {}) {
   localStorage.removeItem("scisiam_user_role");
   localStorage.removeItem("scisiam_user_name");
   localStorage.removeItem("scisiam_user_email");
+  localStorage.removeItem("scisiam_user_avatar");
   localStorage.removeItem("scisiam_demo_mode");
   if (options.emit ?? true) {
     window.dispatchEvent(new Event(SCISIAM_AUTH_EVENT));

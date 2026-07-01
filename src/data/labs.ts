@@ -772,7 +772,7 @@ export const labsData: LabData[] = [
     title: "Quantum Tunneling",
     category: "Physics",
     gradeLevel: "อุดมศึกษา",
-    status: "ยังสร้างไม่เสร็จ",
+    status: "",
     description: "ศึกษาพฤติกรรมความน่าจะเป็นของการทะลุผ่านสิ่งกีดขวางศักย์ (Potential Barrier) ของแพ็กเกจคลื่นตามสมการชโรดิงเจอร์"
   },
   {
@@ -781,7 +781,7 @@ export const labsData: LabData[] = [
     title: "Michelson Interferometer",
     category: "Physics",
     gradeLevel: "อุดมศึกษา",
-    status: "ยังสร้างไม่เสร็จ",
+    status: "",
     description: "จำลองการแทรกสอดของแสงเพื่อวัดความยาวคลื่นของแสงเลเซอร์และการเปลี่ยนแปลงเฟสจากการเลื่อนของกระจกเงา"
   },
   {
@@ -790,7 +790,7 @@ export const labsData: LabData[] = [
     title: "Zeeman Effect",
     category: "Physics",
     gradeLevel: "อุดมศึกษา",
-    status: "ยังสร้างไม่เสร็จ",
+    status: "",
     description: "สังเกตการแยกออกของระดับพลังงานอะตอมภายใต้สนามแม่เหล็กภายนอกและศึกษาการเปลี่ยนสถานะของสปิน"
   },
   {
@@ -799,7 +799,7 @@ export const labsData: LabData[] = [
     title: "Superconductivity & Meissner Effect",
     category: "Physics",
     gradeLevel: "อุดมศึกษา",
-    status: "ยังสร้างไม่เสร็จ",
+    status: "",
     description: "ศึกษาการสูญเสียความต้านทานไฟฟ้าที่อุณหภูมิต่ำวิกฤตและการขับสนามแม่เหล็กออกจากตัวนำยิ่งยวด"
   },
   {
@@ -808,7 +808,7 @@ export const labsData: LabData[] = [
     title: "Bragg Diffraction",
     category: "Physics",
     gradeLevel: "อุดมศึกษา",
-    status: "ยังสร้างไม่เสร็จ",
+    status: "",
     description: "จำลองการเลี้ยวเบนของรังสีเอกซ์ผ่านโครงผลึกสามมิติเพื่อหาโครงสร้างอะตอมและระยะห่างระหว่างระนาบผลึก"
   },
   {
@@ -817,7 +817,7 @@ export const labsData: LabData[] = [
     title: "Relativistic Kinematics",
     category: "Physics",
     gradeLevel: "อุดมศึกษา",
-    status: "ยังสร้างไม่เสร็จ",
+    status: "",
     description: "จำลองการเคลื่อนที่ด้วยความเร็วใกล้แสงเพื่อศึกษาผลของการยืดออกของเวลา การหดตัวของความยาว และความสัมพันธ์ของมวล-พลังงาน"
   },
   {

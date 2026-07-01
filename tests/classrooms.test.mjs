@@ -183,6 +183,17 @@ test("classroom action dialog covers create and join flows", () => {
   assert.match(source, /getClassroomJoinCode/);
   assert.match(source, /navigator\.clipboard\.writeText/);
   assert.match(source, /navigator\.share/);
+  assert.doesNotMatch(source, /เลือกสิ่งที่ต้องการทำ/);
+  assert.match(source, /overflow-y-auto overscroll-contain/);
+});
+
+test("classroom dialog overlay avoids costly full-screen backdrop blur", () => {
+  const source = fs.readFileSync(
+    path.join(root, "src", "components", "ui", "dialog.tsx"),
+    "utf8"
+  );
+
+  assert.doesNotMatch(source, /backdrop-blur/);
 });
 
 test("classroom action dialog keeps one accessible controlled dialog", () => {

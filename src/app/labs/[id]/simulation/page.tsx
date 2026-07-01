@@ -161,6 +161,18 @@ const FloatingSinkingSimulation = dynamic(() =>
   import("@/components/labs/simulation/FloatingSinkingSimulation"));
 const MagnetExplorationSimulation = dynamic(() =>
   import("@/components/labs/simulation/MagnetExplorationSimulation"));
+const QuantumTunnelingSimulation = dynamic(() =>
+  import("@/components/labs/simulation/QuantumTunnelingSimulation"));
+const MichelsonInterferometerSimulation = dynamic(() =>
+  import("@/components/labs/simulation/MichelsonInterferometerSimulation"));
+const ZeemanEffectSimulation = dynamic(() =>
+  import("@/components/labs/simulation/ZeemanEffectSimulation"));
+const SuperconductivityMeissnerSimulation = dynamic(() =>
+  import("@/components/labs/simulation/SuperconductivityMeissnerSimulation"));
+const BraggDiffractionSimulation = dynamic(() =>
+  import("@/components/labs/simulation/BraggDiffractionSimulation"));
+const RelativisticKinematicsSimulation = dynamic(() =>
+  import("@/components/labs/simulation/RelativisticKinematicsSimulation"));
 
 const simulationComponents: Record<DirectSimulationLabId, React.ComponentType> = {
   "newtons-cooling": NewtonsCoolingSimulation,
@@ -206,6 +218,12 @@ const simulationComponents: Record<DirectSimulationLabId, React.ComponentType> =
   "simple-circuits": SimpleCircuitsSimulation,
   "floating-and-sinking": FloatingSinkingSimulation,
   "magnet-exploration": MagnetExplorationSimulation,
+  "quantum-tunneling": QuantumTunnelingSimulation,
+  "michelson-interferometer": MichelsonInterferometerSimulation,
+  "zeeman-effect": ZeemanEffectSimulation,
+  "superconductivity-meissner": SuperconductivityMeissnerSimulation,
+  "bragg-diffraction": BraggDiffractionSimulation,
+  "relativistic-kinematics": RelativisticKinematicsSimulation,
 };
 
 function SimulationPlaceholder({ labId }: { labId: string }) {

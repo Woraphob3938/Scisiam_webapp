@@ -31,6 +31,7 @@ import {
 } from "@/lib/supabase/learning-snapshot";
 import { SCISIAM_AUTH_EVENT } from "@/lib/supabase/auth-cache";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
+import { getProfileAvatarSrc } from "@/lib/supabase/profile-avatar";
 
 type ProfileTab = "overview" | "history" | "rewards";
 
@@ -246,6 +247,7 @@ export default function ProfilePage() {
       setAvatarPath(nextAvatarPath);
       setAvatarVersion(Date.now());
       localStorage.setItem("scisiam_user_avatar", nextAvatarPath);
+      window.dispatchEvent(new Event(SCISIAM_AUTH_EVENT));
       setProfileNotice({ text: "เปลี่ยนรูปโปรไฟล์แล้ว", error: false });
     } catch (error) {
       console.error("Failed to update profile avatar", error);
@@ -255,14 +257,7 @@ export default function ProfilePage() {
     }
   };
 
-  const avatarSrc = useMemo(() => {
-    if (!avatarPath) return "/student_avatar_3d.png";
-    if (avatarPath.startsWith("data:") || avatarPath.startsWith("http")) return avatarPath;
-    if (!isSupabaseConfigured()) return "/student_avatar_3d.png";
-
-    const { data } = createClient().storage.from("profile-avatars").getPublicUrl(avatarPath);
-    return `${data.publicUrl}?v=${avatarVersion}`;
-  }, [avatarPath, avatarVersion]);
+  const avatarSrc = useMemo(() => getProfileAvatarSrc(avatarPath, avatarVersion), [avatarPath, avatarVersion]);
 
   const completedSet = useMemo(() => new Set(completedLabIds), [completedLabIds]);
   const rewards = useMemo(

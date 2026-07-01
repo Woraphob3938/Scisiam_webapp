@@ -413,7 +413,9 @@ export type Database = {
         Returns: Array<{
           user_id: string;
           display_name: string;
+          email: string | null;
           avatar_url: string | null;
+          avatar_updated_at: string;
           role: ScisiamUserRole;
           is_creator: boolean;
           joined_at: string;

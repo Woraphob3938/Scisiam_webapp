@@ -320,11 +320,6 @@ export default function AIChatButton() {
         ) : (
           <Image src="/ai-oon.png" alt="" fill sizes="56px" className="object-contain p-1" />
         )}
-        {!isOpen && (
-          <span className="absolute right-0.5 top-0.5 flex h-3.5 w-3.5 rounded-full bg-emerald-500 ring-2 ring-white">
-            <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping" />
-          </span>
-        )}
       </button>
     </div>
   );
