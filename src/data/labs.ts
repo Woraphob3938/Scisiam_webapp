@@ -313,7 +313,7 @@ export const labsData: LabData[] = [
     title: "Acids and Bases Around Us",
     category: "Chemistry",
     gradeLevel: "ประถม",
-    status: "ยังสร้างไม่เสร็จ",
+    status: "",
     description: "รู้จักกรดและเบสรอบตัวผ่านอินดิเคเตอร์สีธรรมชาติ สังเกตความเปลี่ยนแปลงอย่างปลอดภัยโดยไม่ใช้สารอันตราย"
   },
   {
@@ -322,7 +322,7 @@ export const labsData: LabData[] = [
     title: "Heating and Cooling Materials",
     category: "Chemistry",
     gradeLevel: "ประถม",
-    status: "ยังสร้างไม่เสร็จ",
+    status: "",
     description: "สำรวจผลของความร้อนและความเย็นต่อวัสดุ เช่น การละลาย การแข็งตัว การขยายตัว และการเปลี่ยนแปลงที่ย้อนกลับได้"
   },
   {
@@ -331,7 +331,7 @@ export const labsData: LabData[] = [
     title: "Physical vs Chemical Changes",
     category: "Chemistry",
     gradeLevel: "ประถม",
-    status: "ยังสร้างไม่เสร็จ",
+    status: "",
     description: "แยกการเปลี่ยนแปลงทางกายภาพกับทางเคมีจากหลักฐานง่าย ๆ เช่น สี กลิ่น ฟอง แสง ความร้อน หรือสารใหม่ที่เกิดขึ้น"
   },
   {
@@ -826,7 +826,7 @@ export const labsData: LabData[] = [
     title: "NMR Spectroscopy",
     category: "Chemistry",
     gradeLevel: "อุดมศึกษา",
-    status: "ยังสร้างไม่เสร็จ",
+    status: "",
     description: "วิเคราะห์โครงสร้างโมเลกุลสารอินทรีย์ผ่านระดับการดูดกลืนพลังงานคลื่นวิทยุของสปินนิวเคลียสภายใต้สนามแม่เหล็กแรงสูง"
   },
   {
@@ -835,7 +835,7 @@ export const labsData: LabData[] = [
     title: "XPS Spectroscopy",
     category: "Chemistry",
     gradeLevel: "อุดมศึกษา",
-    status: "ยังสร้างไม่เสร็จ",
+    status: "",
     description: "วิเคราะห์พลังงานยึดเหนี่ยว (Binding Energy) ของอิเล็กตรอนในวงโคจรชั้นในเพื่อตรวจสอบสมบัติพื้นผิวและสถานะออกซิเดชันของสาร"
   },
   {
@@ -844,7 +844,7 @@ export const labsData: LabData[] = [
     title: "HPLC Chromatography",
     category: "Chemistry",
     gradeLevel: "อุดมศึกษา",
-    status: "ยังสร้างไม่เสร็จ",
+    status: "",
     description: "จำลองการแยกสารผสมในคอลัมน์ด้วยเฟสเคลื่อนที่ที่เป็นของเหลวภายใต้ความดันสูงและการตรวจวัดเชิงปริมาณ"
   },
   {
@@ -853,7 +853,7 @@ export const labsData: LabData[] = [
     title: "Transition Metal Complexes",
     category: "Chemistry",
     gradeLevel: "อุดมศึกษา",
-    status: "ยังสร้างไม่เสร็จ",
+    status: "",
     description: "ศึกษาการสปลิตของ d-orbital และสีของสารประกอบเชิงซ้อนภายใต้ลิแกนด์ที่ส่งผลต่อค่าพลังงาน Crystal Field Splitting"
   },
   {
@@ -862,7 +862,7 @@ export const labsData: LabData[] = [
     title: "Electrochemical Impedance Spectroscopy",
     category: "Chemistry",
     gradeLevel: "อุดมศึกษา",
-    status: "ยังสร้างไม่เสร็จ",
+    status: "",
     description: "วิเคราะห์พฤติกรรมการถ่ายโอนประจุและความต้านทานไฟฟ้าเคมีที่ขั้วเชื่อมต่อ (Electrode Interface) ในช่วงความถี่ต่าง ๆ"
   },
   {
@@ -871,7 +871,7 @@ export const labsData: LabData[] = [
     title: "Quantum Chemistry Orbitals",
     category: "Chemistry",
     gradeLevel: "อุดมศึกษา",
-    status: "ยังสร้างไม่เสร็จ",
+    status: "",
     description: "จำลองรูปร่างและการกระจายตัวของอิเล็กตรอนในออร์บิทัลโมเลกุล (HOMO/LUMO) ตามวิธีคำนวณแบบ LCAO-MO"
   },
   {

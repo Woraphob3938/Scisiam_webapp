@@ -261,6 +261,9 @@ test("elementary chemistry labs have dedicated open-exploration simulations", ()
     ["states-of-matter", "StatesOfMatterSimulation"],
     ["mixing-and-separating", "MixingAndSeparatingSimulation"],
     ["dissolving-solutions", "DissolvingSolutionsSimulation"],
+    ["acids-bases-around-us", "AcidsBasesAroundUsSimulation"],
+    ["heating-cooling-materials", "HeatingCoolingMaterialsSimulation"],
+    ["physical-chemical-changes", "PhysicalChemicalChangesSimulation"],
   ];
 
   for (const [labId, component] of targets) {
@@ -286,14 +289,10 @@ test("elementary physics and chemistry labs are detail-only placeholders", () =>
   const labsPage = readProjectFile("src/app/labs/page.tsx");
   const labCard = readProjectFile("src/components/LabCard.tsx");
 
-  const elementaryLabs = [
-    ["acids-bases-around-us", "Chemistry"],
-    ["heating-cooling-materials", "Chemistry"],
-    ["physical-chemical-changes", "Chemistry"],
-  ];
+  const elementaryLabs = [];
   const handleViewDetails = labsPage.match(/const handleViewDetails = \(id: string\) => \{[\s\S]*?\n  \};/)?.[0] ?? "";
 
-  assert.equal(elementaryLabs.length, 3);
+  assert.equal(elementaryLabs.length, 0);
   assert.doesNotMatch(handleViewDetails, /isLabReady/);
   assert.match(labCard, /disabled=\{!readiness\.isReady\}[\s\S]*onClick=\{\(\) => onEnterRoom\?\.\(lab\.id\)\}/);
 

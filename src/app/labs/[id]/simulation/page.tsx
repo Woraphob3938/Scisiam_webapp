@@ -179,6 +179,25 @@ const MixingAndSeparatingSimulation = dynamic(() =>
   import("@/components/labs/simulation/MixingAndSeparatingSimulation"));
 const DissolvingSolutionsSimulation = dynamic(() =>
   import("@/components/labs/simulation/DissolvingSolutionsSimulation"));
+const AcidsBasesAroundUsSimulation = dynamic(() =>
+  import("@/components/labs/simulation/AcidsBasesAroundUsSimulation"));
+const HeatingCoolingMaterialsSimulation = dynamic(() =>
+  import("@/components/labs/simulation/HeatingCoolingMaterialsSimulation"));
+const PhysicalChemicalChangesSimulation = dynamic(() =>
+  import("@/components/labs/simulation/PhysicalChemicalChangesSimulation"));
+const NmrSpectroscopySimulation = dynamic(() =>
+  import("@/components/labs/simulation/NmrSpectroscopySimulation"));
+const XpsSpectroscopySimulation = dynamic(() =>
+  import("@/components/labs/simulation/XpsSpectroscopySimulation"));
+const HplcChromatographySimulation = dynamic(() =>
+  import("@/components/labs/simulation/HplcChromatographySimulation"));
+const TransitionMetalComplexesSimulation = dynamic(() =>
+  import("@/components/labs/simulation/TransitionMetalComplexesSimulation"));
+const EisElectrochemistrySimulation = dynamic(() =>
+  import("@/components/labs/simulation/EisElectrochemistrySimulation"));
+const QuantumChemistryOrbitalsSimulation = dynamic(() =>
+  import("@/components/labs/simulation/QuantumChemistryOrbitalsSimulation"));
+
 
 const simulationComponents: Record<DirectSimulationLabId, React.ComponentType> = {
   "newtons-cooling": NewtonsCoolingSimulation,
@@ -233,6 +252,15 @@ const simulationComponents: Record<DirectSimulationLabId, React.ComponentType> =
   "states-of-matter": StatesOfMatterSimulation,
   "mixing-and-separating": MixingAndSeparatingSimulation,
   "dissolving-solutions": DissolvingSolutionsSimulation,
+  "acids-bases-around-us": AcidsBasesAroundUsSimulation,
+  "heating-cooling-materials": HeatingCoolingMaterialsSimulation,
+  "physical-chemical-changes": PhysicalChemicalChangesSimulation,
+  "nmr-spectroscopy": NmrSpectroscopySimulation,
+  "xps-spectroscopy": XpsSpectroscopySimulation,
+  "hplc-chromatography": HplcChromatographySimulation,
+  "transition-metal-complexes": TransitionMetalComplexesSimulation,
+  "eis-electrochemistry": EisElectrochemistrySimulation,
+  "quantum-chemistry-orbitals": QuantumChemistryOrbitalsSimulation,
 };
 
 function SimulationPlaceholder({ labId }: { labId: string }) {

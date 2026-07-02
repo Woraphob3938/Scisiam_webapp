@@ -2,7 +2,7 @@
 
 import React, { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { HelpCircle } from "lucide-react";
+import { HelpCircle, LoaderCircle } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import CategoryFilter, { Category } from "@/components/CategoryFilter";
@@ -93,6 +93,7 @@ function LabsContent() {
   const [searchQuery, setSearchQuery] = useState(
     () => requestedCategory ? "" : restoredState?.searchQuery ?? ""
   );
+  const [isEnteringLab, setIsEnteringLab] = useState(false);
 
   const categoryLabs = useMemo(
     () =>
@@ -153,7 +154,8 @@ function LabsContent() {
   }, [searchQuery, selectedCategory, selectedGradeLevel, showAllLabs]);
 
   const handleEnterRoom = (id: string) => {
-    if (!isLabReady(id)) return;
+    if (!isLabReady(id) || isEnteringLab) return;
+    setIsEnteringLab(true);
     saveReturnState();
     router.push(`/labs/${id}/simulation`);
   };
@@ -185,6 +187,7 @@ function LabsContent() {
       </div>
 
       <main
+        aria-busy={isEnteringLab}
         className={`relative z-10 min-w-0 pb-28 transition-[padding-left] duration-300 lg:pb-12 ${
           isCollapsed ? "lg:pl-[76px]" : "lg:pl-[260px]"
         }`}
@@ -301,6 +304,26 @@ function LabsContent() {
           )}
         </section>
       </main>
+
+      {isEnteringLab && (
+        <div
+          className="fixed inset-0 z-[100] grid place-items-center bg-slate-950/35 px-4"
+          role="status"
+          aria-live="polite"
+        >
+          <div className="flex w-full max-w-sm flex-col items-center rounded-2xl border border-slate-200 bg-white px-6 py-7 text-center shadow-2xl shadow-slate-950/20">
+            <span className="grid h-14 w-14 place-items-center rounded-full bg-blue-50 text-blue-600">
+              <LoaderCircle className="h-7 w-7 animate-spin" aria-hidden="true" />
+            </span>
+            <p className="mt-4 text-lg font-extrabold leading-[1.5] text-slate-950">
+              กำลังโหลดแล็บทดลอง
+            </p>
+            <p className="mt-1 text-sm font-semibold leading-relaxed text-slate-500">
+              โปรดรอสักครู่
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

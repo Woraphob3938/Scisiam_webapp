@@ -8,11 +8,11 @@ export type Category = "All" | "Foundation" | "Physics" | "Chemistry" | "Biology
 
 const categoriesList = [
   { id: "All" as Category, name: "ทั้งหมด", icon: LayoutGrid, color: "blue", imagePath: null },
-  { id: "Foundation" as Category, name: "ความรู้พื้นฐาน", icon: BookOpen, color: "sky", imagePath: null },
+  { id: "Foundation" as Category, name: "ความรู้พื้นฐาน", icon: BookOpen, color: "sky", imagePath: "/images/categories/foundation.png" },
   { id: "Physics" as Category, name: "ฟิสิกส์", icon: Atom, color: "indigo", imagePath: "/images/categories/physics.png" },
   { id: "Chemistry" as Category, name: "เคมี", icon: Beaker, color: "purple", imagePath: "/images/categories/chemistry.png" },
   { id: "Biology" as Category, name: "ชีววิทยา", icon: Leaf, color: "green", imagePath: "/images/categories/biology.png" },
-  { id: "Mathematics" as Category, name: "คณิตศาสตร์", icon: Calculator, color: "pink", imagePath: null },
+  { id: "Mathematics" as Category, name: "คณิตศาสตร์", icon: Calculator, color: "pink", imagePath: "/images/categories/mathematics.png" },
 ];
 
 const activeColorClasses: Record<string, string> = {
@@ -36,7 +36,7 @@ export default function CategoryFilter({
 }: CategoryFilterProps) {
   return (
     <div className="flex w-full justify-center px-2 pb-5 pt-4 md:pb-6">
-      <div className="w-full max-w-[calc(100vw-1rem)] overflow-hidden rounded-full border border-slate-200/80 bg-white p-1.5 shadow-sm sm:max-w-4xl">
+      <div className="w-full max-w-[calc(100vw-1rem)] overflow-hidden rounded-full border border-slate-200/80 bg-white p-1.5 shadow-sm sm:max-w-6xl">
         <div className="grid w-full min-w-0 grid-cols-3 gap-1.5 sm:grid-cols-6">
         {categoriesList.map((category) => {
           const Icon = category.icon;
@@ -48,7 +48,7 @@ export default function CategoryFilter({
               type="button"
               onClick={() => onCategoryChange(category.id)}
               className={`
-                flex min-h-10 min-w-0 cursor-pointer select-none items-center justify-center gap-1.5 rounded-full border px-1.5 py-2 text-[11px] font-bold leading-[1.45] tracking-normal sm:gap-2 sm:px-4 sm:text-sm
+                flex min-h-10 min-w-0 cursor-pointer select-none items-center justify-center gap-1.5 rounded-full border px-1.5 py-2 text-[11px] font-bold leading-[1.45] tracking-normal sm:gap-2 sm:px-3 sm:text-sm
                 transition-all duration-200 active:scale-[0.98] focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100
                 ${
                   isActive
@@ -81,7 +81,7 @@ export default function CategoryFilter({
                   }`}
                 />
               )}
-              <span className="min-w-0 truncate">{category.name}</span>
+              <span className="min-w-0 break-words text-center sm:whitespace-nowrap">{category.name}</span>
             </button>
           );
         })}

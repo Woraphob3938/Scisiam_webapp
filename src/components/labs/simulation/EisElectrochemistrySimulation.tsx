@@ -1,0 +1,454 @@
+"use client";
+
+import React, { useState, useEffect, useRef } from "react";
+import SharedSimulationShell from "./SharedSimulationShell";
+import { Info, Play, RefreshCw, Zap, Disc } from "lucide-react";
+import { labsById } from "@/data/labs";
+import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";
+
+interface EisState {
+  electrodeId: string;
+  rs: number; // ohms
+  rct: number; // ohms
+  cdl: number; // uF
+  nyquistPoints: { real: number; imag: number; freq: number }[];
+}
+
+interface EisLog {
+  id: number;
+  electrode: string;
+  rs: number;
+  rct: number;
+  cdl: number;
+  acAmp: number;
+}
+
+const electrodes = [
+  {
+    id: "platinum",
+    name: "ขั้วพลาทินัมบริสุทธิ์ (Polished Platinum)",
+    rs: 15,
+    rct: 80,
+    cdl: 10,
+    description: "ขั้วนำไฟฟ้าดีเยี่ยม มีความต้านทานถ่ายโอนประจุต่ำมาก"
+  },
+  {
+    id: "steel",
+    name: "เหล็กในน้ำเกลือ (Corroding Steel)",
+    rs: 30,
+    rct: 350,
+    cdl: 50,
+    description: "เหล็กกำลังเกิดสนิมช้า ๆ พฤติกรรมการถ่ายโอนประจุมีแรงต้านทานสูงขึ้น"
+  },
+  {
+    id: "coated",
+    name: "โลหะเคลือบกันสนิม (Polymer Coated Metal)",
+    rs: 60,
+    rct: 2000,
+    cdl: 2,
+    description: "มีผิวเคลือบกันประจุไฟฟ้าผ่านสูงมาก แสดงผลใกล้เคียงกับตัวเก็บประจุบริสุทธิ์"
+  }
+];
+
+export default function EisElectrochemistrySimulation() {
+  const labId = "eis-electrochemistry";
+  const labData = labsById[labId];
+
+  const [selectedElectrode, setSelectedElectrode] = useState(electrodes[0]);
+  const [acAmplitude, setAcAmplitude] = useState(10); // mV (5 - 20)
+  const [isSweeping, setIsSweeping] = useState(false);
+  const [sweepProgress, setSweepProgress] = useState(0); // 0 to 100
+  const [sweepData, setSweepData] = useState<{ real: number; imag: number; freq: number }[]>([]);
+  const [logs, setLogs] = useState<EisLog[]>([]);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const requestRef = useRef<number>(0);
+  const lastTimeRef = useRef<number>(0);
+
+  const handleSweep = () => {
+    if (isSweeping) return;
+    setIsSweeping(true);
+    setSweepProgress(0);
+    setSweepData([]);
+  };
+
+  const handleReset = () => {
+    setIsSweeping(false);
+    setSweepProgress(0);
+    setSweepData([]);
+  };
+
+  // Generate Randles circuit Nyquist points mathematically
+  const getNyquistPoint = (freq: number) => {
+    const w = 2 * Math.PI * freq;
+    const Rs = selectedElectrode.rs;
+    const Rct = selectedElectrode.rct;
+    const Cdl = selectedElectrode.cdl * 1e-6;
+
+    // Impedance of parallel RC: Z_rc = Rct / (1 + i * w * Rct * Cdl)
+    // Real part: Rs + Rct / (1 + w^2 * Rct^2 * Cdl^2)
+    // Imaginary part: w * Rct^2 * Cdl / (1 + w^2 * Rct^2 * Cdl^2)
+    const denom = 1 + Math.pow(w * Rct * Cdl, 2);
+    const real = Rs + Rct / denom;
+    const imag = (w * Math.pow(Rct, 2) * Cdl) / denom;
+
+    return { real, imag, freq };
+  };
+
+  // Frequency range: 100,000 Hz down to 1 Hz
+  const minFreqLog = 0; // 10^0 = 1 Hz
+  const maxFreqLog = 5; // 10^5 = 100,000 Hz
+
+  const animate = (time: number) => {
+    if (!lastTimeRef.current) lastTimeRef.current = time;
+    const delta = time - lastTimeRef.current;
+
+    if (isSweeping && sweepProgress < 100) {
+      setSweepProgress(prev => {
+        const next = prev + 2;
+
+        // Map progress to log frequency sweep (high frequency to low frequency)
+        const currentLogFreq = maxFreqLog - (next / 100) * (maxFreqLog - minFreqLog);
+        const freq = Math.pow(10, currentLogFreq);
+        const pt = getNyquistPoint(freq);
+
+        setSweepData(prevData => [...prevData, pt]);
+
+        if (next >= 100) {
+          setIsSweeping(false);
+          return 100;
+        }
+        return next;
+      });
+    }
+
+    lastTimeRef.current = time;
+    requestRef.current = requestAnimationFrame(animate);
+  };
+
+  useEffect(() => {
+    requestRef.current = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(requestRef.current);
+  }, [isSweeping, sweepProgress]);
+
+  const handleLogResult = () => {
+    if (sweepData.length === 0) {
+      window.alert("กรุณารันความถี่กระแสสลับให้เสร็จสิ้นก่อนเก็บข้อมูล");
+      return;
+    }
+
+    const isDuplicate = logs.some(l => l.electrode === selectedElectrode.name);
+    if (isDuplicate) {
+      window.alert("มีข้อมูลบันทึกขั้วนี้อยู่แล้ว");
+      return;
+    }
+
+    const newLog = {
+      id: Date.now(),
+      electrode: selectedElectrode.name,
+      rs: selectedElectrode.rs,
+      rct: selectedElectrode.rct,
+      cdl: selectedElectrode.cdl,
+      acAmp: acAmplitude,
+    };
+
+    setLogs(prev => [newLog, ...prev]);
+  };
+
+  const handleClearLogs = () => {
+    setLogs([]);
+  };
+
+  const handleSave = async () => {
+    if (logs.length === 0) {
+      window.alert("กรุณาบันทึกข้อมูลตารางอย่างน้อย 1 รายการก่อนส่งผล");
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      await saveExperimentAndSync({
+        localStorageKey: "scisiam_saved_eis_electrochemistry_experiment",
+        localPayload: {
+          labId,
+          timestamp: new Date().toISOString(),
+          logs,
+        },
+        labId,
+        title: "อิมพีแดนซ์ไฟฟ้าเคมี",
+        variables: { lastAmplitudeMv: acAmplitude },
+        liveValues: {
+          electrodeId: selectedElectrode.id,
+          rs: selectedElectrode.rs,
+          rct: selectedElectrode.rct,
+        },
+        graphPoints: sweepData.map(d => ({
+          x: d.real,
+          y: d.imag,
+        })),
+        tableRows: logs,
+        summary: {
+          electrodesTested: logs.length,
+          lastRct: selectedElectrode.rct,
+        },
+        durationSeconds: 40,
+      });
+      window.alert("บันทึกผลอิมพีแดนซ์ไฟฟ้าเคมีสำเร็จ");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const getMetricDisplay = () => [
+    { label: "แรงต้านสารละลาย (Rs)", value: `${selectedElectrode.rs} Ω` },
+    { label: "ความต้านทานถ่ายโอนประจุ (Rct)", value: `${selectedElectrode.rct} Ω` },
+    { label: "ความจุไฟฟ้าสลายขั้ว (Cdl)", value: `${selectedElectrode.cdl} µF` },
+  ];
+
+  return (
+    <SharedSimulationShell
+      accent="orange"
+      labId={labId}
+      category={labData?.category || "Chemistry"}
+      title={labData?.thaiTitle || labData?.title || "อิมพีแดนซ์ไฟฟ้าเคมี"}
+      subtitle={labData?.description || ""}
+      statusLabel="พร้อมใช้งาน"
+      icon={Disc}
+      sceneTitle="ระบบเซลล์สามขั้วไฟฟ้า (Three-Electrode Cell)"
+      scene={
+        <div className="flex flex-col items-center justify-center p-4 border border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-50 dark:bg-slate-900/50 min-h-[340px] relative w-full h-full">
+          <div className="grid grid-cols-2 gap-4 w-full h-full max-w-md items-center">
+            {/* 3-electrode cell SVG */}
+            <div className="flex flex-col items-center">
+              <svg viewBox="0 0 160 160" className="w-full max-w-[140px] h-auto drop-shadow-md">
+                {/* Electrolyte liquid in Beaker */}
+                <rect x="20" y="40" width="120" height="100" fill="none" stroke="#64748b" strokeWidth="3" />
+                <rect x="22" y="60" width="116" height="78" fill="#bae6fd" opacity="0.4" />
+
+                {/* Electrodes */}
+                {/* Working Electrode (WE) */}
+                <rect x="40" y="30" width="10" height="70" fill={
+                  selectedElectrode.id === "platinum" ? "#e2e8f0" :
+                  selectedElectrode.id === "steel" ? "#94a3b8" : "#f1f5f9"
+                } stroke="#475569" strokeWidth="1" />
+                {selectedElectrode.id === "coated" && (
+                  <rect x="38" y="50" width="14" height="40" fill="#a855f7" opacity="0.6" />
+                )}
+
+                {/* Reference Electrode (RE) */}
+                <rect x="75" y="30" width="8" height="75" fill="#f8fafc" stroke="#94a3b8" />
+                <rect x="77" y="95" width="4" height="8" fill="#10b981" />
+
+                {/* Counter Electrode (CE) */}
+                <rect x="110" y="30" width="10" height="70" fill="#475569" />
+
+                {/* Potentiostat wiring connections */}
+                <path d="M 45 30 L 45 15 L 80 15" stroke="#ef4444" strokeWidth="1.5" fill="none" />
+                <path d="M 79 30 L 79 15" stroke="#10b981" strokeWidth="1.5" fill="none" />
+                <path d="M 115 30 L 115 15 L 80 15" stroke="#3b82f6" strokeWidth="1.5" fill="none" />
+                <circle cx="80" cy="15" r="3" fill="#1e293b" />
+
+                {/* AC wave ripple inside electrolyte */}
+                {isSweeping && (
+                  <path d="M 45 80 Q 60 70 75 80 T 105 80" stroke="#f97316" strokeWidth="1.5" fill="none" className="animate-pulse" />
+                )}
+              </svg>
+              <div className="text-[9px] font-bold text-slate-400 mt-2">ขั้วไฟฟ้า: {selectedElectrode.name.split(" (")[0]}</div>
+            </div>
+
+            {/* Nyquist Plot SVG */}
+            <div className="flex flex-col justify-between h-full py-4 relative border-l border-slate-200 dark:border-slate-800 pl-4">
+              <span className="text-[9px] font-bold text-slate-400 block mb-1">Nyquist Plot (-Z&apos;&apos; vs Z&apos;)</span>
+              <div className="h-44 w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-2 relative">
+                <svg className="w-full h-full" viewBox="0 0 160 120">
+                  {/* Axis */}
+                  <line x1="20" y1="100" x2="150" y2="100" stroke="#94a3b8" strokeWidth="1" />
+                  <line x1="20" y1="10" x2="20" y2="100" stroke="#94a3b8" strokeWidth="1" />
+                  <text x="145" y="112" className="text-[7px] fill-slate-400 font-bold" textAnchor="middle">Z&apos; (Ω)</text>
+                  <text x="15" y="15" className="text-[7px] fill-slate-400 font-bold" textAnchor="end" transform="rotate(-90 15 15)">-Z&apos;&apos; (Ω)</text>
+
+                  {/* Dynamic semicircle path */}
+                  {sweepData.length > 1 && (
+                    <path
+                      d={`M ${20 + (sweepData[0].real / 2200) * 120} ${100 - (sweepData[0].imag / 2200) * 120}
+                          ${sweepData.map(d => {
+                            // Scale axis according to maximum resistance (2200 max)
+                            const rx = 20 + (d.real / 2200) * 120;
+                            const ry = 100 - (d.imag / 2200) * 120;
+                            return `L ${rx} ${ry}`;
+                          }).join(" ")}`}
+                      fill="none"
+                      stroke="#f97316"
+                      strokeWidth="2"
+                    />
+                  )}
+
+                  {/* Semicircle endpoints indicators */}
+                  {sweepData.length > 0 && (
+                    <g>
+                      <circle cx={20 + (sweepData[0].real / 2200) * 120} cy="100" r="2" fill="#ef4444" />
+                      <circle cx={20 + (sweepData[sweepData.length - 1].real / 2200) * 120} cy="100" r="2" fill="#ef4444" />
+                    </g>
+                  )}
+                </svg>
+              </div>
+
+              {/* Progress scale */}
+              {isSweeping && (
+                <div className="text-[8px] text-orange-600 font-bold text-center mt-1">
+                  กำลังรันความถี่: {Math.round(sweepProgress)}%
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      }
+      controlsTitle="เลือกขั้ววัดและกำหนดกระแสสลับ"
+      controls={
+        <div className="flex flex-col gap-4 w-full">
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">เลือกขั้วไฟฟ้าทำงาน (Working)</label>
+            <div className="grid grid-cols-1 gap-1.5">
+              {electrodes.map(e => (
+                <button
+                  key={e.id}
+                  onClick={() => {
+                    setSelectedElectrode(e);
+                    handleReset();
+                  }}
+                  className={`px-3 py-2 text-xs font-semibold rounded-lg border text-left transition-all ${
+                    selectedElectrode.id === e.id
+                      ? "bg-orange-50 border-orange-300 text-orange-700 dark:bg-orange-950/40 dark:border-orange-800 dark:text-orange-300 shadow-sm"
+                      : "bg-white border-slate-200 text-slate-600 dark:bg-slate-850 dark:border-slate-700 dark:text-slate-350 hover:bg-slate-50"
+                  }`}
+                >
+                  <div className="font-bold">{e.name.split(" (")[0]}</div>
+                  <div className="text-[10px] text-slate-400 font-normal mt-0.5">{e.description}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <hr className="border-slate-100 dark:border-slate-800" />
+
+          <div>
+            <div className="flex justify-between text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">
+              <span>แอมพลิจูดกระแสสลับ (AC Amplitude)</span>
+              <span className="text-orange-600 dark:text-orange-400 font-bold">{acAmplitude} mV</span>
+            </div>
+            <input
+              type="range"
+              min="5"
+              max="20"
+              step="1"
+              value={acAmplitude}
+              onChange={(e) => {
+                setAcAmplitude(parseInt(e.target.value));
+                handleReset();
+              }}
+              className="w-full accent-orange-600"
+            />
+          </div>
+
+          <div className="flex gap-2 mt-2">
+            <button
+              onClick={handleSweep}
+              disabled={isSweeping}
+              className="flex-1 py-2 px-4 bg-orange-600 hover:bg-orange-700 disabled:opacity-50 text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+            >
+              <Play className="w-4 h-4" />
+              กวาดความถี่ (Sweep)
+            </button>
+            <button
+              onClick={handleReset}
+              className="py-2 px-3 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg text-xs font-semibold flex items-center justify-center transition-colors"
+            >
+              <RefreshCw className="w-4 h-4 text-slate-500" />
+            </button>
+          </div>
+        </div>
+      }
+      metrics={getMetricDisplay()}
+      graph={null}
+      table={
+        <div className="w-full overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40">
+          <table className="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr className="bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 font-semibold">
+                <th className="p-3">ขั้วไฟฟ้า</th>
+                <th className="p-3">Rs (ความต้านทานน้ำยา - Ω)</th>
+                <th className="p-3">Rct (ความต้านทานขั้ว - Ω)</th>
+                <th className="p-3">Cdl (ความจุไฟฟ้าขั้ว - µF)</th>
+                <th className="p-3">แอมพลิจูดสัญญาณ</th>
+              </tr>
+            </thead>
+            <tbody>
+              {logs.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="p-6 text-center text-slate-400 italic">ยังไม่มีข้อมูลบันทึกสเปกโทรสโกปีอิมพีแดนซ์</td>
+                </tr>
+              ) : (
+                logs.map(l => (
+                  <tr key={l.id} className="border-b border-slate-100 dark:border-slate-800/60 hover:bg-slate-50/50">
+                    <td className="p-3 font-medium text-slate-800 dark:text-slate-200">{l.electrode.split(" (")[0]}</td>
+                    <td className="p-3 text-slate-600 dark:text-slate-400">{l.rs} Ω</td>
+                    <td className="p-3 font-bold text-orange-600 dark:text-orange-400">{l.rct} Ω</td>
+                    <td className="p-3 text-slate-600 dark:text-slate-400">{l.cdl} µF</td>
+                    <td className="p-3 text-slate-600 dark:text-slate-400">{l.acAmp} mV</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+          {logs.length > 0 && (
+            <div className="p-2 bg-slate-50 dark:bg-slate-950 flex justify-end">
+              <button onClick={handleClearLogs} className="text-[10px] font-bold text-red-500 hover:text-red-700 transition-colors">
+                ล้างข้อมูล
+              </button>
+            </div>
+          )}
+        </div>
+      }
+      theory={
+        <div className="space-y-3 text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+          <p>
+            <strong>Electrochemical Impedance Spectroscopy (EIS)</strong> เป็นเทคนิคการจ่ายไฟฟ้ากระแสสลับแรงดันต่ำ (AC voltage)
+            เข้าไปในขั้วไฟฟ้าในช่วงความถี่กว้าง (เช่น $10^5$ Hz ถึง $1$ Hz) เพื่อวัดค่าความต้านทานเสมือน (Impedance, Z) ที่เปลี่ยนแปลงไปตามเฟส
+          </p>
+          <ul className="list-disc pl-5 space-y-1.5">
+            <li><strong>วงจรสมมูล Randles (Equivalent Circuit)</strong>: พฤติกรรมที่รอยต่อขั้วไฟฟ้าถูกสร้างแบบจำลองด้วยชิ้นส่วนอิเล็กทรอนิกส์:
+              <ul className="list-circle pl-5 mt-1">
+                <li><strong>Rs (Solution Resistance)</strong>: แรงต้านการเคลื่อนย้ายไอออนในสารละลายอิเล็กโทรไลต์</li>
+                <li><strong>Rct (Charge Transfer Resistance)</strong>: แรงต้านทานตอนอิเล็กตรอนเกิดปฏิกิริยารีดอกซ์ข้ามขั้วไฟฟ้า</li>
+                <li><strong>Cdl (Double Layer Capacitance)</strong>: ความจุไฟฟ้าของประจุที่มาออดันกันที่ผิวสัมผัสขั้วไฟฟ้า</li>
+              </ul>
+            </li>
+            <li><strong>แผนภาพ Nyquist Plot</strong>: เป็นกราฟระหว่างค่าความต้านทานจริง (Real Z&apos;) และค่าความต้านทานจินตภาพ (Imaginary -Z&apos;&apos;) พีคครึ่งวงกลมจะขยายกว้างออกตามค่าความต้านทานขั้ว (Rct)</li>
+          </ul>
+        </div>
+      }
+      steps={[
+        { label: "เลือกขั้วไฟฟ้าทำงานที่คุณต้องการศึกษาในกล่องสลับ", icon: Zap },
+        { label: "กำหนดแอมพลิจูดแรงดันกระแสสลับป้อนป้อนเข้าระบบ", icon: Zap },
+        { label: "กดกวาดความถี่ (Sweep) เพื่อให้ปั๊มสัญญาณคลื่นความถี่ต่าง ๆ", icon: Play },
+        { label: "สังเกตการวาดเส้นครึ่งวงกลมและอ่านค่าขอบเขตความต้านทาน", icon: Info },
+      ]}
+      learningGoals={[
+        "เรียนรู้วิธีการวิเคราะห์ข้อมูลความจุและแรงต้านไฟฟ้าในแผนภาพ Nyquist Plot",
+        "ศึกษาผลกระทบของคุณลักษณะทางกายภาพขั้วต่อ (เช่น การกัดกร่อน ตัวเคลือบพอลิเมอร์)",
+        "วิเคราะห์วงจรสมมูล Randles ในการอธิบายกลไกแลกเปลี่ยนไอออนไฟเคมี",
+      ]}
+      progressLabel="ระดับการสแกนความถี่"
+      progressValue={sweepProgress >= 100 ? "สำเร็จ" : `${Math.round(sweepProgress)}%`}
+      progressPercent={sweepProgress}
+      tips={[
+        "ยอดครึ่งวงกลมใน Nyquist plot จะเกิดขึ้นที่ค่าความถี่เฉพาะเจาะจง ($\omega_{\text{max}} = 1/(R_{ct} \cdot C_{dl})$)",
+        "ขั้วที่มีการเคลือบสีหนาแน่นมักแสดงค่าครึ่งวงกลมขนาดใหญ่มากเกือบเป็นเส้นตรงแนวตั้ง เพราะประจุไม่สามารถแลกเปลี่ยนได้เลย (ทำตัวเสมือนตัวเก็บประจุแบบ Pure Capacitor)",
+      ]}
+      showLiveMetrics={true}
+      showInfoTabs={true}
+      showSaveButton={true}
+      onSave={handleSave}
+    />
+  );
+}

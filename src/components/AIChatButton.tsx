@@ -78,7 +78,7 @@ export default function AIChatButton() {
       id: "welcome",
       role: "assistant",
       content:
-        "สวัสดีครับ ผมคือ AI ไออุ่น ถามเรื่องแนวคิด สูตร วิธีทดลอง หรือการอ่านกราฟของห้องแล็บนี้ได้เลย",
+        "สวัสดีครับ ผมคือ AI ไออุ่น เพื่อนคู่คิดของ SciSiam จะถามเรื่องแล็บ การเรียน หรือคุยเรื่องทั่วไปก็ได้ครับ",
     },
   ]);
 
@@ -109,7 +109,7 @@ export default function AIChatButton() {
     return labId ? labsById[labId] : null;
   }, [pathname]);
 
-  const visibleTitle = currentLab?.title || "ผู้ช่วยวิทยาศาสตร์";
+  const visibleTitle = currentLab?.title || "เพื่อนคู่คิด SciSiam";
 
   const handleSubmit = async (event?: React.FormEvent<HTMLFormElement>) => {
     event?.preventDefault();
@@ -273,7 +273,7 @@ export default function AIChatButton() {
                 }}
                 rows={1}
                 aria-label="พิมพ์คำถามถึง AI ไออุ่น"
-                placeholder="ถามเรื่องสูตร กราฟ หรือขั้นตอนทดลอง..."
+                placeholder="ถามเรื่องแล็บ การเรียน หรือคุยกับไออุ่น..."
                 className="max-h-24 min-h-8 flex-1 resize-none bg-transparent text-xs font-semibold leading-relaxed text-slate-700 outline-none placeholder:text-slate-400"
               />
               <button
@@ -318,7 +318,7 @@ export default function AIChatButton() {
         {isOpen ? (
           <X className="h-5.5 w-5.5 sm:h-6.5 sm:w-6.5" />
         ) : (
-          <Image src="/ai-oon.png" alt="" fill sizes="56px" className="object-contain p-1" />
+          <Image src="/ai-oon-avatar.png" alt="" fill sizes="56px" className="object-cover" />
         )}
       </button>
     </div>

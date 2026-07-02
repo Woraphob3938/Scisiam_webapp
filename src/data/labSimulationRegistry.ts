@@ -51,6 +51,15 @@ export const directSimulationLabIds = [
   "states-of-matter",
   "mixing-and-separating",
   "dissolving-solutions",
+  "acids-bases-around-us",
+  "heating-cooling-materials",
+  "physical-chemical-changes",
+  "nmr-spectroscopy",
+  "xps-spectroscopy",
+  "hplc-chromatography",
+  "transition-metal-complexes",
+  "eis-electrochemistry",
+  "quantum-chemistry-orbitals",
 ] as const;
 
 export const chemistryConceptSimulationLabIds = [
