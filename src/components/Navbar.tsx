@@ -7,97 +7,25 @@ import { Bell, ChevronDown, Award, Menu, User } from "lucide-react";
 import { useSidebar } from "@/context/SidebarContext";
 import SettingsModal from "@/components/SettingsModal";
 import { ClassroomActions } from "@/components/classrooms/ClassroomActions";
-import {
-  cacheSciSiamAuth,
-  clearSciSiamAuthCache,
-  SCISIAM_AUTH_EVENT,
-} from "@/lib/supabase/auth-cache";
+import { clearSciSiamAuthCache } from "@/lib/supabase/auth-cache";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import { getProfileAvatarSrc } from "@/lib/supabase/profile-avatar";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Navbar() {
   const { toggleSidebar } = useSidebar();
   const [showNotification, setShowNotification] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
-  
-  // Auth state variables
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userName, setUserName] = useState("นักเรียน");
-  const [avatarPath, setAvatarPath] = useState<string | null>(null);
-  const [avatarVersion, setAvatarVersion] = useState(0);
-  const [localNotificationMode, setLocalNotificationMode] = useState(false);
+  const {
+    isAuthReady,
+    isLoggedIn,
+    userName,
+    avatarPath,
+    avatarVersion,
+    localNotificationMode,
+  } = useAuth();
   const [notifications, setNotifications] = useState<Array<{ id: string; title: string; message: string; type: string }>>([]);
-
-  useEffect(() => {
-    const loadAuthStateFromCache = () => {
-      const loggedIn = localStorage.getItem("scisiam_logged_in") === "true";
-      setIsLoggedIn(loggedIn);
-      setUserName(localStorage.getItem("scisiam_user_name") || "นักเรียน");
-      setAvatarPath(localStorage.getItem("scisiam_user_avatar"));
-      setAvatarVersion(Date.now());
-      setLocalNotificationMode(true);
-    };
-
-    const loadAuthState = async () => {
-      const isDemo = localStorage.getItem("scisiam_demo_mode") === "true";
-      if (isDemo || !isSupabaseConfigured()) {
-        loadAuthStateFromCache();
-        return;
-      }
-
-      const supabase = createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) {
-        clearSciSiamAuthCache({ emit: false });
-        setIsLoggedIn(false);
-        setUserName("นักเรียน");
-        setAvatarPath(null);
-        setLocalNotificationMode(false);
-        return;
-      }
-
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("display_name, role, avatar_url")
-        .eq("id", user.id)
-        .maybeSingle();
-
-      const nextRole = profile?.role || "student";
-      const nextName = profile?.display_name || user.email?.split("@")[0] || "นักเรียน";
-      setIsLoggedIn(true);
-      setUserName(nextName);
-      setAvatarPath(profile?.avatar_url ?? null);
-      setAvatarVersion(Date.now());
-      setLocalNotificationMode(false);
-      cacheSciSiamAuth({
-        email: user.email,
-        role: nextRole,
-        displayName: nextName,
-        avatarUrl: profile?.avatar_url ?? null,
-      }, { emit: false });
-    };
-
-    void loadAuthState();
-
-    const supabase = isSupabaseConfigured() ? createClient() : null;
-    const authSubscription = supabase?.auth.onAuthStateChange(() => {
-      void loadAuthState();
-    }).data.subscription;
-    const handleAuthUpdated = () => void loadAuthState();
-
-    window.addEventListener(SCISIAM_AUTH_EVENT, handleAuthUpdated);
-    window.addEventListener("storage", handleAuthUpdated);
-    
-    return () => {
-      window.removeEventListener(SCISIAM_AUTH_EVENT, handleAuthUpdated);
-      window.removeEventListener("storage", handleAuthUpdated);
-      authSubscription?.unsubscribe();
-    };
-  }, []);
 
   useEffect(() => {
     const checkNotifications = () => {
@@ -161,10 +89,6 @@ export default function Navbar() {
     }
 
     clearSciSiamAuthCache();
-    setIsLoggedIn(false);
-    setUserName("นักเรียน");
-    setAvatarPath(null);
-    setLocalNotificationMode(false);
     window.location.href = "/";
   };
 
@@ -251,7 +175,9 @@ export default function Navbar() {
 
         {/* User Profile Avatar / Login Button */}
         <div className="relative">
-          {isLoggedIn ? (
+          {!isAuthReady ? (
+            <div className="h-10 w-[118px] animate-pulse rounded-xl bg-slate-100 sm:w-[172px]" aria-hidden="true" />
+          ) : isLoggedIn ? (
             <>
               <button
                 onClick={() => setShowProfileMenu(!showProfileMenu)}

@@ -8,13 +8,27 @@ const read = (...parts) => fs.readFileSync(path.join(root, ...parts), "utf8");
 
 test("Navbar follows profile name and avatar updates", () => {
   const navbar = read("src", "components", "Navbar.tsx");
+  const authProvider = read("src", "context", "AuthContext.tsx");
   const profile = read("src", "app", "profile", "page.tsx");
 
-  assert.match(navbar, /select\("display_name, role, avatar_url"\)/);
+  assert.match(authProvider, /select\("display_name, role, avatar_url"\)/);
   assert.match(navbar, /getProfileAvatarSrc/);
   assert.match(navbar, /src=\{profileAvatarSrc\}/);
   assert.match(profile, /saveProfile/);
   assert.match(profile, /dispatchEvent\(new Event\(SCISIAM_AUTH_EVENT\)\)/);
+});
+
+test("navbar auth state persists across route navigation", () => {
+  const layout = read("src", "app", "layout.tsx");
+  const navbar = read("src", "components", "Navbar.tsx");
+  const authProvider = read("src", "context", "AuthContext.tsx");
+
+  assert.match(layout, /<AuthProvider>[\s\S]*?<SidebarProvider>/);
+  assert.match(navbar, /useAuth\(\)/);
+  assert.doesNotMatch(navbar, /auth\.getUser\(\)/);
+  assert.doesNotMatch(navbar, /auth\.onAuthStateChange\(/);
+  assert.match(authProvider, /auth\.getUser\(\)/);
+  assert.match(authProvider, /auth\.onAuthStateChange\(/);
 });
 
 test("classroom members expose email and current profile avatar", () => {
@@ -85,9 +99,10 @@ test("mobile category filter stays inside the viewport", () => {
 
 test("navbar notifications do not reuse local lab keys for Supabase accounts", () => {
   const source = read("src", "components", "Navbar.tsx");
+  const authProvider = read("src", "context", "AuthContext.tsx");
 
   assert.match(source, /localNotificationMode/);
-  assert.match(source, /setLocalNotificationMode\(false\)/);
+  assert.match(authProvider, /localNotificationMode:\s*false/);
   assert.match(source, /if\s*\(!localNotificationMode\)\s*\{/);
   assert.match(source, /return;/);
 });

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { SidebarProvider } from "@/context/SidebarContext";
+import { AuthProvider } from "@/context/AuthContext";
 import AIChatButton from "@/components/AIChatButton";
 import MobileTabBar from "@/components/MobileTabBar";
 import { Toaster } from "@/components/ui/sonner";
@@ -54,13 +55,15 @@ export default function RootLayout({
     <html lang="th" className="h-full antialiased">
       <body className="min-h-full flex flex-col bg-slate-50 text-slate-900">
         <TooltipProvider>
-          <SidebarProvider>
-            {children}
-            <AIChatButton />
-            <Suspense fallback={null}>
-              <MobileTabBar />
-            </Suspense>
-          </SidebarProvider>
+          <AuthProvider>
+            <SidebarProvider>
+              {children}
+              <AIChatButton />
+              <Suspense fallback={null}>
+                <MobileTabBar />
+              </Suspense>
+            </SidebarProvider>
+          </AuthProvider>
           <Toaster theme="light" position="top-center" />
         </TooltipProvider>
       </body>
