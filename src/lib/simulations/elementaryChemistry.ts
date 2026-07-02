@@ -81,7 +81,7 @@ export function calculateDissolutionRate(
   isStirring: boolean,
   soluteGrams: number,
 ) {
-  const temperatureFactor = 0.055 + Math.max(0, temperatureC) * 0.0018;
+  const temperatureFactor = 0.12 + Math.max(0, temperatureC) * 0.004;
   const stirringFactor = isStirring ? 1.75 : 1;
   const amountFactor = 1 / Math.max(1, soluteGrams / 5);
 

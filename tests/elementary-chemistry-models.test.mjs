@@ -30,12 +30,14 @@ test("preferred separation methods outperform mismatches", () => {
 
 test("warmth and stirring increase dissolution rate", () => {
   const cool = calculateDissolutionRate(20, false, 5);
+  const classroomBaseline = calculateDissolutionRate(25, false, 5);
   const warm = calculateDissolutionRate(60, false, 5);
   const stirred = calculateDissolutionRate(60, true, 5);
 
   assert.ok(warm > cool);
   assert.ok(stirred > warm);
   assert.ok(calculateDissolutionRate(60, true, 10) < stirred);
+  assert.ok(5 / classroomBaseline < 30);
 });
 
 test("dissolution advance is deterministic and bounded", () => {
