@@ -237,7 +237,7 @@ export default function AuthForm({
       }
 
       setLoading(false);
-      router.push("/");
+      router.replace("/labs");
       router.refresh();
     } catch {
       setError("เกิดข้อผิดพลาดในการเชื่อมต่อ Supabase กรุณาลองใหม่อีกครั้ง");

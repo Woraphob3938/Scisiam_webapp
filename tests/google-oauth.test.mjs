@@ -67,3 +67,13 @@ test("email login remember me persists the next login email only after success",
   assert.match(authCache, /localStorage\.setItem\(SCISIAM_REMEMBER_EMAIL_KEY, email\)/);
   assert.match(authCache, /localStorage\.removeItem\(SCISIAM_REMEMBER_EMAIL_KEY\)/);
 });
+
+test("email login sends authenticated users to the lab listing", () => {
+  const authForm = readProjectFile("src/components/auth/AuthForm.tsx");
+
+  assert.match(
+    authForm,
+    /cacheRememberedLogin\(normalizedEmail, rememberMe\);[\s\S]*router\.replace\("\/labs"\)/,
+  );
+  assert.doesNotMatch(authForm, /router\.push\("\/"\)/);
+});
