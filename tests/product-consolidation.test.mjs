@@ -7,8 +7,8 @@ import { fileURLToPath } from "node:url";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (path) => readFileSync(join(root, path), "utf8");
 
-test("Labs replaces Home and legacy History redirects into Profile", () => {
-  assert.match(read("src/app/page.tsx"), /redirect\("\/labs"\)/);
+test("Login is the site entry and legacy History redirects into Profile", () => {
+  assert.match(read("src/app/page.tsx"), /redirect\("\/login"\)/);
   assert.match(read("src/app/history/page.tsx"), /redirect\("\/profile\?tab=history"\)/);
 
   for (const path of ["src/components/Sidebar.tsx", "src/components/MobileTabBar.tsx"]) {

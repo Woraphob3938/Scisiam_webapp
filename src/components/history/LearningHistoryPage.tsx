@@ -200,15 +200,16 @@ function mapRunToRecord(run: LearningRunSnapshot): HistoryRecord | null {
   };
 }
 
-function mergeHistoryRecords(cloudRuns: LearningRunSnapshot[], localRecords: HistoryRecord[]) {
-  const cloudRecords = cloudRuns.map(mapRunToRecord).filter(Boolean) as HistoryRecord[];
-  const seenLabIds = new Set(cloudRecords.map((record) => record.labId));
-  const merged = [
-    ...cloudRecords,
-    ...localRecords.filter((record) => !seenLabIds.has(record.labId)),
-  ];
+function sortHistoryRecords(records: HistoryRecord[]) {
+  return [...records].sort(
+    (a, b) => b.createdAtMs - a.createdAtMs || a.title.localeCompare(b.title),
+  );
+}
 
-  return merged.sort((a, b) => b.createdAtMs - a.createdAtMs || a.title.localeCompare(b.title));
+function mapCloudHistoryRecords(cloudRuns: LearningRunSnapshot[]) {
+  return sortHistoryRecords(
+    cloudRuns.map(mapRunToRecord).filter(Boolean) as HistoryRecord[],
+  );
 }
 
 function sourceText(source: HistorySource) {
@@ -250,7 +251,9 @@ export default function LearningHistoryPage({ embedded = false }: LearningHistor
 
       setSnapshot(nextSnapshot);
       setRecords(
-        mergeHistoryRecords(nextSource === "cloud" ? nextSnapshot.recentRuns : [], localRecords)
+        nextSource === "cloud"
+          ? mapCloudHistoryRecords(nextSnapshot.recentRuns)
+          : sortHistoryRecords(localRecords),
       );
       setSource(nextSource);
       setLoading(false);

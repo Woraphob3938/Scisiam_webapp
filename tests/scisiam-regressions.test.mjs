@@ -260,16 +260,13 @@ test("elementary physics and chemistry labs are detail-only placeholders", () =>
   const labCard = readProjectFile("src/components/LabCard.tsx");
 
   const elementaryLabs = [
-    ["states-of-matter", "Chemistry"],
-    ["mixing-and-separating", "Chemistry"],
-    ["dissolving-solutions", "Chemistry"],
     ["acids-bases-around-us", "Chemistry"],
     ["heating-cooling-materials", "Chemistry"],
     ["physical-chemical-changes", "Chemistry"],
   ];
   const handleViewDetails = labsPage.match(/const handleViewDetails = \(id: string\) => \{[\s\S]*?\n  \};/)?.[0] ?? "";
 
-  assert.equal(elementaryLabs.length, 6);
+  assert.equal(elementaryLabs.length, 3);
   assert.doesNotMatch(handleViewDetails, /isLabReady/);
   assert.match(labCard, /disabled=\{!readiness\.isReady\}[\s\S]*onClick=\{\(\) => onEnterRoom\?\.\(lab\.id\)\}/);
 
@@ -952,8 +949,8 @@ test("profile authentication cannot leave the page on an infinite loading state"
   );
 });
 
-test("home redirects directly to the lab listing", () => {
+test("home redirects directly to login", () => {
   const source = readProjectFile("src/app/page.tsx");
 
-  assert.match(source, /redirect\("\/labs"\)/);
+  assert.match(source, /redirect\("\/login"\)/);
 });
