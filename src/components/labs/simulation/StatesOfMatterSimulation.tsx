@@ -303,7 +303,7 @@ export default function StatesOfMatterSimulation() {
       scene={
         <div className="h-full min-h-[310px] overflow-hidden rounded-2xl border border-blue-100 bg-[#f7fbff]">
           <svg viewBox="0 0 760 380" className="h-full w-full" role="img" aria-labelledby={`${titleId} ${descriptionId}`}>
-            <title id={titleId}>แบบจำลองอนุภาคของ{phase.thaiLabel}</title>
+            <title id={titleId}>{`แบบจำลองอนุภาคของ${phase.thaiLabel}`}</title>
             <desc id={descriptionId}>อนุภาคเปลี่ยนการจัดเรียงและความเร็วตามอุณหภูมิ โดยใช้แบบจำลองน้ำที่ความดันปกติ</desc>
             <defs><linearGradient id={chamberGradientId} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#ffffff" /><stop offset="1" stopColor={phase.id === "gas" ? "#ccfbf1" : "#dbeafe"} /></linearGradient></defs>
             <rect width="760" height="380" fill="#f7fbff" />

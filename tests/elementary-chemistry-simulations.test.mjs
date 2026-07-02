@@ -23,6 +23,11 @@ for (const file of files) {
     assert.match(source, /aria-labelledby/);
     assert.match(source, /<title id=/);
     assert.match(source, /<desc id=/);
+    assert.doesNotMatch(
+      source,
+      /<title id=\{[^}]+\}>[^<{]+\{/,
+      "SVG titles must use one text expression to hydrate consistently",
+    );
     assert.match(source, /graph=\{/);
     assert.match(source, /table=\{/);
     assert.doesNotMatch(source, /progressValue="0\/1"/);
