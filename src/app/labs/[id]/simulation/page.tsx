@@ -173,6 +173,12 @@ const BraggDiffractionSimulation = dynamic(() =>
   import("@/components/labs/simulation/BraggDiffractionSimulation"));
 const RelativisticKinematicsSimulation = dynamic(() =>
   import("@/components/labs/simulation/RelativisticKinematicsSimulation"));
+const StatesOfMatterSimulation = dynamic(() =>
+  import("@/components/labs/simulation/StatesOfMatterSimulation"));
+const MixingAndSeparatingSimulation = dynamic(() =>
+  import("@/components/labs/simulation/MixingAndSeparatingSimulation"));
+const DissolvingSolutionsSimulation = dynamic(() =>
+  import("@/components/labs/simulation/DissolvingSolutionsSimulation"));
 
 const simulationComponents: Record<DirectSimulationLabId, React.ComponentType> = {
   "newtons-cooling": NewtonsCoolingSimulation,
@@ -224,6 +230,9 @@ const simulationComponents: Record<DirectSimulationLabId, React.ComponentType> =
   "superconductivity-meissner": SuperconductivityMeissnerSimulation,
   "bragg-diffraction": BraggDiffractionSimulation,
   "relativistic-kinematics": RelativisticKinematicsSimulation,
+  "states-of-matter": StatesOfMatterSimulation,
+  "mixing-and-separating": MixingAndSeparatingSimulation,
+  "dissolving-solutions": DissolvingSolutionsSimulation,
 };
 
 function SimulationPlaceholder({ labId }: { labId: string }) {

@@ -48,6 +48,9 @@ export const directSimulationLabIds = [
   "superconductivity-meissner",
   "bragg-diffraction",
   "relativistic-kinematics",
+  "states-of-matter",
+  "mixing-and-separating",
+  "dissolving-solutions",
 ] as const;
 
 export const chemistryConceptSimulationLabIds = [

@@ -286,7 +286,7 @@ export const labsData: LabData[] = [
     title: "States of Matter",
     category: "Chemistry",
     gradeLevel: "ประถม",
-    status: "ยังสร้างไม่เสร็จ",
+    status: "",
     description: "สำรวจของแข็ง ของเหลว และแก๊ส ผ่านการสังเกตรูปร่าง ปริมาตร การไหล และการเปลี่ยนสถานะอย่างง่าย"
   },
   {
@@ -295,7 +295,7 @@ export const labsData: LabData[] = [
     title: "Mixing and Separating",
     category: "Chemistry",
     gradeLevel: "ประถม",
-    status: "ยังสร้างไม่เสร็จ",
+    status: "",
     description: "ทดลองผสมวัสดุและแยกสารด้วยการกรอง ร่อน แม่เหล็ก หรือการตกตะกอน เพื่อเข้าใจว่าสารผสมแยกได้หลายวิธี"
   },
   {
@@ -304,7 +304,7 @@ export const labsData: LabData[] = [
     title: "Dissolving and Solutions",
     category: "Chemistry",
     gradeLevel: "ประถม",
-    status: "ยังสร้างไม่เสร็จ",
+    status: "",
     description: "สังเกตการละลายของสารในน้ำ เปรียบเทียบตัวละลาย ตัวทำละลาย อุณหภูมิ และการคนที่มีผลต่อการละลาย"
   },
   {

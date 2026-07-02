@@ -252,6 +252,33 @@ test("elementary physics labs have dedicated interactive simulations", () => {
   }
 });
 
+test("elementary chemistry labs have dedicated open-exploration simulations", () => {
+  const labs = readProjectFile("src/data/labs.ts");
+  const registry = readProjectFile("src/data/labSimulationRegistry.ts");
+  const savedRegistry = readProjectFile("src/data/labSavedExperiments.ts");
+  const route = readProjectFile("src/app/labs/[id]/simulation/page.tsx");
+  const targets = [
+    ["states-of-matter", "StatesOfMatterSimulation"],
+    ["mixing-and-separating", "MixingAndSeparatingSimulation"],
+    ["dissolving-solutions", "DissolvingSolutionsSimulation"],
+  ];
+
+  for (const [labId, component] of targets) {
+    assert.match(
+      labs,
+      new RegExp(`id: "${labId}"[\\s\\S]*?status: ""`),
+      `${labId} should be marked ready`,
+    );
+    assert.match(registry, new RegExp(`"${labId}"`));
+    assert.match(savedRegistry, new RegExp(`"${labId}"\\s*:`));
+    assert.match(
+      route,
+      new RegExp(`const ${component} = dynamic\\([\\s\\S]*?${component}`),
+    );
+    assert.match(route, new RegExp(`"${labId}": ${component}`));
+  }
+});
+
 test("elementary physics and chemistry labs are detail-only placeholders", () => {
   const labs = readProjectFile("src/data/labs.ts");
   const details = readProjectFile("src/data/labDetails.ts");
