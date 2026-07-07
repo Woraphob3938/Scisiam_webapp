@@ -1,8 +1,21 @@
 "use client";
 
-import React, { useState, useMemo, useEffect, useRef } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Sliders, RotateCcw, ClipboardList, Activity, Play, Pause, Layers, Thermometer, Zap, Eye, Sparkles, Clipboard, Download, Trash, CheckCircle2, Target } from "lucide-react";
+import {
+  Sliders,
+  RotateCcw,
+  ClipboardList,
+  Play,
+  Layers,
+  Thermometer,
+  Zap,
+  Sparkles,
+  Clipboard,
+  Download,
+  Trash,
+  Target,
+} from "lucide-react";
 import SharedSimulationShell from "@/components/labs/simulation/SharedSimulationShell";
 import ManualNumberInput from "@/components/labs/simulation/ManualNumberInput";
 import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";

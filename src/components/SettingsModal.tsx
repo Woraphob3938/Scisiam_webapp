@@ -4,13 +4,15 @@ import React, { useEffect, useMemo, useState } from "react";
 import {
   Bot,
   Check,
+  KeyRound,
   Monitor,
   Type,
   Wand2,
   X,
 } from "lucide-react";
+import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 
-export const SCISIAM_SETTINGS_EVENT = "scisiam_settings_updated";
+export const scisiam_SETTINGS_EVENT = "scisiam_settings_updated";
 
 const AI_STYLE_KEY = "scisiam_ai_tutor_style";
 const AI_DETAIL_KEY = "scisiam_ai_answer_detail";
@@ -66,7 +68,7 @@ function getStoredBoolean(key: string, fallback = false) {
   return fallback;
 }
 
-export function getSciSiamAiSettings() {
+export function getScisiamAiSettings() {
   return {
     aiStyle: getStoredValue<AiStyle>(AI_STYLE_KEY, "simple", ["simple", "hint", "guided"]),
     aiDetail: getStoredValue<AiDetail>(AI_DETAIL_KEY, "normal", ["short", "normal", "detailed"]),
@@ -94,7 +96,7 @@ function persistSettings(input: {
   localStorage.setItem(TEXT_SIZE_KEY, input.textSize);
   localStorage.setItem(REDUCE_MOTION_KEY, String(input.reduceMotion));
   applyDisplaySettings();
-  window.dispatchEvent(new CustomEvent(SCISIAM_SETTINGS_EVENT));
+  window.dispatchEvent(new CustomEvent(scisiam_SETTINGS_EVENT));
 }
 
 export default function SettingsModal({
@@ -116,6 +118,9 @@ export default function SettingsModal({
   const [reduceMotion, setReduceMotion] = useState(() =>
     getStoredBoolean(REDUCE_MOTION_KEY, false)
   );
+  const [passwordResetBusy, setPasswordResetBusy] = useState(false);
+  const [passwordResetMessage, setPasswordResetMessage] = useState("");
+  const [passwordResetError, setPasswordResetError] = useState(false);
 
   useEffect(() => {
     applyDisplaySettings();
@@ -146,6 +151,40 @@ export default function SettingsModal({
     [aiStyle]
   );
 
+  const sendPasswordResetEmail = async () => {
+    setPasswordResetMessage("");
+    setPasswordResetError(false);
+
+    if (!isSupabaseConfigured()) {
+      setPasswordResetMessage("ยังไม่ได้ตั้งค่า Supabase สำหรับส่งอีเมลเปลี่ยนรหัสผ่าน");
+      setPasswordResetError(true);
+      return;
+    }
+
+    setPasswordResetBusy(true);
+    try {
+      const supabase = createClient();
+      const { data, error: userError } = await supabase.auth.getUser();
+      const email = data.user?.email;
+
+      if (userError || !email) {
+        throw new Error("Missing current user email");
+      }
+
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth/verify`,
+      });
+
+      if (error) throw error;
+      setPasswordResetMessage("ส่งลิงก์เปลี่ยนรหัสผ่านแล้ว กรุณาตรวจสอบอีเมลของคุณ");
+    } catch {
+      setPasswordResetMessage("ส่งลิงก์เปลี่ยนรหัสผ่านไม่สำเร็จ กรุณาลองใหม่อีกครั้ง");
+      setPasswordResetError(true);
+    } finally {
+      setPasswordResetBusy(false);
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -166,7 +205,7 @@ export default function SettingsModal({
           <div className="min-w-0">
             <div className="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-xs font-extrabold leading-[1.45] text-blue-700">
               <Wand2 className="h-3.5 w-3.5" />
-              การตั้งค่า SciSiam
+              การตั้งค่า Scisiam
             </div>
             <h2
               id="scisiam-settings-title"
@@ -327,6 +366,37 @@ export default function SettingsModal({
                 />
               </label>
             </div>
+          </section>
+
+          <section className="rounded-2xl border border-slate-200 bg-white p-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex min-w-0 items-start gap-3">
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white text-slate-600 ring-1 ring-slate-200">
+                  <KeyRound className="h-5 w-5" />
+                </span>
+                <div className="min-w-0">
+                  <h3 className="text-base font-extrabold leading-[1.45] text-slate-950">
+                    บัญชี
+                  </h3>
+                  <p className="text-sm font-semibold leading-relaxed text-slate-500">
+                    ส่งลิงก์ไปยังอีเมลบัญชีนี้เพื่อยืนยันและตั้งรหัสผ่านใหม่
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => void sendPasswordResetEmail()}
+                disabled={passwordResetBusy}
+                className="inline-flex min-h-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-sm font-extrabold leading-[1.45] text-slate-700 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
+              >
+                {passwordResetBusy ? "กำลังส่ง..." : "เปลี่ยนรหัสผ่าน"}
+              </button>
+            </div>
+            {passwordResetMessage ? (
+              <p className={`mt-3 text-xs font-bold leading-relaxed ${passwordResetError ? "text-rose-600" : "text-emerald-600"}`} role="status">
+                {passwordResetMessage}
+              </p>
+            ) : null}
           </section>
         </div>
 

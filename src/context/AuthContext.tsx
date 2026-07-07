@@ -9,8 +9,8 @@ import {
   type ReactNode,
 } from "react";
 import {
-  cacheSciSiamAuth,
-  clearSciSiamAuthCache,
+  cacheScisiamAuth,
+  clearScisiamAuthCache,
   SCISIAM_AUTH_EVENT,
 } from "@/lib/supabase/auth-cache";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
@@ -63,7 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } = await supabase.auth.getUser();
 
       if (!user) {
-        clearSciSiamAuthCache({ emit: false });
+        clearScisiamAuthCache({ emit: false });
         setAuthState({ ...defaultAuthState, isAuthReady: true });
         return;
       }
@@ -83,7 +83,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         avatarVersion: Date.now(),
         localNotificationMode: false,
       });
-      cacheSciSiamAuth(
+      cacheScisiamAuth(
         {
           email: user.email,
           role: profile?.role || "student",

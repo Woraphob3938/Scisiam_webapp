@@ -1,7 +1,7 @@
 <!-- BEGIN:scisiam-agent-rules -->
 # SciSiam Agent Guidelines
 
-Working rules for coding agents that modify **SciSiam Virtual Lab**. Treat this project as a competition-ready educational product that can later become a web demo, PC app, and mobile learning app.
+Working rules for coding agents that modify **SciSiam Virtual Lab**. Treat this as a real Thai-first educational product with a deployed web app and future PC/mobile packaging targets, not a disposable demo.
 
 ---
 
@@ -11,11 +11,13 @@ SciSiam is an interactive virtual science lab for Thai students and teachers. Th
 
 Core product surfaces:
 
-- 103 labs across Physics, Chemistry, Biology, and Mathematics, plus a Foundation entry; 61 of them ship a ready simulation today.
+- 103 labs across Physics, Chemistry, Biology, Mathematics, and Foundation; all 103 are currently registered as ready simulations (61 direct, 6 shared chemistry-concept, 36 shared mathematics-concept).
 - Lab detail pages with objectives, equipment, theory, steps, readiness, and start actions.
 - Simulation pages where learners change variables, observe live results, review graphs/tables, and save experiment runs.
-- AI tutor support through the server-side AI route.
-- Points, missions, learning history, profile, and teacher-oriented progress workflows.
+- Auth-first navigation: `/` redirects to `/login`; successful email login opens `/labs` and Google OAuth returns to `/profile` by default.
+- AI ไออุ่น support through the authenticated server-side AI route.
+- Profile editing, rewards, missions, learning history, and Supabase-backed experiment progress. Active scoring and points are intentionally disabled; legacy score columns remain only for schema compatibility.
+- Shared classrooms for teachers and students, including invite codes, selected labs, member profiles, classroom assignments, and guarded owner actions.
 - Future packaging targets for web, PC, and mobile distribution.
 
 When choosing between a flashy feature and a reliable learning flow, prefer the reliable learning flow.
@@ -28,8 +30,10 @@ When choosing between a flashy feature and a reliable learning flow, prefer the 
 - **React**: React 19.2.4
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS v4 through `src/app/globals.css` and CSS variables
+- **UI primitives**: Radix UI, shadcn components, `class-variance-authority`, `tailwind-merge`, and Sonner notifications
 - **Icons**: `lucide-react`
 - **Images**: `next/image` for app bitmap assets
+- **Optional 3D**: `three`
 - **AI API**: `src/app/api/ai-tutor/route.ts`
 - **Data source**: `src/data/labs.ts` is the source of truth for lab metadata
 - **Lab details**: `src/data/labDetails.ts`
@@ -42,11 +46,15 @@ Do not add large frameworks or dependencies unless they clearly reduce complexit
 
 ## 3. Repository Map
 
-- `src/app/page.tsx`: Home page and high-level entry point.
+- `src/app/page.tsx`: Redirects the site root to `/login`.
 - `src/app/labs/page.tsx`: Lab listing, search, category, and grade-level filtering.
 - `src/app/labs/[id]/page.tsx`: Lab detail route.
 - `src/app/labs/[id]/simulation/page.tsx`: Simulation route selector by `labId`.
 - `src/app/api/ai-tutor/route.ts`: Server route for SciSiam AI Tutor.
+- `src/app/classrooms/page.tsx`: Authenticated classroom list with creator names.
+- `src/app/classrooms/[id]/page.tsx`: Classroom workspace for labs, assignments, and members.
+- `src/app/auth/*`: Email confirmation, recovery, and OAuth callback routes.
+- `middleware.ts` + `src/lib/supabase/proxy.ts`: Refresh Supabase sessions and protect `/profile` and `/classrooms`.
 - `src/components/LabCard.tsx`: Lab card UI and shared `LabData` type.
 - `src/components/labs/*`: Lab detail components.
 - `src/components/labs/simulation/*`: Simulation components and the shared `SharedSimulationShell`.
@@ -55,6 +63,7 @@ Do not add large frameworks or dependencies unless they clearly reduce complexit
 - `src/components/AIChatButton.tsx`: Floating AI tutor UI.
 - `src/components/SettingsModal.tsx`: User-facing settings.
 - `src/components/auth/*`: Login, register, and password-reset forms.
+- `src/components/classrooms/ClassroomActions.tsx`: Create/join classroom dialog shared by desktop and mobile navigation.
 - `src/components/profile/*`: Student profile and teacher dashboard surfaces.
 - `src/context/SidebarContext.tsx`: Layout/sidebar state.
 - `src/data/labs.ts`: Lab metadata for all 103 labs.
@@ -63,10 +72,19 @@ Do not add large frameworks or dependencies unless they clearly reduce complexit
 - `src/data/labSimulationRegistry.ts`: Authoritative registry of ready lab ids (direct, chemistry-concept, math-concept).
 - `src/data/labSavedExperiments.ts`: localStorage keys used by the save flow for every ready lab.
 - `src/lib/supabase/*`: Supabase clients, experiment sync, missions, and learning data helpers.
+- `src/lib/supabase/classrooms.ts`: Classroom reads and owner/member RPC wrappers.
 - `supabase/migrations/*`: Database migrations and RPC hardening.
 - `tests/*.test.mjs`: Node regression tests.
 
 Before adding a new component or data structure, look for an existing shared component or data model.
+
+### Runtime Data Flow
+
+- **Labs**: `labs.ts` → listing/detail routes → readiness registry → simulation selector. Unsupported ids must stop at a matching not-found/placeholder state.
+- **Experiment saves**: simulation → `saveExperimentAndSync` → local offline copy when applicable + authenticated `save_experiment_run` RPC → `experiment_runs` and `lab_progress` → profile/history snapshots.
+- **Profiles**: Supabase Auth session → `profiles`; avatar files use the `profile-avatars` Storage bucket and the profile row stores the resulting path.
+- **Classrooms**: UI → `src/lib/supabase/classrooms.ts` → RLS-protected tables and SECURITY DEFINER RPCs. Owner status comes from `classrooms.creator_id`, never from a client-provided role flag.
+- **AI ไออุ่น**: client → `/api/ai-tutor` → authenticated/rate-limited server route → Gemini. Usage telemetry stores bounded metadata only, never prompts, secrets, or provider payloads.
 
 ---
 
@@ -75,7 +93,7 @@ Before adding a new component or data structure, look for an existing shared com
 Use the Prompt Optimizer MCP before complex work that affects multiple parts of the project, especially:
 
 - Project, security, performance, responsive UI, or deployment audits.
-- Major redesigns such as the home page, lab detail pages, simulations, profile, or teacher dashboard.
+- Major redesigns such as auth, labs, simulations, classrooms, profile, or teacher dashboard surfaces.
 - Architecture, shared data model, API, Supabase, or migration planning.
 - Implementation plans that touch many routes/components or many labs.
 
@@ -90,10 +108,10 @@ Rules:
 
 ## 5. Lab Content Rules
 
-SciSiam has 103 labs in `labsData`; 61 are registered as ready in `src/data/labSimulationRegistry.ts`. Never show content from the wrong lab.
+SciSiam has 103 labs in `labsData`; all 103 are registered as ready in `src/data/labSimulationRegistry.ts`. Never show content from the wrong lab.
 
 - Do not fallback an unsupported lab to Newton cooling or any other unrelated lab.
-- If a simulation is incomplete, show a placeholder or disabled state that matches the requested lab.
+- If a future lab is added before its simulation is complete, show a placeholder or disabled state that matches the requested lab.
 - Detail content, equipment, theory, steps, hero imagery, and simulation visuals must match the lab name.
 - Prefer data-driven/shared layout structures over long `if/else` trees. The simulation selector (`src/app/labs/[id]/simulation/page.tsx`) already favors the `simulationComponents` map; route new labs through the registry instead of adding more `if` branches.
 - When adding or changing a lab, check both:
@@ -150,22 +168,29 @@ For PC/mobile apps, assume the app bundle can be inspected. The app must not con
 
 ---
 
-## 8. Supabase, Auth, And Data Rules
+## 8. Supabase, Auth, Classrooms, And Data Rules
 
-Supabase is used for real user-facing data such as profiles, experiment runs, missions, rewards, learning snapshots, and rate-limit support.
+Supabase is the canonical store for sessions, profiles, avatar storage, experiment runs, progress, missions/rewards, AI usage limits, classrooms, memberships, selected labs, and classroom assignments.
 
-- Use Supabase helpers in `src/lib/supabase/*` instead of duplicating client setup.
-- Use publishable keys only on the client.
-- Keep service-role or secret keys server-side only.
-- Apply schema changes through migrations in `supabase/migrations/`.
-- Prefer database/RPC checks for important scoring or progress operations.
-- Treat localStorage as convenience data, not the source of truth for real points or classroom progress.
-- When data is still mock/demo, label it clearly and do not present it as production state.
-- Read browser APIs (`window`, `document`, `localStorage`) only after mount in client components.
-- Auth and points are mirrored to localStorage by `src/lib/supabase/auth-cache.ts` only as a UI cache; the canonical source is the Supabase session and the `profiles` table.
-- Password reset goes through `/auth/callback` → `/reset-password`. Document redirect URLs in the dashboard and require verified SMTP before production email.
+- Use helpers in `src/lib/supabase/*`; do not duplicate client creation or hand-roll session cookies.
+- Client code may use only `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. Service-role/database secrets remain server-side and uncommitted.
+- `middleware.ts` delegates to `src/lib/supabase/proxy.ts`; `/profile` and `/classrooms/**` require a valid Supabase claim and preserve the intended destination in `?next=`.
+- Email registration always returns to login. Email confirmation and password recovery use token-hash pages: `/auth/verify` → POST `/auth/confirm` → `/login` or `/reset-password`.
+- Google login uses `/auth/oauth-callback`, validates the relative `next` path, and requests account selection.
+- `auth-cache.ts` mirrors display name/avatar/role and remembered email only for responsive UI. It is not authorization and must never unlock private data.
+- Read `window`, `document`, and `localStorage` only in mounted client code. Authenticated history must come from Supabase, not another account's device-local runs.
+- Active score/point mutation is disabled. Do not reintroduce score UI, trust client-provided scores, or treat legacy `total_points`, `score`, `points_awarded`, level, or XP columns as active product state.
+- Authoritative experiment writes go through `save_experiment_run`; mission claims are server-derived and idempotent through `claim_mission_reward` but no longer award points.
+- Apply schema changes through ordered files in `supabase/migrations/`. Use a new forward migration instead of editing an applied migration. Keep local filenames aligned with deployed migration history; regression tests assert that alignment.
 
-Avoid making score/progress flows easy to exploit by repeated local saves. Points are awarded only once per lab, and authoritative writes go through the `save_experiment_run` and `claim_mission_reward` RPCs.
+### Classroom Authorization
+
+- Teachers and students may create or join rooms. A room contains a name, grade level, description, 1-24 selected labs, an owner-only invite code, members, and assignments.
+- Room members may read room labs, member profile details, creator name, and assignments through RLS/guarded RPCs.
+- Only the creator may read the invite code, rename or disband the room, remove a non-owner member, or create an assignment. Enforce this with `private.is_class_creator` inside database RPCs, not only by hiding buttons.
+- Disbanding sets `is_active = false` and invalidates the join code; it does not hard-delete classroom history.
+- Never expose private join codes in list queries, client caches, logs, or public profile data.
+- Any classroom schema/RPC change requires a migration, corresponding `database.types.ts` update, and regression coverage in `tests/classrooms.test.mjs` and/or `tests/classroom-workspace-ui.test.mjs`.
 
 ---
 
@@ -173,7 +198,9 @@ Avoid making score/progress flows easy to exploit by repeated local saves. Point
 
 SciSiam should feel like a focused learning dashboard for Thai students: friendly, clean, and credible.
 
-- Home page: prioritize lab discovery, search, filters, and readable cards.
+- Login/register: keep the auth form as the primary experience; `/` is not a marketing/home dashboard.
+- Labs page: prioritize discovery, search, subject/grade filters, readiness summary, and readable Thai-first cards.
+- Classroom workspace: keep labs, classwork, and members as clear tabs; owner-only destructive actions require confirmation and must remain usable on mobile.
 - Lab detail: complete but not crowded; clear hierarchy; no unrelated decoration.
 - Simulation: experiment first; controls and panels should support the task without covering key content.
 - Avoid nested cards and decorative UI that has no job.
@@ -207,15 +234,17 @@ Thai text guidance:
 
 ## 11. Deployment And Packaging Readiness
 
-Targets:
+Current and future targets:
 
-- **Web demo**: Next.js deployment on Vercel or another host that supports route handlers.
+- **Web**: Next.js deployment on Vercel; the fallback canonical origin in `next.config.ts` is `https://scisiam-app.vercel.app`. The host must support route handlers, middleware, and server environment variables.
 - **PC app**: Electron or Tauri later, with no bundled API secrets.
 - **Mobile app**: Capacitor/PWA or native wrapper later, with AI calls routed through a backend.
 
 Watch-outs:
 
 - Static export cannot use built-in API routes; use a separate backend if static export becomes necessary.
+- There is currently no committed `.github/workflows` CI pipeline. Do not claim GitHub Actions coverage unless a workflow is added and verified.
+- Configure `NEXT_PUBLIC_SITE_URL`, Supabase redirect URLs, publishable credentials, `GEMINI_API_KEY`, and optional `GEMINI_MODEL` in the deployment environment.
 - Do not commit build outputs such as `.next`, `dist`, screenshots, local package output, or generated QA folders.
 - Before production deployment, run lint, build, regression tests, secret scan, and dependency review.
 - In-memory rate limits are not enough for multi-instance production. Use Supabase, Redis, or another durable store.
@@ -253,14 +282,15 @@ npm run build
 
 For UI work, inspect at least:
 
-- `/`
+- `/login` (and verify `/` redirects there)
 - `/labs`
 - `/labs/newtons-cooling`
 - `/labs/newtons-cooling/simulation`
 - The lab detail or simulation route that changed
-- `/missions` and `/history` if progress, points, or missions changed
-- `/profile` if progress, points, auth, or localStorage changed
-- `/login`, `/register`, and `/reset-password` if auth or brand UI changed
+- `/missions` and `/profile?tab=history` if progress, rewards, or missions changed; `/history` is only a redirect.
+- `/profile` if progress, profile editing, auth, avatar storage, or localStorage mirrors changed.
+- `/classrooms` and one `/classrooms/[id]` workspace for classroom, member, assignment, or navigation changes. Test both creator and ordinary-member permissions when possible.
+- `/login`, `/register`, `/auth/verify`, and `/reset-password` if auth, email, redirect, or brand UI changed.
 
 Check console errors, hydration warnings, layout overflow, mobile width around 390px, search/filter flows, enter-lab actions, save result actions, AI tutor interactions, and password-reset redirects.
 
@@ -270,6 +300,8 @@ Check console errors, hydration warnings, layout overflow, mobile width around 3
 
 - Do not revert user work without explicit permission.
 - If the working tree is dirty, separate your changes from existing user changes.
+- Use `codex/` for new agent-created branches unless the user requests another name. Treat `main` as the Vercel deployment branch when the connected project is configured that way.
+- Commit or push only when the user asks. Before pushing `main`, confirm the intended files, current branch, remote, and required verification have succeeded.
 - Do not commit build output, local environment files, generated screenshots, or tool caches.
 - If `package-lock.json` changes, confirm it came from an intentional dependency change.
 - Before handing off, summarize changed files, verification commands, and remaining warnings.
@@ -280,13 +312,14 @@ Check console errors, hydration warnings, layout overflow, mobile width around 3
 
 If the user gives no more specific direction, prioritize:
 
-1. Prevent wrong-lab fallback and keep all 103 labs aligned across detail/simulation routes. The anti-fallback guards and registry tests are in place; keep coverage as new labs are added.
-2. Continue shared lab detail and simulation data models to reduce copy/paste. Replace the remaining `if/else` chains in the simulation selector with registry-driven lookups.
-3. Harden AI Tutor for deployable server-side use and durable rate limiting. The RPC-based limiter exists; verify it across multi-instance deploys and rotate keys before go-live.
-4. Make profile, points, progress, missions, and learning history reflect real data. The Supabase snapshot layer exists; finish wiring remaining simulations to the save flow.
-5. Complete save/log flows for each simulation. Ensure every ready lab writes through `saveExperimentAndSync`.
-6. Improve mobile QA for floating AI, navigation, and simulation panels.
-7. Prepare packaging strategy for web, PC, and mobile targets. The Electron scaffold (`main.js`) exists; confirm no bundled secrets before any packaging build.
+1. Keep all 103 labs aligned across metadata, detail content, readiness, routing, and save keys; preserve the anti-fallback regression guards.
+2. Continue consolidating shared lab detail/simulation data models and replace remaining selector branches with registry-driven dispatch where practical.
+3. Audit every ready simulation's save/log flow so authenticated runs use `saveExperimentAndSync` and history never leaks device-local data across accounts.
+4. Extend classrooms without weakening database authorization: assignment lifecycle, lab-set editing, member workflows, and creator/member browser QA.
+5. Harden AI ไออุ่น for multi-instance deployment, monitor the durable Supabase limiter, and rotate provider credentials before public launch.
+6. Finish production auth operations: verified SMTP/custom Thai email templates, canonical redirects, Google consent verification, and recovery testing across devices.
+7. Improve 390px mobile QA for tabs, dialogs, floating AI, navigation, and simulation controls.
+8. Prepare packaging strategy for web, PC, and mobile. The Electron scaffold (`main.js`) exists; confirm no bundled secrets before any packaging build.
 
 <!-- END:scisiam-agent-rules -->
 

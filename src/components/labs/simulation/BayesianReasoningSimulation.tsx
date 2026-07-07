@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import {
   Sliders,
@@ -73,13 +73,11 @@ export default function BayesianReasoningSimulation() {
 
     // Within true hypotheses, true positives count (Sensitivity * trueHCount)
     const truePosCount = Math.round(sensitivity * trueHCount);
-    const falseNegCount = trueHCount - truePosCount;
 
     // False Hypotheses count (100 - trueHCount)
     const falseHCount = total - trueHCount;
     // Within false hypotheses, false positives count (falsePositive * falseHCount)
     const falsePosCount = Math.round(falsePositive * falseHCount);
-    const trueNegCount = falseHCount - falsePosCount;
 
     for (let index = 0; index < total; index++) {
       // Coordinate layout

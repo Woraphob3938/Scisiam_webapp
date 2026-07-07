@@ -2,11 +2,16 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import SharedSimulationShell from "./SharedSimulationShell";
-import { Beaker, RotateCcw, Info, Play, CheckCircle, XCircle, Award } from "lucide-react";
+import {
+  Beaker,
+  Info,
+  Play,
+  CheckCircle,
+  XCircle,
+  Award,
+} from "lucide-react";
 import { labsById } from "@/data/labs";
 import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";
-
-interface GraphPoint { x: number; y: number; }
 
 interface QuizLog {
   id: number;
@@ -72,14 +77,13 @@ export default function PhysicalChemicalChangesSimulation() {
   const [selectedEvidences, setSelectedEvidences] = useState<string[]>([]);
   const [hasChecked, setHasChecked] = useState(false);
   const [logs, setLogs] = useState<QuizLog[]>([]);
-  const [isSaving, setIsSaving] = useState(false);
+  const [, setIsSaving] = useState(false);
 
   const requestRef = useRef<number>(0);
   const lastUpdateRef = useRef<number>(0);
 
   const animate = (time: number) => {
     if (!lastUpdateRef.current) lastUpdateRef.current = time;
-    const delta = time - lastUpdateRef.current;
 
     if (isRunning && progress < 100) {
       // Speed up animation based on activity
@@ -94,6 +98,7 @@ export default function PhysicalChemicalChangesSimulation() {
   useEffect(() => {
     requestRef.current = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(requestRef.current);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- RAF loop intentionally uses the current activity animation closure.
   }, [isRunning, progress]);
 
   const handleStart = () => {

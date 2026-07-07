@@ -1,6 +1,10 @@
 "use client";
 
-import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+} from "react";
 import { useRouter } from "next/navigation";
 import {
   Sliders,
@@ -137,7 +141,7 @@ export default function FourierAnalysisSimulation() {
       startY = endY;
     }
     return { circles: list, finalPt: { x: startX, y: startY } };
-  }, [harmonicComponents, fundamentalFreq, time, signal, amplitude]);
+  }, [harmonicComponents, fundamentalFreq, time, signal]);
 
   // Calculate approximation error (RMSE) and THD
   const rmse = useMemo(() => {

@@ -11,7 +11,7 @@ type CacheAuthInput = {
   avatarUrl?: string | null;
 };
 
-export function cacheSciSiamAuth(
+export function cacheScisiamAuth(
   input: CacheAuthInput,
   options: { emit?: boolean } = {}
 ) {
@@ -38,7 +38,7 @@ export function cacheSciSiamAuth(
   }
 }
 
-export function clearSciSiamAuthCache(options: { emit?: boolean } = {}) {
+export function clearScisiamAuthCache(options: { emit?: boolean } = {}) {
   if (typeof window === "undefined") return;
 
   localStorage.removeItem("scisiam_logged_in");

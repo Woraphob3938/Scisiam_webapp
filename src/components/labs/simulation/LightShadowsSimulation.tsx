@@ -2,7 +2,19 @@
 
 import React, { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { Sliders, RotateCcw, ClipboardList, Activity, Play, Zap, Sparkles, Clipboard, Download, Trash, CheckCircle2, Eye, Target } from "lucide-react";
+import {
+  Sliders,
+  RotateCcw,
+  ClipboardList,
+  Activity,
+  Zap,
+  Sparkles,
+  Clipboard,
+  Download,
+  Trash,
+  Eye,
+  Target,
+} from "lucide-react";
 import SharedSimulationShell from "@/components/labs/simulation/SharedSimulationShell";
 import ManualNumberInput from "@/components/labs/simulation/ManualNumberInput";
 import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";

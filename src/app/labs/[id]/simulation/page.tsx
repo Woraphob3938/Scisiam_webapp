@@ -338,7 +338,7 @@ function SimulationPlaceholder({ labId }: { labId: string }) {
         {/* Status Message */}
         <p className="mb-8 text-sm font-semibold leading-relaxed text-slate-500">
           {isInvalid
-            ? "ขออภัย ไม่พบห้องแล็บวิทยาศาสตร์ที่คุณกำลังเรียกดูในระบบ SciSiam กรุณาตรวจสอบเส้นทางหรือรหัสแล็บใหม่อีกครั้ง"
+            ? "ขออภัย ไม่พบห้องแล็บวิทยาศาสตร์ที่คุณกำลังเรียกดูในระบบ Scisiam กรุณาตรวจสอบเส้นทางหรือรหัสแล็บใหม่อีกครั้ง"
             : "แล็บนี้ยังสร้างไม่เสร็จ: ห้องทดลองจำลองอยู่ระหว่างการพัฒนาให้ตรงกับวัตถุประสงค์การเรียนรู้และหัวข้อแล็บนี้"}
         </p>
 
@@ -359,7 +359,7 @@ function SimulationPlaceholder({ labId }: { labId: string }) {
             className="flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-600 transition-all hover:bg-slate-50 active:scale-[0.98]"
           >
             <Home className="h-4 w-4" />
-            <span>กลับหน้าหลัก SciSiam</span>
+            <span>กลับหน้าหลัก Scisiam</span>
           </Link>
         </div>
       </div>

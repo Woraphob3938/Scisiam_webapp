@@ -2,15 +2,14 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import SharedSimulationShell from "./SharedSimulationShell";
-import { Info, Play, RefreshCw, Zap, Sliders } from "lucide-react";
+import {
+  Info,
+  RefreshCw,
+  Zap,
+  Sliders,
+} from "lucide-react";
 import { labsById } from "@/data/labs";
 import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";
-
-interface XpsPeak {
-  bindingEnergy: number;
-  height: number;
-  label: string;
-}
 
 const samples = [
   {
@@ -49,7 +48,7 @@ export default function XpsSpectroscopySimulation() {
   const [isEmitting, setIsEmitting] = useState(false);
   const [hasSpectrum, setHasSpectrum] = useState(false);
   const [beamProgress, setBeamProgress] = useState(0);
-  const [isSaving, setIsSaving] = useState(false);
+  const [, setIsSaving] = useState(false);
 
   const requestRef = useRef<number>(0);
   const lastTimeRef = useRef<number>(0);
@@ -69,7 +68,6 @@ export default function XpsSpectroscopySimulation() {
 
   const animate = (time: number) => {
     if (!lastTimeRef.current) lastTimeRef.current = time;
-    const delta = time - lastTimeRef.current;
 
     if (isEmitting && beamProgress < 100) {
       setBeamProgress(prev => {
@@ -90,6 +88,7 @@ export default function XpsSpectroscopySimulation() {
   useEffect(() => {
     requestRef.current = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(requestRef.current);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- RAF beam loop intentionally uses the current animation closure.
   }, [isEmitting, beamProgress]);
 
   const handleSaveResult = async () => {

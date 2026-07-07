@@ -181,6 +181,7 @@ export default function DifferentialEquationsSimulation() {
         cancelAnimationFrame(requestRef.current);
       }
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- RAF loop intentionally uses the current simulation step closure.
   }, [isRunning, xPos, velocity, time, damping, mass, stiffness]);
 
   const handleAddLog = () => {

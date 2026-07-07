@@ -6,22 +6,31 @@ import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 export async function POST(request: NextRequest) {
   const url = new URL(request.url);
   const formData = await request.formData();
+  const email = formData.get("email");
+  const token = formData.get("token");
   const tokenHash = formData.get("token_hash");
   const type = formData.get("type");
   const isRecovery = type === "recovery";
   const isEmailConfirmation = type === "email";
 
-  if (
-    typeof tokenHash === "string" &&
-    tokenHash.length > 0 &&
-    (isRecovery || isEmailConfirmation) &&
-    isSupabaseConfigured()
-  ) {
+  if ((isRecovery || isEmailConfirmation) && isSupabaseConfigured()) {
     const supabase = await createClient();
-    const { error } = await supabase.auth.verifyOtp({
-      token_hash: tokenHash,
-      type: type as EmailOtpType,
-    });
+    const { error } =
+      isRecovery &&
+      typeof email === "string" &&
+      typeof token === "string" &&
+      /^[0-9]{6}$/.test(token)
+        ? await supabase.auth.verifyOtp({
+            email,
+            token,
+            type: "recovery",
+          })
+        : typeof tokenHash === "string" && tokenHash.length > 0
+          ? await supabase.auth.verifyOtp({
+              token_hash: tokenHash,
+              type: type as EmailOtpType,
+            })
+          : { error: new Error("Missing verification token") };
 
     if (!error) {
       if (isRecovery) {
@@ -36,7 +45,7 @@ export async function POST(request: NextRequest) {
   }
 
   const invalidDestination = isRecovery
-    ? "/reset-password?error=invalid_link"
+    ? "/auth/verify?type=recovery&error=invalid_otp"
     : "/login?confirmed=invalid_link";
   return NextResponse.redirect(new URL(invalidDestination, url.origin), 303);
 }

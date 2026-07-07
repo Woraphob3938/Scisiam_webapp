@@ -89,7 +89,7 @@ export default function MissionsPage() {
       {
         id: "daily-login",
         title: "เข้าศึกษาประจำวัน",
-        desc: "เข้าสู่ระบบและสำรวจห้องปฏิบัติการจำลองของ SciSiam",
+        desc: "เข้าสู่ระบบและสำรวจห้องปฏิบัติการจำลองของ Scisiam",
         type: "daily",
         category: "General",
         progress: 1,
@@ -194,7 +194,7 @@ export default function MissionsPage() {
           "success",
         );
       } else if (result.reason === "signed_out" || result.reason === "not_configured") {
-        showToast("เข้าสู่ระบบก่อนรับรางวัล เพื่อบันทึกความสำเร็จลงบัญชี SciSiam", "info");
+        showToast("เข้าสู่ระบบก่อนรับรางวัล เพื่อบันทึกความสำเร็จลงบัญชี Scisiam", "info");
       } else if (result.reason === "not_completed") {
         showToast("ภารกิจนี้ยังไม่ครบเงื่อนไข ลองทำแล็บและบันทึกผลเพิ่ม", "info");
       } else {

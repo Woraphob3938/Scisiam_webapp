@@ -1,12 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent, type RefObject } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import {
   ArrowLeft,
   ArrowRight,
+  CalendarDays,
   CheckCircle2,
   Clock3,
   ClipboardList,
@@ -16,26 +17,46 @@ import {
   GraduationCap,
   LockKeyhole,
   Megaphone,
+  Pencil,
+  Plus,
   RefreshCw,
   School,
   Share2,
   ShieldCheck,
+  Trash2,
   UserRound,
+  UserMinus,
   UsersRound,
 } from "lucide-react";
+import { toast } from "sonner";
 
 import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSidebar } from "@/context/SidebarContext";
 import { getLabReadiness } from "@/data/labReadiness";
 import { labsById } from "@/data/labs";
 import {
+  createClassroomAssignment,
+  disbandClassroom,
   getClassroom,
+  getClassroomAssignments,
   getClassroomJoinCode,
   getClassroomMembers,
+  removeClassroomMember,
+  renameClassroom,
+  type ClassroomAssignment,
   type ClassroomDetail,
   type ClassroomMember,
+  type CreateClassroomAssignmentInput,
 } from "@/lib/supabase/classrooms";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import { getProfileAvatarSrc } from "@/lib/supabase/profile-avatar";
@@ -71,8 +92,14 @@ export default function ClassroomWorkspacePage() {
   const [status, setStatus] = useState<WorkspaceStatus>("loading");
   const [room, setRoom] = useState<ClassroomDetail | null>(null);
   const [members, setMembers] = useState<ClassroomMember[]>([]);
+  const [assignments, setAssignments] = useState<ClassroomAssignment[]>([]);
   const [joinCode, setJoinCode] = useState<string | null>(null);
   const [shareStatus, setShareStatus] = useState("");
+  const [renameOpen, setRenameOpen] = useState(false);
+  const [renameName, setRenameName] = useState("");
+  const [disbandOpen, setDisbandOpen] = useState(false);
+  const [memberToRemove, setMemberToRemove] = useState<ClassroomMember | null>(null);
+  const [pendingAction, setPendingAction] = useState<"rename" | "disband" | "remove" | "assignment" | null>(null);
 
   const roomLabs = useMemo(() => {
     if (!room) {
@@ -108,9 +135,10 @@ export default function ClassroomWorkspacePage() {
     }
 
     try {
-      const [loadedRoom, loadedMembers] = await Promise.all([
+      const [loadedRoom, loadedMembers, loadedAssignments] = await Promise.all([
         getClassroom(id),
         getClassroomMembers(id),
+        getClassroomAssignments(id),
       ]);
       const code = loadedRoom.isCreator ? await getClassroomJoinCode(id) : null;
 
@@ -120,6 +148,7 @@ export default function ClassroomWorkspacePage() {
 
       setRoom(loadedRoom);
       setMembers(loadedMembers);
+      setAssignments(loadedAssignments);
       setJoinCode(code);
       setStatus("ready");
     } catch (error) {
@@ -130,6 +159,7 @@ export default function ClassroomWorkspacePage() {
       const message = error instanceof Error ? error.message : "";
       setRoom(null);
       setMembers([]);
+      setAssignments([]);
       setJoinCode(null);
       setStatus(message === CLASSROOM_ACCESS_ERROR ? "unavailable" : "error");
     }
@@ -168,11 +198,11 @@ export default function ClassroomWorkspacePage() {
     if (!joinCode || !room) {
       return;
     }
-    const text = `เข้าร่วมห้อง ${room.name} บน SciSiam ด้วยรหัส ${joinCode}`;
+    const text = `เข้าร่วมห้อง ${room.name} บน Scisiam ด้วยรหัส ${joinCode}`;
 
     try {
       if (navigator.share) {
-        await navigator.share({ title: `SciSiam - ${room.name}`, text });
+        await navigator.share({ title: `Scisiam - ${room.name}`, text });
         setShareStatus("เปิดเมนูแชร์แล้ว");
         return;
       }
@@ -183,6 +213,72 @@ export default function ClassroomWorkspacePage() {
         return;
       }
       setShareStatus("ไม่สามารถแชร์รหัสได้ในขณะนี้");
+    }
+  }
+
+  function openRenameDialog() {
+    if (!room) return;
+    setRenameName(room.name);
+    setRenameOpen(true);
+  }
+
+  async function handleRename() {
+    if (!room) return;
+    setPendingAction("rename");
+    try {
+      const name = await renameClassroom(room.id, renameName);
+      setRoom((current) => current ? { ...current, name } : current);
+      setRenameOpen(false);
+      toast.success("เปลี่ยนชื่อห้องแล้ว");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "เปลี่ยนชื่อห้องไม่สำเร็จ");
+    } finally {
+      setPendingAction(null);
+    }
+  }
+
+  async function handleDisband() {
+    if (!room) return;
+    setPendingAction("disband");
+    try {
+      await disbandClassroom(room.id);
+      toast.success("ยุบห้องเรียนแล้ว");
+      router.replace("/classrooms");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "ยุบห้องเรียนไม่สำเร็จ");
+      setPendingAction(null);
+    }
+  }
+
+  async function handleRemoveMember() {
+    if (!room || !memberToRemove) return;
+    setPendingAction("remove");
+    try {
+      await removeClassroomMember(room.id, memberToRemove.userId);
+      setMembers((current) => current.filter((member) => member.userId !== memberToRemove.userId));
+      setRoom((current) => current ? { ...current, memberCount: Math.max(1, current.memberCount - 1) } : current);
+      setMemberToRemove(null);
+      toast.success(`นำ ${memberToRemove.displayName} ออกจากห้องแล้ว`);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "นำสมาชิกออกไม่สำเร็จ");
+    } finally {
+      setPendingAction(null);
+    }
+  }
+
+  async function handleCreateAssignment(input: CreateClassroomAssignmentInput) {
+    if (!room) return false;
+    setPendingAction("assignment");
+    try {
+      await createClassroomAssignment(room.id, input);
+      setAssignments(await getClassroomAssignments(room.id));
+      toast.success("เพิ่มงานของชั้นเรียนแล้ว");
+      return true;
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "เพิ่มงานไม่สำเร็จ");
+      return false;
+    } finally {
+      setPendingAction(null);
     }
   }
 
@@ -242,10 +338,34 @@ export default function ClassroomWorkspacePage() {
                       <p className="mt-2 max-w-3xl text-sm font-semibold leading-relaxed text-slate-500 sm:text-base">
                         {room.description || "พื้นที่เรียนรู้ร่วมกันสำหรับทดลอง สังเกต และทบทวนผลจากห้องแล็บ"}
                       </p>
+                      <p className="mt-2 flex items-center gap-1.5 text-xs font-bold text-slate-500">
+                        <UserRound className="size-3.5" aria-hidden="true" />
+                        สร้างโดย {room.creatorName}
+                      </p>
                       <dl className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-3 border-t border-slate-100 pt-4">
                         <HeaderStat icon={FlaskConical} label="ห้องแล็บ" value={`${roomLabs.length} แล็บ`} />
                         <HeaderStat icon={UsersRound} label="สมาชิก" value={`${room.memberCount} คน`} />
                       </dl>
+                      {room.isCreator ? (
+                        <div className="mt-4 flex flex-wrap gap-2">
+                          <button
+                            type="button"
+                            onClick={openRenameDialog}
+                            className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-3 text-sm font-extrabold text-blue-700 transition-colors hover:bg-blue-100 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
+                          >
+                            <Pencil className="size-4" aria-hidden="true" />
+                            เปลี่ยนชื่อห้อง
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setDisbandOpen(true)}
+                            className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-rose-200 bg-white px-3 text-sm font-extrabold text-rose-700 transition-colors hover:bg-rose-50 focus:outline-none focus-visible:ring-3 focus-visible:ring-rose-100"
+                          >
+                            <Trash2 className="size-4" aria-hidden="true" />
+                            ยุบห้องเรียน
+                          </button>
+                        </div>
+                      ) : null}
                     </div>
                   </div>
                   {room.isCreator && joinCode ? (
@@ -262,32 +382,59 @@ export default function ClassroomWorkspacePage() {
 
             <section className="mx-auto max-w-7xl px-4 py-6 sm:px-8 lg:px-10">
               <Tabs defaultValue="labs" className="gap-0">
-                <TabsList variant="line" className="grid h-auto w-full grid-cols-3 border-b border-slate-200" aria-label="เนื้อหาในชั้นเรียน">
-                  <TabsTrigger value="labs" className="min-h-12 min-w-0 rounded-none px-1 text-xs font-extrabold data-active:text-blue-700 sm:px-4 sm:text-sm">
-                    <FlaskConical data-icon="inline-start" className="hidden sm:block" aria-hidden="true" />
-                    ห้องแล็บ {roomLabs.length}
-                  </TabsTrigger>
-                  <TabsTrigger value="classwork" className="min-h-12 min-w-0 rounded-none px-1 text-xs font-extrabold data-active:text-blue-700 sm:px-4 sm:text-sm">
-                    <ClipboardList data-icon="inline-start" className="hidden sm:block" aria-hidden="true" />
-                    งานของชั้นเรียน
-                  </TabsTrigger>
-                  <TabsTrigger value="people" className="min-h-12 min-w-0 rounded-none px-1 text-xs font-extrabold data-active:text-blue-700 sm:px-4 sm:text-sm">
-                    <UsersRound data-icon="inline-start" className="hidden sm:block" aria-hidden="true" />
-                    บุคคล {orderedMembers.length}
-                  </TabsTrigger>
+                <TabsList variant="line" className="grid h-auto w-full grid-cols-3 rounded-lg border border-slate-200 bg-white p-1 shadow-sm" aria-label="เนื้อหาในชั้นเรียน">
+                  <TabsTrigger value="labs" className="min-h-12 min-w-0 rounded-md px-1 text-xs font-extrabold after:bottom-0 after:inset-x-3 after:rounded-full after:bg-blue-600 data-active:bg-blue-50 data-active:text-blue-700 sm:px-4 sm:text-sm">ห้องแล็บ</TabsTrigger>
+                  <TabsTrigger value="classwork" className="min-h-12 min-w-0 rounded-md px-1 text-xs font-extrabold after:bottom-0 after:inset-x-3 after:rounded-full after:bg-blue-600 data-active:bg-blue-50 data-active:text-blue-700 sm:px-4 sm:text-sm">งานของชั้นเรียน</TabsTrigger>
+                  <TabsTrigger value="people" className="min-h-12 min-w-0 rounded-md px-1 text-xs font-extrabold after:bottom-0 after:inset-x-3 after:rounded-full after:bg-blue-600 data-active:bg-blue-50 data-active:text-blue-700 sm:px-4 sm:text-sm">สมาชิก</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="labs" className="pt-6">
                   <LabsPanel labs={roomLabs} />
                 </TabsContent>
                 <TabsContent value="classwork" className="pt-6">
-                  <ClassworkPanel isCreator={room.isCreator} />
+                  <ClassworkPanel
+                    assignments={assignments}
+                    isCreator={room.isCreator}
+                    isSubmitting={pendingAction === "assignment"}
+                    onCreate={handleCreateAssignment}
+                  />
                 </TabsContent>
                 <TabsContent value="people" className="pt-6">
-                  <PeoplePanel members={orderedMembers} />
+                  <PeoplePanel
+                    members={orderedMembers}
+                    isCreator={room.isCreator}
+                    onRemove={setMemberToRemove}
+                  />
                 </TabsContent>
               </Tabs>
             </section>
+
+            <RenameClassroomDialog
+              open={renameOpen}
+              name={renameName}
+              isSubmitting={pendingAction === "rename"}
+              onOpenChange={setRenameOpen}
+              onNameChange={setRenameName}
+              onSubmit={() => void handleRename()}
+            />
+            <ConfirmActionDialog
+              open={disbandOpen}
+              title="ยุบห้องเรียน"
+              description="สมาชิกจะไม่สามารถเปิดหรือเข้าร่วมห้องนี้ได้อีก ข้อมูลเดิมจะยังถูกเก็บไว้ในระบบ"
+              confirmLabel="ยุบห้องเรียน"
+              isSubmitting={pendingAction === "disband"}
+              onOpenChange={setDisbandOpen}
+              onConfirm={() => void handleDisband()}
+            />
+            <ConfirmActionDialog
+              open={Boolean(memberToRemove)}
+              title="นำสมาชิกออกจากห้อง"
+              description={memberToRemove ? `ยืนยันการนำ ${memberToRemove.displayName} ออกจากห้องเรียน` : ""}
+              confirmLabel="นำออก"
+              isSubmitting={pendingAction === "remove"}
+              onOpenChange={(open) => { if (!open) setMemberToRemove(null); }}
+              onConfirm={() => void handleRemoveMember()}
+            />
           </>
         ) : null}
       </main>
@@ -434,31 +581,155 @@ function LabsPanel({ labs }: { labs: Array<(typeof labsById)[string]> }) {
   );
 }
 
-function ClassworkPanel({ isCreator }: { isCreator: boolean }) {
+function ClassworkPanel({
+  assignments,
+  isCreator,
+  isSubmitting,
+  onCreate,
+}: {
+  assignments: ClassroomAssignment[];
+  isCreator: boolean;
+  isSubmitting: boolean;
+  onCreate: (input: CreateClassroomAssignmentInput) => Promise<boolean>;
+}) {
+  const [open, setOpen] = useState(false);
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [dueAt, setDueAt] = useState("");
+
+  async function submitAssignment(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const saved = await onCreate({
+      title,
+      description,
+      dueAt: dueAt ? new Date(dueAt).toISOString() : null,
+    });
+    if (!saved) return;
+    setTitle("");
+    setDescription("");
+    setDueAt("");
+    setOpen(false);
+  }
+
   return (
     <section aria-labelledby="classwork-heading">
-      <div className="mb-4">
-        <p className="text-xs font-extrabold text-blue-600">CLASSWORK</p>
-        <h2 id="classwork-heading" className="mt-1 text-xl font-extrabold leading-relaxed text-slate-950">งานของชั้นเรียน</h2>
-      </div>
-      <div className="flex min-h-64 flex-col items-center justify-center gap-4 rounded-lg border border-dashed border-slate-300 bg-white p-6 text-center">
-        <span className="flex size-12 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
-          <Megaphone className="size-6" aria-hidden="true" />
-        </span>
+      <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h3 className="text-lg font-extrabold leading-relaxed text-slate-950">ยังไม่มีงานของชั้นเรียน</h3>
-          <p className="mt-1 max-w-lg text-sm font-semibold leading-relaxed text-slate-500">
-            {isCreator
-              ? "งาน ประกาศ และกิจกรรมที่คุณมอบหมายให้สมาชิกจะแสดงเรียงตามลำดับเวลา"
-              : "งานหรือประกาศใหม่จากผู้สร้างห้องจะแสดงที่นี่เมื่อมีการมอบหมาย"}
-          </p>
+          <p className="text-xs font-extrabold text-blue-600">CLASSWORK</p>
+          <h2 id="classwork-heading" className="mt-1 text-xl font-extrabold leading-relaxed text-slate-950">งานของชั้นเรียน</h2>
         </div>
+        {isCreator ? (
+          <button
+            type="button"
+            onClick={() => setOpen(true)}
+            className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-blue-600 px-4 text-sm font-extrabold text-white transition-colors hover:bg-blue-700 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
+          >
+            <Plus className="size-4" aria-hidden="true" />
+            เพิ่มงาน
+          </button>
+        ) : null}
       </div>
+      {assignments.length === 0 ? (
+        <div className="flex min-h-64 flex-col items-center justify-center gap-4 rounded-lg border border-dashed border-slate-300 bg-white p-6 text-center">
+          <span className="flex size-12 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+            <Megaphone className="size-6" aria-hidden="true" />
+          </span>
+          <div>
+            <h3 className="text-lg font-extrabold leading-relaxed text-slate-950">ยังไม่มีงานของชั้นเรียน</h3>
+            <p className="mt-1 max-w-lg text-sm font-semibold leading-relaxed text-slate-500">
+              {isCreator
+                ? "เพิ่มงานหรือกิจกรรมแรกเพื่อให้สมาชิกเริ่มเรียนรู้ร่วมกัน"
+                : "งานใหม่จากผู้สร้างห้องจะแสดงที่นี่เมื่อมีการมอบหมาย"}
+            </p>
+          </div>
+        </div>
+      ) : (
+        <ul className="grid gap-3">
+          {assignments.map((assignment) => (
+            <li key={assignment.id} className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+              <div className="flex items-start gap-3">
+                <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-700">
+                  <ClipboardList className="size-5" aria-hidden="true" />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <h3 className="break-words text-base font-extrabold leading-relaxed text-slate-950">{assignment.title}</h3>
+                  {assignment.description ? (
+                    <p className="mt-1 whitespace-pre-wrap text-sm font-semibold leading-relaxed text-slate-500">{assignment.description}</p>
+                  ) : null}
+                  <p className="mt-3 flex flex-wrap items-center gap-1.5 text-xs font-bold text-slate-500">
+                    <CalendarDays className="size-3.5" aria-hidden="true" />
+                    {assignment.dueAt ? `กำหนดส่ง ${formatClassroomDate(assignment.dueAt)}` : "ไม่กำหนดวันส่ง"}
+                  </p>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <form onSubmit={submitAssignment}>
+            <DialogHeader>
+              <DialogTitle className="text-lg font-extrabold">เพิ่มงานของชั้นเรียน</DialogTitle>
+              <DialogDescription>ระบุหัวข้องาน รายละเอียด และวันส่งสำหรับสมาชิกในห้อง</DialogDescription>
+            </DialogHeader>
+            <div className="mt-5 grid gap-4">
+              <label className="grid gap-2 text-sm font-extrabold text-slate-800">
+                ชื่องาน <span className="text-rose-600">*</span>
+                <input
+                  value={title}
+                  onChange={(event) => setTitle(event.target.value)}
+                  maxLength={120}
+                  required
+                  autoFocus
+                  className="min-h-11 rounded-lg border border-slate-300 px-3 font-semibold outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-100"
+                  placeholder="เช่น สรุปผลการทดลองเรื่องแรง"
+                />
+              </label>
+              <label className="grid gap-2 text-sm font-extrabold text-slate-800">
+                รายละเอียดเพิ่มเติม
+                <textarea
+                  value={description}
+                  onChange={(event) => setDescription(event.target.value)}
+                  maxLength={1000}
+                  rows={4}
+                  className="resize-y rounded-lg border border-slate-300 px-3 py-2 font-semibold leading-relaxed outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-100"
+                  placeholder="คำแนะนำหรือสิ่งที่ต้องส่ง"
+                />
+              </label>
+              <label className="grid gap-2 text-sm font-extrabold text-slate-800">
+                กำหนดส่ง
+                <input
+                  type="datetime-local"
+                  value={dueAt}
+                  onChange={(event) => setDueAt(event.target.value)}
+                  className="min-h-11 rounded-lg border border-slate-300 px-3 font-semibold outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-100"
+                />
+              </label>
+            </div>
+            <DialogFooter className="mt-5">
+              <button type="button" onClick={() => setOpen(false)} disabled={isSubmitting} className="min-h-11 rounded-lg border border-slate-300 bg-white px-4 font-extrabold text-slate-700 hover:bg-slate-50 disabled:opacity-50">ยกเลิก</button>
+              <button type="submit" disabled={isSubmitting || !title.trim()} className="min-h-11 rounded-lg bg-blue-600 px-4 font-extrabold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50">
+                {isSubmitting ? "กำลังเพิ่ม..." : "เพิ่มงาน"}
+              </button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }
 
-function PeoplePanel({ members }: { members: ClassroomMember[] }) {
+function PeoplePanel({
+  members,
+  isCreator,
+  onRemove,
+}: {
+  members: ClassroomMember[];
+  isCreator: boolean;
+  onRemove: (member: ClassroomMember) => void;
+}) {
   const teacherMembers = members.filter((member) => member.role === "teacher" || member.isCreator);
   const studentMembers = members.filter((member) => member.role !== "teacher" && !member.isCreator);
 
@@ -472,14 +743,26 @@ function PeoplePanel({ members }: { members: ClassroomMember[] }) {
         <p className="text-sm font-bold text-slate-500">สมาชิกทั้งหมด {members.length} คน</p>
       </div>
       <div className="grid gap-4 lg:grid-cols-2 lg:items-start">
-        <PeopleGroup title="คุณครูและผู้ดูแล" members={teacherMembers} emptyText="ยังไม่มีคุณครูในห้องนี้" />
-        <PeopleGroup title="นักเรียน" members={studentMembers} emptyText="ยังไม่มีนักเรียนเข้าร่วมห้อง" />
+        <PeopleGroup title="คุณครูและผู้ดูแล" members={teacherMembers} emptyText="ยังไม่มีคุณครูในห้องนี้" isCreator={isCreator} onRemove={onRemove} />
+        <PeopleGroup title="นักเรียน" members={studentMembers} emptyText="ยังไม่มีนักเรียนเข้าร่วมห้อง" isCreator={isCreator} onRemove={onRemove} />
       </div>
     </section>
   );
 }
 
-function PeopleGroup({ title, members, emptyText }: { title: string; members: ClassroomMember[]; emptyText: string }) {
+function PeopleGroup({
+  title,
+  members,
+  emptyText,
+  isCreator,
+  onRemove,
+}: {
+  title: string;
+  members: ClassroomMember[];
+  emptyText: string;
+  isCreator: boolean;
+  onRemove: (member: ClassroomMember) => void;
+}) {
   return (
     <section className="overflow-hidden rounded-lg border border-slate-200 bg-white" aria-label={title}>
       <div className="flex min-h-14 items-center justify-between border-b border-slate-200 px-4 py-3 sm:px-5">
@@ -512,6 +795,15 @@ function PeopleGroup({ title, members, emptyText }: { title: string; members: Cl
                   <ShieldCheck className="size-3.5" aria-hidden="true" />
                   ผู้สร้าง
                 </span>
+              ) : isCreator ? (
+                <button
+                  type="button"
+                  onClick={() => onRemove(member)}
+                  className="inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-lg border border-rose-200 px-2.5 text-xs font-extrabold text-rose-700 transition-colors hover:bg-rose-50 focus:outline-none focus-visible:ring-3 focus-visible:ring-rose-100"
+                >
+                  <UserMinus className="size-3.5" aria-hidden="true" />
+                  นำออก
+                </button>
               ) : null}
             </li>
           ))}
@@ -521,6 +813,94 @@ function PeopleGroup({ title, members, emptyText }: { title: string; members: Cl
       )}
     </section>
   );
+}
+
+function RenameClassroomDialog({
+  open,
+  name,
+  isSubmitting,
+  onOpenChange,
+  onNameChange,
+  onSubmit,
+}: {
+  open: boolean;
+  name: string;
+  isSubmitting: boolean;
+  onOpenChange: (open: boolean) => void;
+  onNameChange: (name: string) => void;
+  onSubmit: () => void;
+}) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <form onSubmit={(event) => { event.preventDefault(); onSubmit(); }}>
+          <DialogHeader>
+            <DialogTitle className="text-lg font-extrabold">เปลี่ยนชื่อห้อง</DialogTitle>
+            <DialogDescription>ชื่อใหม่จะแสดงให้สมาชิกทุกคนเห็น</DialogDescription>
+          </DialogHeader>
+          <label className="mt-5 grid gap-2 text-sm font-extrabold text-slate-800">
+            ชื่อห้อง
+            <input
+              value={name}
+              onChange={(event) => onNameChange(event.target.value)}
+              maxLength={80}
+              required
+              autoFocus
+              className="min-h-11 rounded-lg border border-slate-300 px-3 font-semibold outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-100"
+            />
+          </label>
+          <DialogFooter className="mt-5">
+            <button type="button" onClick={() => onOpenChange(false)} disabled={isSubmitting} className="min-h-11 rounded-lg border border-slate-300 bg-white px-4 font-extrabold text-slate-700 hover:bg-slate-50 disabled:opacity-50">ยกเลิก</button>
+            <button type="submit" disabled={isSubmitting || !name.trim()} className="min-h-11 rounded-lg bg-blue-600 px-4 font-extrabold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50">
+              {isSubmitting ? "กำลังบันทึก..." : "ยืนยัน"}
+            </button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function ConfirmActionDialog({
+  open,
+  title,
+  description,
+  confirmLabel,
+  isSubmitting,
+  onOpenChange,
+  onConfirm,
+}: {
+  open: boolean;
+  title: string;
+  description: string;
+  confirmLabel: string;
+  isSubmitting: boolean;
+  onOpenChange: (open: boolean) => void;
+  onConfirm: () => void;
+}) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle className="text-lg font-extrabold text-rose-700">{title}</DialogTitle>
+          <DialogDescription className="leading-relaxed">{description}</DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <button type="button" onClick={() => onOpenChange(false)} disabled={isSubmitting} className="min-h-11 rounded-lg border border-slate-300 bg-white px-4 font-extrabold text-slate-700 hover:bg-slate-50 disabled:opacity-50">ยกเลิก</button>
+          <button type="button" onClick={onConfirm} disabled={isSubmitting} className="min-h-11 rounded-lg bg-rose-600 px-4 font-extrabold text-white hover:bg-rose-700 disabled:cursor-not-allowed disabled:opacity-50">
+            {isSubmitting ? "กำลังดำเนินการ..." : confirmLabel}
+          </button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function formatClassroomDate(value: string) {
+  return new Intl.DateTimeFormat("th-TH", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(new Date(value));
 }
 
 function WorkspaceLoadingState() {

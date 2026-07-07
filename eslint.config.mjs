@@ -21,7 +21,11 @@ const eslintConfig = defineConfig([
     ".impeccable/**",
     ".obsidian/**",
     ".playwright-cli/**",
+    ".superpowers/**",
+    "graphify-out/**",
+    "output/**",
     "qa-screenshots/**",
+    "scratch/**",
   ]),
 ]);
 

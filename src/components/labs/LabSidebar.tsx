@@ -102,7 +102,7 @@ export default function LabSidebar({
               โฟกัสก่อนทดลอง
             </h3>
             <p className="mt-1 line-clamp-2 text-[11px] font-semibold leading-relaxed text-slate-500">
-              {lab?.title ?? "ห้องแล็บ SciSiam"}
+              {lab?.title ?? "ห้องแล็บ Scisiam"}
             </p>
           </div>
           <span

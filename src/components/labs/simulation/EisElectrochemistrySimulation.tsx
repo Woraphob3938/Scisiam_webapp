@@ -2,17 +2,15 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import SharedSimulationShell from "./SharedSimulationShell";
-import { Info, Play, RefreshCw, Zap, Disc } from "lucide-react";
+import {
+  Info,
+  Play,
+  RefreshCw,
+  Zap,
+  Disc,
+} from "lucide-react";
 import { labsById } from "@/data/labs";
 import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";
-
-interface EisState {
-  electrodeId: string;
-  rs: number; // ohms
-  rct: number; // ohms
-  cdl: number; // uF
-  nyquistPoints: { real: number; imag: number; freq: number }[];
-}
 
 interface EisLog {
   id: number;
@@ -60,7 +58,7 @@ export default function EisElectrochemistrySimulation() {
   const [sweepProgress, setSweepProgress] = useState(0); // 0 to 100
   const [sweepData, setSweepData] = useState<{ real: number; imag: number; freq: number }[]>([]);
   const [logs, setLogs] = useState<EisLog[]>([]);
-  const [isSaving, setIsSaving] = useState(false);
+  const [, setIsSaving] = useState(false);
 
   const requestRef = useRef<number>(0);
   const lastTimeRef = useRef<number>(0);
@@ -101,7 +99,6 @@ export default function EisElectrochemistrySimulation() {
 
   const animate = (time: number) => {
     if (!lastTimeRef.current) lastTimeRef.current = time;
-    const delta = time - lastTimeRef.current;
 
     if (isSweeping && sweepProgress < 100) {
       setSweepProgress(prev => {
@@ -129,6 +126,7 @@ export default function EisElectrochemistrySimulation() {
   useEffect(() => {
     requestRef.current = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(requestRef.current);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- RAF sweep loop intentionally uses the current animation closure.
   }, [isSweeping, sweepProgress]);
 
   const handleLogResult = () => {
@@ -358,6 +356,13 @@ export default function EisElectrochemistrySimulation() {
             >
               <Play className="w-4 h-4" />
               กวาดความถี่ (Sweep)
+            </button>
+            <button
+              onClick={handleLogResult}
+              disabled={isSweeping || sweepData.length === 0}
+              className="py-2 px-3 border border-orange-200 text-orange-700 hover:bg-orange-50 disabled:opacity-50 disabled:hover:bg-transparent dark:border-orange-900/60 dark:text-orange-300 dark:hover:bg-orange-950/30 rounded-lg text-xs font-semibold flex items-center justify-center transition-colors"
+            >
+              บันทึกค่า
             </button>
             <button
               onClick={handleReset}

@@ -1,7 +1,7 @@
 import { LAB_SAVED_EXPERIMENT_KEYS } from "@/data/labSavedExperiments";
 import { labsById, labsData } from "@/data/labs";
 
-import { cacheSciSiamAuth } from "./auth-cache";
+import { cacheScisiamAuth } from "./auth-cache";
 import { createClient, isSupabaseConfigured } from "./client";
 import type { ScisiamUserRole } from "./database.types";
 
@@ -152,7 +152,7 @@ export async function loadSupabaseLearningSnapshot(): Promise<LearningSnapshot |
     : undefined;
 
   if (profile) {
-    cacheSciSiamAuth(
+    cacheScisiamAuth(
       {
         email: user.email,
         role: profile.role,

@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="th">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ตั้งรหัสผ่านใหม่ Scisiam</title>
+</head>
+
+<body style="margin:0;background:#eef6ff;color:#0f172a;font-family:Arial,'Noto Sans Thai',sans-serif;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#eef6ff;">
+    <tr>
+      <td align="center" style="padding:32px 16px;">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0"
+          style="max-width:600px;background:#ffffff;border:1px solid #dbeafe;border-radius:24px;overflow:hidden;">
+          <tr>
+            <td align="center" style="background:#dff1ff;padding:28px 28px 18px;">
+              <img src="{{ .SiteURL }}/ai-oon-avatar.png" width="136" height="136" alt="น้องไออุ่น ผู้ช่วยของ Scisiam"
+                style="display:block;width:136px;height:136px;border-radius:999px;border:6px solid #ffffff;object-fit:cover;" />
+              <p style="margin:18px 0 0;color:#2563eb;font-size:20px;font-weight:700;line-height:1.4;">Scisiam</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:32px 36px 8px;">
+              <h1 style="margin:0 0 14px;color:#0f172a;font-size:28px;font-weight:700;line-height:1.45;">
+                ตั้งรหัสผ่านใหม่</h1>
+              <p style="margin:0;color:#475569;font-size:16px;line-height:1.8;">สวัสดีครับ
+                น้องไออุ่นได้รับคำขอเปลี่ยนรหัสผ่านของบัญชี Scisiam แล้ว กดปุ่มด้านล่างเพื่อเข้าสู่หน้ายืนยัน OTP
+                ก่อนตั้งรหัสผ่านใหม่อย่างปลอดภัย</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:18px 36px 8px;">
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0">
+                <tr>
+                  <td style="border-radius:14px;background:#2563eb;">
+                    <a href="{{ .SiteURL }}/auth/verify?type=recovery"
+                      style="display:inline-block;padding:15px 24px;color:#ffffff;font-size:16px;font-weight:700;line-height:1.4;text-decoration:none;">ไปหน้ายืนยัน
+                      OTP</a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:14px 36px 22px;">
+              <p style="margin:0 0 10px;color:#64748b;font-size:14px;font-weight:700;line-height:1.7;">รหัส OTP เลข 6
+                หลักสำหรับคำขอนี้</p>
+              <p
+                style="margin:0;padding:14px 18px;border-radius:16px;background:#f8fafc;border:1px dashed #93c5fd;color:#1d4ed8;font-size:28px;font-weight:700;letter-spacing:6px;line-height:1.2;text-align:center;">
+                {{ .Token }}</p>
+              <p style="margin:12px 0 0;color:#64748b;font-size:13px;line-height:1.8;">หากปุ่มไม่ทำงาน ให้กลับไปที่
+                Scisiam แล้วขอลิงก์เปลี่ยนรหัสผ่านใหม่อีกครั้ง</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:0 36px 36px;">
+              <p
+                style="margin:0;padding-top:24px;border-top:1px solid #e2e8f0;color:#64748b;font-size:13px;line-height:1.8;">
+                ถ้าคุณไม่ได้ขอเปลี่ยนรหัสผ่าน สามารถเพิกเฉยต่ออีเมลฉบับนี้ได้
+                บัญชีของคุณจะยังปลอดภัยและรหัสผ่านเดิมจะไม่ถูกเปลี่ยน</p>
+            </td>
+          </tr>
+        </table>
+        <p style="margin:16px 0 0;color:#94a3b8;font-size:12px;line-height:1.6;">ส่งจาก Scisiam โดยใช้ระบบอีเมลของ Brevo
+        </p>
+      </td>
+    </tr>
+  </table>
+</body>
+
+</html>

@@ -2,16 +2,14 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import SharedSimulationShell from "./SharedSimulationShell";
-import { Info, Play, RefreshCw, Radio, Settings } from "lucide-react";
+import {
+  Info,
+  RefreshCw,
+  Radio,
+  Settings,
+} from "lucide-react";
 import { labsById } from "@/data/labs";
 import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";
-
-interface SpectrumPeak {
-  ppm: number;
-  height: number;
-  label: string;
-  multiplicity: string; // singlet, doublet, triplet, quartet
-}
 
 const samples = [
   {
@@ -50,7 +48,7 @@ export default function NmrSpectroscopySimulation() {
   const [isPulsing, setIsPulsing] = useState(false);
   const [hasSpectrum, setHasSpectrum] = useState(false);
   const [pulseProgress, setPulseProgress] = useState(0);
-  const [isSaving, setIsSaving] = useState(false);
+  const [, setIsSaving] = useState(false);
 
   const requestRef = useRef<number>(0);
   const lastTimeRef = useRef<number>(0);
@@ -70,7 +68,6 @@ export default function NmrSpectroscopySimulation() {
 
   const animate = (time: number) => {
     if (!lastTimeRef.current) lastTimeRef.current = time;
-    const delta = time - lastTimeRef.current;
 
     if (isPulsing && pulseProgress < 100) {
       setPulseProgress(prev => {
@@ -91,6 +88,7 @@ export default function NmrSpectroscopySimulation() {
   useEffect(() => {
     requestRef.current = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(requestRef.current);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- RAF pulse loop intentionally uses the current animation closure.
   }, [isPulsing, pulseProgress]);
 
   const handleSaveResult = async () => {

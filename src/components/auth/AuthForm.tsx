@@ -9,12 +9,13 @@ import {
   EyeOff,
   Lock,
   Mail,
+  School,
   ShieldAlert,
   User,
 } from "lucide-react";
 import {
   cacheRememberedLogin,
-  cacheSciSiamAuth,
+  cacheScisiamAuth,
   getRememberedLogin,
 } from "@/lib/supabase/auth-cache";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
@@ -27,6 +28,13 @@ interface AuthFormProps {
 
 type AuthMode = "login" | "register" | "forgot-password";
 type AuthRole = "student" | "teacher";
+type SchoolOption = {
+  id: string;
+  name: string;
+  district: string | null;
+  province: string | null;
+  education_area: string | null;
+};
 
 const isDemoModeEnabled =
   process.env.NEXT_PUBLIC_ENABLE_DEMO_MODE === "true";
@@ -53,6 +61,11 @@ export default function AuthForm({
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [role, setRole] = useState<AuthRole>("student");
+  const [schoolSearch, setSchoolSearch] = useState("");
+  const [schoolOptions, setSchoolOptions] = useState<SchoolOption[]>([]);
+  const [selectedSchool, setSelectedSchool] = useState<SchoolOption | null>(null);
+  const [schoolLoading, setSchoolLoading] = useState(false);
+  const [schoolLookupError, setSchoolLookupError] = useState("");
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
@@ -89,6 +102,43 @@ export default function AuthForm({
 
     return () => window.clearTimeout(timer);
   }, [initialMode]);
+
+  useEffect(() => {
+    if (!isRegister || role !== "teacher") return;
+
+    const query = schoolSearch.trim();
+    if (selectedSchool && query === selectedSchool.name) return;
+
+    if (query.length < 2 || !isSupabaseConfigured()) return;
+
+    let ignore = false;
+
+    const timer = window.setTimeout(async () => {
+      setSchoolLoading(true);
+      setSchoolLookupError("");
+      const supabase = createClient();
+      const { data, error: catalogError } = await supabase
+        .from("school_catalog")
+        .select("id, name, district, province, education_area")
+        .ilike("name", `%${query}%`)
+        .order("name", { ascending: true })
+        .limit(8);
+
+      if (ignore) return;
+      setSchoolLoading(false);
+      if (catalogError) {
+        setSchoolOptions([]);
+        setSchoolLookupError("โหลดรายชื่อโรงเรียนไม่ได้ กรุณาตรวจสอบว่าฐานข้อมูลโรงเรียนถูกติดตั้งแล้ว");
+        return;
+      }
+      setSchoolOptions(data ?? []);
+    }, 250);
+
+    return () => {
+      ignore = true;
+      window.clearTimeout(timer);
+    };
+  }, [isRegister, role, schoolSearch, selectedSchool]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -158,6 +208,11 @@ export default function AuthForm({
         setLoading(false);
         return;
       }
+      if (role === "teacher" && !selectedSchool) {
+        setError("กรุณาเลือกโรงเรียนจากรายการที่ค้นหา");
+        setLoading(false);
+        return;
+      }
     }
 
     if (!isSupabaseConfigured()) {
@@ -180,6 +235,8 @@ export default function AuthForm({
             data: {
               display_name: fullName.trim(),
               requested_role: role,
+              school_id: role === "teacher" ? selectedSchool?.id ?? null : null,
+              school_name: role === "teacher" ? selectedSchool?.name ?? null : null,
             },
           },
         });
@@ -228,7 +285,7 @@ export default function AuthForm({
               : "นักเรียน",
         });
 
-        cacheSciSiamAuth({
+        cacheScisiamAuth({
           email: normalizedEmail,
           role: profile.role,
           displayName: profile.display_name,
@@ -250,6 +307,30 @@ export default function AuthForm({
     setNotice("");
     setRecoverySent(false);
     setMode(nextMode);
+    if (nextMode !== "register") {
+      resetSchoolPicker();
+    }
+  };
+
+  const resetSchoolPicker = () => {
+    setSchoolSearch("");
+    setSchoolOptions([]);
+    setSelectedSchool(null);
+    setSchoolLoading(false);
+    setSchoolLookupError("");
+  };
+
+  const handleRoleChange = (nextRole: AuthRole) => {
+    setRole(nextRole);
+    if (nextRole !== "teacher") {
+      resetSchoolPicker();
+    }
+  };
+
+  const selectSchool = (school: SchoolOption) => {
+    setSelectedSchool(school);
+    setSchoolSearch(school.name);
+    setSchoolOptions([]);
   };
 
   const handleGoogleAuth = async () => {
@@ -287,7 +368,7 @@ export default function AuthForm({
     if (!isDemoModeEnabled) return;
 
     localStorage.setItem("scisiam_demo_mode", "true");
-    cacheSciSiamAuth({
+    cacheScisiamAuth({
       role: "teacher",
       displayName: "ครูอรทัย",
       email: "teacher.demo@scisiam.com",
@@ -301,10 +382,10 @@ export default function AuthForm({
       className="flex min-h-[calc(100svh-24px)] w-full items-center justify-center px-4 py-5 sm:px-6 lg:min-h-[calc(100svh-32px)] lg:px-10 lg:py-8"
       aria-label={
         isForgotPassword
-          ? "หน้ากู้คืนรหัสผ่าน SciSiam"
+          ? "หน้ากู้คืนรหัสผ่าน Scisiam"
           : isRegister
-            ? "หน้าสมัครสมาชิก SciSiam"
-            : "หน้าเข้าสู่ระบบ SciSiam"
+            ? "หน้าสมัครสมาชิก Scisiam"
+            : "หน้าเข้าสู่ระบบ Scisiam"
       }
     >
       <div className="flex w-full min-w-0 items-center justify-center">
@@ -349,8 +430,8 @@ export default function AuthForm({
                 {isForgotPassword
                   ? "กรอกอีเมลที่ใช้สมัครสมาชิก แล้วเราจะส่งลิงก์สำหรับตั้งรหัสผ่านใหม่"
                   : isRegister
-                  ? "สร้างบัญชีเพื่อเรียน ทดลอง และติดตามความคืบหน้าใน SciSiam"
-                  : "ใช้บัญชี SciSiam เพื่อเข้าเรียนหรือจัดการห้องเรียนวิทยาศาสตร์ของคุณ"}
+                  ? "สร้างบัญชีเพื่อเรียน ทดลอง และติดตามความคืบหน้าใน Scisiam"
+                  : "ใช้บัญชี Scisiam เพื่อเข้าเรียนหรือจัดการห้องเรียนวิทยาศาสตร์ของคุณ"}
               </p>
             </div>
 
@@ -495,7 +576,7 @@ export default function AuthForm({
                       <button
                         key={option.id}
                         type="button"
-                        onClick={() => setRole(option.id)}
+                        onClick={() => handleRoleChange(option.id)}
                         aria-pressed={isSelected}
                       className={`min-h-11 rounded-[14px] border px-3 py-2.5 text-left transition-all focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100 sm:min-h-12 ${
                           isSelected
@@ -514,6 +595,74 @@ export default function AuthForm({
                   })}
                 </div>
               </div>}
+
+              {isRegister && role === "teacher" && (
+                <AuthField
+                  id="auth-school"
+                  label="โรงเรียน"
+                  helper="ค้นหาด้วยชื่อโรงเรียน แล้วเลือกจากรายการข้อมูล สพฐ."
+                  icon={School}
+                >
+                  <div className="relative">
+                    <input
+                      id="auth-school"
+                      type="text"
+                      required
+                      autoComplete="organization"
+                      placeholder="เช่น สตรีวิทยา"
+                      value={schoolSearch}
+                      onChange={(e) => {
+                        const nextValue = e.target.value;
+                        setSchoolSearch(nextValue);
+                        setSelectedSchool(null);
+                        setSchoolLookupError("");
+                        if (nextValue.trim().length < 2) {
+                          setSchoolOptions([]);
+                          setSchoolLoading(false);
+                        }
+                      }}
+                      aria-autocomplete="list"
+                      aria-controls="auth-school-results"
+                      className={inputClassName}
+                    />
+                    {(schoolOptions.length > 0 || schoolLoading || schoolLookupError) && (
+                      <div
+                        id="auth-school-results"
+                        role="listbox"
+                        className="absolute left-0 right-0 top-[calc(100%+6px)] z-20 max-h-64 overflow-y-auto rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl shadow-slate-200/70"
+                      >
+                        {schoolLoading ? (
+                          <div className="px-3 py-2 text-xs font-bold leading-relaxed text-slate-400">
+                            กำลังค้นหาโรงเรียน...
+                          </div>
+                        ) : schoolLookupError ? (
+                          <div className="px-3 py-2 text-xs font-bold leading-relaxed text-rose-600">
+                            {schoolLookupError}
+                          </div>
+                        ) : (
+                          schoolOptions.map((school) => (
+                            <button
+                              key={school.id}
+                              type="button"
+                              role="option"
+                              aria-selected={selectedSchool?.id === school.id}
+                              onClick={() => selectSchool(school)}
+                              className="grid w-full gap-0.5 rounded-lg px-3 py-2 text-left transition-colors hover:bg-blue-50 focus:outline-none focus-visible:bg-blue-50"
+                            >
+                              <span className="text-sm font-extrabold leading-[1.45] text-slate-900">
+                                {school.name}
+                              </span>
+                              <span className="text-xs font-semibold leading-relaxed text-slate-500">
+                                {[school.district, school.province, school.education_area].filter(Boolean).join(" • ")}
+                              </span>
+                            </button>
+                          ))
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </AuthField>
+              )}
 
               {!isRegister && !isForgotPassword && (
                 <label className="flex min-h-11 cursor-pointer items-center gap-2 text-sm font-bold leading-[1.45] text-slate-700">
@@ -557,8 +706,8 @@ export default function AuthForm({
                           ? "ส่งอีเมลอีกครั้ง"
                           : "ส่งลิงก์รีเซ็ตรหัสผ่าน"
                         : isRegister
-                          ? "สร้างบัญชี SciSiam"
-                          : "เข้าสู่ระบบ SciSiam"}
+                          ? "สร้างบัญชี Scisiam"
+                          : "เข้าสู่ระบบ Scisiam"}
                     </span>
                     <ArrowRight className="h-4.5 w-4.5" />
                   </>

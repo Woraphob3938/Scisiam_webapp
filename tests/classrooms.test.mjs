@@ -30,6 +30,12 @@ function classroomCatalogIndexMigration() {
   return fs.readFileSync(path.join(migrations, files[0]), "utf8");
 }
 
+function classroomOwnerToolsMigration() {
+  const files = fs.readdirSync(migrations).filter((name) => name.endsWith("_classroom_owner_tools.sql"));
+  assert.equal(files.length, 1, "expected exactly one classroom owner tools migration");
+  return fs.readFileSync(path.join(migrations, files[0]), "utf8");
+}
+
 test("classroom migration keeps codes private and removes direct joining", () => {
   const sql = classroomMigration();
   assert.match(sql, /private\.classroom_join_codes/i);
@@ -77,7 +83,7 @@ test("classroom catalog hardening rejects unknown labs and preserves membership 
   assert.doesNotMatch(sql, /profiles\.role[\s\S]+members\.joined_at/i);
 
   const catalogRows = sql.match(/^\s*\('[a-z0-9-]+'\),?$/gm) ?? [];
-  assert.equal(catalogRows.length, 103, "private classroom catalog must mirror all 103 SciSiam labs");
+  assert.equal(catalogRows.length, 103, "private classroom catalog must mirror all 103 Scisiam labs");
 });
 
 test("classroom lab catalog foreign key has a covering index", () => {
@@ -85,7 +91,52 @@ test("classroom lab catalog foreign key has a covering index", () => {
   assert.match(sql, /create index if not exists classroom_labs_lab_id_idx[\s\S]+public\.classroom_labs\s*\(lab_id\)/i);
 });
 
-test("classroom client uses RPC writes and the SciSiam lab catalog", () => {
+test("classroom owner tools are enforced by guarded RPCs", () => {
+  const sql = classroomOwnerToolsMigration();
+
+  for (const name of [
+    "rename_classroom",
+    "disband_classroom",
+    "remove_classroom_member",
+    "create_classroom_assignment",
+  ]) {
+    assert.match(sql, new RegExp(`create (?:or replace )?function public\\.${name}`, "i"));
+    assert.match(sql, new RegExp(`${name}[\\s\\S]+private\\.is_class_creator`, "i"));
+  }
+
+  assert.match(sql, /create table public\.classroom_assignments/i);
+  assert.match(sql, /Members can read classroom assignments/i);
+  assert.match(sql, /revoke insert, update, delete on public\.classroom_assignments from authenticated/i);
+  assert.match(sql, /target_user_id\s*<>\s*classrooms\.creator_id/i);
+});
+
+test("classroom assignment foreign keys have covering indexes", () => {
+  const files = fs.readdirSync(migrations).filter((name) => name.endsWith("_add_classroom_assignment_creator_index.sql"));
+  assert.equal(files.length, 1, "expected exactly one classroom assignment creator index migration");
+  const sql = fs.readFileSync(path.join(migrations, files[0]), "utf8");
+  assert.match(sql, /classroom_assignments_created_by_idx[\s\S]+public\.classroom_assignments\s*\(created_by\)/i);
+});
+
+test("classroom client exposes owner actions, assignments, and creator names", () => {
+  const source = fs.readFileSync(
+    path.join(root, "src", "lib", "supabase", "classrooms.ts"),
+    "utf8",
+  );
+
+  for (const rpc of [
+    "get_classroom_creator_names",
+    "rename_classroom",
+    "disband_classroom",
+    "remove_classroom_member",
+    "create_classroom_assignment",
+  ]) {
+    assert.match(source, new RegExp(`rpc\\("${rpc}"`));
+  }
+  assert.match(source, /from\("classroom_assignments"\)/);
+  assert.match(source, /creatorName:/);
+});
+
+test("classroom client uses RPC writes and the Scisiam lab catalog", () => {
   const source = fs.readFileSync(
     path.join(root, "src", "lib", "supabase", "classrooms.ts"),
     "utf8"
@@ -271,7 +322,7 @@ test("classroom workspace loads private room data and exposes three stable tabs"
   assert.match(source, /room\.labIds[\s\S]+labsById\[id\][\s\S]+filter/s);
   assert.match(source, /<TabsList/);
 
-  for (const label of ["ห้องแล็บ", "งานของชั้นเรียน", "บุคคล"]) {
+  for (const label of ["ห้องแล็บ", "งานของชั้นเรียน", "สมาชิก"]) {
     assert.match(source, new RegExp(label));
   }
 

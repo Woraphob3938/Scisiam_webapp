@@ -36,7 +36,7 @@ function InvalidLabDetail({ labId }: { labId: string }) {
             Lab not found
           </p>
           <h1 className="text-2xl font-black leading-relaxed text-slate-900">
-            ไม่พบห้องแล็บนี้ใน SciSiam
+            ไม่พบห้องแล็บนี้ใน Scisiam
           </h1>
           <p className="mt-3 text-sm font-semibold leading-relaxed text-slate-500">
             รหัสแล็บ <span className="font-mono text-slate-700">{labId || "-"}</span> ไม่มีอยู่ในรายการห้องแล็บของโปรเจกต์ จึงไม่แสดงเนื้อหาของห้องอื่นแทนเพื่อป้องกันข้อมูลผิดหัวข้อ

@@ -2,11 +2,17 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import SharedSimulationShell from "./SharedSimulationShell";
-import { Beaker, Thermometer, RotateCcw, Info, Play, Pause, Flame } from "lucide-react";
+import {
+  Beaker,
+  Thermometer,
+  RotateCcw,
+  Info,
+  Play,
+  Pause,
+  Flame,
+} from "lucide-react";
 import { labsById } from "@/data/labs";
 import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";
-
-interface GraphPoint { x: number; y: number; }
 
 interface SimulationLog {
   id: number;
@@ -33,7 +39,7 @@ export default function HeatingCoolingMaterialsSimulation() {
   const [temperature, setTemperature] = useState(25); // Current temp of material
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [observations, setObservations] = useState<SimulationLog[]>([]);
-  const [isSaving, setIsSaving] = useState(false);
+  const [, setIsSaving] = useState(false);
 
   // References for simulation loop
   const temperatureRef = useRef(25);
@@ -72,6 +78,7 @@ export default function HeatingCoolingMaterialsSimulation() {
   useEffect(() => {
     requestRef.current = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(requestRef.current);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- RAF loop intentionally uses refs and the current animation closure.
   }, [isRunning]);
 
   const handleReset = () => {
@@ -165,7 +172,6 @@ export default function HeatingCoolingMaterialsSimulation() {
   // Render SVG view of the material melting/freezing
   const renderMaterialVisuals = () => {
     const isSolid = matState.id === "solid";
-    const isLiquid = matState.id === "liquid";
     const isGas = matState.id === "gas";
 
     // Dynamic melting ratio for visuals (0 solid -> 1 liquid)

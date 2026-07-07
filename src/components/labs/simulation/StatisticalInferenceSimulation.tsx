@@ -11,7 +11,6 @@ import {
   Trash,
   Target,
   Sparkles,
-  LineChart,
   Layers,
   BarChart3,
 } from "lucide-react";
@@ -104,7 +103,7 @@ export default function StatisticalInferenceSimulation() {
 
   const xToSvg = useCallback(
     (x: number) => pad.l + ((x - displayMin) / (displayMax - displayMin)) * plotW,
-    [displayMin, displayMax, plotW]
+    [pad.l, displayMin, displayMax, plotW]
   );
 
   // Normal PDF scaled for display
@@ -112,7 +111,7 @@ export default function StatisticalInferenceSimulation() {
 
   const yToSvg = useCallback(
     (y: number) => pad.t + plotH - (y / pdfMax) * plotH * 0.9,
-    [pdfMax, plotH]
+    [pad.t, pdfMax, plotH]
   );
 
   // Build bell curve path

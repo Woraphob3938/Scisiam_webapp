@@ -1,6 +1,11 @@
 "use client";
 
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+} from "react";
 import { useRouter } from "next/navigation";
 import {
   Sliders,
@@ -9,7 +14,6 @@ import {
   ClipboardList,
   Download,
   Trash,
-  Target,
   Sparkles,
   LineChart,
   Layers,
@@ -88,7 +92,6 @@ export default function ComplexPhasorsSimulation() {
   const imagZMult = useMemo(() => multRadius * Math.sin(multThetaRad), [multRadius, multThetaRad]);
 
   // SVG parameters
-  const svgW = 480, svgH = 300;
 
   // Grid coordinates mapping
   // Center of complex plane is at (140, 150)

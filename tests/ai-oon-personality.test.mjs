@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 const rootDir = join(dirname(fileURLToPath(import.meta.url)), "..");
 const readProjectFile = (path) => readFileSync(join(rootDir, path), "utf8");
 
-test("AI I-Oon supports natural SciSiam and general conversation", () => {
+test("AI I-Oon supports natural Scisiam and general conversation", () => {
   const route = readProjectFile("src/app/api/ai-tutor/route.ts");
   const chat = readProjectFile("src/components/AIChatButton.tsx");
 

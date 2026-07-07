@@ -11,7 +11,7 @@ import {
   X,
 } from "lucide-react";
 import { labsById } from "@/data/labs";
-import { getSciSiamAiSettings } from "@/components/SettingsModal";
+import { getScisiamAiSettings } from "@/components/SettingsModal";
 import { SCISIAM_AUTH_EVENT } from "@/lib/supabase/auth-cache";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 
@@ -78,7 +78,7 @@ export default function AIChatButton() {
       id: "welcome",
       role: "assistant",
       content:
-        "สวัสดีครับ ผมคือ AI ไออุ่น เพื่อนคู่คิดของ SciSiam จะถามเรื่องแล็บ การเรียน หรือคุยเรื่องทั่วไปก็ได้ครับ",
+        "สวัสดีครับ ผมคือ AI ไออุ่น เพื่อนคู่คิดของ Scisiam จะถามเรื่องแล็บ การเรียน หรือคุยเรื่องทั่วไปก็ได้ครับ",
     },
   ]);
 
@@ -109,7 +109,7 @@ export default function AIChatButton() {
     return labId ? labsById[labId] : null;
   }, [pathname]);
 
-  const visibleTitle = currentLab?.title || "เพื่อนคู่คิด SciSiam";
+  const visibleTitle = currentLab?.title || "เพื่อนคู่คิด Scisiam";
 
   const handleSubmit = async (event?: React.FormEvent<HTMLFormElement>) => {
     event?.preventDefault();
@@ -128,7 +128,7 @@ export default function AIChatButton() {
     setIsSending(true);
 
     try {
-      const aiSettings = getSciSiamAiSettings();
+      const aiSettings = getScisiamAiSettings();
       const response = await fetch("/api/ai-tutor", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

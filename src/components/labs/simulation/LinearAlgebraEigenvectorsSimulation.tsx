@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useState, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import {
   Sliders,
@@ -12,7 +12,6 @@ import {
   Target,
   Sparkles,
   Layers,
-  HelpCircle,
 } from "lucide-react";
 import SharedSimulationShell from "@/components/labs/simulation/SharedSimulationShell";
 import ManualNumberInput from "@/components/labs/simulation/ManualNumberInput";
@@ -94,7 +93,7 @@ export default function LinearAlgebraEigenvectorsSimulation() {
     const dot = vx * wx + vy * wy;
     const sign = dot >= 0 ? 1.0 : -1.0;
     return (sign * (magW / magV)).toFixed(2);
-  }, [isEigenvector, vx, vy, magW, magV]);
+  }, [isEigenvector, vx, vy, wx, wy, magW, magV]);
 
   // True eigenvector directions for guide lines
   const guides = useMemo(() => {
