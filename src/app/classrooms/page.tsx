@@ -9,6 +9,7 @@ import {
   FlaskConical,
   RefreshCw,
   ShieldCheck,
+  UserRound,
   UsersRound,
 } from "lucide-react";
 
@@ -221,6 +222,10 @@ function ClassroomCard({ classroom }: { classroom: ClassroomSummary }) {
       </div>
 
       <h2 className="mt-4 break-words text-lg font-extrabold leading-relaxed text-slate-950">{classroom.name}</h2>
+      <p className="mt-1 flex items-center gap-1.5 text-xs font-bold text-slate-500">
+        <UserRound className="size-3.5 shrink-0" aria-hidden="true" />
+        สร้างโดย {classroom.creatorName}
+      </p>
       {classroom.description ? (
         <p className="mt-1 line-clamp-2 text-sm font-semibold leading-relaxed text-slate-500">{classroom.description}</p>
       ) : (

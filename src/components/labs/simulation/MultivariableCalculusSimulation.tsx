@@ -23,7 +23,7 @@ const SURFACES = [
   {
     label: "x² + y²  (พาราโบลอยด์)",
     f: (x: number, y: number) => x * x + y * y,
-    dfdx: (x: number, _y: number) => 2 * x,
+    dfdx: (x: number) => 2 * x,
     dfdy: (_x: number, y: number) => 2 * y,
     xRange: [-3, 3] as [number, number],
     yRange: [-3, 3] as [number, number],
@@ -41,7 +41,7 @@ const SURFACES = [
   {
     label: "x²− y²  (อานม้า)",
     f: (x: number, y: number) => x * x - y * y,
-    dfdx: (x: number, _y: number) => 2 * x,
+    dfdx: (x: number) => 2 * x,
     dfdy: (_x: number, y: number) => -2 * y,
     xRange: [-3, 3] as [number, number],
     yRange: [-3, 3] as [number, number],
@@ -87,8 +87,8 @@ export default function MultivariableCalculusSimulation() {
   const [yMin, yMax] = surf.yRange;
   const [zMin, zMax] = surf.zRange;
 
-  const xToSvg = useCallback((x: number) => pad.l + ((x - xMin) / (xMax - xMin)) * plotW, [xMin, xMax, plotW]);
-  const yToSvg = useCallback((y: number) => pad.t + ((yMax - y) / (yMax - yMin)) * plotH, [yMin, yMax, plotH]);
+  const xToSvg = useCallback((x: number) => pad.l + ((x - xMin) / (xMax - xMin)) * plotW, [pad.l, xMin, xMax, plotW]);
+  const yToSvg = useCallback((y: number) => pad.t + ((yMax - y) / (yMax - yMin)) * plotH, [pad.t, yMin, yMax, plotH]);
 
   // Color for z value
   const zToColor = useCallback((z: number) => {
@@ -131,7 +131,7 @@ export default function MultivariableCalculusSimulation() {
       }
     }
     return cells;
-  }, [surf, xMin, xMax, yMin, yMax, plotW, plotH, zToColor]);
+  }, [surf, xMin, xMax, yMin, yMax, pad.l, pad.t, plotW, plotH, zToColor]);
 
   // Generate contour paths using marching squares approximation
   const contourPaths = useMemo(() => {

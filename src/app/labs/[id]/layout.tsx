@@ -21,35 +21,35 @@ export async function generateMetadata({
 
   if (!lab) {
     return {
-      title: "ไม่พบห้องแล็บ | SciSiam Virtual Lab",
-      description: "ไม่พบห้องแล็บที่ระบุในระบบ SciSiam Virtual Lab",
+      title: "ไม่พบห้องแล็บ | Scisiam",
+      description: "ไม่พบห้องแล็บที่ระบุในระบบ Scisiam",
       metadataBase: new URL(siteUrl),
       openGraph: {
-        title: "ไม่พบห้องแล็บ | SciSiam Virtual Lab",
-        description: "ไม่พบห้องแล็บที่ระบุในระบบ SciSiam Virtual Lab",
+        title: "ไม่พบห้องแล็บ | Scisiam",
+        description: "ไม่พบห้องแล็บที่ระบุในระบบ Scisiam",
         images: ["/ai-oon-logo.png"],
       },
       twitter: {
         card: "summary",
-        title: "ไม่พบห้องแล็บ | SciSiam Virtual Lab",
-        description: "ไม่พบห้องแล็บที่ระบุในระบบ SciSiam Virtual Lab",
+        title: "ไม่พบห้องแล็บ | Scisiam",
+        description: "ไม่พบห้องแล็บที่ระบุในระบบ Scisiam",
         images: ["/ai-oon-logo.png"],
       },
     };
   }
 
   return {
-    title: `${lab.title} | SciSiam Virtual Lab`,
+    title: `${lab.title} | Scisiam`,
     description: lab.description,
     metadataBase: new URL(siteUrl),
     openGraph: {
-      title: `${lab.title} | SciSiam Virtual Lab`,
+      title: `${lab.title} | Scisiam`,
       description: lab.description,
       images: ["/ai-oon-logo.png"],
     },
     twitter: {
       card: "summary",
-      title: `${lab.title} | SciSiam Virtual Lab`,
+      title: `${lab.title} | Scisiam`,
       description: lab.description,
       images: ["/ai-oon-logo.png"],
     },

@@ -15,7 +15,7 @@ const siteUrl =
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: "SciSiam - รายชื่อห้องแล็บวิทยาศาสตร์จำลองออนไลน์",
+  title: "Scisiam - รายชื่อห้องแล็บวิทยาศาสตร์จำลองออนไลน์",
   description: "แพลตฟอร์มจำลองการทดลองวิทยาศาสตร์ออนไลน์ เรียนรู้สนุกสนานและเป็นส่วนตัวสำหรับทุกคน",
   icons: {
     icon: "/ai-oon-logo.png",
@@ -23,10 +23,10 @@ export const metadata: Metadata = {
     apple: "/ai-oon-logo.png",
   },
   openGraph: {
-    title: "SciSiam - รายชื่อห้องแล็บวิทยาศาสตร์จำลองออนไลน์",
+    title: "Scisiam - รายชื่อห้องแล็บวิทยาศาสตร์จำลองออนไลน์",
     description: "แพลตฟอร์มจำลองการทดลองวิทยาศาสตร์ออนไลน์ เรียนรู้สนุกสนานและเป็นส่วนตัวสำหรับทุกคน",
     url: "/",
-    siteName: "SciSiam",
+    siteName: "Scisiam",
     locale: "th_TH",
     type: "website",
     images: [
@@ -34,13 +34,13 @@ export const metadata: Metadata = {
         url: "/ai-oon-logo.png",
         width: 500,
         height: 500,
-        alt: "โลโก้ SciSiam น้องไออุ่น",
+        alt: "โลโก้ Scisiam น้องไออุ่น",
       },
     ],
   },
   twitter: {
     card: "summary",
-    title: "SciSiam - รายชื่อห้องแล็บวิทยาศาสตร์จำลองออนไลน์",
+    title: "Scisiam - รายชื่อห้องแล็บวิทยาศาสตร์จำลองออนไลน์",
     description: "แพลตฟอร์มจำลองการทดลองวิทยาศาสตร์ออนไลน์ เรียนรู้สนุกสนานและเป็นส่วนตัวสำหรับทุกคน",
     images: ["/ai-oon-logo.png"],
   },

@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import SharedSimulationShell from "./SharedSimulationShell";
-import { Info, HelpCircle, Activity, Disc } from "lucide-react";
+import { Info, Activity, Disc } from "lucide-react";
 import { labsById } from "@/data/labs";
 import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";
 
@@ -53,7 +53,7 @@ export default function QuantumChemistryOrbitalsSimulation() {
   const [selectedOrbital, setSelectedOrbital] = useState(molecules[0].orbitals[0]);
   const [bondDistance, setBondDistance] = useState(0.74); // Angstroms (0.4 to 2.5)
   const [logs, setLogs] = useState<OrbitalLog[]>([]);
-  const [isSaving, setIsSaving] = useState(false);
+  const [, setIsSaving] = useState(false);
 
   // Calculate potential energy based on Morse Potential: V(r) = De * (1 - e^-a(r-re))^2 - De
   const getMorsePotential = (r: number) => {
@@ -125,7 +125,7 @@ export default function QuantumChemistryOrbitalsSimulation() {
           orbitalId: selectedOrbital.id,
           totalEnergyEv: currentEnergy,
         },
-        graphPoints: logs.map((l, idx) => ({
+        graphPoints: logs.map((l) => ({
           x: parseFloat(l.distance),
           y: parseFloat(l.energy),
         })),

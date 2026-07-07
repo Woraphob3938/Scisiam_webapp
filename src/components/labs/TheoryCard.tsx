@@ -12,6 +12,60 @@ interface TheoryGraphRendererProps {
   config: GraphConfigData;
 }
 
+const EQUATION_ENTITY_MAP: Record<string, string> = {
+  "&Delta;": "Δ",
+  "&Epsilon;": "Ε",
+  "&Phi;": "Φ",
+  "&apos;": "'",
+  "&epsilon;": "ε",
+  "&frac12;": "½",
+  "&rarr;": "→",
+  "&rho;": "ρ",
+  "&sigma;": "σ",
+  "&sup2;": "²",
+  "&sup3;": "³",
+  "&theta;": "θ",
+  "&times;": "×",
+};
+
+function decodeEquationText(value: string) {
+  return value.replace(/&[a-zA-Z0-9#]+;/g, (entity) => EQUATION_ENTITY_MAP[entity] ?? entity);
+}
+
+function renderEquationMarkup(value: string) {
+  const nodes: React.ReactNode[] = [];
+  const tokens = value.split(/(<\/?(?:sub|sup)>)/g).filter(Boolean);
+  let inlineTag: "sub" | "sup" | null = null;
+
+  tokens.forEach((token, index) => {
+    if (token === "<sub>") {
+      inlineTag = "sub";
+      return;
+    }
+    if (token === "<sup>") {
+      inlineTag = "sup";
+      return;
+    }
+    if (token === "</sub>" || token === "</sup>") {
+      inlineTag = null;
+      return;
+    }
+
+    const text = decodeEquationText(token);
+    if (inlineTag === "sub") {
+      nodes.push(<sub key={`${index}-${text}`}>{text}</sub>);
+      return;
+    }
+    if (inlineTag === "sup") {
+      nodes.push(<sup key={`${index}-${text}`}>{text}</sup>);
+      return;
+    }
+    nodes.push(text);
+  });
+
+  return nodes;
+}
+
 function TheoryGraphRenderer({ config }: TheoryGraphRendererProps) {
   const {
     xTitle,
@@ -249,10 +303,9 @@ export default function TheoryCard({ labId }: TheoryCardProps) {
               <span className="text-[10px] text-slate-500 font-bold uppercase block mb-1">
                 สมการความสัมพันธ์
               </span>
-              <div 
-                className="text-lg sm:text-xl font-mono font-bold text-slate-800 inline-flex items-center gap-1.5"
-                dangerouslySetInnerHTML={{ __html: details.equationHtml }}
-              />
+              <div className="text-lg sm:text-xl font-mono font-bold text-slate-800 inline-flex items-center gap-1.5">
+                {renderEquationMarkup(details.equationHtml)}
+              </div>
             </div>
 
             <div className="text-[11px] sm:text-xs text-slate-500 font-semibold space-y-1 border-t sm:border-t-0 sm:border-l border-slate-200/60 pt-3 sm:pt-0 sm:pl-4 w-full sm:w-auto">

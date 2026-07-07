@@ -10,6 +10,75 @@ const supabaseHostname = (() => {
   }
 })();
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://scisiam-app.vercel.app";
+const siteOrigin = (() => {
+  try {
+    return new URL(siteUrl).origin;
+  } catch {
+    return "https://scisiam-app.vercel.app";
+  }
+})();
+
+const geminiOrigin = "https://generativelanguage.googleapis.com";
+const supabaseOrigin = process.env.NEXT_PUBLIC_SUPABASE_URL
+  ? (() => {
+      try {
+        return new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).origin;
+      } catch {
+        return null;
+      }
+    })()
+  : null;
+
+const contentSecurityPolicyReportOnly = [
+  "default-src 'self'",
+  "base-uri 'self'",
+  "frame-ancestors 'none'",
+  "object-src 'none'",
+  "form-action 'self'",
+  "img-src 'self' data: blob: https:",
+  "font-src 'self' data:",
+  "style-src 'self' 'unsafe-inline'",
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+  `connect-src 'self' ${siteOrigin} ${geminiOrigin}${supabaseOrigin ? ` ${supabaseOrigin}` : ""}`,
+  "upgrade-insecure-requests",
+].join("; ");
+
+const securityHeaders = [
+  {
+    key: "X-Content-Type-Options",
+    value: "nosniff",
+  },
+  {
+    key: "X-Frame-Options",
+    value: "DENY",
+  },
+  {
+    key: "Referrer-Policy",
+    value: "strict-origin-when-cross-origin",
+  },
+  {
+    key: "Permissions-Policy",
+    value: "camera=(), microphone=(), geolocation=()",
+  },
+  {
+    key: "Cross-Origin-Opener-Policy",
+    value: "same-origin",
+  },
+  {
+    key: "Content-Security-Policy-Report-Only",
+    value: contentSecurityPolicyReportOnly,
+  },
+  ...(process.env.NODE_ENV === "production"
+    ? [
+        {
+          key: "Strict-Transport-Security",
+          value: "max-age=63072000; includeSubDomains; preload",
+        },
+      ]
+    : []),
+];
+
 const nextConfig: NextConfig = {
   images: supabaseHostname
     ? {
@@ -26,28 +95,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/(.*)",
-        headers: [
-          {
-            key: "X-Content-Type-Options",
-            value: "nosniff",
-          },
-          {
-            key: "X-Frame-Options",
-            value: "DENY",
-          },
-          {
-            key: "Referrer-Policy",
-            value: "strict-origin-when-cross-origin",
-          },
-          {
-            key: "Permissions-Policy",
-            value: "camera=(), microphone=(), geolocation=()",
-          },
-          {
-            key: "Cross-Origin-Opener-Policy",
-            value: "same-origin",
-          },
-        ],
+        headers: securityHeaders,
       },
     ];
   },

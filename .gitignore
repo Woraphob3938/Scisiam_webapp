@@ -39,9 +39,18 @@ yarn-error.log*
 /qa-screenshots/
 /.playwright-cli/
 /File/
+/graphify-out/
+/output/
+/scratch/
+recovery_step_*.json
+test*.log
+test_output*.txt
+test_utf8.log
 
 # local agent/tooling workspaces
+/.codex_tmp/
 /.agents/
+/.superpowers/
 /.impeccable/
 /supabase/.temp/
 

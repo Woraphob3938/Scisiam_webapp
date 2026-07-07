@@ -2,15 +2,15 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import SharedSimulationShell from "./SharedSimulationShell";
-import { Info, Play, RefreshCw, Layers, Sliders } from "lucide-react";
+import {
+  Info,
+  Play,
+  RefreshCw,
+  Layers,
+  Sliders,
+} from "lucide-react";
 import { labsById } from "@/data/labs";
 import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";
-
-interface HplcPeak {
-  name: string;
-  baseRetentionTime: number; // minutes
-  height: number;
-}
 
 const mixtures = [
   {
@@ -43,7 +43,7 @@ export default function HplcChromatographySimulation() {
   const [isInjecting, setIsInjecting] = useState(false);
   const [time, setTime] = useState(0); // simulation minutes
   const [chromatogramData, setChromatogramData] = useState<{ t: number; abs: number }[]>([]);
-  const [isSaving, setIsSaving] = useState(false);
+  const [, setIsSaving] = useState(false);
 
   const requestRef = useRef<number>(0);
   const lastTimeRef = useRef<number>(0);
@@ -118,6 +118,7 @@ export default function HplcChromatographySimulation() {
   useEffect(() => {
     requestRef.current = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(requestRef.current);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- RAF loop intentionally uses the current chromatogram animation closure.
   }, [isInjecting]);
 
   const handleSaveResult = async () => {

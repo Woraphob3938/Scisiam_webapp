@@ -90,8 +90,8 @@ export default function NumericalMethodsSimulation() {
   const plotH = svgH - pad.t - pad.b;
   const [xMin, xMax] = func.xRange;
   const [yMin, yMax] = func.yRange;
-  const xToSvg = useCallback((x: number) => pad.l + ((x - xMin) / (xMax - xMin)) * plotW, [xMin, xMax, plotW]);
-  const yToSvg = useCallback((y: number) => pad.t + ((yMax - y) / (yMax - yMin)) * plotH, [yMin, yMax, plotH]);
+  const xToSvg = useCallback((x: number) => pad.l + ((x - xMin) / (xMax - xMin)) * plotW, [pad.l, xMin, xMax, plotW]);
+  const yToSvg = useCallback((y: number) => pad.t + ((yMax - y) / (yMax - yMin)) * plotH, [pad.t, yMin, yMax, plotH]);
 
   // Build curve path
   const curvePath = useMemo(() => {
@@ -104,7 +104,7 @@ export default function NumericalMethodsSimulation() {
       pts.push(`${xToSvg(x).toFixed(1)},${cy.toFixed(1)}`);
     }
     return pts.join(" ");
-  }, [funcIdx, xToSvg, yToSvg, xMin, xMax, func]);
+  }, [xToSvg, yToSvg, xMin, xMax, pad.t, func]);
 
   // Current state
   const currentX = steps.length > 0 ? steps[steps.length - 1].xnext : x0;

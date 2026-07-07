@@ -827,6 +827,45 @@ test("self-registration cannot promote an account to teacher", () => {
   assert.doesNotMatch(migration, /raw_user_meta_data[\s\S]*?->>\s*'role'/i);
 });
 
+test("teacher registration captures a selected school without granting teacher authorization", () => {
+  const authForm = readProjectFile("src/components/auth/AuthForm.tsx");
+  const signUpBlock = authForm.match(
+    /supabase\.auth\.signUp\(\{([\s\S]*?)\n\s*\}\);/,
+  )?.[1];
+
+  assert.ok(signUpBlock, "sign-up request should be present");
+  assert.match(authForm, /\.from\("school_catalog"\)/);
+  assert.match(authForm, /setSelectedSchool\(school\)/);
+  assert.match(authForm, /role === "teacher"[\s\S]*?auth-school/);
+  assert.match(authForm, /schoolLookupError/);
+  assert.match(authForm, /โหลดรายชื่อโรงเรียนไม่ได้/);
+  assert.doesNotMatch(authForm, /catalogError \? \[\] : data \?\? \[\]/);
+  assert.match(signUpBlock, /school_id:\s*role === "teacher" \? selectedSchool\?\.id/);
+  assert.match(signUpBlock, /school_name:\s*role === "teacher" \? selectedSchool\?\.name/);
+  assert.match(signUpBlock, /requested_role:\s*role/);
+  assert.doesNotMatch(signUpBlock, /\n\s+role\s*[:,]/);
+});
+
+test("school catalog migration imports DMC school data with explicit API grants and profile linkage", () => {
+  const migrationFile = readdirSync(join(rootDir, "supabase/migrations"))
+    .find((file) => file.endsWith("_add_school_catalog.sql"));
+
+  assert.ok(migrationFile, "school catalog migration should exist");
+  const migration = readProjectFile(`supabase/migrations/${migrationFile}`);
+  const types = readProjectFile("src/lib/supabase/database.types.ts");
+
+  assert.match(migration, /create table if not exists public\.school_catalog/i);
+  assert.match(migration, /alter table public\.school_catalog enable row level security/i);
+  assert.match(migration, /grant select on public\.school_catalog to anon, authenticated/i);
+  assert.match(migration, /create policy "Anyone can search the school catalog"/i);
+  assert.match(migration, /alter table public\.profiles[\s\S]*add column if not exists school_id text/i);
+  assert.match(migration, /new\.raw_user_meta_data ->> 'school_id'/i);
+  assert.match(migration, /สตรีวิทยา/);
+  assert.match(migration, /สพม\.กรุงเทพมหานคร เขต 1/);
+  assert.match(types, /school_catalog:/);
+  assert.match(types, /school_id: string \| null/);
+});
+
 test("simulations award local points only through the shared experiment save helper", () => {
   const simulationDir = join(rootDir, "src/components/labs/simulation");
   const simulationFiles = readdirSync(simulationDir)
@@ -862,6 +901,9 @@ test("local Supabase migrations mirror the deployed migration history", () => {
     "20260630041642",
     "20260630042012",
     "20260701060555",
+    "20260702193746",
+    "20260702193948",
+    "20260707103000",
   ];
 
   assert.deepEqual(

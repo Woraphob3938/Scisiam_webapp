@@ -1688,7 +1688,7 @@ function createMathConceptDetails(input: {
     learningObjectives: input.learningObjectives ?? [
       `อธิบายความหมายของ ${input.focus} ได้ด้วยคำพูด กราฟ และสัญลักษณ์ทางคณิตศาสตร์`,
       "อ่านค่าจากกราฟหรือตาราง และระบุว่าตัวแปรใดเป็น input, output หรือค่าที่ต้องควบคุม",
-      "นำแนวคิดคณิตศาสตร์ไปช่วยวิเคราะห์ผลการทดลองในแล็บวิทยาศาสตร์ของ SciSiam ได้",
+      "นำแนวคิดคณิตศาสตร์ไปช่วยวิเคราะห์ผลการทดลองในแล็บวิทยาศาสตร์ของ Scisiam ได้",
     ],
     equipments: input.equipments ?? [
       {
@@ -1762,7 +1762,7 @@ function createMathConceptDetails(input: {
         bg: "bg-amber-50",
       },
     ],
-    theoryDescription: input.theoryDescription ?? `${input.title} เป็นแล็บคณิตศาสตร์พื้นฐานสำหรับช่วยอ่านความสัมพันธ์ของข้อมูลใน SciSiam ผู้เรียนจะใช้ภาพ ตาราง กราฟ และสมการเพื่อแปลความหมายของตัวแปรและแนวโน้มอย่างเป็นระบบ`,
+    theoryDescription: input.theoryDescription ?? `${input.title} เป็นแล็บคณิตศาสตร์พื้นฐานสำหรับช่วยอ่านความสัมพันธ์ของข้อมูลใน Scisiam ผู้เรียนจะใช้ภาพ ตาราง กราฟ และสมการเพื่อแปลความหมายของตัวแปรและแนวโน้มอย่างเป็นระบบ`,
     equationHtml: input.equation,
     equationLabels: input.equationLabels ?? [
       { label: "input", desc: "ค่าที่ผู้เรียนปรับหรือกำหนดก่อนสังเกตผลลัพธ์", color: "text-violet-500" },

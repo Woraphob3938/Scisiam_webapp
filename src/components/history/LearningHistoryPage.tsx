@@ -347,7 +347,7 @@ export default function LearningHistoryPage({ embedded = false }: LearningHistor
                   ประวัติการเรียนรู้
                 </div>
                 <h1 className="mt-4 max-w-3xl text-3xl font-extrabold leading-[1.25] tracking-normal text-slate-950 sm:text-4xl lg:text-[42px]">
-                  ดูเส้นทางการทดลองของคุณใน SciSiam
+                  ดูเส้นทางการทดลองของคุณใน Scisiam
                 </h1>
                 <p className="mt-3 max-w-2xl text-sm font-semibold leading-relaxed text-slate-500 sm:text-base">
                   รวมแล็บที่บันทึกผลแล้วและห้องที่ควรทดลองต่อ โดยใช้ข้อมูลจากบัญชีหรือข้อมูลในเครื่องนี้ตามสถานะการใช้งาน

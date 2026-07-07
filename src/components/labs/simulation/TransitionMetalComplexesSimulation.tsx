@@ -1,19 +1,14 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import SharedSimulationShell from "./SharedSimulationShell";
-import { Info, HelpCircle, Activity, Sparkles } from "lucide-react";
+import {
+  Info,
+  Activity,
+  Sparkles,
+} from "lucide-react";
 import { labsById } from "@/data/labs";
 import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";
-
-interface ComplexState {
-  metalId: string;
-  ligandId: string;
-  energyGapEv: number;
-  absorbWavelengthNm: number;
-  observedColorHex: string;
-  observedColorName: string;
-}
 
 interface ComplexLog {
   id: number;
@@ -48,7 +43,7 @@ export default function TransitionMetalComplexesSimulation() {
   const [showExcitation, setShowExcitation] = useState(false);
   const [excitationProgress, setExcitationProgress] = useState(0);
   const [logs, setLogs] = useState<ComplexLog[]>([]);
-  const [isSaving, setIsSaving] = useState(false);
+  const [, setIsSaving] = useState(false);
 
   // Energy gap calculations
   // Base energy gap for octahedrals is roughly 2.0 eV

@@ -1,8 +1,21 @@
 "use client";
 
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { Sliders, RotateCcw, ClipboardList, Activity, Play, Scissors, Zap, Sparkles, Clipboard, Download, Trash, CheckCircle2, Thermometer, Snowflake } from "lucide-react";
+import {
+  Sliders,
+  RotateCcw,
+  ClipboardList,
+  Play,
+  Scissors,
+  Zap,
+  Sparkles,
+  Clipboard,
+  Download,
+  Trash,
+  CheckCircle2,
+  Thermometer,
+} from "lucide-react";
 import SharedSimulationShell from "@/components/labs/simulation/SharedSimulationShell";
 import ManualNumberInput from "@/components/labs/simulation/ManualNumberInput";
 import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";
@@ -31,7 +44,7 @@ export default function RecombinantDnaTransformationSimulation() {
   const [isLigating, setIsLigating] = useState<boolean>(false);
   const [isLigationDone, setIsLigationDone] = useState<boolean>(false);
   const [isShocking, setIsShocking] = useState<boolean>(false);
-  const [isShockDone, setIsShockDone] = useState<boolean>(false);
+  const [, setIsShockDone] = useState<boolean>(false);
 
   const [loggedRuns, setLoggedRuns] = useState<LoggedTransformationRun[]>([]);
 

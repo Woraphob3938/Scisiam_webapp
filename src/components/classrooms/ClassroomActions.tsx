@@ -331,11 +331,11 @@ export function ClassroomActions({ placement }: ClassroomActionsProps) {
       return;
     }
 
-    const text = `เข้าร่วมห้อง ${createdClassroom.name} บน SciSiam ด้วยรหัส ${createdClassroom.code}`;
+    const text = `เข้าร่วมห้อง ${createdClassroom.name} บน Scisiam ด้วยรหัส ${createdClassroom.code}`;
 
     try {
       if (navigator.share) {
-        await navigator.share({ title: `SciSiam - ${createdClassroom.name}`, text });
+        await navigator.share({ title: `Scisiam - ${createdClassroom.name}`, text });
         setShareStatus("เปิดเมนูแชร์แล้ว");
         return;
       }
@@ -357,7 +357,7 @@ export function ClassroomActions({ placement }: ClassroomActionsProps) {
         ? "เข้าร่วมห้อง"
         : mode === "created"
           ? "สร้างห้องสำเร็จ"
-          : "ห้องเรียน SciSiam";
+          : "ห้องเรียน Scisiam";
 
   const descriptionText =
     mode === "create"

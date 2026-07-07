@@ -2,7 +2,20 @@
 
 import React, { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Sliders, RotateCcw, ClipboardList, Activity, Play, Settings, Zap, Sparkles, Clipboard, Download, Trash, CheckCircle2, HelpCircle, Eye, Target } from "lucide-react";
+import {
+  Sliders,
+  RotateCcw,
+  ClipboardList,
+  Activity,
+  Play,
+  Settings,
+  Zap,
+  Sparkles,
+  Clipboard,
+  Download,
+  Trash,
+  Target,
+} from "lucide-react";
 import SharedSimulationShell from "@/components/labs/simulation/SharedSimulationShell";
 import ManualNumberInput from "@/components/labs/simulation/ManualNumberInput";
 import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";
@@ -28,7 +41,7 @@ export default function CrisprGeneEditingSimulation() {
   // Playback/Cut animation state
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [editStep, setEditStep] = useState<"idle" | "targeting" | "cleaving" | "repairing" | "done">("idle");
-  const [animProgress, setAnimProgress] = useState<number>(0);
+  const [, setAnimProgress] = useState<number>(0);
 
   const [loggedRuns, setLoggedRuns] = useState<LoggedCrisprRun[]>([]);
 

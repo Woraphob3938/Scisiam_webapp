@@ -8,7 +8,9 @@ type SupabaseClient = ReturnType<typeof createClient>;
 type ClassroomRow = Database["public"]["Tables"]["classrooms"]["Row"];
 type ClassroomMemberRow = Database["public"]["Tables"]["classroom_members"]["Row"];
 type ClassroomLabRow = Database["public"]["Tables"]["classroom_labs"]["Row"];
+type ClassroomAssignmentRow = Database["public"]["Tables"]["classroom_assignments"]["Row"];
 type ClassroomMemberRpcRow = Database["public"]["Functions"]["get_classroom_members"]["Returns"][number];
+type ClassroomCreatorRpcRow = Database["public"]["Functions"]["get_classroom_creator_names"]["Returns"][number];
 
 type VisibleClassroomRow = Pick<
   ClassroomRow,
@@ -28,6 +30,7 @@ const GRADE_LEVELS: readonly GradeLevel[] = [
 export type ClassroomSummary = {
   id: string;
   creatorId: string;
+  creatorName: string;
   name: string;
   description: string | null;
   gradeLevel: GradeLevel;
@@ -58,6 +61,22 @@ export type CreateClassroomInput = {
   labIds: string[];
 };
 
+export type ClassroomAssignment = {
+  id: string;
+  classroomId: string;
+  createdBy: string;
+  title: string;
+  description: string | null;
+  dueAt: string | null;
+  createdAt: string;
+};
+
+export type CreateClassroomAssignmentInput = {
+  title: string;
+  description: string;
+  dueAt: string | null;
+};
+
 export async function listMyClassrooms(): Promise<ClassroomSummary[]> {
   const supabase = createClient();
   const userId = await getCurrentUserId(supabase);
@@ -69,6 +88,7 @@ export async function listMyClassrooms(): Promise<ClassroomSummary[]> {
   const { data, error } = await supabase
     .from("classrooms")
     .select("id, creator_id, name, description, grade_level, is_active, created_at")
+    .eq("is_active", true)
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -81,9 +101,10 @@ export async function listMyClassrooms(): Promise<ClassroomSummary[]> {
   }
 
   const classroomIds = classrooms.map((classroom) => classroom.id);
-  const [labRows, memberRows] = await Promise.all([
+  const [labRows, memberRows, creatorRows] = await Promise.all([
     selectClassroomLabs(supabase, classroomIds),
     selectClassroomMembers(supabase, classroomIds),
+    selectClassroomCreatorNames(supabase, classroomIds),
   ]);
 
   return classrooms.map((classroom) =>
@@ -92,6 +113,7 @@ export async function listMyClassrooms(): Promise<ClassroomSummary[]> {
       currentUserId: userId,
       labRows,
       memberRows,
+      creatorRows,
     }),
   );
 }
@@ -127,7 +149,7 @@ export async function createClassroom(input: CreateClassroomInput): Promise<Clas
   const uniqueLabIds = new Set<string>();
   for (const labId of normalizedLabIds) {
     if (!labId || !labsById[labId]) {
-      throw new Error("พบรหัสห้องทดลองที่ไม่อยู่ในรายการ SciSiam");
+      throw new Error("พบรหัสห้องทดลองที่ไม่อยู่ในรายการ Scisiam");
     }
 
     if (uniqueLabIds.has(labId)) {
@@ -212,6 +234,86 @@ export async function getClassroomMembers(id: string): Promise<ClassroomMember[]
   return (data ?? []).map((member) => mapClassroomMember(member));
 }
 
+export async function renameClassroom(id: string, name: string): Promise<string> {
+  const normalizedName = name.trim();
+  if (normalizedName.length < 1 || normalizedName.length > 80) {
+    throw new Error("ชื่อห้องเรียนต้องมีความยาว 1-80 ตัวอักษร");
+  }
+
+  const supabase = createClient();
+  await requireCurrentUserId(supabase);
+  const { data, error } = await supabase.rpc("rename_classroom", {
+    p_classroom_id: validateClassroomId(id),
+    p_name: normalizedName,
+  });
+
+  if (error) throwClassroomActionError(error.code, error.message);
+  return data ?? normalizedName;
+}
+
+export async function disbandClassroom(id: string): Promise<void> {
+  const supabase = createClient();
+  await requireCurrentUserId(supabase);
+  const { error } = await supabase.rpc("disband_classroom", {
+    p_classroom_id: validateClassroomId(id),
+  });
+
+  if (error) throwClassroomActionError(error.code, error.message);
+}
+
+export async function removeClassroomMember(id: string, userId: string): Promise<void> {
+  const supabase = createClient();
+  await requireCurrentUserId(supabase);
+  const { data, error } = await supabase.rpc("remove_classroom_member", {
+    p_classroom_id: validateClassroomId(id),
+    target_user_id: validateUserId(userId),
+  });
+
+  if (error) throwClassroomActionError(error.code, error.message);
+  if (!data) throw new Error("ไม่พบสมาชิกที่ต้องการนำออก");
+}
+
+export async function getClassroomAssignments(id: string): Promise<ClassroomAssignment[]> {
+  const supabase = createClient();
+  await requireCurrentUserId(supabase);
+  const classroomId = validateClassroomId(id);
+  const { data, error } = await supabase
+    .from("classroom_assignments")
+    .select("id, classroom_id, created_by, title, description, due_at, created_at")
+    .eq("classroom_id", classroomId)
+    .order("created_at", { ascending: false });
+
+  if (error) throwClassroomActionError(error.code, error.message);
+  return ((data ?? []) as ClassroomAssignmentRow[]).map(mapClassroomAssignment);
+}
+
+export async function createClassroomAssignment(
+  id: string,
+  input: CreateClassroomAssignmentInput,
+): Promise<string> {
+  const title = input.title.trim();
+  const description = input.description.trim();
+  if (title.length < 1 || title.length > 120) {
+    throw new Error("ชื่องานต้องมีความยาว 1-120 ตัวอักษร");
+  }
+  if (description.length > 1000) {
+    throw new Error("รายละเอียดงานต้องไม่เกิน 1,000 ตัวอักษร");
+  }
+
+  const supabase = createClient();
+  await requireCurrentUserId(supabase);
+  const { data, error } = await supabase.rpc("create_classroom_assignment", {
+    p_classroom_id: validateClassroomId(id),
+    p_title: title,
+    p_description: description || null,
+    p_due_at: input.dueAt,
+  });
+
+  if (error) throwClassroomActionError(error.code, error.message);
+  if (!data) throw new Error("ไม่สามารถเพิ่มงานได้ในขณะนี้");
+  return data;
+}
+
 async function loadClassroomDetailById(
   supabase: SupabaseClient,
   currentUserId: string,
@@ -221,6 +323,7 @@ async function loadClassroomDetailById(
     .from("classrooms")
     .select("id, creator_id, name, description, grade_level, is_active, created_at")
     .eq("id", classroomId)
+    .eq("is_active", true)
     .maybeSingle();
 
   if (error) {
@@ -231,9 +334,10 @@ async function loadClassroomDetailById(
     throw new Error(CLASSROOM_ACCESS_ERROR);
   }
 
-  const [labRows, memberRows] = await Promise.all([
+  const [labRows, memberRows, creatorRows] = await Promise.all([
     selectClassroomLabs(supabase, [classroomId]),
     selectClassroomMembers(supabase, [classroomId]),
+    selectClassroomCreatorNames(supabase, [classroomId]),
   ]);
 
   return buildClassroomSummary({
@@ -241,6 +345,7 @@ async function loadClassroomDetailById(
     currentUserId,
     labRows,
     memberRows,
+    creatorRows,
   });
 }
 
@@ -285,6 +390,20 @@ async function selectClassroomMembers(
   return (data ?? []) as VisibleClassroomMemberRow[];
 }
 
+async function selectClassroomCreatorNames(
+  supabase: SupabaseClient,
+  classroomIds: string[],
+): Promise<ClassroomCreatorRpcRow[]> {
+  if (classroomIds.length === 0) return [];
+
+  const { data, error } = await supabase.rpc("get_classroom_creator_names", {
+    p_classroom_ids: classroomIds,
+  });
+
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
+
 async function getCurrentUserId(supabase: SupabaseClient): Promise<string | null> {
   const {
     data: { user },
@@ -313,12 +432,14 @@ function buildClassroomSummary(input: {
   currentUserId: string;
   labRows: VisibleClassroomLabRow[];
   memberRows: VisibleClassroomMemberRow[];
+  creatorRows: ClassroomCreatorRpcRow[];
 }): ClassroomSummary {
-  const { classroom, currentUserId, labRows, memberRows } = input;
+  const { classroom, currentUserId, labRows, memberRows, creatorRows } = input;
 
   return {
     id: classroom.id,
     creatorId: classroom.creator_id,
+    creatorName: creatorRows.find((row) => row.classroom_id === classroom.id)?.display_name ?? "ผู้สร้างห้อง",
     name: classroom.name,
     description: classroom.description,
     gradeLevel: normalizeGradeLevel(classroom.grade_level),
@@ -354,6 +475,18 @@ function mapClassroomMember(member: ClassroomMemberRpcRow): ClassroomMember {
   };
 }
 
+function mapClassroomAssignment(assignment: ClassroomAssignmentRow): ClassroomAssignment {
+  return {
+    id: assignment.id,
+    classroomId: assignment.classroom_id,
+    createdBy: assignment.created_by,
+    title: assignment.title,
+    description: assignment.description,
+    dueAt: assignment.due_at,
+    createdAt: assignment.created_at,
+  };
+}
+
 function isGradeLevel(value: string | null | undefined): value is GradeLevel {
   return typeof value === "string" && GRADE_LEVELS.includes(value as GradeLevel);
 }
@@ -370,6 +503,19 @@ function validateClassroomId(id: string) {
   }
 
   return normalizedId;
+}
+
+function validateUserId(id: string) {
+  const normalizedId = id.trim();
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(normalizedId)) {
+    throw new Error("ไม่พบสมาชิกที่ต้องการนำออก");
+  }
+  return normalizedId;
+}
+
+function throwClassroomActionError(code: string | undefined, message: string): never {
+  if (code === "42501" || code === "P0002") throw new Error(CLASSROOM_ACCESS_ERROR);
+  throw new Error(message);
 }
 
 function readRpcClassroomId(value: Json | null): string | null {

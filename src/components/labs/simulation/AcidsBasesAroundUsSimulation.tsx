@@ -2,11 +2,15 @@
 
 import React, { useState } from "react";
 import SharedSimulationShell from "./SharedSimulationShell";
-import { Beaker, Droplets, RotateCcw, Info, PlusCircle, CheckCircle2 } from "lucide-react";
+import {
+  Beaker,
+  Droplets,
+  RotateCcw,
+  PlusCircle,
+  CheckCircle2,
+} from "lucide-react";
 import { labsById } from "@/data/labs";
 import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";
-
-interface GraphPoint { x: number; y: number; }
 
 interface ObservationLog {
   id: number;
@@ -109,7 +113,7 @@ export default function AcidsBasesAroundUsSimulation() {
   const [drops, setDrops] = useState(0);
   const [isDropping, setIsDropping] = useState(false);
   const [observations, setObservations] = useState<ObservationLog[]>([]);
-  const [isSaving, setIsSaving] = useState(false);
+  const [, setIsSaving] = useState(false);
 
   // Animation drop positioning
   const [dropY, setDropY] = useState(60);

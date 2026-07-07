@@ -23,6 +23,7 @@ export type Database = {
           display_name: string;
           email: string | null;
           avatar_url: string | null;
+          school_id: string | null;
           school_name: string | null;
           grade_level: string | null;
           classroom_label: string | null;
@@ -42,6 +43,7 @@ export type Database = {
           display_name?: string;
           email?: string | null;
           avatar_url?: string | null;
+          school_id?: string | null;
           school_name?: string | null;
           grade_level?: string | null;
           classroom_label?: string | null;
@@ -59,6 +61,7 @@ export type Database = {
           role?: ScisiamUserRole;
           display_name?: string;
           avatar_url?: string | null;
+          school_id?: string | null;
           school_name?: string | null;
           grade_level?: string | null;
           classroom_label?: string | null;
@@ -85,6 +88,58 @@ export type Database = {
         };
         Insert: never;
         Update: never;
+        Relationships: [];
+      };
+      school_catalog: {
+        Row: {
+          id: string;
+          school_code: string | null;
+          area_code: string | null;
+          name: string;
+          district: string | null;
+          province: string | null;
+          education_area: string | null;
+          school_type: string | null;
+          region: string | null;
+          lowest_grade: string | null;
+          highest_grade: string | null;
+          latitude: number | null;
+          longitude: number | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id: string;
+          school_code?: string | null;
+          area_code?: string | null;
+          name: string;
+          district?: string | null;
+          province?: string | null;
+          education_area?: string | null;
+          school_type?: string | null;
+          region?: string | null;
+          lowest_grade?: string | null;
+          highest_grade?: string | null;
+          latitude?: number | null;
+          longitude?: number | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          school_code?: string | null;
+          area_code?: string | null;
+          name?: string;
+          district?: string | null;
+          province?: string | null;
+          education_area?: string | null;
+          school_type?: string | null;
+          region?: string | null;
+          lowest_grade?: string | null;
+          highest_grade?: string | null;
+          latitude?: number | null;
+          longitude?: number | null;
+          updated_at?: string;
+        };
         Relationships: [];
       };
       experiment_runs: {
@@ -306,6 +361,32 @@ export type Database = {
         };
         Relationships: [];
       };
+      classroom_assignments: {
+        Row: {
+          id: string;
+          classroom_id: string;
+          created_by: string;
+          title: string;
+          description: string | null;
+          due_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          classroom_id: string;
+          created_by: string;
+          title: string;
+          description?: string | null;
+          due_at?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          title?: string;
+          description?: string | null;
+          due_at?: string | null;
+        };
+        Relationships: [];
+      };
       ai_usage_events: {
         Row: {
           id: string;
@@ -420,6 +501,44 @@ export type Database = {
           is_creator: boolean;
           joined_at: string;
         }>;
+      };
+      get_classroom_creator_names: {
+        Args: {
+          p_classroom_ids: string[];
+        };
+        Returns: Array<{
+          classroom_id: string;
+          display_name: string;
+        }>;
+      };
+      rename_classroom: {
+        Args: {
+          p_classroom_id: string;
+          p_name: string;
+        };
+        Returns: string;
+      };
+      disband_classroom: {
+        Args: {
+          p_classroom_id: string;
+        };
+        Returns: boolean;
+      };
+      remove_classroom_member: {
+        Args: {
+          p_classroom_id: string;
+          target_user_id: string;
+        };
+        Returns: boolean;
+      };
+      create_classroom_assignment: {
+        Args: {
+          p_classroom_id: string;
+          p_title: string;
+          p_description?: string | null;
+          p_due_at?: string | null;
+        };
+        Returns: string;
       };
     };
     Enums: {
