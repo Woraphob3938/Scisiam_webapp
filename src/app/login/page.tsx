@@ -5,19 +5,21 @@ export default async function LoginPage({
 }: {
   searchParams: Promise<{
     confirmed?: string;
+    email?: string;
     oauth?: string;
     registered?: string;
     reset?: string;
   }>;
 }) {
-  const { confirmed, oauth, registered, reset } = await searchParams;
+  const { confirmed, email, oauth, registered, reset } = await searchParams;
+  const registeredEmail = typeof email === "string" && email.includes("@") ? email : "";
   const initialNotice =
     reset === "success"
       ? "เปลี่ยนรหัสผ่านสำเร็จแล้ว กรุณาเข้าสู่ระบบด้วยรหัสผ่านใหม่"
       : confirmed === "success"
         ? "ยืนยันอีเมลสำเร็จแล้ว กรุณาเข้าสู่ระบบ"
         : registered === "success"
-          ? "สมัครสมาชิกสำเร็จ กรุณาตรวจสอบอีเมลเพื่อยืนยันบัญชี"
+          ? `สมัครสมาชิกสำเร็จแล้ว กรุณาตรวจสอบอีเมล${registeredEmail ? ` ${registeredEmail}` : ""} เพื่อกดยืนยันบัญชีก่อนเข้าสู่ระบบ หากไม่พบให้ดูในสแปมหรือจดหมายขยะ`
           : "";
   const initialError =
     oauth === "error"

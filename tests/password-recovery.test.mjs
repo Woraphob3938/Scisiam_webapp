@@ -32,14 +32,15 @@ test("password recovery uses a cross-device token-hash flow without exposing acc
   assert.match(verifyPage, /name="email"/);
   assert.match(verifyPage, /name="token"/);
   assert.match(verifyPage, /ยืนยัน OTP/);
-  assert.match(verifyPage, /pattern="\[0-9\]\{6\}"/);
+  assert.match(verifyPage, /pattern="\[0-9\]\{6,8\}"/);
   assert.match(verifyPage, /name="token_hash"/);
   assert.match(verifyPage, /name="type"/);
   assert.match(confirmRoute, /export async function POST/);
   assert.match(confirmRoute, /request\.formData\(\)/);
   assert.match(confirmRoute, /verifyOtp/);
-  assert.match(confirmRoute, /email,\s*token,\s*type: "recovery"/);
-  assert.match(confirmRoute, /\^\[0-9\]\{6\}\$/);
+  assert.match(confirmRoute, /email: cleanEmail,\s*token: cleanToken,\s*type: "recovery"/);
+  assert.match(confirmRoute, /\^\[0-9\]\{6,8\}\$/);
+  assert.match(confirmRoute, /replace\(\/\\s\+\/g, ""\)/);
   assert.match(confirmRoute, /token_hash/);
   assert.doesNotMatch(confirmRoute, /searchParams\.get\("next"\)/);
   assert.match(confirmRoute, /new URL\("\/reset-password", url\.origin\)/);
@@ -54,12 +55,38 @@ test("password recovery uses a cross-device token-hash flow without exposing acc
 
 test("account settings can send a password change email through the shared recovery flow", () => {
   const settingsModal = readProjectFile("src/components/SettingsModal.tsx");
+  const globals = readProjectFile("src/app/globals.css");
 
   assert.match(settingsModal, /เปลี่ยนรหัสผ่าน/);
+  assert.match(settingsModal, /createPortal/);
+  assert.match(settingsModal, /document\.body/);
+  assert.match(settingsModal, /z-\[999\]/);
   assert.match(settingsModal, /getUser\(\)/);
   assert.match(settingsModal, /resetPasswordForEmail/);
   assert.match(settingsModal, /\/auth\/verify/);
   assert.match(settingsModal, /ส่งลิงก์เปลี่ยนรหัสผ่านแล้ว/);
+  assert.match(settingsModal, /ตาบอดสี/);
+  assert.match(settingsModal, /function SwitchButton/);
+  assert.match(settingsModal, /role="switch"/);
+  assert.match(settingsModal, /aria-checked=\{checked\}/);
+  assert.match(settingsModal, /ON/);
+  assert.match(settingsModal, /OFF/);
+  assert.match(settingsModal, /scisiam_display_color_blind/);
+  assert.match(settingsModal, /dataset\.scisiamColorblind/);
+  assert.match(settingsModal, /label="เปิดโหมดช่วยสำหรับผู้ตาบอดสี"/);
+  assert.match(settingsModal, /onMouseDown=\{\(event\) => event\.stopPropagation\(\)\}/);
+  assert.match(settingsModal, /onClick=\{\(event\) => \{/);
+  assert.match(settingsModal, /event\.stopPropagation\(\);\s*onChange\(!checked\);/);
+  assert.match(settingsModal, /setReduceMotion/);
+  assert.match(settingsModal, /setColorBlind/);
+  assert.match(settingsModal, /scisiam-colorblind-panel/);
+  assert.match(settingsModal, /scisiam-colorblind-pattern-blue/);
+  assert.match(globals, /data-scisiam-colorblind="true"/);
+  assert.match(globals, /repeating-linear-gradient/);
+  assert.match(globals, /\.scisiam-colorblind-panel/);
+  assert.match(globals, /background-color: #dbeafe !important/);
+  assert.doesNotMatch(globals, /\[class\*="bg-blue-/);
+  assert.doesNotMatch(globals, /\[class\*="text-slate-/);
 });
 
 test("email signup uses the shared token-hash verification page and returns to login", () => {
@@ -69,12 +96,16 @@ test("email signup uses the shared token-hash verification page and returns to l
 
   assert.match(authForm, /emailRedirectTo/);
   assert.match(authForm, /emailRedirectTo = `\$\{window\.location\.origin\}\/auth\/verify`/);
+  assert.match(authForm, /registered=success&email=/);
+  assert.match(authForm, /setMode\("login"\)/);
+  assert.match(authForm, /สมัครสมาชิกสำเร็จแล้ว กรุณาตรวจสอบอีเมล/);
   assert.match(confirmRoute, /type === "email"/);
   assert.match(confirmRoute, /\/login\?confirmed=success/);
   assert.match(loginPage, /confirmed === "success"/);
-  assert.match(authForm, /router\.replace\("\/login\?registered=success"\)/);
+  assert.match(authForm, /router\.replace\(`\/login\?registered=success&email=/);
   assert.match(loginPage, /registered === "success"/);
-  assert.match(loginPage, /สมัครสมาชิกสำเร็จ กรุณาตรวจสอบอีเมลเพื่อยืนยันบัญชี/);
+  assert.match(loginPage, /กรุณาตรวจสอบอีเมล/);
+  assert.match(loginPage, /สแปมหรือจดหมายขยะ/);
 });
 
 test("Scisiam provides a Thai signup confirmation email template", () => {
@@ -83,8 +114,15 @@ test("Scisiam provides a Thai signup confirmation email template", () => {
 
   const template = readProjectFile(templatePath);
   assert.match(template, /ยืนยันอีเมล Scisiam/);
+  assert.match(template, />Scisiam<\/p>/);
+  assert.match(template, /น้องไออุ่น/);
+  assert.match(template, /สวัสดีค่ะ/);
+  assert.match(template, /ai-oon-avatar\.png/);
   assert.match(template, /ยืนยันอีเมลของฉัน/);
-  assert.match(template, /\{\{ \.ConfirmationURL \}\}/);
+  assert.match(template, /\{\{ \.SiteURL \}\}\/auth\/verify\?token_hash=\{\{ \.TokenHash \}\}&type=email/);
+  assert.doesNotMatch(template, /\{\{ \.ConfirmationURL \}\}/);
+  assert.doesNotMatch(template, /SciSiam/);
+  assert.doesNotMatch(template, /Scisiam Virtual Lab/);
   assert.doesNotMatch(template, /Confirm your email address/);
 });
 
@@ -97,10 +135,11 @@ test("Scisiam provides a Thai branded password recovery email template", () => {
   assert.match(template, />Scisiam<\/p>/);
   assert.doesNotMatch(template, /Scisiam Virtual Lab/);
   assert.match(template, /น้องไออุ่น/);
+  assert.match(template, /สวัสดีค่ะ/);
   assert.match(template, /ai-oon-avatar\.png/);
   assert.match(template, /\{\{ \.SiteURL \}\}\/auth\/verify\?type=recovery/);
   assert.doesNotMatch(template, /token_hash=/);
   assert.match(template, /\{\{ \.Token \}\}/);
-  assert.match(template, /รหัส OTP เลข 6 หลัก/);
+  assert.match(template, /รหัส OTP สำหรับคำขอนี้/);
   assert.doesNotMatch(template, /Reset your password/);
 });

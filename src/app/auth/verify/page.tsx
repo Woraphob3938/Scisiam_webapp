@@ -46,10 +46,10 @@ export default async function VerifyEmailLinkPage({
                 <ShieldCheck className="h-6 w-6" />
               </span>
               <h1 className="text-2xl font-extrabold leading-[1.35] text-slate-950">ยืนยัน OTP</h1>
-              <p className="mt-2 text-sm font-semibold leading-relaxed text-slate-500">กรอกรหัส 6 หลักจากอีเมล Scisiam ก่อนตั้งรหัสผ่านใหม่</p>
+              <p className="mt-2 text-sm font-semibold leading-relaxed text-slate-500">กรอกรหัสจากอีเมล Scisiam ก่อนตั้งรหัสผ่านใหม่</p>
               {error ? (
                 <p className="mt-3 rounded-xl border border-rose-100 bg-rose-50 px-3 py-2 text-xs font-bold leading-relaxed text-rose-700" role="alert">
-                  OTP ไม่ถูกต้องหรือหมดอายุ กรุณาตรวจสอบอีเมลอีกครั้ง
+                  OTP ไม่ถูกต้อง หมดอายุ หรือกรอกรหัสไม่ครบตามอีเมล กรุณาตรวจสอบอีเมลอีกครั้ง
                 </p>
               ) : null}
             </div>
@@ -73,8 +73,8 @@ export default async function VerifyEmailLinkPage({
                 type="text"
                 required
                 inputMode="numeric"
-                pattern="[0-9]{6}"
-                maxLength={6}
+                pattern="[0-9]{6,8}"
+                maxLength={8}
                 autoComplete="one-time-code"
                 className="min-h-12 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-center text-2xl font-extrabold tracking-[0.35em] text-slate-800 outline-none transition-all hover:border-blue-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
               />
@@ -119,7 +119,7 @@ export default async function VerifyEmailLinkPage({
             </span>
             <div>
               <h1 className="text-2xl font-extrabold leading-[1.35] text-slate-950">ลิงก์ไม่ถูกต้องหรือหมดอายุ</h1>
-              <p className="mt-2 text-sm font-semibold leading-relaxed text-slate-500">กลับไปหน้าเข้าสู่ระบบเพื่อขอลิงก์ฉบับใหม่</p>
+              <p className="mt-2 text-sm font-semibold leading-relaxed text-slate-500">ลิงก์อาจหมดอายุ ถูกเปิดไปแล้ว หรือมาจากอีเมลฉบับเก่า กรุณากลับไปสมัคร/เข้าสู่ระบบเพื่อขออีเมลฉบับใหม่</p>
             </div>
             <Link
               href="/login"

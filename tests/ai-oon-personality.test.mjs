@@ -14,7 +14,9 @@ test("AI I-Oon supports natural Scisiam and general conversation", () => {
   assert.match(route, /เพื่อนคู่คิดและผู้ช่วยการเรียนรู้/);
   assert.match(route, /สามารถคุยเรื่องทั่วไปนอกวิทยาศาสตร์ได้/);
   assert.doesNotMatch(route, /ถ้าคำถามไม่เกี่ยวกับวิทยาศาสตร์ ให้ชวนกลับ/);
-  assert.match(chat, /คุยเรื่องทั่วไปก็ได้ครับ/);
+  assert.match(route, /ใช้คำลงท้ายสุภาพแบบผู้หญิง/);
+  assert.match(chat, /คุยเรื่องทั่วไปก็ได้ค่ะ/);
+  assert.doesNotMatch(chat, /ผมคือ AI ไออุ่น/);
 });
 
 test("AI I-Oon uses a full-frame avatar", () => {

@@ -1,45 +1,59 @@
 <!doctype html>
 <html lang="th">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>ยืนยันอีเมล Scisiam</title>
-  </head>
-  <body style="margin:0;background:#f3f7ff;color:#0f172a;font-family:Arial,'Noto Sans Thai',sans-serif;">
-    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#f3f7ff;">
-      <tr>
-        <td align="center" style="padding:32px 16px;">
-          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width:560px;background:#ffffff;border:1px solid #dbe5f4;border-radius:20px;overflow:hidden;">
-            <tr>
-              <td style="height:8px;background:#2563eb;font-size:0;line-height:0;">&nbsp;</td>
-            </tr>
-            <tr>
-              <td style="padding:36px 36px 16px;">
-                <p style="margin:0 0 24px;color:#2563eb;font-size:20px;font-weight:700;line-height:1.4;">Scisiam</p>
-                <h1 style="margin:0 0 16px;color:#0f172a;font-size:28px;font-weight:700;line-height:1.45;">ยืนยันอีเมล Scisiam</h1>
-                <p style="margin:0;color:#475569;font-size:16px;line-height:1.8;">ขอบคุณที่สมัครสมาชิก Scisiam กรุณายืนยันอีเมลเพื่อเริ่มใช้งานห้องทดลองเสมือนจริง</p>
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:16px 36px 24px;">
-                <table role="presentation" cellspacing="0" cellpadding="0" border="0">
-                  <tr>
-                    <td style="border-radius:12px;background:#2563eb;">
-                      <a href="{{ .ConfirmationURL }}" style="display:inline-block;padding:14px 24px;color:#ffffff;font-size:16px;font-weight:700;line-height:1.4;text-decoration:none;">ยืนยันอีเมลของฉัน</a>
-                    </td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:0 36px 36px;">
-                <p style="margin:0;padding-top:24px;border-top:1px solid #e2e8f0;color:#64748b;font-size:13px;line-height:1.8;">หากคุณไม่ได้สมัครสมาชิก Scisiam สามารถเพิกเฉยต่ออีเมลฉบับนี้ได้</p>
-              </td>
-            </tr>
-          </table>
-          <p style="margin:16px 0 0;color:#94a3b8;font-size:12px;line-height:1.6;">Scisiam</p>
-        </td>
-      </tr>
-    </table>
-  </body>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ยืนยันอีเมล Scisiam</title>
+</head>
+
+<body style="margin:0;background:#eef6ff;color:#0f172a;font-family:Arial,'Noto Sans Thai',sans-serif;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#eef6ff;">
+    <tr>
+      <td align="center" style="padding:32px 16px;">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0"
+          style="max-width:600px;background:#ffffff;border:1px solid #dbeafe;border-radius:24px;overflow:hidden;">
+          <tr>
+            <td align="center" style="background:#dff1ff;padding:28px 28px 18px;">
+              <img src="{{ .SiteURL }}/ai-oon-avatar.png" width="136" height="136" alt="น้องไออุ่น ผู้ช่วยของ Scisiam"
+                style="display:block;width:136px;height:136px;border-radius:999px;border:6px solid #ffffff;object-fit:cover;" />
+              <p style="margin:18px 0 0;color:#2563eb;font-size:20px;font-weight:700;line-height:1.4;">Scisiam</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:32px 36px 8px;">
+              <h1 style="margin:0 0 14px;color:#0f172a;font-size:28px;font-weight:700;line-height:1.45;">
+                ยืนยันอีเมลของคุณ</h1>
+              <p style="margin:0;color:#475569;font-size:16px;line-height:1.8;">สวัสดีค่ะ น้องไออุ่นขอต้อนรับสู่ Scisiam
+                กรุณายืนยันอีเมลนี้เพื่อเปิดใช้งานบัญชีและเริ่มสำรวจห้องทดลองเสมือนจริงอย่างปลอดภัย</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:18px 36px 24px;">
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0">
+                <tr>
+                  <td style="border-radius:14px;background:#2563eb;">
+                    <a href="{{ .SiteURL }}/auth/verify?token_hash={{ .TokenHash }}&type=email"
+                      style="display:inline-block;padding:15px 24px;color:#ffffff;font-size:16px;font-weight:700;line-height:1.4;text-decoration:none;">ยืนยันอีเมลของฉัน</a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:0 36px 36px;">
+              <p
+                style="margin:0;padding-top:24px;border-top:1px solid #e2e8f0;color:#64748b;font-size:13px;line-height:1.8;">
+                หากคุณไม่ได้สมัครสมาชิก Scisiam สามารถเพิกเฉยต่ออีเมลฉบับนี้ได้
+                บัญชีจะไม่ถูกเปิดใช้งานจนกว่าจะมีการยืนยันอีเมล</p>
+            </td>
+          </tr>
+        </table>
+        <p style="margin:16px 0 0;color:#94a3b8;font-size:12px;line-height:1.6;">ส่งจาก Scisiam โดยใช้ระบบอีเมลของ Brevo
+        </p>
+      </td>
+    </tr>
+  </table>
+</body>
+
 </html>

@@ -12,17 +12,18 @@ export async function POST(request: NextRequest) {
   const type = formData.get("type");
   const isRecovery = type === "recovery";
   const isEmailConfirmation = type === "email";
+  const cleanEmail = typeof email === "string" ? email.trim().toLowerCase() : "";
+  const cleanToken = typeof token === "string" ? token.replace(/\s+/g, "") : "";
 
   if ((isRecovery || isEmailConfirmation) && isSupabaseConfigured()) {
     const supabase = await createClient();
     const { error } =
       isRecovery &&
-      typeof email === "string" &&
-      typeof token === "string" &&
-      /^[0-9]{6}$/.test(token)
+      cleanEmail &&
+      /^[0-9]{6,8}$/.test(cleanToken)
         ? await supabase.auth.verifyOtp({
-            email,
-            token,
+            email: cleanEmail,
+            token: cleanToken,
             type: "recovery",
           })
         : typeof tokenHash === "string" && tokenHash.length > 0
@@ -45,7 +46,7 @@ export async function POST(request: NextRequest) {
   }
 
   const invalidDestination = isRecovery
-    ? "/auth/verify?type=recovery&error=invalid_otp"
+    ? `/auth/verify?type=recovery&error=invalid_otp${cleanEmail ? `&email=${encodeURIComponent(cleanEmail)}` : ""}`
     : "/login?confirmed=invalid_link";
   return NextResponse.redirect(new URL(invalidDestination, url.origin), 303);
 }

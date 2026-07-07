@@ -262,8 +262,14 @@ export default function AuthForm({
         }
 
         setLoading(false);
-        router.replace("/login?registered=success");
-        router.refresh();
+        setMode("login");
+        setPassword("");
+        setConfirmPassword("");
+        setAcceptTerms(false);
+        setNotice(
+          `สมัครสมาชิกสำเร็จแล้ว กรุณาตรวจสอบอีเมล ${normalizedEmail} เพื่อกดยืนยันบัญชีก่อนเข้าสู่ระบบ หากไม่พบให้ดูในสแปมหรือจดหมายขยะ`,
+        );
+        router.replace(`/login?registered=success&email=${encodeURIComponent(normalizedEmail)}`);
         return;
       } else {
         const { data, error: signInError } = await supabase.auth.signInWithPassword({

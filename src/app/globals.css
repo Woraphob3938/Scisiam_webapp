@@ -57,6 +57,45 @@ html[data-scisiam-reduce-motion="true"] *::after {
   transition-duration: 0.001ms !important;
 }
 
+html[data-scisiam-colorblind="true"] {
+  --chart-1: #005fcc;
+  --chart-2: #0f766e;
+  --chart-3: #7c3aed;
+  --chart-4: #b45309;
+  --chart-5: #be123c;
+}
+
+html[data-scisiam-colorblind="true"] .scisiam-colorblind-readable {
+  color: #334155 !important;
+}
+
+html[data-scisiam-colorblind="true"] .scisiam-colorblind-panel {
+  border-color: #475569 !important;
+  background-color: #f8fafc !important;
+  background-image: repeating-linear-gradient(135deg, rgba(37, 99, 235, 0.12) 0 8px, transparent 8px 16px);
+}
+
+html[data-scisiam-colorblind="true"] .scisiam-colorblind-pattern-blue {
+  background-color: #dbeafe !important;
+  background-image: repeating-linear-gradient(135deg, rgba(29, 78, 216, 0.34) 0 6px, transparent 6px 13px);
+}
+
+html[data-scisiam-colorblind="true"] .scisiam-colorblind-pattern-emerald {
+  background-color: #ccfbf1 !important;
+  background-image: radial-gradient(circle at 4px 4px, rgba(15, 118, 110, 0.46) 0 2px, transparent 2px);
+  background-size: 12px 12px;
+}
+
+html[data-scisiam-colorblind="true"] .scisiam-colorblind-pattern-violet {
+  background-color: #ede9fe !important;
+  background-image: repeating-linear-gradient(45deg, rgba(109, 40, 217, 0.28) 0 5px, transparent 5px 10px), repeating-linear-gradient(135deg, rgba(109, 40, 217, 0.22) 0 4px, transparent 4px 11px);
+}
+
+html[data-scisiam-colorblind="true"] .scisiam-colorblind-pattern-rose {
+  background-color: #ffe4e6 !important;
+  background-image: repeating-linear-gradient(90deg, rgba(190, 18, 60, 0.32) 0 5px, transparent 5px 11px);
+}
+
 /* Custom Scrollbar for better aesthetics */
 ::-webkit-scrollbar {
   width: 8px;
