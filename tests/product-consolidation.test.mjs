@@ -33,8 +33,8 @@ test("Lab cards are Thai-first and expose only Enter Lab", () => {
   const data = read("src/data/labs.ts");
   const cards = read("src/components/LabCard.tsx");
   const listing = read("src/app/labs/page.tsx");
-  assert.equal((data.match(/\bid:\s*"/g) ?? []).length, 103);
-  assert.equal((data.match(/\bthaiTitle:\s*"/g) ?? []).length, 103);
+  assert.equal((data.match(/\bid:\s*"/g) ?? []).length, 112);
+  assert.equal((data.match(/\bthaiTitle:\s*"/g) ?? []).length, 112);
   assert.match(cards, /thaiTitle: string/);
   assert.match(cards, /\{lab\.thaiTitle\}[\s\S]*?\{lab\.title\}/);
   assert.doesNotMatch(cards, /รายละเอียด|onViewDetails|<Eye/);

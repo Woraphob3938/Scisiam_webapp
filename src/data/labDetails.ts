@@ -1,3 +1,5 @@
+import { foundationExplorerLabList, type FoundationExplorerLab } from "./foundationExplorerLabs";
+
 export interface EquipmentItemData {
   id: string;
   name: string;
@@ -1662,6 +1664,120 @@ const periodicTableDetails: LabDetailData = {
     annotation: { x: 132, y: 42, text: "Ionization ↑", color: "#7c3aed" }
   }
 };
+
+const atmosphereLayersDetails: LabDetailData = {
+  overviewBullets: [
+    "สำรวจชั้นบรรยากาศหลักจากพื้นโลกขึ้นไป และดูว่าชั้นใดเกี่ยวข้องกับสภาพอากาศมากที่สุด",
+    "คลิกก้อนเมฆแต่ละชนิดเพื่ออ่านลักษณะเด่น ช่วงความสูง และสภาพอากาศที่มักพบ",
+    "บันทึกการสังเกตเมฆหลายชนิดเพื่อเปรียบเทียบเมฆต่ำ เมฆระดับกลาง เมฆสูง และเมฆฝนฟ้าคะนอง"
+  ],
+  learningObjectives: [
+    "บอกชื่อและช่วงความสูงโดยประมาณของชั้นบรรยากาศหลักได้",
+    "จำแนกเมฆพื้นฐานจากรูปร่างและช่วงความสูงที่พบได้",
+    "อธิบายความสัมพันธ์ระหว่างเมฆในโทรโพสเฟียร์กับสภาพอากาศประจำวันได้"
+  ],
+  equipments: [
+    { id: "atmosphere-map", name: "แผนภาพชั้นบรรยากาศ", role: "แสดงระดับความสูงของโทรโพสเฟียร์ สตราโตสเฟียร์ มีโซสเฟียร์ และเทอร์โมสเฟียร์", note: "ใช้ดูภาพรวมก่อนเลือกก้อนเมฆ", unit: "km", tone: "blue", visualKey: "GraphVisual" },
+    { id: "cloud-buttons", name: "ก้อนเมฆแบบคลิกได้", role: "เลือกชนิดเมฆเพื่ออ่านรายละเอียดและช่วงความสูง", note: "เปรียบเทียบเมฆต่ำ เมฆกลาง เมฆสูง และเมฆแนวตั้ง", unit: "5 แบบ", tone: "cyan", visualKey: "ClipboardVisual" },
+    { id: "altitude-ruler", name: "สเกลระดับความสูง", role: "ช่วยอ่านช่วงความสูงของเมฆและชั้นบรรยากาศ", note: "ค่าความสูงเป็นช่วงโดยประมาณเพื่อการเรียนรู้", unit: "กม.", tone: "emerald", visualKey: "ThermometerVisual" }
+  ],
+  steps: [
+    { num: 1, title: "อ่านชั้นบรรยากาศ", desc: "เริ่มจากดูแถบชั้นบรรยากาศและสังเกตว่าเมฆส่วนใหญ่อยู่ในโทรโพสเฟียร์", iconKey: "Layers", color: "text-blue-500", bg: "bg-blue-50" },
+    { num: 2, title: "คลิกก้อนเมฆ", desc: "เลือกก้อนเมฆบนฉากเพื่อดูชื่อ ช่วงความสูง ลักษณะ และสภาพอากาศที่เกี่ยวข้อง", iconKey: "Cloud", color: "text-cyan-500", bg: "bg-cyan-50" },
+    { num: 3, title: "บันทึกการสังเกต", desc: "บันทึกเมฆที่เลือกลงตารางเพื่อเปรียบเทียบความสูงและชนิดของเมฆ", iconKey: "ClipboardList", color: "text-emerald-500", bg: "bg-emerald-50" },
+    { num: 4, title: "สรุปผล", desc: "อธิบายว่าเมฆแต่ละชนิดบอกข้อมูลเกี่ยวกับอากาศบริเวณนั้นอย่างไร", iconKey: "CheckCircle2", color: "text-amber-500", bg: "bg-amber-50" }
+  ],
+  theoryDescription: "ชั้นบรรยากาศแบ่งตามการเปลี่ยนแปลงของอุณหภูมิและความสูง ชั้นที่ใกล้พื้นโลกที่สุดคือโทรโพสเฟียร์ มีความสูงประมาณ 0-12 กิโลเมตรและเป็นบริเวณที่เกิดเมฆ ฝน ลม และสภาพอากาศส่วนใหญ่ เมฆแต่ละชนิดมีรูปร่างและช่วงความสูงต่างกัน จึงช่วยบอกสภาพอากาศได้ในระดับพื้นฐาน",
+  equationHtml: "เมฆส่วนใหญ่เกิดใน Troposphere ≈ 0-12 km",
+  equationLabels: [
+    { label: "Troposphere", desc: "ชั้นล่างสุดที่เกิดสภาพอากาศและเมฆส่วนใหญ่", color: "text-blue-500" },
+    { label: "Altitude", desc: "ระดับความสูงจากพื้นโลก ใช้จำแนกเมฆต่ำ กลาง สูง", color: "text-emerald-500" },
+    { label: "Cloud type", desc: "รูปร่างของเมฆช่วยบอกสภาพอากาศโดยประมาณ", color: "text-cyan-500" }
+  ],
+  graph: {
+    title: "ช่วงความสูงของเมฆ",
+    subtitle: "Cloud Altitude Bands",
+    xTitle: "ชนิดเมฆ",
+    yTitle: "ระดับความสูง (km)",
+    yLabels: ["16", "12", "8", "4", "0"],
+    xLabels: ["Stratus", "Cumulus", "Altocumulus", "Cirrus", "Cumulonimbus"],
+    graphType: "custom",
+    customPath: "M18,102 L54,92 L92,66 L132,42 L178,18",
+    pathColor: "#0284c7",
+    annotation: { x: 118, y: 34, text: "High clouds", color: "#0284c7" }
+  }
+};
+
+const foundationVisualKeys: Record<FoundationExplorerLab["visualKind"], string> = {
+  equipment: "BeakerVisual",
+  "animal-cell": "MicroscopeSlideVisual",
+  "leaf-cell": "PlantChamberVisual",
+  blood: "BloodTypingSVG",
+  chemicals: "BuretteVisual",
+  "external-muscle": "HeartRateSVG",
+  "internal-muscle": "HeartRateSVG",
+  minerals: "ClipboardListVisual",
+};
+
+const foundationStepIcons: Record<FoundationExplorerLab["visualKind"], string> = {
+  equipment: "FlaskConical",
+  "animal-cell": "Microscope",
+  "leaf-cell": "Leaf",
+  blood: "Activity",
+  chemicals: "FlaskConical",
+  "external-muscle": "Activity",
+  "internal-muscle": "Activity",
+  minerals: "ClipboardList",
+};
+
+function createFoundationExplorerDetails(lab: FoundationExplorerLab): LabDetailData {
+  const tones: EquipmentItemData["tone"][] = ["blue", "emerald", "violet", "amber", "cyan"];
+  const visualKey = foundationVisualKeys[lab.visualKind];
+  const iconKey = foundationStepIcons[lab.visualKind];
+
+  return {
+    overviewBullets: lab.overviewBullets,
+    learningObjectives: lab.learningObjectives,
+    equipments: lab.items.slice(0, 5).map((item, index) => ({
+      id: item.id,
+      name: item.name,
+      role: item.subtitle,
+      note: item.detail,
+      unit: item.tag,
+      tone: tones[index % tones.length],
+      visualKey,
+    })),
+    steps: [
+      { num: 1, title: "อ่านภาพรวม", desc: `ดูภาพรวมของ ${lab.thaiTitle} และคำสำคัญก่อนเริ่มสำรวจ`, iconKey: "BookOpen", color: "text-blue-500", bg: "bg-blue-50" },
+      { num: 2, title: "เลือกหัวข้อ", desc: "คลิกการ์ดหรือรายการบนภาพเพื่อดูรายละเอียดของหัวข้อนั้น", iconKey, color: "text-emerald-500", bg: "bg-emerald-50" },
+      { num: 3, title: "เปรียบเทียบข้อมูล", desc: "เปรียบเทียบหน้าที่ ตำแหน่ง ประโยชน์ หรือข้อควรระวังของแต่ละรายการ", iconKey: "Shuffle", color: "text-violet-500", bg: "bg-violet-50" },
+      { num: 4, title: "สรุปข้อควรจำ", desc: "ทบทวนข้อควรจำและนำไปใช้ก่อนเข้าสู่แล็บทดลองจริง", iconKey: "ClipboardList", color: "text-amber-500", bg: "bg-amber-50" },
+    ],
+    theoryDescription: lab.theory,
+    equationHtml: lab.keyLine,
+    equationLabels: lab.items.slice(0, 3).map((item, index) => ({
+      label: item.name,
+      desc: item.subtitle,
+      color: ["text-blue-500", "text-emerald-500", "text-violet-500"][index],
+    })),
+    graph: {
+      title: `${lab.thaiTitle} แบบสำรวจ`,
+      subtitle: "Foundation Knowledge Map",
+      xTitle: "หัวข้อ",
+      yTitle: "ความเชื่อมโยง",
+      yLabels: ["มาก", "กลาง", "พื้นฐาน", "เริ่มต้น"],
+      xLabels: lab.items.slice(0, 4).map((item) => item.tag),
+      graphType: "custom",
+      customPath: "M18,96 C48,70 72,78 98,48 C124,18 148,42 182,22",
+      pathColor: "#0891b2",
+      annotation: { x: 116, y: 34, text: "สำรวจ", color: "#0891b2" },
+    },
+  };
+}
+
+const foundationExplorerDetails = Object.fromEntries(
+  foundationExplorerLabList.map((lab) => [lab.id, createFoundationExplorerDetails(lab)])
+) as Record<string, LabDetailData>;
 
 function createMathConceptDetails(input: {
   title: string;
@@ -3495,6 +3611,8 @@ export const labDetails: Record<string, LabDetailData> = {
   "stefan-boltzmann": stefanBoltzmannDetails,
   "acid-base-titration": acidBaseDetails,
   "periodic-table": periodicTableDetails,
+  "atmosphere-layers": atmosphereLayersDetails,
+  ...foundationExplorerDetails,
   "boyles-law": boylesLawDetails,
   "charles-law": charlesLawDetails,
   "photosynthesis-rate": photosynthesisDetails,

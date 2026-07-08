@@ -31,7 +31,8 @@ test("lab navigation links have visible button affordances", () => {
   const shell = readProjectFile("src/components/labs/simulation/SharedSimulationShell.tsx");
 
   assert.match(hero, /href="\/labs"[\s\S]*?border-slate-200[\s\S]*?bg-white[\s\S]*?กลับไปหน้ารายชื่อห้องแล็บ/);
-  assert.match(shell, /href=\{`\/labs\/\$\{labId\}`\}[\s\S]*?border[\s\S]*?bg-white[\s\S]*?รายละเอียดแล็บ/);
+  assert.match(shell, /href="\/labs"[\s\S]*?border[\s\S]*?bg-white[\s\S]*?ย้อนกลับ/);
+  assert.doesNotMatch(shell, /รายละเอียดแล็บ/);
 });
 
 test("Mathematics simulation command buttons use Pastel Blush chrome", () => {

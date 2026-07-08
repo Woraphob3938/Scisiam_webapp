@@ -182,6 +182,87 @@ export const labsData: LabData[] = [
     description: "สำรวจตารางธาตุแบบ 3D เรียนรู้เลขอะตอม สัญลักษณ์ มวลอะตอม คาบ หมู่ และหมวดธาตุหลัก 7 หมู่"
   },
   {
+    id: "atmosphere-layers",
+    thaiTitle: "ชั้นบรรยากาศและก้อนเมฆ",
+    title: "Atmospheric Layers and Clouds",
+    category: "Foundation",
+    gradeLevel: "มัธยมต้น",
+    status: "",
+    description: "สำรวจชั้นบรรยากาศและชนิดของก้อนเมฆ คลิกเมฆเพื่อดูรายละเอียด ลักษณะ และช่วงความสูงที่พบได้"
+  },
+  {
+    id: "lab-equipment-overview",
+    thaiTitle: "วัสดุอุปกรณ์ในห้องแล็บ",
+    title: "Laboratory Equipment Guide",
+    category: "Foundation",
+    gradeLevel: "มัธยมต้น",
+    status: "",
+    description: "รู้จักวัสดุอุปกรณ์สำคัญในห้องปฏิบัติการ เช่น บีกเกอร์ หลอดทดลอง กระบอกตวง ปิเปต กล้องจุลทรรศน์ และอุปกรณ์ความปลอดภัย"
+  },
+  {
+    id: "animal-cell",
+    thaiTitle: "เซลล์สัตว์",
+    title: "Animal Cell Explorer",
+    category: "Foundation",
+    gradeLevel: "มัธยมต้น",
+    status: "",
+    description: "สำรวจเยื่อหุ้มเซลล์ นิวเคลียส ไซโทพลาซึม ไมโทคอนเดรีย ไรโบโซม เอนโดพลาสมิกเรติคูลัม กอลจิบอดี และไลโซโซมในเซลล์สัตว์"
+  },
+  {
+    id: "leaf-cell",
+    thaiTitle: "เซลล์ใบไม้",
+    title: "Leaf Cell Explorer",
+    category: "Foundation",
+    gradeLevel: "มัธยมต้น",
+    status: "",
+    description: "เรียนรู้โครงสร้างของเซลล์ใบไม้ ได้แก่ ผนังเซลล์ คลอโรพลาสต์ แวคิวโอล เซลล์พาลิเสด เซลล์คุม และปากใบ"
+  },
+  {
+    id: "human-blood-cells",
+    thaiTitle: "เซลล์เม็ดเลือดคน",
+    title: "Human Blood Cell Explorer",
+    category: "Foundation",
+    gradeLevel: "มัธยมต้น",
+    status: "",
+    description: "สำรวจองค์ประกอบหลักของเลือดคนและหน้าที่ เช่น การลำเลียงออกซิเจน ภูมิคุ้มกัน การแข็งตัวของเลือด และการขนส่งสาร"
+  },
+  {
+    id: "experiment-chemicals",
+    thaiTitle: "สารเคมีในการทดลอง",
+    title: "Experiment Chemicals Catalog",
+    category: "Foundation",
+    gradeLevel: "มัธยมต้น",
+    status: "",
+    description: "สำรวจสารเคมีพื้นฐานในห้องทดลอง เช่น กรด เบส เกลือ อินดิเคเตอร์ ตัวทำละลาย และสารรีเอเจนต์ พร้อมข้อควรระวังในการใช้งาน"
+  },
+  {
+    id: "external-muscle-anatomy",
+    thaiTitle: "กายวิภาคกล้ามเนื้อภายนอก",
+    title: "External Muscle Anatomy",
+    category: "Foundation",
+    gradeLevel: "มัธยมต้น",
+    status: "",
+    description: "สำรวจกล้ามเนื้อภายนอก เช่น เดลทอยด์ เพกทอราลิส ไบเซปส์ เรคตัสแอบโดมินิส ควอดริเซปส์ และน่อง"
+  },
+  {
+    id: "internal-muscle-anatomy",
+    thaiTitle: "กายวิภาคกล้ามเนื้อภายใน",
+    title: "Internal Muscle Anatomy",
+    category: "Foundation",
+    gradeLevel: "มัธยมต้น",
+    status: "",
+    description: "เรียนรู้กล้ามเนื้อชั้นลึกที่ช่วยหายใจ พยุงแกนกลาง และควบคุมท่าทาง เช่น กะบังลม กล้ามเนื้อระหว่างซี่โครง และอิลิโอโซแอส"
+  },
+  {
+    id: "good-bad-minerals",
+    thaiTitle: "แร่ธาตุดีและไม่ดี",
+    title: "Essential and Harmful Minerals",
+    category: "Foundation",
+    gradeLevel: "มัธยมต้น",
+    status: "",
+    description: "เปรียบเทียบแร่ธาตุจำเป็นต่อร่างกายกับโลหะหนักหรือธาตุที่เป็นพิษ เพื่อเข้าใจประโยชน์ ความเสี่ยง และหลักการได้รับในปริมาณเหมาะสม"
+  },
+  {
     id: "boyles-law",
     thaiTitle: "กฎของบอยล์",
     title: "Boyle's Gas Law Lab",

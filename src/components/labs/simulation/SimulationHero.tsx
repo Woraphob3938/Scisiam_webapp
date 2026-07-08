@@ -4,11 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { Atom, ArrowLeft } from "lucide-react";
 
-interface SimulationHeroProps {
-  labId: string;
-}
-
-export default function SimulationHero({ labId }: SimulationHeroProps) {
+export default function SimulationHero() {
   return (
     <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-12 md:px-20 py-4 select-none">
       <div className="relative overflow-hidden bg-white border border-slate-100 rounded-[32px] shadow-xl shadow-slate-200/40 p-6 sm:p-8 flex flex-col lg:flex-row items-center justify-between gap-8">
@@ -41,11 +37,11 @@ export default function SimulationHero({ labId }: SimulationHeroProps) {
 
           {/* Back link */}
           <Link
-            href={`/labs/${labId}`}
+            href="/labs"
             className="flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors duration-200"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            <span>กลับไปหน้ารายละเอียดห้องแล็บ</span>
+            <span>ย้อนกลับ</span>
           </Link>
         </div>
 

@@ -906,6 +906,8 @@ test("local Supabase migrations mirror the deployed migration history", () => {
     "20260707103000",
     "20260707203430",
     "20260707212025",
+    "20260708085729",
+    "20260708194528",
   ];
 
   assert.deepEqual(
@@ -923,6 +925,85 @@ test("learning snapshots derive local labs from the shared registry", () => {
   );
   assert.match(source, /labsData\.(?:map|flatMap)\(/);
   assert.doesNotMatch(source, /labId:\s*"newtons-cooling"[\s\S]*labId:\s*"colligative-properties"/);
+});
+
+test("atmosphere layers lab is a ready clickable cloud simulation", () => {
+  const labs = readProjectFile("src/data/labs.ts");
+  const details = readProjectFile("src/data/labDetails.ts");
+  const registry = readProjectFile("src/data/labSimulationRegistry.ts");
+  const route = readProjectFile("src/app/labs/[id]/simulation/page.tsx");
+  const card = readProjectFile("src/components/LabCard.tsx");
+  const savedRegistry = readProjectFile("src/data/labSavedExperiments.ts");
+  const simulation = readProjectFile("src/components/labs/simulation/AtmosphereLayersSimulation.tsx");
+
+  assert.match(labs, /id:\s*"atmosphere-layers"[\s\S]*?category:\s*"Foundation"/);
+  assert.match(details, /"atmosphere-layers": atmosphereLayersDetails/);
+  assert.match(registry, /"atmosphere-layers"/);
+  assert.match(route, /AtmosphereLayersSimulation/);
+  assert.match(card, /case "atmosphere-layers":[\s\S]*?<AtmosphereLayersSVG \/>/);
+  assert.match(savedRegistry, /"atmosphere-layers": "scisiam_saved_atmosphere_layers_experiment"/);
+
+  for (const term of ["Cirrus", "Cumulus", "Cumulonimbus", "โทรโพสเฟียร์", "0.5-16 กม."]) {
+    assert.match(simulation, new RegExp(term), `${term} should appear in the simulation`);
+  }
+  assert.match(simulation, /setInfoOpen\(true\)/);
+  assert.match(simulation, /role="dialog"/);
+  assert.match(simulation, /showLiveMetrics=\{false\}/);
+  assert.match(simulation, /showInfoTabs=\{false\}/);
+  assert.doesNotMatch(simulation, /\["100", "85", "50", "12", "0 km"\]/);
+  assert.doesNotMatch(simulation, /saveExperimentAndSync/);
+  assert.doesNotMatch(simulation, /บันทึกผล/);
+});
+
+test("foundation simulations keep exploration-only chrome", () => {
+  for (const file of [
+    "src/components/labs/simulation/PeriodicTableSimulation.tsx",
+    "src/components/labs/simulation/AtmosphereLayersSimulation.tsx",
+    "src/components/labs/simulation/FoundationExplorerSimulation.tsx",
+  ]) {
+    const source = readProjectFile(file);
+
+    assert.match(source, /showLiveMetrics=\{false\}/, `${file} should hide real-time metrics`);
+    assert.match(source, /showInfoTabs=\{false\}/, `${file} should hide detail tabs`);
+    assert.match(source, /showSaveButton=\{false\}/, `${file} should hide save buttons`);
+  }
+});
+
+test("foundation explorer labs are ready and content-mapped", () => {
+  const labIds = [
+    "lab-equipment-overview",
+    "animal-cell",
+    "leaf-cell",
+    "human-blood-cells",
+    "experiment-chemicals",
+    "external-muscle-anatomy",
+    "internal-muscle-anatomy",
+    "good-bad-minerals",
+  ];
+  const labs = readProjectFile("src/data/labs.ts");
+  const details = readProjectFile("src/data/labDetails.ts");
+  const registry = readProjectFile("src/data/labSimulationRegistry.ts");
+  const route = readProjectFile("src/app/labs/[id]/simulation/page.tsx");
+  const card = readProjectFile("src/components/LabCard.tsx");
+  const savedRegistry = readProjectFile("src/data/labSavedExperiments.ts");
+  const data = readProjectFile("src/data/foundationExplorerLabs.ts");
+  const simulation = readProjectFile("src/components/labs/simulation/FoundationExplorerSimulation.tsx");
+
+  for (const labId of labIds) {
+    assert.match(labs, new RegExp(`id:\\s*"${labId}"[\\s\\S]*?category:\\s*"Foundation"`), `${labId} should be a Foundation lab`);
+    assert.match(registry, new RegExp(`"${labId}"`), `${labId} should be ready`);
+    assert.match(route, new RegExp(`"${labId}": FoundationExplorerSimulation`), `${labId} should route to the shared foundation explorer`);
+    assert.match(card, new RegExp(`case "${labId}"`), `${labId} should have a card illustration`);
+    assert.match(savedRegistry, new RegExp(`"${labId}": "scisiam_saved_`), `${labId} should have a saved registry key`);
+    assert.match(data, new RegExp(`id: "${labId}"`), `${labId} should have foundation explorer content`);
+  }
+
+  assert.match(details, /\.\.\.foundationExplorerDetails/);
+  assert.match(simulation, /ChemicalListModal/);
+  assert.match(simulation, /side === "good"/);
+  assert.match(simulation, /showLiveMetrics=\{false\}/);
+  assert.match(simulation, /showInfoTabs=\{false\}/);
+  assert.match(simulation, /showSaveButton=\{false\}/);
 });
 
 test("cloud completion counts come only from completed lab progress", () => {

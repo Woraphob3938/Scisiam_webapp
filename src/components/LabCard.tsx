@@ -242,6 +242,57 @@ const PeriodicTableSVG = () => (
   </svg>
 );
 
+const AtmosphereLayersSVG = () => (
+  <svg className="h-32 w-full" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <rect width="200" height="120" rx="18" fill="#e0f2fe" />
+    <rect y="0" width="200" height="30" fill="#1e3a8a" opacity="0.86" />
+    <rect y="30" width="200" height="30" fill="#2563eb" opacity="0.46" />
+    <rect y="60" width="200" height="32" fill="#38bdf8" opacity="0.38" />
+    <rect y="92" width="200" height="28" fill="#bbf7d0" opacity="0.72" />
+    <path d="M16 94 C38 88 54 94 76 88 C96 83 116 88 140 82 C158 78 176 82 190 76" stroke="#22c55e" strokeWidth="3" strokeLinecap="round" opacity="0.75" />
+    <g transform="translate(126 18)">
+      <ellipse cx="20" cy="24" rx="21" ry="12" fill="#ffffff" />
+      <circle cx="11" cy="20" r="10" fill="#ffffff" />
+      <circle cx="25" cy="16" r="13" fill="#ffffff" />
+      <circle cx="36" cy="23" r="9" fill="#ffffff" />
+      <text x="23" y="49" fill="#1d4ed8" fontSize="8" fontWeight="800" textAnchor="middle">6-12 km</text>
+    </g>
+    <g transform="translate(64 45)">
+      <ellipse cx="22" cy="24" rx="28" ry="13" fill="#ffffff" />
+      <circle cx="10" cy="20" r="12" fill="#ffffff" />
+      <circle cx="29" cy="16" r="16" fill="#ffffff" />
+      <circle cx="45" cy="24" r="11" fill="#ffffff" />
+      <text x="26" y="50" fill="#0369a1" fontSize="8" fontWeight="800" textAnchor="middle">2-7 km</text>
+    </g>
+    <g transform="translate(20 71)">
+      <ellipse cx="32" cy="24" rx="35" ry="14" fill="#ffffff" />
+      <circle cx="14" cy="20" r="14" fill="#ffffff" />
+      <circle cx="36" cy="15" r="18" fill="#ffffff" />
+      <circle cx="56" cy="24" r="13" fill="#ffffff" />
+      <text x="36" y="51" fill="#0f766e" fontSize="8" fontWeight="800" textAnchor="middle">0-2 km</text>
+    </g>
+    <text x="16" y="18" fill="#ffffff" fontSize="9" fontWeight="900">ชั้นบรรยากาศ</text>
+  </svg>
+);
+
+const FoundationKnowledgeSVG = ({ label, tone = "#0891b2" }: { label: string; tone?: string }) => (
+  <svg className="h-32 w-full" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <rect width="200" height="120" rx="18" fill="#f8fafc" />
+    <circle cx="52" cy="58" r="30" fill={tone} opacity="0.14" />
+    <circle cx="148" cy="54" r="36" fill="#34d399" opacity="0.12" />
+    <rect x="36" y="28" width="128" height="64" rx="18" fill="#ffffff" stroke="#cbd5e1" strokeWidth="1.5" />
+    <g transform="translate(52 43)">
+      <circle cx="18" cy="18" r="18" fill={tone} opacity="0.16" />
+      <path d="M9 20 C13 10 23 10 27 20 C24 27 12 27 9 20Z" fill={tone} opacity="0.86" />
+      <circle cx="18" cy="18" r="5" fill="#ffffff" opacity="0.9" />
+    </g>
+    <rect x="94" y="42" width="52" height="8" rx="4" fill="#e2e8f0" />
+    <rect x="94" y="57" width="42" height="7" rx="3.5" fill={tone} opacity="0.62" />
+    <rect x="94" y="70" width="58" height="7" rx="3.5" fill="#cbd5e1" />
+    <text x="100" y="105" textAnchor="middle" fill="#0f172a" fontSize="10" fontWeight="900">{label}</text>
+  </svg>
+);
+
 const MathConceptSVG = () => (
   <svg className="h-32 w-full" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <circle cx="100" cy="60" r="45" fill="#ede9fe" opacity="0.5" />
@@ -1614,6 +1665,24 @@ export default function LabCard({
         return <TitrationSVG />;
       case "periodic-table":
         return <PeriodicTableSVG />;
+      case "atmosphere-layers":
+        return <AtmosphereLayersSVG />;
+      case "lab-equipment-overview":
+        return <FoundationKnowledgeSVG label="อุปกรณ์" tone="#2563eb" />;
+      case "animal-cell":
+        return <FoundationKnowledgeSVG label="เซลล์สัตว์" tone="#7c3aed" />;
+      case "leaf-cell":
+        return <FoundationKnowledgeSVG label="เซลล์ใบไม้" tone="#059669" />;
+      case "human-blood-cells":
+        return <FoundationKnowledgeSVG label="เม็ดเลือด" tone="#e11d48" />;
+      case "experiment-chemicals":
+        return <FoundationKnowledgeSVG label="สารเคมี" tone="#f97316" />;
+      case "external-muscle-anatomy":
+        return <FoundationKnowledgeSVG label="กล้ามเนื้อภายนอก" tone="#e11d48" />;
+      case "internal-muscle-anatomy":
+        return <FoundationKnowledgeSVG label="กล้ามเนื้อภายใน" tone="#7c3aed" />;
+      case "good-bad-minerals":
+        return <FoundationKnowledgeSVG label="แร่ธาตุ" tone="#0891b2" />;
       case "boyles-law":
         return <BoylesLawSVG />;
       case "charles-law":

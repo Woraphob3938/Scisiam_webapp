@@ -316,11 +316,11 @@ export default function SharedSimulationShell({
         <div className="min-w-0 max-w-[calc(100%-64px)] rounded-2xl border border-white/70 bg-white/92 px-4 py-3 shadow-lg shadow-slate-900/10 backdrop-blur-md sm:max-w-none pointer-events-auto">
           <div className="mb-1 flex flex-wrap items-center gap-2">
             <Link
-              href={`/labs/${labId}`}
+              href="/labs"
               className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-black text-slate-700 shadow-sm transition-colors hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-1"
             >
               <ArrowLeft className="h-3.5 w-3.5" />
-              รายละเอียดแล็บ
+              ย้อนกลับ
             </Link>
             <span className={`rounded-full border px-2.5 py-1 text-[10px] font-black ${tone.soft}`}>{category}</span>
             <span className="hidden rounded-full border border-emerald-100 bg-emerald-50 px-2.5 py-1 text-[10px] font-black text-emerald-700 sm:inline-flex">{statusLabel}</span>

@@ -48,6 +48,18 @@ function classroomBulkAttachmentsMigration() {
   return fs.readFileSync(path.join(migrations, files[0]), "utf8");
 }
 
+function atmosphereLayersCatalogMigration() {
+  const files = fs.readdirSync(migrations).filter((name) => name.endsWith("_add_atmosphere_layers_lab_catalog.sql"));
+  assert.equal(files.length, 1, "expected exactly one atmosphere layers catalog migration");
+  return fs.readFileSync(path.join(migrations, files[0]), "utf8");
+}
+
+function foundationExplorerCatalogMigration() {
+  const files = fs.readdirSync(migrations).filter((name) => name.endsWith("_add_foundation_explorer_labs_catalog.sql"));
+  assert.equal(files.length, 1, "expected exactly one foundation explorer catalog migration");
+  return fs.readFileSync(path.join(migrations, files[0]), "utf8");
+}
+
 test("classroom migration keeps codes private and removes direct joining", () => {
   const sql = classroomMigration();
   assert.match(sql, /private\.classroom_join_codes/i);
@@ -95,7 +107,27 @@ test("classroom catalog hardening rejects unknown labs and preserves membership 
   assert.doesNotMatch(sql, /profiles\.role[\s\S]+members\.joined_at/i);
 
   const catalogRows = sql.match(/^\s*\('[a-z0-9-]+'\),?$/gm) ?? [];
-  assert.equal(catalogRows.length, 103, "private classroom catalog must mirror all 103 Scisiam labs");
+  assert.equal(catalogRows.length, 103, "base private classroom catalog must preserve the original 103 Scisiam labs");
+
+  const incrementalSql = atmosphereLayersCatalogMigration();
+  assert.match(incrementalSql, /insert into private\.classroom_lab_catalog\s*\(lab_id\)/i);
+  assert.match(incrementalSql, /'atmosphere-layers'/);
+  assert.match(incrementalSql, /on conflict\s*\(lab_id\)\s*do update[\s\S]*is_active\s*=\s*true/i);
+
+  const foundationSql = foundationExplorerCatalogMigration();
+  for (const labId of [
+    "lab-equipment-overview",
+    "animal-cell",
+    "leaf-cell",
+    "human-blood-cells",
+    "experiment-chemicals",
+    "external-muscle-anatomy",
+    "internal-muscle-anatomy",
+    "good-bad-minerals",
+  ]) {
+    assert.match(foundationSql, new RegExp(`'${labId}'`));
+  }
+  assert.match(foundationSql, /on conflict\s*\(lab_id\)\s*do update[\s\S]*is_active\s*=\s*true/i);
 });
 
 test("classroom lab catalog foreign key has a covering index", () => {

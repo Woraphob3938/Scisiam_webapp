@@ -69,6 +69,10 @@ const ChemistryConceptSimulation = dynamic(() =>
   import("@/components/labs/simulation/ChemistryConceptSimulation"));
 const PeriodicTableSimulation = dynamic(() =>
   import("@/components/labs/simulation/PeriodicTableSimulation"));
+const AtmosphereLayersSimulation = dynamic(() =>
+  import("@/components/labs/simulation/AtmosphereLayersSimulation"));
+const FoundationExplorerSimulation = dynamic(() =>
+  import("@/components/labs/simulation/FoundationExplorerSimulation"));
 const OsmosisPlasmolysisSimulation = dynamic(() =>
   import("@/components/labs/simulation/OsmosisPlasmolysisSimulation"));
 const EnzymeKineticsSimulation = dynamic(() =>
@@ -205,6 +209,15 @@ const simulationComponents: Record<DirectSimulationLabId, React.ComponentType> =
   "hookes-law": HookesLawSimulation,
   "acid-base-titration": AcidBaseTitrationSimulation,
   "periodic-table": PeriodicTableSimulation,
+  "atmosphere-layers": AtmosphereLayersSimulation,
+  "lab-equipment-overview": FoundationExplorerSimulation,
+  "animal-cell": FoundationExplorerSimulation,
+  "leaf-cell": FoundationExplorerSimulation,
+  "human-blood-cells": FoundationExplorerSimulation,
+  "experiment-chemicals": FoundationExplorerSimulation,
+  "external-muscle-anatomy": FoundationExplorerSimulation,
+  "internal-muscle-anatomy": FoundationExplorerSimulation,
+  "good-bad-minerals": FoundationExplorerSimulation,
   "boyles-law": BoylesLawSimulation,
   "charles-law": CharlesLawSimulation,
   "photosynthesis-rate": PhotosynthesisRateSimulation,
@@ -346,11 +359,11 @@ function SimulationPlaceholder({ labId }: { labId: string }) {
         <div className="flex flex-col gap-3">
           {!isInvalid && (
             <Link
-              href={`/labs/${labId}`}
+              href="/labs"
               className={`flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold text-white transition-all active:scale-[0.98] bg-gradient-to-r ${themeColors.gradient} shadow-md`}
             >
               <ArrowLeft className="h-4 w-4" />
-              <span>กลับหน้ารายละเอียดแล็บ</span>
+              <span>ย้อนกลับ</span>
             </Link>
           )}
 
