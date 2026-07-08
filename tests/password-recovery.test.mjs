@@ -84,6 +84,10 @@ test("account settings can send a password change email through the shared recov
   assert.match(globals, /data-scisiam-colorblind="true"/);
   assert.match(globals, /repeating-linear-gradient/);
   assert.match(globals, /\.scisiam-colorblind-panel/);
+  assert.match(globals, /\.bg-blue-600/);
+  assert.match(globals, /\.text-blue-600/);
+  assert.match(globals, /\.border-blue-200/);
+  assert.match(globals, /\.bg-emerald-50/);
   assert.match(globals, /background-color: #dbeafe !important/);
   assert.doesNotMatch(globals, /\[class\*="bg-blue-/);
   assert.doesNotMatch(globals, /\[class\*="text-slate-/);

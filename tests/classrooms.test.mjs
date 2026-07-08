@@ -36,6 +36,18 @@ function classroomOwnerToolsMigration() {
   return fs.readFileSync(path.join(migrations, files[0]), "utf8");
 }
 
+function classroomAssignmentUploadsMigration() {
+  const files = fs.readdirSync(migrations).filter((name) => name.endsWith("_classroom_assignment_uploads.sql"));
+  assert.equal(files.length, 1, "expected exactly one classroom assignment uploads migration");
+  return fs.readFileSync(path.join(migrations, files[0]), "utf8");
+}
+
+function classroomBulkAttachmentsMigration() {
+  const files = fs.readdirSync(migrations).filter((name) => name.endsWith("_classroom_assignment_bulk_attachments.sql"));
+  assert.equal(files.length, 1, "expected exactly one classroom assignment bulk attachments migration");
+  return fs.readFileSync(path.join(migrations, files[0]), "utf8");
+}
+
 test("classroom migration keeps codes private and removes direct joining", () => {
   const sql = classroomMigration();
   assert.match(sql, /private\.classroom_join_codes/i);
@@ -117,6 +129,43 @@ test("classroom assignment foreign keys have covering indexes", () => {
   assert.match(sql, /classroom_assignments_created_by_idx[\s\S]+public\.classroom_assignments\s*\(created_by\)/i);
 });
 
+test("classroom assignments support teacher attachments and student submissions", () => {
+  const sql = classroomAssignmentUploadsMigration();
+
+  assert.match(sql, /storage\.buckets[\s\S]+'classroom-files'/i);
+  assert.match(sql, /alter table public\.classroom_assignments[\s\S]+link_url[\s\S]+attachment_path/i);
+  assert.match(sql, /create table public\.classroom_assignment_submissions/i);
+  assert.match(sql, /private\.is_class_creator\(classroom_id\) or student_id = \(select auth\.uid\(\)\)/i);
+  assert.match(sql, /create policy "Classroom members can upload own classroom files"[\s\S]+private\.classroom_file_owner_id\(name\) = \(select auth\.uid\(\)\)/i);
+  assert.match(sql, /create or replace function public\.submit_classroom_assignment/i);
+  assert.match(sql, /on conflict \(assignment_id, student_id\) do update/i);
+});
+
+test("classroom assignment notifications are persisted for students and teachers", () => {
+  const sql = classroomAssignmentUploadsMigration();
+
+  assert.match(sql, /create table public\.classroom_notifications/i);
+  assert.match(sql, /recipient_id = \(select auth\.uid\(\)\)/i);
+  assert.match(sql, /คุณครูได้อัปโหลดงาน/i);
+  assert.match(sql, /มีนักเรียนส่งงานแล้ว/i);
+  assert.match(sql, /grant select on public\.classroom_notifications to authenticated/i);
+});
+
+test("classroom assignments support deletion, multiple files, multiple links, and read notifications", () => {
+  const sql = classroomBulkAttachmentsMigration();
+
+  assert.match(sql, /allowed_mime_types\s*=\s*null/i);
+  assert.match(sql, /add column link_urls jsonb/i);
+  assert.match(sql, /add column attachments jsonb/i);
+  assert.match(sql, /add column deleted_at timestamptz/i);
+  assert.match(sql, /jsonb_array_length\(normalized_links\) > 10/i);
+  assert.match(sql, /jsonb_array_length\(normalized_attachments\) > 10/i);
+  assert.match(sql, /create or replace function public\.delete_classroom_assignment/i);
+  assert.match(sql, /set deleted_at = now\(\)/i);
+  assert.match(sql, /create or replace function public\.mark_classroom_notifications_read/i);
+  assert.match(sql, /set read_at = now\(\)/i);
+});
+
 test("classroom client exposes owner actions, assignments, and creator names", () => {
   const source = fs.readFileSync(
     path.join(root, "src", "lib", "supabase", "classrooms.ts"),
@@ -129,10 +178,23 @@ test("classroom client exposes owner actions, assignments, and creator names", (
     "disband_classroom",
     "remove_classroom_member",
     "create_classroom_assignment",
+    "submit_classroom_assignment",
+    "delete_classroom_assignment",
+    "mark_classroom_notifications_read",
   ]) {
     assert.match(source, new RegExp(`rpc\\("${rpc}"`));
   }
   assert.match(source, /from\("classroom_assignments"\)/);
+  assert.match(source, /from\("classroom_assignment_submissions"\)/);
+  assert.match(source, /from\("classroom_notifications"\)/);
+  assert.match(source, /export async function listMyClassroomNotifications/);
+  assert.match(source, /Math\.max\(1, Math\.min\(limit, 20\)\)/);
+  assert.match(source, /storage\.from\(CLASSROOM_FILES_BUCKET\)\.upload/);
+  assert.match(source, /uploadClassroomFiles/);
+  assert.match(source, /validateClassroomFile/);
+  assert.match(source, /getSafeFileExtension/);
+  assert.match(source, /contentType:\s*file\.type \|\| "application\/octet-stream"/);
+  assert.doesNotMatch(source, /safeName\s*=/);
   assert.match(source, /creatorName:/);
 });
 

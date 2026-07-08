@@ -3,14 +3,24 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Bell, ChevronDown, Award, Menu, User } from "lucide-react";
+import { Bell, ChevronDown, Award, Menu, User, X } from "lucide-react";
 import { useSidebar } from "@/context/SidebarContext";
 import SettingsModal from "@/components/SettingsModal";
 import { ClassroomActions } from "@/components/classrooms/ClassroomActions";
 import { clearScisiamAuthCache } from "@/lib/supabase/auth-cache";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
+import { listMyClassroomNotifications, markClassroomNotificationsRead, type ClassroomNotification } from "@/lib/supabase/classrooms";
 import { getProfileAvatarSrc } from "@/lib/supabase/profile-avatar";
 import { useAuth } from "@/context/AuthContext";
+
+type NavbarNotification = {
+  id: string;
+  title: string;
+  message: string;
+  type: "classroom" | "lab" | "mission";
+  classroomId?: string;
+  readAt?: string | null;
+};
 
 export default function Navbar() {
   const { toggleSidebar } = useSidebar();
@@ -25,16 +35,31 @@ export default function Navbar() {
     avatarVersion,
     localNotificationMode,
   } = useAuth();
-  const [notifications, setNotifications] = useState<Array<{ id: string; title: string; message: string; type: string }>>([]);
+  const [notifications, setNotifications] = useState<NavbarNotification[]>([]);
 
   useEffect(() => {
-    const checkNotifications = () => {
-      const items: Array<{ id: string; title: string; message: string; type: string }> = [];
-      if (!localNotificationMode) {
-        setNotifications(items);
+    let cancelled = false;
+
+    const loadSupabaseNotifications = async () => {
+      if (!isLoggedIn || !isSupabaseConfigured()) {
+        setNotifications([]);
         return;
       }
-      
+      try {
+        const items = await listMyClassroomNotifications(10);
+        if (!cancelled) setNotifications(items.map(toNavbarClassroomNotification));
+      } catch {
+        if (!cancelled) setNotifications([]);
+      }
+    };
+
+    const checkNotifications = () => {
+      const items: NavbarNotification[] = [];
+      if (!localNotificationMode) {
+        void loadSupabaseNotifications();
+        return;
+      }
+
       if (typeof window !== "undefined") {
         const labs = [
           { key: "scisiam_saved_hookes_experiment", name: "Hooke's Law" },
@@ -75,11 +100,16 @@ export default function Navbar() {
     };
 
     checkNotifications();
+    const refreshIntervalId = window.setInterval(checkNotifications, 30_000);
     window.addEventListener("storage", checkNotifications);
+    window.addEventListener("focus", checkNotifications);
     return () => {
+      cancelled = true;
+      window.clearInterval(refreshIntervalId);
       window.removeEventListener("storage", checkNotifications);
+      window.removeEventListener("focus", checkNotifications);
     };
-  }, [localNotificationMode]);
+  }, [isLoggedIn, localNotificationMode]);
 
   const handleSignOut = async () => {
     setShowProfileMenu(false);
@@ -93,7 +123,45 @@ export default function Navbar() {
   };
 
   const displayedNotifications = isLoggedIn ? notifications : [];
+  const unreadNotifications = displayedNotifications.filter((item) => !item.readAt);
+  const unreadNotificationCount = unreadNotifications.length;
   const profileAvatarSrc = getProfileAvatarSrc(avatarPath, avatarVersion);
+
+  const markClassroomReadLocally = (classroomIds: string[]) => {
+    if (classroomIds.length === 0) return;
+    const classroomIdSet = new Set(classroomIds);
+    const readAt = new Date().toISOString();
+    setNotifications((items) =>
+      items.map((item) =>
+        item.classroomId && classroomIdSet.has(item.classroomId) ? { ...item, readAt } : item,
+      ),
+    );
+  };
+
+  const markClassroomNotificationsReadByIds = async (classroomIds: string[]) => {
+    const uniqueClassroomIds = [...new Set(classroomIds)];
+    markClassroomReadLocally(uniqueClassroomIds);
+    await Promise.all(uniqueClassroomIds.map((classroomId) => markClassroomNotificationsRead(classroomId).catch(() => null)));
+  };
+
+  const closeNotifications = () => {
+    setShowNotification(false);
+    void markClassroomNotificationsReadByIds(unreadNotifications.map((item) => item.classroomId).filter(Boolean) as string[]);
+  };
+
+  const openClassroomNotification = (notification: NavbarNotification) => {
+    if (notification.type !== "classroom" || !notification.classroomId) return;
+    void markClassroomNotificationsReadByIds([notification.classroomId]).finally(() => {
+      window.location.href = `/classrooms/${notification.classroomId}?tab=classwork`;
+    });
+  };
+
+  const dismissNotification = (notification: NavbarNotification) => {
+    setNotifications((items) => items.filter((item) => item.id !== notification.id));
+    if (notification.type === "classroom" && notification.classroomId) {
+      void markClassroomNotificationsReadByIds([notification.classroomId]);
+    }
+  };
 
   return (
     <>
@@ -127,12 +195,25 @@ export default function Navbar() {
         {/* Notification Bell */}
         <div className="relative">
           <button
-            onClick={() => setShowNotification(!showNotification)}
+            onClick={() => {
+              if (showNotification) {
+                closeNotifications();
+                return;
+              }
+              setShowNotification(true);
+              if (!localNotificationMode) {
+                void listMyClassroomNotifications(10)
+                  .then((items) =>
+                    setNotifications(items.map(toNavbarClassroomNotification)),
+                  )
+                  .catch(() => setNotifications([]));
+              }
+            }}
             className="relative flex size-10 items-center justify-center rounded-xl text-slate-500 transition-all duration-200 hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
             aria-label="การแจ้งเตือน"
           >
             <Bell className="w-5 h-5" />
-            {displayedNotifications.length > 0 && (
+            {unreadNotificationCount > 0 && (
               <>
                 <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white animate-ping" />
                 <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white" />
@@ -145,23 +226,40 @@ export default function Navbar() {
             <div className="absolute right-0 mt-2.5 w-72 bg-white rounded-2xl shadow-xl border border-slate-100 py-2.5 text-left z-50 animate-in fade-in slide-in-from-top-2 duration-200">
               <div className="px-4 py-1.5 border-b border-slate-50 flex justify-between items-center">
                 <span className="font-semibold text-slate-800 text-sm">การแจ้งเตือน</span>
-                <span className="text-[10px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded-md font-semibold">ใหม่ {displayedNotifications.length}</span>
+                <span className="text-[10px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded-md font-semibold">ใหม่ {unreadNotificationCount}</span>
               </div>
               <div className="max-h-60 overflow-y-auto px-2 py-1.5 space-y-1">
-                {displayedNotifications.length === 0 ? (
+                {unreadNotifications.length === 0 ? (
                   <div className="py-8 text-center text-slate-400 font-semibold text-xs">
                     ไม่มีการแจ้งเตือนในขณะนี้
                   </div>
                 ) : (
-                  displayedNotifications.map((n) => (
-                    <div key={n.id} className="p-2.5 hover:bg-slate-50 rounded-xl cursor-pointer transition-all duration-200 flex gap-2">
-                      <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
-                        <Award className="w-4 h-4" />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-xs font-semibold text-slate-800 truncate">{n.title}</p>
-                        <p className="text-[10px] text-slate-500 mt-0.5 break-words">{n.message}</p>
-                      </div>
+                  unreadNotifications.map((n) => (
+                    <div
+                      key={n.id}
+                      className="flex gap-2 rounded-xl p-2.5 transition-all duration-200 hover:bg-slate-50"
+                    >
+                      <button
+                        type="button"
+                        onClick={() => openClassroomNotification(n)}
+                        className="flex min-w-0 flex-1 gap-2 text-left focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                        {n.type === "classroom" ? <Bell className="w-4 h-4" /> : <Award className="w-4 h-4" />}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-semibold text-slate-800 truncate">{n.title}</p>
+                          <p className="text-[10px] text-slate-500 mt-0.5 break-words">{n.message}</p>
+                        </div>
+                      </button>
+                      <button
+                        type="button"
+                        aria-label={`ลบแจ้งเตือน ${n.title}`}
+                        onClick={() => dismissNotification(n)}
+                        className="grid size-7 shrink-0 place-items-center rounded-lg text-slate-400 hover:bg-rose-50 hover:text-rose-600 focus:outline-none focus-visible:ring-3 focus-visible:ring-rose-100"
+                      >
+                        <X className="size-3.5" aria-hidden="true" />
+                      </button>
                     </div>
                   ))
                 )}
@@ -244,4 +342,15 @@ export default function Navbar() {
     />
     </>
   );
+}
+
+function toNavbarClassroomNotification(item: ClassroomNotification): NavbarNotification {
+  return {
+    id: item.id,
+    title: item.title,
+    message: item.message,
+    type: "classroom",
+    classroomId: item.classroomId,
+    readAt: item.readAt,
+  };
 }

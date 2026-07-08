@@ -369,6 +369,14 @@ export type Database = {
           title: string;
           description: string | null;
           due_at: string | null;
+          link_url: string | null;
+          attachment_path: string | null;
+          attachment_name: string | null;
+          attachment_mime_type: string | null;
+          attachment_size: number | null;
+          link_urls: Json;
+          attachments: Json;
+          deleted_at: string | null;
           created_at: string;
         };
         Insert: {
@@ -378,13 +386,66 @@ export type Database = {
           title: string;
           description?: string | null;
           due_at?: string | null;
+          link_url?: string | null;
+          attachment_path?: string | null;
+          attachment_name?: string | null;
+          attachment_mime_type?: string | null;
+          attachment_size?: number | null;
+          link_urls?: Json;
+          attachments?: Json;
+          deleted_at?: string | null;
           created_at?: string;
         };
         Update: {
           title?: string;
           description?: string | null;
           due_at?: string | null;
+          link_url?: string | null;
+          attachment_path?: string | null;
+          attachment_name?: string | null;
+          attachment_mime_type?: string | null;
+          attachment_size?: number | null;
+          link_urls?: Json;
+          attachments?: Json;
+          deleted_at?: string | null;
         };
+        Relationships: [];
+      };
+      classroom_assignment_submissions: {
+        Row: {
+          id: string;
+          assignment_id: string;
+          classroom_id: string;
+          student_id: string;
+          note: string | null;
+          link_url: string | null;
+          attachment_path: string | null;
+          attachment_name: string | null;
+          attachment_mime_type: string | null;
+          attachment_size: number | null;
+          link_urls: Json;
+          attachments: Json;
+          submitted_at: string;
+          updated_at: string;
+        };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
+      classroom_notifications: {
+        Row: {
+          id: string;
+          classroom_id: string;
+          recipient_id: string;
+          actor_id: string;
+          assignment_id: string | null;
+          title: string;
+          message: string;
+          read_at: string | null;
+          created_at: string;
+        };
+        Insert: never;
+        Update: never;
         Relationships: [];
       };
       ai_usage_events: {
@@ -537,8 +598,31 @@ export type Database = {
           p_title: string;
           p_description?: string | null;
           p_due_at?: string | null;
+          p_link_urls?: Json;
+          p_attachments?: Json;
         };
         Returns: string;
+      };
+      submit_classroom_assignment: {
+        Args: {
+          p_assignment_id: string;
+          p_note?: string | null;
+          p_link_urls?: Json;
+          p_attachments?: Json;
+        };
+        Returns: string;
+      };
+      delete_classroom_assignment: {
+        Args: {
+          p_assignment_id: string;
+        };
+        Returns: boolean;
+      };
+      mark_classroom_notifications_read: {
+        Args: {
+          p_classroom_id: string;
+        };
+        Returns: number;
       };
     };
     Enums: {

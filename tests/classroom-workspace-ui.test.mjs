@@ -25,10 +25,49 @@ test("classroom owner can manage the room, members, and classwork", () => {
   assert.match(source, /createClassroomAssignment/);
 });
 
+test("classroom classwork supports assignment files, links, and student submissions", () => {
+  for (const label of [
+    "ลิงก์ประกอบงาน",
+    "ไฟล์ประกอบงาน",
+    "ลบงาน",
+    "การแจ้งเตือน",
+    "อ่านแล้ว",
+    "ไฟล์ที่เลือก",
+    "ล้างไฟล์",
+    "เลือกไฟล์",
+    "ส่งงานของคุณ",
+    "ลิงก์ส่งงาน",
+    "ไฟล์ส่งงาน",
+    "งานที่นักเรียนส่ง",
+  ]) {
+    assert.match(source, new RegExp(label));
+  }
+
+  assert.match(source, /getClassroomAssignmentSubmissions/);
+  assert.match(source, /getClassroomNotifications/);
+  assert.match(source, /submitClassroomAssignment/);
+  assert.match(source, /deleteClassroomAssignment/);
+  assert.match(source, /markClassroomNotificationsRead/);
+  assert.match(source, /role="status"/);
+  assert.match(source, /multiple/);
+  assert.match(source, /FilePickerField/);
+  assert.match(source, /SelectedFilesList/);
+  assert.match(source, /mergeSelectedFiles/);
+  assert.match(source, /onRemove=\{/);
+  assert.match(source, /aria-label=\{`เอาไฟล์ \$\{file\.name\} ออก`\}/);
+  assert.match(source, /overflow-x-hidden/);
+  assert.match(source, /md:grid-cols-\[minmax\(0,1fr\)_minmax\(0,320px\)\]/);
+  assert.doesNotMatch(source, /accept="image\/png,image\/jpeg/);
+  assert.doesNotMatch(source, /file:mr-3/);
+});
+
 test("classroom tabs are prominent, count-free, and keep the active line inside", () => {
   assert.match(source, /ห้องแล็บ<\/TabsTrigger>/);
   assert.match(source, /งานของชั้นเรียน<\/TabsTrigger>/);
   assert.match(source, /สมาชิก<\/TabsTrigger>/);
+  assert.match(source, /useSearchParams/);
+  assert.match(source, /requestedTab === "classwork"/);
+  assert.match(source, /Tabs value=\{activeTab\}/);
   assert.doesNotMatch(source, /ห้องแล็บ \{roomLabs\.length\}/);
   assert.doesNotMatch(source, /บุคคล \{orderedMembers\.length\}/);
   assert.match(source, /after:bottom-0/);

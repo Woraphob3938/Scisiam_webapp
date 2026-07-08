@@ -128,13 +128,11 @@ export default function SettingsModal({
   const [colorBlind, setColorBlind] = useState(() =>
     getStoredBoolean(COLOR_BLIND_KEY, false)
   );
-  const [mounted, setMounted] = useState(false);
   const [passwordResetBusy, setPasswordResetBusy] = useState(false);
   const [passwordResetMessage, setPasswordResetMessage] = useState("");
   const [passwordResetError, setPasswordResetError] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
     applyDisplaySettings();
   }, []);
 
@@ -197,7 +195,8 @@ export default function SettingsModal({
     }
   };
 
-  if (!mounted || !isOpen) return null;
+  const portalTarget = typeof document === "undefined" ? null : document.body;
+  if (!isOpen || !portalTarget) return null;
 
   return createPortal(
     <div
@@ -458,7 +457,7 @@ export default function SettingsModal({
         </div>
       </div>
     </div>,
-    document.body
+    portalTarget
   );
 }
 

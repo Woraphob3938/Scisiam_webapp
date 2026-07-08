@@ -9,6 +9,8 @@ type ClassroomRow = Database["public"]["Tables"]["classrooms"]["Row"];
 type ClassroomMemberRow = Database["public"]["Tables"]["classroom_members"]["Row"];
 type ClassroomLabRow = Database["public"]["Tables"]["classroom_labs"]["Row"];
 type ClassroomAssignmentRow = Database["public"]["Tables"]["classroom_assignments"]["Row"];
+type ClassroomSubmissionRow = Database["public"]["Tables"]["classroom_assignment_submissions"]["Row"];
+type ClassroomNotificationRow = Database["public"]["Tables"]["classroom_notifications"]["Row"];
 type ClassroomMemberRpcRow = Database["public"]["Functions"]["get_classroom_members"]["Returns"][number];
 type ClassroomCreatorRpcRow = Database["public"]["Functions"]["get_classroom_creator_names"]["Returns"][number];
 
@@ -20,6 +22,8 @@ type VisibleClassroomMemberRow = Pick<ClassroomMemberRow, "classroom_id" | "user
 type VisibleClassroomLabRow = Pick<ClassroomLabRow, "classroom_id" | "lab_id" | "position">;
 
 const CLASSROOM_ACCESS_ERROR = "ไม่พบห้องเรียนหรือคุณไม่มีสิทธิ์เข้าถึง";
+const CLASSROOM_FILES_BUCKET = "classroom-files";
+const CLASSROOM_FILE_SIZE_LIMIT = 10 * 1024 * 1024;
 const GRADE_LEVELS: readonly GradeLevel[] = [
   "ประถม",
   "มัธยมต้น",
@@ -68,13 +72,55 @@ export type ClassroomAssignment = {
   title: string;
   description: string | null;
   dueAt: string | null;
+  linkUrls: string[];
+  attachments: ClassroomFileAttachment[];
   createdAt: string;
+};
+
+export type ClassroomFileAttachment = {
+  path: string;
+  name: string;
+  mimeType: string | null;
+  size: number | null;
+  signedUrl: string | null;
 };
 
 export type CreateClassroomAssignmentInput = {
   title: string;
   description: string;
   dueAt: string | null;
+  linkUrls: string;
+  attachmentFiles: File[];
+};
+
+export type ClassroomAssignmentSubmission = {
+  id: string;
+  assignmentId: string;
+  classroomId: string;
+  studentId: string;
+  note: string | null;
+  linkUrls: string[];
+  attachments: ClassroomFileAttachment[];
+  submittedAt: string;
+  updatedAt: string;
+};
+
+export type SubmitClassroomAssignmentInput = {
+  assignmentId: string;
+  classroomId: string;
+  note: string;
+  linkUrls: string;
+  attachmentFiles: File[];
+};
+
+export type ClassroomNotification = {
+  id: string;
+  classroomId: string;
+  assignmentId: string | null;
+  title: string;
+  message: string;
+  readAt: string | null;
+  createdAt: string;
 };
 
 export async function listMyClassrooms(): Promise<ClassroomSummary[]> {
@@ -279,12 +325,12 @@ export async function getClassroomAssignments(id: string): Promise<ClassroomAssi
   const classroomId = validateClassroomId(id);
   const { data, error } = await supabase
     .from("classroom_assignments")
-    .select("id, classroom_id, created_by, title, description, due_at, created_at")
+    .select("id, classroom_id, created_by, title, description, due_at, link_url, attachment_path, attachment_name, attachment_mime_type, attachment_size, link_urls, attachments, created_at")
     .eq("classroom_id", classroomId)
     .order("created_at", { ascending: false });
 
   if (error) throwClassroomActionError(error.code, error.message);
-  return ((data ?? []) as ClassroomAssignmentRow[]).map(mapClassroomAssignment);
+  return Promise.all(((data ?? []) as ClassroomAssignmentRow[]).map((assignment) => mapClassroomAssignment(supabase, assignment)));
 }
 
 export async function createClassroomAssignment(
@@ -301,17 +347,117 @@ export async function createClassroomAssignment(
   }
 
   const supabase = createClient();
-  await requireCurrentUserId(supabase);
+  const userId = await requireCurrentUserId(supabase);
+  const classroomId = validateClassroomId(id);
+  const linkUrls = normalizeOptionalUrls(input.linkUrls, "ลิงก์งาน");
+  const uploaded = await uploadClassroomFiles(supabase, classroomId, userId, input.attachmentFiles);
+
   const { data, error } = await supabase.rpc("create_classroom_assignment", {
-    p_classroom_id: validateClassroomId(id),
+    p_classroom_id: classroomId,
     p_title: title,
     p_description: description || null,
     p_due_at: input.dueAt,
+    p_link_urls: linkUrls,
+    p_attachments: uploaded.map(toAttachmentJson),
+  });
+
+  if (error) {
+    await removeClassroomFiles(supabase, uploaded.map((file) => file.path));
+    throwClassroomActionError(error.code, error.message);
+  }
+  if (!data) throw new Error("ไม่สามารถเพิ่มงานได้ในขณะนี้");
+  return data;
+}
+
+export async function deleteClassroomAssignment(assignmentId: string): Promise<void> {
+  const supabase = createClient();
+  await requireCurrentUserId(supabase);
+  const { data, error } = await supabase.rpc("delete_classroom_assignment", {
+    p_assignment_id: validateUuid(assignmentId, "ไม่พบงานที่ต้องการลบ"),
   });
 
   if (error) throwClassroomActionError(error.code, error.message);
-  if (!data) throw new Error("ไม่สามารถเพิ่มงานได้ในขณะนี้");
+  if (!data) throw new Error("ลบงานไม่สำเร็จ");
+}
+
+export async function getClassroomAssignmentSubmissions(id: string): Promise<ClassroomAssignmentSubmission[]> {
+  const supabase = createClient();
+  await requireCurrentUserId(supabase);
+  const classroomId = validateClassroomId(id);
+  const { data, error } = await supabase
+    .from("classroom_assignment_submissions")
+    .select("id, assignment_id, classroom_id, student_id, note, link_url, attachment_path, attachment_name, attachment_mime_type, attachment_size, link_urls, attachments, submitted_at, updated_at")
+    .eq("classroom_id", classroomId)
+    .order("submitted_at", { ascending: false });
+
+  if (error) throwClassroomActionError(error.code, error.message);
+  return Promise.all(((data ?? []) as ClassroomSubmissionRow[]).map((submission) => mapClassroomSubmission(supabase, submission)));
+}
+
+export async function submitClassroomAssignment(input: SubmitClassroomAssignmentInput): Promise<string> {
+  const supabase = createClient();
+  const userId = await requireCurrentUserId(supabase);
+  const classroomId = validateClassroomId(input.classroomId);
+  const note = input.note.trim();
+  const linkUrls = normalizeOptionalUrls(input.linkUrls, "ลิงก์ส่งงาน");
+  const uploaded = await uploadClassroomFiles(supabase, classroomId, userId, input.attachmentFiles);
+
+  if (!note && linkUrls.length === 0 && uploaded.length === 0) {
+    throw new Error("กรุณาแนบไฟล์ วางลิงก์ หรือเขียนหมายเหตุอย่างน้อยหนึ่งอย่าง");
+  }
+
+  const { data, error } = await supabase.rpc("submit_classroom_assignment", {
+    p_assignment_id: validateUuid(input.assignmentId, "ไม่พบงานที่ต้องการส่ง"),
+    p_note: note || null,
+    p_link_urls: linkUrls,
+    p_attachments: uploaded.map(toAttachmentJson),
+  });
+
+  if (error) {
+    await removeClassroomFiles(supabase, uploaded.map((file) => file.path));
+    throwClassroomActionError(error.code, error.message);
+  }
+  if (!data) throw new Error("ส่งงานไม่สำเร็จ");
   return data;
+}
+
+export async function getClassroomNotifications(id: string): Promise<ClassroomNotification[]> {
+  const supabase = createClient();
+  await requireCurrentUserId(supabase);
+  const classroomId = validateClassroomId(id);
+  const { data, error } = await supabase
+    .from("classroom_notifications")
+    .select("id, classroom_id, assignment_id, title, message, read_at, created_at")
+    .eq("classroom_id", classroomId)
+    .order("created_at", { ascending: false })
+    .limit(10);
+
+  if (error) throwClassroomActionError(error.code, error.message);
+  return ((data ?? []) as ClassroomNotificationRow[]).map(mapClassroomNotification);
+}
+
+export async function listMyClassroomNotifications(limit = 10): Promise<ClassroomNotification[]> {
+  const supabase = createClient();
+  await requireCurrentUserId(supabase);
+  const safeLimit = Math.max(1, Math.min(limit, 20));
+  const { data, error } = await supabase
+    .from("classroom_notifications")
+    .select("id, classroom_id, assignment_id, title, message, read_at, created_at")
+    .order("created_at", { ascending: false })
+    .limit(safeLimit);
+
+  if (error) throwClassroomActionError(error.code, error.message);
+  return ((data ?? []) as ClassroomNotificationRow[]).map(mapClassroomNotification);
+}
+
+export async function markClassroomNotificationsRead(id: string): Promise<void> {
+  const supabase = createClient();
+  await requireCurrentUserId(supabase);
+  const { error } = await supabase.rpc("mark_classroom_notifications_read", {
+    p_classroom_id: validateClassroomId(id),
+  });
+
+  if (error) throwClassroomActionError(error.code, error.message);
 }
 
 async function loadClassroomDetailById(
@@ -475,7 +621,7 @@ function mapClassroomMember(member: ClassroomMemberRpcRow): ClassroomMember {
   };
 }
 
-function mapClassroomAssignment(assignment: ClassroomAssignmentRow): ClassroomAssignment {
+async function mapClassroomAssignment(supabase: SupabaseClient, assignment: ClassroomAssignmentRow): Promise<ClassroomAssignment> {
   return {
     id: assignment.id,
     classroomId: assignment.classroom_id,
@@ -483,7 +629,189 @@ function mapClassroomAssignment(assignment: ClassroomAssignmentRow): ClassroomAs
     title: assignment.title,
     description: assignment.description,
     dueAt: assignment.due_at,
+    linkUrls: normalizeStoredLinks(assignment.link_urls, assignment.link_url),
+    attachments: await buildAttachments(supabase, assignment.attachments, {
+      path: assignment.attachment_path,
+      name: assignment.attachment_name,
+      mimeType: assignment.attachment_mime_type,
+      size: assignment.attachment_size,
+    }),
     createdAt: assignment.created_at,
+  };
+}
+
+async function mapClassroomSubmission(
+  supabase: SupabaseClient,
+  submission: ClassroomSubmissionRow,
+): Promise<ClassroomAssignmentSubmission> {
+  return {
+    id: submission.id,
+    assignmentId: submission.assignment_id,
+    classroomId: submission.classroom_id,
+    studentId: submission.student_id,
+    note: submission.note,
+    linkUrls: normalizeStoredLinks(submission.link_urls, submission.link_url),
+    attachments: await buildAttachments(supabase, submission.attachments, {
+      path: submission.attachment_path,
+      name: submission.attachment_name,
+      mimeType: submission.attachment_mime_type,
+      size: submission.attachment_size,
+    }),
+    submittedAt: submission.submitted_at,
+    updatedAt: submission.updated_at,
+  };
+}
+
+function mapClassroomNotification(notification: ClassroomNotificationRow): ClassroomNotification {
+  return {
+    id: notification.id,
+    classroomId: notification.classroom_id,
+    assignmentId: notification.assignment_id,
+    title: notification.title,
+    message: notification.message,
+    readAt: notification.read_at,
+    createdAt: notification.created_at,
+  };
+}
+
+async function buildAttachments(
+  supabase: SupabaseClient,
+  storedValue: Json | undefined,
+  legacy: { path: string | null; name: string | null; mimeType: string | null; size: number | null },
+): Promise<ClassroomFileAttachment[]> {
+  const attachments = normalizeStoredAttachments(storedValue);
+  if (attachments.length === 0 && legacy.path && legacy.name) {
+    attachments.push({ path: legacy.path, name: legacy.name, mimeType: legacy.mimeType, size: legacy.size });
+  }
+
+  return Promise.all(
+    attachments.map(async (attachment) => ({
+      ...attachment,
+      signedUrl: await createClassroomFileUrl(supabase, attachment.path),
+    })),
+  );
+}
+
+async function uploadClassroomFiles(
+  supabase: SupabaseClient,
+  classroomId: string,
+  userId: string,
+  files: File[],
+): Promise<Omit<ClassroomFileAttachment, "signedUrl">[]> {
+  if (files.length > 10) {
+    throw new Error("อัปโหลดไฟล์ได้ไม่เกิน 10 ไฟล์ต่อครั้ง");
+  }
+
+  for (const file of files) {
+    validateClassroomFile(file);
+  }
+
+  const uploaded: Omit<ClassroomFileAttachment, "signedUrl">[] = [];
+  try {
+    for (const file of files) {
+      uploaded.push(await uploadClassroomFile(supabase, classroomId, userId, file));
+    }
+  } catch (error) {
+    await removeClassroomFiles(supabase, uploaded.map((file) => file.path));
+    throw error;
+  }
+
+  return uploaded;
+}
+
+async function uploadClassroomFile(
+  supabase: SupabaseClient,
+  classroomId: string,
+  userId: string,
+  file: File,
+): Promise<Omit<ClassroomFileAttachment, "signedUrl">> {
+  const path = `classrooms/${classroomId}/${userId}/${crypto.randomUUID()}${getSafeFileExtension(file.name)}`;
+  const { error } = await supabase.storage.from(CLASSROOM_FILES_BUCKET).upload(path, file, {
+    cacheControl: "3600",
+    contentType: file.type || "application/octet-stream",
+    upsert: false,
+  });
+
+  if (error) throw new Error(error.message);
+  return {
+    path,
+    name: file.name,
+    mimeType: file.type || null,
+    size: file.size,
+  };
+}
+
+function validateClassroomFile(file: File) {
+  if (file.size <= 0) {
+    throw new Error(`ไฟล์ ${file.name || "ที่เลือก"} ไม่มีข้อมูล`);
+  }
+  if (file.size > CLASSROOM_FILE_SIZE_LIMIT) {
+    throw new Error(`ไฟล์ ${file.name || "ที่เลือก"} ต้องมีขนาดไม่เกิน 10 MB`);
+  }
+}
+
+function getSafeFileExtension(fileName: string) {
+  const extension = fileName.match(/\.([a-z0-9]{1,12})$/i)?.[0]?.toLowerCase();
+  return extension ? extension.replace(/[^a-z0-9.]/g, "") : "";
+}
+
+async function removeClassroomFiles(supabase: SupabaseClient, paths: string[]) {
+  if (paths.length === 0) return;
+  await supabase.storage.from(CLASSROOM_FILES_BUCKET).remove(paths).catch(() => null);
+}
+
+async function createClassroomFileUrl(supabase: SupabaseClient, path: string): Promise<string | null> {
+  const { data, error } = await supabase.storage.from(CLASSROOM_FILES_BUCKET).createSignedUrl(path, 60 * 60);
+  if (error) return null;
+  return data.signedUrl;
+}
+
+function normalizeOptionalUrls(value: string, label: string) {
+  const rawUrls = value
+    .split(/[\n,]+/)
+    .map((url) => url.trim())
+    .filter(Boolean);
+  const urls = [...new Set(rawUrls)];
+  if (urls.length > 10) throw new Error(`${label}ใส่ได้ไม่เกิน 10 ลิงก์`);
+
+  return urls.map((urlValue) => {
+    try {
+      const url = new URL(urlValue);
+      if (url.protocol !== "http:" && url.protocol !== "https:") throw new Error("Invalid protocol");
+      if (url.href.length > 500) throw new Error("Too long");
+      return url.href;
+    } catch {
+      throw new Error(`${label}ต้องขึ้นต้นด้วย http:// หรือ https://`);
+    }
+  });
+}
+
+function normalizeStoredLinks(value: Json | undefined, legacyUrl: string | null) {
+  if (Array.isArray(value)) {
+    return value.filter((item): item is string => typeof item === "string" && item.length > 0);
+  }
+  return legacyUrl ? [legacyUrl] : [];
+}
+
+function normalizeStoredAttachments(value: Json | undefined): Omit<ClassroomFileAttachment, "signedUrl">[] {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap((item) => {
+    if (!isJsonObject(item)) return [];
+    const path = item.path;
+    const name = item.name;
+    if (typeof path !== "string" || typeof name !== "string") return [];
+    const mimeType = typeof item.mimeType === "string" ? item.mimeType : null;
+    const size = typeof item.size === "number" ? item.size : null;
+    return [{ path, name, mimeType, size }];
+  });
+}
+
+function toAttachmentJson(attachment: Omit<ClassroomFileAttachment, "signedUrl">): Json {
+  return {
+    path: attachment.path,
+    name: attachment.name,
+    mimeType: attachment.mimeType,
+    size: attachment.size,
   };
 }
 
@@ -506,9 +834,13 @@ function validateClassroomId(id: string) {
 }
 
 function validateUserId(id: string) {
+  return validateUuid(id, "ไม่พบสมาชิกที่ต้องการนำออก");
+}
+
+function validateUuid(id: string, message: string) {
   const normalizedId = id.trim();
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(normalizedId)) {
-    throw new Error("ไม่พบสมาชิกที่ต้องการนำออก");
+    throw new Error(message);
   }
   return normalizedId;
 }

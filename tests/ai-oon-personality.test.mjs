@@ -27,3 +27,12 @@ test("AI I-Oon uses a full-frame avatar", () => {
   assert.match(chat, /className="object-cover"/);
   assert.equal(existsSync(join(rootDir, avatarPath)), true);
 });
+
+test("AI I-Oon chat header stays compact and uses the mascot", () => {
+  const chat = readProjectFile("src/components/AIChatButton.tsx");
+
+  assert.match(chat, /src="\/ai-oon-logo\.png"/);
+  assert.match(chat, /text-base font-extrabold/);
+  assert.doesNotMatch(chat, /เพื่อนคู่คิด Scisiam/);
+  assert.doesNotMatch(chat, /visibleTitle/);
+});

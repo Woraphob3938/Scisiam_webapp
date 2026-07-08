@@ -3,11 +3,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent, type RefObject } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import {
   ArrowLeft,
   ArrowRight,
+  Bell,
   CalendarDays,
+  CheckCheck,
   CheckCircle2,
   Clock3,
   ClipboardList,
@@ -17,6 +19,7 @@ import {
   GraduationCap,
   LockKeyhole,
   Megaphone,
+  Paperclip,
   Pencil,
   Plus,
   RefreshCw,
@@ -24,9 +27,11 @@ import {
   Share2,
   ShieldCheck,
   Trash2,
+  Upload,
   UserRound,
   UserMinus,
   UsersRound,
+  X,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -46,17 +51,25 @@ import { getLabReadiness } from "@/data/labReadiness";
 import { labsById } from "@/data/labs";
 import {
   createClassroomAssignment,
+  deleteClassroomAssignment,
   disbandClassroom,
   getClassroom,
   getClassroomAssignments,
+  getClassroomAssignmentSubmissions,
   getClassroomJoinCode,
   getClassroomMembers,
+  getClassroomNotifications,
+  markClassroomNotificationsRead,
   removeClassroomMember,
   renameClassroom,
+  submitClassroomAssignment,
   type ClassroomAssignment,
+  type ClassroomAssignmentSubmission,
   type ClassroomDetail,
   type ClassroomMember,
+  type ClassroomNotification,
   type CreateClassroomAssignmentInput,
+  type SubmitClassroomAssignmentInput,
 } from "@/lib/supabase/classrooms";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import { getProfileAvatarSrc } from "@/lib/supabase/profile-avatar";
@@ -65,6 +78,7 @@ const AUTH_CHECK_TIMEOUT_MS = 6_000;
 const CLASSROOM_ACCESS_ERROR = "ไม่พบห้องเรียนหรือคุณไม่มีสิทธิ์เข้าถึง";
 
 type WorkspaceStatus = "loading" | "ready" | "error" | "unavailable";
+type ClassroomTab = "labs" | "classwork" | "people";
 
 async function hasAuthenticatedUser() {
   const supabase = createClient();
@@ -86,13 +100,18 @@ async function hasAuthenticatedUser() {
 export default function ClassroomWorkspacePage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { isCollapsed } = useSidebar();
+  const requestedTab = searchParams.get("tab");
   const mountedRef = useRef(false);
   const headingRef = useRef<HTMLHeadingElement>(null);
+  const [activeTab, setActiveTab] = useState<ClassroomTab>(requestedTab === "classwork" || requestedTab === "people" ? requestedTab : "labs");
   const [status, setStatus] = useState<WorkspaceStatus>("loading");
   const [room, setRoom] = useState<ClassroomDetail | null>(null);
   const [members, setMembers] = useState<ClassroomMember[]>([]);
   const [assignments, setAssignments] = useState<ClassroomAssignment[]>([]);
+  const [submissions, setSubmissions] = useState<ClassroomAssignmentSubmission[]>([]);
+  const [notifications, setNotifications] = useState<ClassroomNotification[]>([]);
   const [joinCode, setJoinCode] = useState<string | null>(null);
   const [shareStatus, setShareStatus] = useState("");
   const [renameOpen, setRenameOpen] = useState(false);
@@ -135,10 +154,12 @@ export default function ClassroomWorkspacePage() {
     }
 
     try {
-      const [loadedRoom, loadedMembers, loadedAssignments] = await Promise.all([
+      const [loadedRoom, loadedMembers, loadedAssignments, loadedSubmissions, loadedNotifications] = await Promise.all([
         getClassroom(id),
         getClassroomMembers(id),
         getClassroomAssignments(id),
+        getClassroomAssignmentSubmissions(id),
+        getClassroomNotifications(id),
       ]);
       const code = loadedRoom.isCreator ? await getClassroomJoinCode(id) : null;
 
@@ -149,6 +170,8 @@ export default function ClassroomWorkspacePage() {
       setRoom(loadedRoom);
       setMembers(loadedMembers);
       setAssignments(loadedAssignments);
+      setSubmissions(loadedSubmissions);
+      setNotifications(loadedNotifications);
       setJoinCode(code);
       setStatus("ready");
     } catch (error) {
@@ -160,6 +183,8 @@ export default function ClassroomWorkspacePage() {
       setRoom(null);
       setMembers([]);
       setAssignments([]);
+      setSubmissions([]);
+      setNotifications([]);
       setJoinCode(null);
       setStatus(message === CLASSROOM_ACCESS_ERROR ? "unavailable" : "error");
     }
@@ -271,12 +296,71 @@ export default function ClassroomWorkspacePage() {
     setPendingAction("assignment");
     try {
       await createClassroomAssignment(room.id, input);
-      setAssignments(await getClassroomAssignments(room.id));
+      const [nextAssignments, nextNotifications] = await Promise.all([
+        getClassroomAssignments(room.id),
+        getClassroomNotifications(room.id),
+      ]);
+      setAssignments(nextAssignments);
+      setNotifications(nextNotifications);
       toast.success("เพิ่มงานของชั้นเรียนแล้ว");
       return true;
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "เพิ่มงานไม่สำเร็จ");
       return false;
+    } finally {
+      setPendingAction(null);
+    }
+  }
+
+  async function handleSubmitAssignment(input: SubmitClassroomAssignmentInput) {
+    if (!room) return false;
+    setPendingAction("assignment");
+    try {
+      await submitClassroomAssignment(input);
+      const [nextSubmissions, nextNotifications] = await Promise.all([
+        getClassroomAssignmentSubmissions(room.id),
+        getClassroomNotifications(room.id),
+      ]);
+      setSubmissions(nextSubmissions);
+      setNotifications(nextNotifications);
+      toast.success("ส่งงานให้คุณครูแล้ว");
+      return true;
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "ส่งงานไม่สำเร็จ");
+      return false;
+    } finally {
+      setPendingAction(null);
+    }
+  }
+
+  async function handleDeleteAssignment(assignment: ClassroomAssignment) {
+    if (!room || !window.confirm(`ลบงาน "${assignment.title}" ออกจากชั้นเรียนใช่ไหม?`)) return;
+    setPendingAction("assignment");
+    try {
+      await deleteClassroomAssignment(assignment.id);
+      const [nextAssignments, nextNotifications] = await Promise.all([
+        getClassroomAssignments(room.id),
+        getClassroomNotifications(room.id),
+      ]);
+      setAssignments(nextAssignments);
+      setNotifications(nextNotifications);
+      toast.success("ลบงานออกจากชั้นเรียนแล้ว");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "ลบงานไม่สำเร็จ");
+    } finally {
+      setPendingAction(null);
+    }
+  }
+
+  async function handleMarkNotificationsRead() {
+    if (!room) return;
+    setPendingAction("assignment");
+    try {
+      await markClassroomNotificationsRead(room.id);
+      setNotifications(await getClassroomNotifications(room.id));
+      toast.success("อ่านการแจ้งเตือนแล้ว");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "อัปเดตการแจ้งเตือนไม่สำเร็จ");
     } finally {
       setPendingAction(null);
     }
@@ -381,7 +465,7 @@ export default function ClassroomWorkspacePage() {
             </section>
 
             <section className="mx-auto max-w-7xl px-4 py-6 sm:px-8 lg:px-10">
-              <Tabs defaultValue="labs" className="gap-0">
+              <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as ClassroomTab)} className="gap-0">
                 <TabsList variant="line" className="grid h-auto w-full grid-cols-3 rounded-lg border border-slate-200 bg-white p-1 shadow-sm" aria-label="เนื้อหาในชั้นเรียน">
                   <TabsTrigger value="labs" className="min-h-12 min-w-0 rounded-md px-1 text-xs font-extrabold after:bottom-0 after:inset-x-3 after:rounded-full after:bg-blue-600 data-active:bg-blue-50 data-active:text-blue-700 sm:px-4 sm:text-sm">ห้องแล็บ</TabsTrigger>
                   <TabsTrigger value="classwork" className="min-h-12 min-w-0 rounded-md px-1 text-xs font-extrabold after:bottom-0 after:inset-x-3 after:rounded-full after:bg-blue-600 data-active:bg-blue-50 data-active:text-blue-700 sm:px-4 sm:text-sm">งานของชั้นเรียน</TabsTrigger>
@@ -394,9 +478,15 @@ export default function ClassroomWorkspacePage() {
                 <TabsContent value="classwork" className="pt-6">
                   <ClassworkPanel
                     assignments={assignments}
+                    submissions={submissions}
+                    notifications={notifications}
+                    members={members}
                     isCreator={room.isCreator}
                     isSubmitting={pendingAction === "assignment"}
                     onCreate={handleCreateAssignment}
+                    onDelete={handleDeleteAssignment}
+                    onSubmit={handleSubmitAssignment}
+                    onMarkNotificationsRead={handleMarkNotificationsRead}
                   />
                 </TabsContent>
                 <TabsContent value="people" className="pt-6">
@@ -583,19 +673,39 @@ function LabsPanel({ labs }: { labs: Array<(typeof labsById)[string]> }) {
 
 function ClassworkPanel({
   assignments,
+  submissions,
+  notifications,
+  members,
   isCreator,
   isSubmitting,
   onCreate,
+  onDelete,
+  onSubmit,
+  onMarkNotificationsRead,
 }: {
   assignments: ClassroomAssignment[];
+  submissions: ClassroomAssignmentSubmission[];
+  notifications: ClassroomNotification[];
+  members: ClassroomMember[];
   isCreator: boolean;
   isSubmitting: boolean;
   onCreate: (input: CreateClassroomAssignmentInput) => Promise<boolean>;
+  onDelete: (assignment: ClassroomAssignment) => void;
+  onSubmit: (input: SubmitClassroomAssignmentInput) => Promise<boolean>;
+  onMarkNotificationsRead: () => void;
 }) {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [dueAt, setDueAt] = useState("");
+  const [linkUrls, setLinkUrls] = useState("");
+  const [attachmentFiles, setAttachmentFiles] = useState<File[]>([]);
+  const [attachmentInputKey, setAttachmentInputKey] = useState(0);
+  const unreadNotifications = notifications.filter((notification) => !notification.readAt);
+  const memberNameById = useMemo(
+    () => new Map(members.map((member) => [member.userId, member.displayName])),
+    [members],
+  );
 
   async function submitAssignment(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -603,11 +713,16 @@ function ClassworkPanel({
       title,
       description,
       dueAt: dueAt ? new Date(dueAt).toISOString() : null,
+      linkUrls,
+      attachmentFiles,
     });
     if (!saved) return;
     setTitle("");
     setDescription("");
     setDueAt("");
+    setLinkUrls("");
+    setAttachmentFiles([]);
+    setAttachmentInputKey((key) => key + 1);
     setOpen(false);
   }
 
@@ -629,6 +744,14 @@ function ClassworkPanel({
           </button>
         ) : null}
       </div>
+      {notifications.length > 0 ? (
+        <NotificationPanel
+          notifications={notifications}
+          unreadCount={unreadNotifications.length}
+          isSubmitting={isSubmitting}
+          onMarkRead={onMarkNotificationsRead}
+        />
+      ) : null}
       {assignments.length === 0 ? (
         <div className="flex min-h-64 flex-col items-center justify-center gap-4 rounded-lg border border-dashed border-slate-300 bg-white p-6 text-center">
           <span className="flex size-12 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
@@ -660,6 +783,31 @@ function ClassworkPanel({
                     <CalendarDays className="size-3.5" aria-hidden="true" />
                     {assignment.dueAt ? `กำหนดส่ง ${formatClassroomDate(assignment.dueAt)}` : "ไม่กำหนดวันส่ง"}
                   </p>
+                  <AttachmentLinks linkUrls={assignment.linkUrls} attachments={assignment.attachments} />
+                  {isCreator ? (
+                    <button
+                      type="button"
+                      onClick={() => onDelete(assignment)}
+                      disabled={isSubmitting}
+                      className="mt-3 inline-flex min-h-9 items-center gap-2 rounded-lg border border-rose-200 bg-white px-3 text-xs font-extrabold text-rose-700 hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus-visible:ring-3 focus-visible:ring-rose-100"
+                    >
+                      <Trash2 className="size-3.5" aria-hidden="true" />
+                      ลบงาน
+                    </button>
+                  ) : null}
+                  {isCreator ? (
+                    <SubmissionList
+                      submissions={submissions.filter((submission) => submission.assignmentId === assignment.id)}
+                      memberNameById={memberNameById}
+                    />
+                  ) : (
+                    <AssignmentSubmissionForm
+                      assignment={assignment}
+                      existingSubmission={submissions.find((submission) => submission.assignmentId === assignment.id) ?? null}
+                      isSubmitting={isSubmitting}
+                      onSubmit={onSubmit}
+                    />
+                  )}
                 </div>
               </div>
             </li>
@@ -668,47 +816,80 @@ function ClassworkPanel({
       )}
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="sm:max-w-lg">
-          <form onSubmit={submitAssignment}>
-            <DialogHeader>
-              <DialogTitle className="text-lg font-extrabold">เพิ่มงานของชั้นเรียน</DialogTitle>
-              <DialogDescription>ระบุหัวข้องาน รายละเอียด และวันส่งสำหรับสมาชิกในห้อง</DialogDescription>
+        <DialogContent className="w-[calc(100vw-1rem)] max-w-[calc(100vw-1rem)] overflow-hidden p-0 sm:max-w-xl md:max-h-[calc(100dvh-2rem)] md:max-w-3xl">
+          <form onSubmit={submitAssignment} className="flex max-h-[calc(100dvh-2rem)] flex-col">
+            <DialogHeader className="border-b border-slate-100 bg-slate-50/70 px-5 py-4 pr-12 sm:px-6">
+              <DialogTitle className="text-lg font-extrabold leading-relaxed text-slate-950">เพิ่มงานของชั้นเรียน</DialogTitle>
+              <DialogDescription className="font-semibold leading-relaxed">จัดรายละเอียดงาน แนบไฟล์ และกำหนดส่งให้สมาชิกในห้อง</DialogDescription>
             </DialogHeader>
-            <div className="mt-5 grid gap-4">
-              <label className="grid gap-2 text-sm font-extrabold text-slate-800">
-                ชื่องาน <span className="text-rose-600">*</span>
-                <input
-                  value={title}
-                  onChange={(event) => setTitle(event.target.value)}
-                  maxLength={120}
-                  required
-                  autoFocus
-                  className="min-h-11 rounded-lg border border-slate-300 px-3 font-semibold outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-100"
-                  placeholder="เช่น สรุปผลการทดลองเรื่องแรง"
+            <div className="grid gap-4 overflow-y-auto overflow-x-hidden px-5 py-5 md:grid-cols-[minmax(0,1fr)_minmax(0,320px)] sm:px-6">
+              <div className="grid min-w-0 gap-4">
+                <label className="grid gap-2 text-sm font-extrabold text-slate-800">
+                  ชื่องาน <span className="text-rose-600">*</span>
+                  <input
+                    value={title}
+                    onChange={(event) => setTitle(event.target.value)}
+                    maxLength={120}
+                    required
+                    autoFocus
+                    className="min-h-11 rounded-lg border border-slate-300 px-3 font-semibold outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-100"
+                    placeholder="เช่น สรุปผลการทดลองเรื่องแรง"
+                  />
+                </label>
+                <label className="grid gap-2 text-sm font-extrabold text-slate-800">
+                  รายละเอียดเพิ่มเติม
+                  <textarea
+                    value={description}
+                    onChange={(event) => setDescription(event.target.value)}
+                    maxLength={1000}
+                    rows={7}
+                    className="min-h-40 resize-y rounded-lg border border-slate-300 px-3 py-2 font-semibold leading-relaxed outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-100"
+                    placeholder="คำแนะนำ สิ่งที่ต้องส่ง หรือเกณฑ์สั้น ๆ"
+                  />
+                </label>
+              </div>
+              <div className="grid min-w-0 content-start gap-4 rounded-xl border border-slate-200 bg-slate-50/70 p-4">
+                <label className="grid min-w-0 gap-2 text-sm font-extrabold text-slate-800">
+                  ลิงก์ประกอบงาน
+                  <textarea
+                    value={linkUrls}
+                    onChange={(event) => setLinkUrls(event.target.value)}
+                    maxLength={5000}
+                    rows={3}
+                    className="min-w-0 resize-y rounded-lg border border-slate-300 bg-white px-3 py-2 font-semibold leading-relaxed outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-100"
+                    placeholder="วางลิงก์ได้หลายอัน แยกบรรทัดละ 1 ลิงก์"
+                  />
+                </label>
+                <FilePickerField
+                  inputKey={attachmentInputKey}
+                  label="ไฟล์ประกอบงาน"
+                  files={attachmentFiles}
+                  helpText="รองรับไฟล์ทั่วไป รวมถึง PNG/JPG ไม่เกิน 10 MB ต่อไฟล์ สูงสุด 10 ไฟล์"
+                  onSelect={(files) => setAttachmentFiles((current) => mergeSelectedFiles(current, files))}
                 />
-              </label>
-              <label className="grid gap-2 text-sm font-extrabold text-slate-800">
-                รายละเอียดเพิ่มเติม
-                <textarea
-                  value={description}
-                  onChange={(event) => setDescription(event.target.value)}
-                  maxLength={1000}
-                  rows={4}
-                  className="resize-y rounded-lg border border-slate-300 px-3 py-2 font-semibold leading-relaxed outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-100"
-                  placeholder="คำแนะนำหรือสิ่งที่ต้องส่ง"
+                <SelectedFilesList
+                  files={attachmentFiles}
+                  onRemove={(index) => {
+                    setAttachmentFiles((current) => current.filter((_, fileIndex) => fileIndex !== index));
+                    setAttachmentInputKey((key) => key + 1);
+                  }}
+                  onClear={() => {
+                    setAttachmentFiles([]);
+                    setAttachmentInputKey((key) => key + 1);
+                  }}
                 />
-              </label>
-              <label className="grid gap-2 text-sm font-extrabold text-slate-800">
-                กำหนดส่ง
-                <input
-                  type="datetime-local"
-                  value={dueAt}
-                  onChange={(event) => setDueAt(event.target.value)}
-                  className="min-h-11 rounded-lg border border-slate-300 px-3 font-semibold outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-100"
-                />
-              </label>
+                <label className="grid min-w-0 gap-2 text-sm font-extrabold text-slate-800">
+                  กำหนดส่ง
+                  <input
+                    type="datetime-local"
+                    value={dueAt}
+                    onChange={(event) => setDueAt(event.target.value)}
+                    className="min-h-11 min-w-0 rounded-lg border border-slate-300 bg-white px-3 font-semibold outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-100"
+                  />
+                </label>
+              </div>
             </div>
-            <DialogFooter className="mt-5">
+            <DialogFooter className="!mx-0 !mb-0 mt-0 rounded-none border-t border-slate-100 bg-white px-5 py-4 sm:px-6">
               <button type="button" onClick={() => setOpen(false)} disabled={isSubmitting} className="min-h-11 rounded-lg border border-slate-300 bg-white px-4 font-extrabold text-slate-700 hover:bg-slate-50 disabled:opacity-50">ยกเลิก</button>
               <button type="submit" disabled={isSubmitting || !title.trim()} className="min-h-11 rounded-lg bg-blue-600 px-4 font-extrabold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50">
                 {isSubmitting ? "กำลังเพิ่ม..." : "เพิ่มงาน"}
@@ -718,6 +899,268 @@ function ClassworkPanel({
         </DialogContent>
       </Dialog>
     </section>
+  );
+}
+
+function NotificationPanel({
+  notifications,
+  unreadCount,
+  isSubmitting,
+  onMarkRead,
+}: {
+  notifications: ClassroomNotification[];
+  unreadCount: number;
+  isSubmitting: boolean;
+  onMarkRead: () => void;
+}) {
+  return (
+    <section className="mb-4 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3" aria-labelledby="classroom-notifications-heading">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h3 id="classroom-notifications-heading" className="inline-flex items-center gap-2 text-sm font-extrabold text-blue-900">
+          <Bell className="size-4" aria-hidden="true" />
+          การแจ้งเตือน {unreadCount > 0 ? `(${unreadCount} ใหม่)` : ""}
+        </h3>
+        {unreadCount > 0 ? (
+          <button
+            type="button"
+            onClick={onMarkRead}
+            disabled={isSubmitting}
+            className="inline-flex min-h-8 items-center gap-1.5 rounded-lg bg-white px-3 text-xs font-extrabold text-blue-700 hover:bg-blue-100 disabled:opacity-50 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
+          >
+            <CheckCheck className="size-3.5" aria-hidden="true" />
+            อ่านแล้ว
+          </button>
+        ) : null}
+      </div>
+      <ul className="mt-2 grid gap-1.5">
+        {notifications.slice(0, 5).map((notification) => (
+          <li
+            key={notification.id}
+            className={`rounded-md px-3 py-2 text-xs font-bold leading-relaxed ${notification.readAt ? "bg-white/60 text-slate-600" : "bg-white text-blue-800"}`}
+            role={notification.readAt ? undefined : "status"}
+          >
+            <span className="block font-extrabold">{notification.title}</span>
+            {notification.message}
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+function FilePickerField({
+  inputKey,
+  label,
+  files,
+  helpText,
+  onSelect,
+}: {
+  inputKey: number;
+  label: string;
+  files: File[];
+  helpText: string;
+  onSelect: (files: File[]) => void;
+}) {
+  return (
+    <div className="grid min-w-0 gap-2 text-sm font-extrabold text-slate-800">
+      <span>{label}</span>
+      <label className="flex min-h-11 min-w-0 cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-blue-200 bg-white px-3 py-2 text-sm font-extrabold text-blue-700 transition-colors hover:border-blue-400 hover:bg-blue-50 focus-within:ring-3 focus-within:ring-blue-100">
+        <Upload className="size-4 shrink-0" aria-hidden="true" />
+        <span className="min-w-0 truncate">{files.length > 0 ? `เลือกแล้ว ${files.length} ไฟล์` : "เลือกไฟล์"}</span>
+        <input
+          key={inputKey}
+          type="file"
+          multiple
+          onChange={(event) => onSelect(Array.from(event.target.files ?? []))}
+          className="sr-only"
+        />
+      </label>
+      <span className="text-xs font-semibold leading-relaxed text-slate-500">{helpText}</span>
+    </div>
+  );
+}
+
+function SelectedFilesList({
+  files,
+  onRemove,
+  onClear,
+}: {
+  files: File[];
+  onRemove: (index: number) => void;
+  onClear: () => void;
+}) {
+  if (files.length === 0) return null;
+  return (
+    <div className="min-w-0 rounded-lg border border-blue-100 bg-white p-3">
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-xs font-extrabold text-slate-700">ไฟล์ที่เลือก {files.length} ไฟล์</p>
+        <button type="button" onClick={onClear} className="text-xs font-extrabold text-rose-600 hover:text-rose-700 focus:outline-none focus-visible:ring-3 focus-visible:ring-rose-100">
+          ล้างไฟล์
+        </button>
+      </div>
+      <ul className="mt-2 grid gap-1.5">
+        {files.map((file, index) => (
+          <li key={`${file.name}-${file.size}-${file.lastModified}`} className="flex min-w-0 items-center gap-2 rounded-md bg-slate-50 px-2.5 py-2 text-xs font-semibold text-slate-600">
+            <span className="min-w-0 flex-1 break-all">{file.name}</span>
+            <span className="shrink-0 text-slate-500">{formatFileSize(file.size)}</span>
+            <button
+              type="button"
+              onClick={() => onRemove(index)}
+              className="grid size-7 shrink-0 place-items-center rounded-md text-slate-400 hover:bg-rose-50 hover:text-rose-600 focus:outline-none focus-visible:ring-3 focus-visible:ring-rose-100"
+              aria-label={`เอาไฟล์ ${file.name} ออก`}
+            >
+              <X className="size-3.5" aria-hidden="true" />
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function SubmissionList({
+  submissions,
+  memberNameById,
+}: {
+  submissions: ClassroomAssignmentSubmission[];
+  memberNameById: Map<string, string>;
+}) {
+  return (
+    <div className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-3">
+      <p className="text-xs font-extrabold text-slate-700">งานที่นักเรียนส่ง ({submissions.length})</p>
+      {submissions.length === 0 ? (
+        <p className="mt-2 text-xs font-semibold text-slate-500">ยังไม่มีนักเรียนส่งงานนี้</p>
+      ) : (
+        <ul className="mt-2 grid gap-2">
+          {submissions.map((submission) => (
+            <li key={submission.id} className="rounded-lg border border-slate-200 bg-white p-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="text-sm font-extrabold text-slate-900">{memberNameById.get(submission.studentId) ?? "นักเรียน"}</p>
+                <p className="text-xs font-bold text-slate-500">{formatClassroomDate(submission.submittedAt)}</p>
+              </div>
+              {submission.note ? <p className="mt-2 whitespace-pre-wrap text-xs font-semibold leading-relaxed text-slate-600">{submission.note}</p> : null}
+              <AttachmentLinks linkUrls={submission.linkUrls} attachments={submission.attachments} />
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+function AssignmentSubmissionForm({
+  assignment,
+  existingSubmission,
+  isSubmitting,
+  onSubmit,
+}: {
+  assignment: ClassroomAssignment;
+  existingSubmission: ClassroomAssignmentSubmission | null;
+  isSubmitting: boolean;
+  onSubmit: (input: SubmitClassroomAssignmentInput) => Promise<boolean>;
+}) {
+  const [note, setNote] = useState(existingSubmission?.note ?? "");
+  const [linkUrls, setLinkUrls] = useState(existingSubmission?.linkUrls.join("\n") ?? "");
+  const [attachmentFiles, setAttachmentFiles] = useState<File[]>([]);
+  const [attachmentInputKey, setAttachmentInputKey] = useState(0);
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const saved = await onSubmit({
+      assignmentId: assignment.id,
+      classroomId: assignment.classroomId,
+      note,
+      linkUrls,
+      attachmentFiles,
+    });
+    if (saved) {
+      setAttachmentFiles([]);
+      setAttachmentInputKey((key) => key + 1);
+    }
+  }
+
+  return (
+    <form onSubmit={submit} className="mt-4 grid gap-3 rounded-lg border border-blue-100 bg-blue-50/50 p-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="text-sm font-extrabold text-blue-900">{existingSubmission ? "ส่งแล้ว แก้ไขได้" : "ส่งงานของคุณ"}</p>
+        {existingSubmission ? <span className="text-xs font-bold text-blue-700">ส่งล่าสุด {formatClassroomDate(existingSubmission.submittedAt)}</span> : null}
+      </div>
+      <label className="grid gap-1.5 text-xs font-extrabold text-slate-700">
+        หมายเหตุ
+        <textarea
+          value={note}
+          onChange={(event) => setNote(event.target.value)}
+          maxLength={1000}
+          rows={2}
+          className="resize-y rounded-lg border border-slate-300 bg-white px-3 py-2 font-semibold leading-relaxed outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-100"
+          placeholder="บอกคุณครูสั้น ๆ เกี่ยวกับงานที่ส่ง"
+        />
+      </label>
+      <label className="grid gap-1.5 text-xs font-extrabold text-slate-700">
+        ลิงก์ส่งงาน
+        <textarea
+          value={linkUrls}
+          onChange={(event) => setLinkUrls(event.target.value)}
+          maxLength={5000}
+          rows={2}
+          className="resize-y rounded-lg border border-slate-300 bg-white px-3 py-2 font-semibold leading-relaxed outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-100"
+          placeholder="วางลิงก์ได้หลายอัน แยกบรรทัดละ 1 ลิงก์"
+        />
+      </label>
+      <FilePickerField
+        inputKey={attachmentInputKey}
+        label="ไฟล์ส่งงาน"
+        files={attachmentFiles}
+        helpText="เลือกได้หลายไฟล์ รวมถึง PNG/JPG ไม่เกิน 10 MB ต่อไฟล์"
+        onSelect={(files) => setAttachmentFiles((current) => mergeSelectedFiles(current, files))}
+      />
+      <SelectedFilesList
+        files={attachmentFiles}
+        onRemove={(index) => {
+          setAttachmentFiles((current) => current.filter((_, fileIndex) => fileIndex !== index));
+          setAttachmentInputKey((key) => key + 1);
+        }}
+        onClear={() => {
+          setAttachmentFiles([]);
+          setAttachmentInputKey((key) => key + 1);
+        }}
+      />
+      {existingSubmission ? <AttachmentLinks linkUrls={existingSubmission.linkUrls} attachments={existingSubmission.attachments} /> : null}
+      <button
+        type="submit"
+        disabled={isSubmitting || (!note.trim() && !linkUrls.trim() && attachmentFiles.length === 0)}
+        className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 text-sm font-extrabold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
+      >
+        <Upload className="size-4" aria-hidden="true" />
+        {isSubmitting ? "กำลังส่ง..." : "ส่งงาน"}
+      </button>
+    </form>
+  );
+}
+
+function AttachmentLinks({
+  linkUrls,
+  attachments,
+}: {
+  linkUrls: string[];
+  attachments: ClassroomAssignment["attachments"];
+}) {
+  if (linkUrls.length === 0 && attachments.length === 0) return null;
+  return (
+    <div className="mt-3 flex flex-wrap gap-2">
+      {linkUrls.map((linkUrl, index) => (
+        <a key={linkUrl} href={linkUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-9 items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-3 text-xs font-extrabold text-blue-700 hover:bg-blue-100 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100">
+          <Share2 className="size-3.5" aria-hidden="true" />
+          เปิดลิงก์ {linkUrls.length > 1 ? index + 1 : ""}
+        </a>
+      ))}
+      {attachments.map((attachment) => attachment.signedUrl ? (
+        <a key={attachment.path} href={attachment.signedUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-9 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-xs font-extrabold text-slate-700 hover:bg-slate-50 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100">
+          <Paperclip className="size-3.5" aria-hidden="true" />
+          {attachment.name}
+        </a>
+      ) : null)}
+    </div>
   );
 }
 
@@ -901,6 +1344,28 @@ function formatClassroomDate(value: string) {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(value));
+}
+
+function formatFileSize(size: number) {
+  if (size >= 1024 * 1024) return `${(size / (1024 * 1024)).toFixed(1)} MB`;
+  if (size >= 1024) return `${Math.ceil(size / 1024)} KB`;
+  return `${size} B`;
+}
+
+function mergeSelectedFiles(currentFiles: File[], nextFiles: File[]) {
+  const knownFiles = new Set(currentFiles.map(getFileIdentity));
+  const merged = [...currentFiles];
+  for (const file of nextFiles) {
+    const identity = getFileIdentity(file);
+    if (knownFiles.has(identity)) continue;
+    knownFiles.add(identity);
+    merged.push(file);
+  }
+  return merged.slice(0, 10);
+}
+
+function getFileIdentity(file: File) {
+  return `${file.name}-${file.size}-${file.lastModified}`;
 }
 
 function WorkspaceLoadingState() {

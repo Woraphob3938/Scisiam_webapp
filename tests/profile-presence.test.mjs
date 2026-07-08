@@ -103,7 +103,22 @@ test("navbar notifications do not reuse local lab keys for Supabase accounts", (
 
   assert.match(source, /localNotificationMode/);
   assert.match(authProvider, /localNotificationMode:\s*false/);
+  assert.match(source, /listMyClassroomNotifications/);
+  assert.match(source, /markClassroomNotificationsRead/);
+  assert.match(source, /toNavbarClassroomNotification/);
+  assert.match(source, /classroomId/);
   assert.match(source, /if\s*\(!localNotificationMode\)\s*\{/);
+  assert.match(source, /void loadSupabaseNotifications\(\);/);
+  assert.match(source, /window\.addEventListener\("focus", checkNotifications\)/);
+  assert.match(source, /window\.setInterval\(checkNotifications, 30_000\)/);
+  assert.match(source, /window\.clearInterval\(refreshIntervalId\)/);
+  assert.match(source, /unreadNotificationCount/);
+  assert.match(source, /closeNotifications/);
+  assert.match(source, /dismissNotification/);
+  assert.match(source, /openClassroomNotification/);
+  assert.match(source, /\?tab=classwork/);
+  assert.match(source, /aria-label=\{`ลบแจ้งเตือน/);
+  assert.match(source, /n\.type === "classroom"/);
   assert.match(source, /return;/);
 });
 

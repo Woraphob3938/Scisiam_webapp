@@ -7,7 +7,6 @@ import {
   FlaskConical,
   Loader2,
   Send,
-  Sparkles,
   X,
 } from "lucide-react";
 import { labsById } from "@/data/labs";
@@ -109,8 +108,6 @@ export default function AIChatButton() {
     return labId ? labsById[labId] : null;
   }, [pathname]);
 
-  const visibleTitle = currentLab?.title || "เพื่อนคู่คิด Scisiam";
-
   const handleSubmit = async (event?: React.FormEvent<HTMLFormElement>) => {
     event?.preventDefault();
     const question = input.trim();
@@ -188,19 +185,16 @@ export default function AIChatButton() {
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-white">
-                    <Sparkles className="h-4 w-4" />
-                    </span>
+                  <span className="relative h-9 w-9 shrink-0 overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-blue-100">
+                    <Image src="/ai-oon-logo.png" alt="" fill sizes="36px" className="object-contain p-0.5" />
+                  </span>
                     <div className="min-w-0">
                       <p
                         id="ai-tutor-title"
-                        className="text-sm font-extrabold leading-[1.5] text-slate-900"
+                        className="text-base font-extrabold leading-[1.45] text-slate-900"
                       >
                       AI ไออุ่น
                       </p>
-                    <p className="truncate text-[11px] font-semibold leading-relaxed text-slate-500">
-                      {visibleTitle}
-                    </p>
                   </div>
                 </div>
               </div>
