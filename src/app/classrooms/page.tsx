@@ -17,6 +17,7 @@ import { ClassroomActions } from "@/components/classrooms/ClassroomActions";
 import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
 import { useSidebar } from "@/context/SidebarContext";
+import { clearScisiamAuthCache } from "@/lib/supabase/auth-cache";
 import {
   listMyClassrooms,
   type ClassroomSummary,
@@ -66,6 +67,7 @@ export default function ClassroomsPage() {
     }
 
     if (!authenticated) {
+      clearScisiamAuthCache();
       router.replace("/login?next=/classrooms");
       return;
     }

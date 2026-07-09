@@ -4,7 +4,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getSupabaseConfig, isSupabaseConfigured } from "./config";
 import type { Database } from "./database.types";
 
-const PRIVATE_PATH_PREFIXES = ["/profile", "/classrooms"];
+const PRIVATE_PATH_PREFIXES = ["/profile", "/classrooms", "/dashboard"];
 
 function isPrivatePath(pathname: string) {
   return PRIVATE_PATH_PREFIXES.some(

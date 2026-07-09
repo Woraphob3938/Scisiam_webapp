@@ -22,7 +22,6 @@ import {
 import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
 import LearningHistoryPage from "@/components/history/LearningHistoryPage";
-import TeacherDashboardSection from "@/components/profile/TeacherDashboardSection";
 import { useSidebar } from "@/context/SidebarContext";
 import {
   loadSupabaseLearningSnapshot,
@@ -138,8 +137,10 @@ export default function ProfilePage() {
         setUsername(storedName);
         setDraftName(storedName);
         setAvatarPath(storedAvatar);
+        if (storedRole !== "teacher") {
+          applySnapshot(readLocalLearningSnapshot());
+        }
       }
-      applySnapshot(readLocalLearningSnapshot());
 
       if (!isDemo) {
         try {
@@ -338,8 +339,6 @@ export default function ProfilePage() {
               <ArrowRight className="h-4 w-4" />
             </Link>
           </section>
-        ) : role === "teacher" ? (
-          <TeacherDashboardSection />
         ) : (
           <>
             <section className="border-b border-slate-200 bg-white px-4 py-6 sm:px-8 lg:px-10">
@@ -370,7 +369,9 @@ export default function ProfilePage() {
                     />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-xs font-extrabold text-blue-600">STUDENT PROFILE</p>
+                    <p className="text-xs font-extrabold text-blue-600">
+                      {role === "teacher" ? "TEACHER PROFILE" : "STUDENT PROFILE"}
+                    </p>
                     {isEditingProfile ? (
                       <div className="mt-1 flex flex-wrap items-center gap-2">
                         <input value={draftName} onChange={(event) => setDraftName(event.target.value)} maxLength={80} className="min-h-10 min-w-0 rounded-xl border border-blue-200 bg-white px-3 text-lg font-extrabold text-slate-900 outline-none focus:ring-3 focus:ring-blue-100" aria-label="ชื่อที่แสดง" />
@@ -392,7 +393,9 @@ export default function ProfilePage() {
                         </button>
                       </div>
                     )}
-                    <p className="mt-1 text-sm font-semibold text-slate-500">ติดตามการทดลองและรางวัลที่ปลดล็อกแล้ว</p>
+                    <p className="mt-1 text-sm font-semibold text-slate-500">
+                      {role === "teacher" ? "จัดการข้อมูลบัญชีส่วนตัวและรูปโปรไฟล์ของคุณครู" : "ติดตามการทดลองและรางวัลที่ปลดล็อกแล้ว"}
+                    </p>
                     {profileNotice ? (
                       <p className={`mt-1 text-xs font-bold ${profileNotice.error ? "text-rose-600" : "text-emerald-600"}`} role="status">
                         {profileNotice.text}
@@ -400,10 +403,18 @@ export default function ProfilePage() {
                     ) : null}
                   </div>
                 </div>
-                <Link href="/labs" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-extrabold text-white shadow-md shadow-blue-500/15 hover:bg-blue-700">
-                  <FlaskConical className="h-4 w-4" />
-                  ไปห้องแล็บ
-                </Link>
+                <div className="flex flex-wrap gap-2">
+                  {role === "teacher" ? (
+                    <Link href="/dashboard" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-extrabold text-white shadow-md shadow-blue-500/15 hover:bg-blue-700">
+                      ไปแดชบอร์ดครู
+                      <ArrowRight className="h-4 w-4" />
+                    </Link>
+                  ) : null}
+                  <Link href="/labs" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-extrabold text-slate-700 shadow-sm hover:bg-slate-50">
+                    <FlaskConical className="h-4 w-4" />
+                    ไปห้องแล็บ
+                  </Link>
+                </div>
               </div>
             </section>
 

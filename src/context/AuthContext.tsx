@@ -14,10 +14,14 @@ import {
   SCISIAM_AUTH_EVENT,
 } from "@/lib/supabase/auth-cache";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
+import type { ScisiamUserRole } from "@/lib/supabase/database.types";
+
+const isDemoModeEnabled = process.env.NEXT_PUBLIC_ENABLE_DEMO_MODE === "true";
 
 type AuthState = {
   isAuthReady: boolean;
   isLoggedIn: boolean;
+  role: ScisiamUserRole;
   userName: string;
   avatarPath: string | null;
   avatarVersion: number;
@@ -27,6 +31,7 @@ type AuthState = {
 const defaultAuthState: AuthState = {
   isAuthReady: false,
   isLoggedIn: false,
+  role: "student",
   userName: "นักเรียน",
   avatarPath: null,
   avatarVersion: 0,
@@ -43,6 +48,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setAuthState({
         isAuthReady: true,
         isLoggedIn: localStorage.getItem("scisiam_logged_in") === "true",
+        role: (localStorage.getItem("scisiam_user_role") as ScisiamUserRole | null) || "student",
         userName: localStorage.getItem("scisiam_user_name") || "นักเรียน",
         avatarPath: localStorage.getItem("scisiam_user_avatar"),
         avatarVersion: Date.now(),
@@ -51,7 +57,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     const loadAuthState = async () => {
-      const isDemo = localStorage.getItem("scisiam_demo_mode") === "true";
+      const isDemo = isDemoModeEnabled && localStorage.getItem("scisiam_demo_mode") === "true";
       if (isDemo || !isSupabaseConfigured()) {
         loadAuthStateFromCache();
         return;
@@ -78,6 +84,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setAuthState({
         isAuthReady: true,
         isLoggedIn: true,
+        role: profile?.role || "student",
         userName,
         avatarPath: profile?.avatar_url ?? null,
         avatarVersion: Date.now(),

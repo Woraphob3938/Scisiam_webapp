@@ -224,6 +224,7 @@ export default function AuthForm({
     try {
       const supabase = createClient();
       const normalizedEmail = email.trim().toLowerCase();
+      let nextPath = "/labs";
 
       if (mode === "register") {
         const emailRedirectTo = `${window.location.origin}/auth/verify`;
@@ -297,10 +298,11 @@ export default function AuthForm({
           displayName: profile.display_name,
         });
         cacheRememberedLogin(normalizedEmail, rememberMe);
+        nextPath = profile.role === "teacher" ? "/dashboard" : "/labs";
       }
 
       setLoading(false);
-      router.replace("/labs");
+      router.replace(nextPath);
       router.refresh();
     } catch {
       setError("เกิดข้อผิดพลาดในการเชื่อมต่อ Supabase กรุณาลองใหม่อีกครั้ง");
@@ -437,7 +439,7 @@ export default function AuthForm({
                   ? "กรอกอีเมลที่ใช้สมัครสมาชิก แล้วเราจะส่งลิงก์สำหรับตั้งรหัสผ่านใหม่"
                   : isRegister
                   ? "สร้างบัญชีเพื่อเรียน ทดลอง และติดตามความคืบหน้าใน Scisiam"
-                  : "ใช้บัญชี Scisiam เพื่อเข้าเรียนหรือจัดการห้องเรียนวิทยาศาสตร์ของคุณ"}
+                  : "ใช้อีเมลบัญชีเพื่อเข้าทำการทดลองหรือเป็นครูเพื่อจัดการห้องเรียนของคุณ"}
               </p>
             </div>
 
@@ -571,7 +573,7 @@ export default function AuthForm({
                 </>
               )}
 
-              {!isForgotPassword && <div className="grid gap-2">
+              {isRegister && !isForgotPassword && <div className="grid gap-2">
                 <span className="text-sm font-extrabold leading-[1.45] text-slate-900">
                   บทบาท
                 </span>
@@ -606,7 +608,7 @@ export default function AuthForm({
                 <AuthField
                   id="auth-school"
                   label="โรงเรียน"
-                  helper="ค้นหาด้วยชื่อโรงเรียน แล้วเลือกจากรายการข้อมูล สพฐ."
+                  helper="เลือกโรงเรียนเพื่อส่งคำขอบทบาทคุณครู หลังยืนยันอีเมลแล้วบัญชีต้องได้รับการอนุมัติก่อนใช้งานแดชบอร์ดครู"
                   icon={School}
                 >
                   <div className="relative">

@@ -3,9 +3,10 @@
 import { useEffect, useState, type ElementType } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ClipboardCheck, FlaskConical, User, UsersRound } from "lucide-react";
+import { ClipboardCheck, FlaskConical, LayoutDashboard, User, UsersRound } from "lucide-react";
 
 import { ClassroomActions } from "@/components/classrooms/ClassroomActions";
+import { useAuth } from "@/context/AuthContext";
 
 type MobileNavItem = {
   name: string;
@@ -18,8 +19,14 @@ const leftNavItems: MobileNavItem[] = [
   { name: "ภารกิจ", href: "/missions", icon: ClipboardCheck },
 ];
 
+const teacherLeftNavItems: MobileNavItem[] = [
+  { name: "ห้องแล็บ", href: "/labs", icon: FlaskConical },
+  { name: "แดชบอร์ด", href: "/dashboard", icon: LayoutDashboard },
+];
+
 function getActiveItem(pathname: string) {
   if (pathname.startsWith("/labs")) return "ห้องแล็บ";
+  if (pathname === "/dashboard") return "แดชบอร์ด";
   if (pathname === "/missions") return "ภารกิจ";
   if (pathname.startsWith("/classrooms")) return "ชั้นเรียน";
   if (pathname === "/profile") return "โปรไฟล์";
@@ -48,6 +55,7 @@ function MobileNavLink({ item, activeItem }: { item: MobileNavItem; activeItem: 
 
 export default function MobileTabBar() {
   const pathname = usePathname();
+  const { role } = useAuth();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -61,6 +69,7 @@ export default function MobileTabBar() {
   }
 
   const activeItem = getActiveItem(pathname);
+  const navItems = role === "teacher" ? teacherLeftNavItems : leftNavItems;
 
   return (
     <>
@@ -73,7 +82,7 @@ export default function MobileTabBar() {
         aria-label="เมนูหลักบนมือถือ"
       >
         <div className="mx-auto grid max-w-md grid-cols-5 items-center gap-1">
-          {leftNavItems.map((item) => (
+          {navItems.map((item) => (
             <MobileNavLink key={item.name} item={item} activeItem={activeItem} />
           ))}
 

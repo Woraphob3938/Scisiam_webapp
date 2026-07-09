@@ -436,49 +436,51 @@ export const PhysicalChemicalSVG = ({ className = "w-full h-32" }: { className?:
 // 13. Probability & Random Trials
 export const ProbabilitySVG = ({ className = "w-full h-32" }: { className?: string }) => (
   <svg className={className} viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <circle cx="100" cy="60" r="45" fill="#ede9fe" opacity="0.5" />
+    <circle cx="100" cy="60" r="45" fill="#fce7f3" opacity="0.5" />
     <defs>
-      <linearGradient id="pr-dice-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="#a78bfa" />
-        <stop offset="100%" stopColor="#7c3aed" />
+      <linearGradient id="math-pr-dice-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#ec4899" />
+        <stop offset="100%" stopColor="#db2777" />
       </linearGradient>
     </defs>
-    {/* Dice 1 (3D perspective isometric) */}
-    <g transform="translate(42, 38)">
-      {/* Front-left */}
-      <path d="M20,15 L5,22 L5,42 L20,35 Z" fill="#8b5cf6" stroke="#6d28d9" strokeWidth="1" />
-      {/* Front-right */}
-      <path d="M20,15 L35,22 L35,42 L20,35 Z" fill="url(#pr-dice-grad)" stroke="#6d28d9" strokeWidth="1" />
-      {/* Top */}
-      <path d="M20,15 L5,22 L20,29 L35,22 Z" fill="#ddd6fe" stroke="#6d28d9" strokeWidth="1" />
-      {/* Dots on Top (representing 1) */}
-      <circle cx="20" cy="22" r="2" fill="#475569" />
-      {/* Dots on Right (representing 3) */}
-      <circle cx="24" cy="27" r="1.5" fill="#ffffff" />
-      <circle cx="27" cy="31" r="1.5" fill="#ffffff" />
-      <circle cx="30" cy="35" r="1.5" fill="#ffffff" />
+
+    {/* Dice Left (Flipped/Tilt) */}
+    <g transform="translate(48, 48) rotate(-15)">
+      {/* 3D Dice faces */}
+      <path d="M 0 10 L 15 0 L 30 10 L 30 28 L 15 38 L 0 28 Z" fill="url(#math-pr-dice-grad)" stroke="#9d174d" strokeWidth="1.5" />
+      <path d="M 15 0 L 15 38" stroke="#9d174d" strokeWidth="1" opacity="0.4" />
+      <path d="M 0 10 L 30 10" stroke="#9d174d" strokeWidth="1" opacity="0.4" />
+      <path d="M 15 0 L 30 10 L 15 20 L 0 10 Z" fill="#fbcfe8" stroke="#9d174d" strokeWidth="1" opacity="0.8" />
+
+      {/* Dots (representing '1' and '2') */}
+      <circle cx="15" cy="10" r="2.5" fill="#be185d" />
+      <circle cx="7" cy="24" r="2" fill="#ffffff" />
+      <circle cx="23" cy="24" r="2" fill="#ffffff" />
     </g>
 
-    {/* Coin flipping path */}
-    <path d="M125,75 C125,45 155,45 155,25" stroke="#a78bfa" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="3 3" />
+    {/* Flipping Path (Arch) */}
+    <path d="M 82,65 A 32,26 0 0,1 126,52" stroke="#fda4af" strokeWidth="2.5" strokeDasharray="3 2" fill="none" />
+    <path d="M 126,52 L 118,50 M 126,52 L 122,59" stroke="#db2777" strokeWidth="2" strokeLinecap="round" />
 
-    {/* Coin */}
-    <g transform="translate(138, 20)">
-      <circle cx="10" cy="10" r="10" fill="#f59e0b" stroke="#d97706" strokeWidth="1.5" />
-      <circle cx="10" cy="10" r="7" fill="none" stroke="#fef08a" strokeWidth="1" />
-      <text x="10" y="13" fill="#ffffff" fontSize="8" fontWeight="bold" textAnchor="middle">H</text>
+    {/* Spinning Coin (Right) */}
+    <g transform="translate(138, 45)">
+      <ellipse cx="12" cy="12" rx="14" ry="14" fill="#fda4af" stroke="#db2777" strokeWidth="2.5" />
+      <ellipse cx="12" cy="12" rx="10" ry="10" fill="none" stroke="#fdf2f8" strokeWidth="1.2" />
+      <text x="12" y="16" fill="#be185d" fontSize="11" fontWeight="black" textAnchor="middle">H</text>
     </g>
 
-    {/* Formula panel */}
-    <rect x="90" y="76" width="55" height="18" rx="5" fill="#ffffff" stroke="#ddd6fe" strokeWidth="1.5" />
-    <text x="117.5" y="88" fill="#7c3aed" fontSize="7.5" fontWeight="black" textAnchor="middle">P(A) = n(A)/n(S)</text>
+    {/* Small probability label */}
+    <g transform="translate(86, 75)">
+      <rect width="32" height="15" rx="5" fill="#fff1f2" stroke="#fbcfe8" strokeWidth="1.2" />
+      <text x="16" y="10.5" fill="#be185d" fontSize="7" fontWeight="bold" textAnchor="middle">P(A) = 1/2</text>
+    </g>
   </svg>
 );
 
 // 14. Trigonometry & Waves
 export const TrigoWavesSVG = ({ className = "w-full h-32" }: { className?: string }) => (
   <svg className={className} viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <circle cx="100" cy="60" r="45" fill="#ede9fe" opacity="0.5" />
+    <circle cx="100" cy="60" r="45" fill="#fce7f3" opacity="0.5" />
     {/* Unit Circle (Left) */}
     <g transform="translate(45, 60)">
       <circle cx="0" cy="0" r="25" stroke="#cbd5e1" strokeWidth="1.5" />
@@ -486,23 +488,23 @@ export const TrigoWavesSVG = ({ className = "w-full h-32" }: { className?: strin
       <line x1="0" y1="-30" x2="0" y2="30" stroke="#94a3b8" strokeWidth="1" />
 
       {/* Radius line and angle */}
-      <line x1="0" y1="0" x2="17" y2="-17" stroke="#7c3aed" strokeWidth="2.5" strokeLinecap="round" />
-      <circle cx="17" cy="-17" r="3.5" fill="#ef4444" />
+      <line x1="0" y1="0" x2="17" y2="-17" stroke="#db2777" strokeWidth="2.5" strokeLinecap="round" />
+      <circle cx="17" cy="-17" r="3.5" fill="#e11d48" />
       {/* Sine projector */}
-      <line x1="17" y1="-17" x2="17" y2="0" stroke="#10b981" strokeWidth="1.5" strokeDasharray="2 2" />
+      <line x1="17" y1="-17" x2="17" y2="0" stroke="#ec4899" strokeWidth="1.5" strokeDasharray="2 2" />
     </g>
 
     {/* Connecting arrow */}
-    <path d="M80,60 L92,60" stroke="#7c3aed" strokeWidth="2" strokeLinecap="round" />
-    <path d="M92,60 L87,56 M92,60 L87,64" stroke="#7c3aed" strokeWidth="2" strokeLinecap="round" />
+    <path d="M80,60 L92,60" stroke="#db2777" strokeWidth="2" strokeLinecap="round" />
+    <path d="M92,60 L87,56 M92,60 L87,64" stroke="#db2777" strokeWidth="2" strokeLinecap="round" />
 
     {/* Sine wave (Right) */}
     <g transform="translate(100, 60)">
       <line x1="0" y1="0" x2="80" y2="0" stroke="#cbd5e1" strokeWidth="1.5" />
       {/* Sine Wave Curve */}
-      <path d="M0,0 Q10,-25 20,0 T40,0 T60,0 T80,0" stroke="#7c3aed" strokeWidth="3" strokeLinecap="round" fill="none" />
-      <circle cx="20" cy="-22" r="3" fill="#ef4444" />
-      <text x="70" y="-12" fill="#7c3aed" fontSize="9" fontWeight="black">sin(θ)</text>
+      <path d="M0,0 Q10,-25 20,0 T40,0 T60,0 T80,0" stroke="#db2777" strokeWidth="3" strokeLinecap="round" fill="none" />
+      <circle cx="20" cy="-22" r="3" fill="#e11d48" />
+      <text x="70" y="-12" fill="#be185d" fontSize="9" fontWeight="black">sin(θ)</text>
     </g>
   </svg>
 );
@@ -510,58 +512,58 @@ export const TrigoWavesSVG = ({ className = "w-full h-32" }: { className?: strin
 // 15. Systems of Equations
 export const SystemsEquationsSVG = ({ className = "w-full h-32" }: { className?: string }) => (
   <svg className={className} viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <circle cx="100" cy="60" r="45" fill="#ede9fe" opacity="0.5" />
-    <rect x="36" y="20" width="128" height="80" rx="12" fill="#ffffff" stroke="#c4b5fd" strokeWidth="2" />
+    <circle cx="100" cy="60" r="45" fill="#fce7f3" opacity="0.5" />
+    <rect x="36" y="20" width="128" height="80" rx="12" fill="#ffffff" stroke="#fbcfe8" strokeWidth="2" />
 
     {/* Grid Backdrop */}
     <line x1="60" y1="20" x2="60" y2="100" stroke="#e2e8f0" strokeWidth="1" />
     <line x1="84" y1="20" x2="84" y2="100" stroke="#e2e8f0" strokeWidth="1" />
-    <line x1="108" y1="20" x2="108" y2="100" stroke="#ede9fe" strokeWidth="2" /> {/* Axis Y */}
+    <line x1="108" y1="20" x2="108" y2="100" stroke="#fce7f3" strokeWidth="2" /> {/* Axis Y */}
     <line x1="132" y1="20" x2="132" y2="100" stroke="#e2e8f0" strokeWidth="1" />
     <line x1="156" y1="20" x2="156" y2="100" stroke="#e2e8f0" strokeWidth="1" />
 
     <line x1="36" y1="40" x2="164" y2="40" stroke="#e2e8f0" strokeWidth="1" />
-    <line x1="36" y1="60" x2="164" y2="60" stroke="#ede9fe" strokeWidth="2" /> {/* Axis X */}
+    <line x1="36" y1="60" x2="164" y2="60" stroke="#fce7f3" strokeWidth="2" /> {/* Axis X */}
     <line x1="36" y1="80" x2="164" y2="80" stroke="#e2e8f0" strokeWidth="1" />
 
     {/* Line 1 (y = -x + 4) */}
-    <line x1="45" y1="30" x2="145" y2="90" stroke="#3b82f6" strokeWidth="3" strokeLinecap="round" />
+    <line x1="45" y1="30" x2="145" y2="90" stroke="#ec4899" strokeWidth="3" strokeLinecap="round" />
 
     {/* Line 2 (y = x - 2) */}
-    <line x1="45" y1="85" x2="145" y2="35" stroke="#f97316" strokeWidth="3" strokeLinecap="round" />
+    <line x1="45" y1="85" x2="145" y2="35" stroke="#e11d48" strokeWidth="3" strokeLinecap="round" />
 
     {/* Intersection Point */}
     {/* Calculated intersection of the sample lines */}
-    <circle cx="108" cy="53" r="5" fill="#7c3aed" stroke="#ffffff" strokeWidth="1.5" className="animate-pulse" />
+    <circle cx="108" cy="53" r="5" fill="#db2777" stroke="#ffffff" strokeWidth="1.5" />
 
     {/* Label tag */}
-    <rect x="115" y="42" width="42" height="15" rx="5" fill="#f5f3ff" stroke="#7c3aed" strokeWidth="1" />
-    <text x="136" y="52" fill="#7c3aed" fontSize="7" fontWeight="bold" textAnchor="middle">(x*, y*)</text>
+    <rect x="115" y="42" width="42" height="15" rx="5" fill="#fff1f2" stroke="#fda4af" strokeWidth="1" />
+    <text x="136" y="52" fill="#be185d" fontSize="7" fontWeight="bold" textAnchor="middle">(x*, y*)</text>
   </svg>
 );
 
 // 16. Geometry Measurement Lab
 export const GeometryMeasurementSVG = ({ className = "w-full h-32" }: { className?: string }) => (
   <svg className={className} viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <circle cx="100" cy="60" r="45" fill="#ede9fe" opacity="0.5" />
+    <circle cx="100" cy="60" r="45" fill="#fce7f3" opacity="0.5" />
     {/* Triangular ruler */}
-    <path d="M40,85 L140,85 L40,25 Z" fill="rgba(255,255,255,0.7)" stroke="#a78bfa" strokeWidth="2" strokeLinejoin="round" />
-    <path d="M52,77 L110,77 L52,42 Z" fill="none" stroke="#ddd6fe" strokeWidth="1.5" />
+    <path d="M40,85 L140,85 L40,25 Z" fill="rgba(255,255,255,0.7)" stroke="#fda4af" strokeWidth="2" strokeLinejoin="round" />
+    <path d="M52,77 L110,77 L52,42 Z" fill="none" stroke="#fbcfe8" strokeWidth="1.5" />
 
     {/* Measurement ticks on ruler bottom */}
-    <line x1="45" y1="85" x2="45" y2="80" stroke="#7c3aed" strokeWidth="1" />
-    <line x1="60" y1="85" x2="60" y2="81" stroke="#7c3aed" strokeWidth="1" />
-    <line x1="75" y1="85" x2="75" y2="80" stroke="#7c3aed" strokeWidth="1" />
-    <line x1="90" y1="85" x2="90" y2="81" stroke="#7c3aed" strokeWidth="1" />
-    <line x1="105" y1="85" x2="105" y2="80" stroke="#7c3aed" strokeWidth="1" />
-    <line x1="120" y1="85" x2="120" y2="81" stroke="#7c3aed" strokeWidth="1" />
-    <line x1="135" y1="85" x2="135" y2="80" stroke="#7c3aed" strokeWidth="1" />
+    <line x1="45" y1="85" x2="45" y2="80" stroke="#db2777" strokeWidth="1" />
+    <line x1="60" y1="85" x2="60" y2="81" stroke="#db2777" strokeWidth="1" />
+    <line x1="75" y1="85" x2="75" y2="80" stroke="#db2777" strokeWidth="1" />
+    <line x1="90" y1="85" x2="90" y2="81" stroke="#db2777" strokeWidth="1" />
+    <line x1="105" y1="85" x2="105" y2="80" stroke="#db2777" strokeWidth="1" />
+    <line x1="120" y1="85" x2="120" y2="81" stroke="#db2777" strokeWidth="1" />
+    <line x1="135" y1="85" x2="135" y2="80" stroke="#db2777" strokeWidth="1" />
 
     {/* Cylindrical shape being measured */}
     <g transform="translate(125, 30)">
-      <ellipse cx="20" cy="10" rx="15" ry="5" fill="#c084fc" stroke="#a855f7" strokeWidth="1" />
-      <path d="M5,10 L5,45 A15,5 0 0,0 35,45 L35,10 Z" fill="#c084fc" opacity="0.5" stroke="#a855f7" strokeWidth="1" />
-      <ellipse cx="20" cy="45" rx="15" ry="5" fill="#a855f7" />
+      <ellipse cx="20" cy="10" rx="15" ry="5" fill="#fda4af" stroke="#ec4899" strokeWidth="1" />
+      <path d="M5,10 L5,45 A15,5 0 0,0 35,45 L35,10 Z" fill="#fda4af" opacity="0.5" stroke="#ec4899" strokeWidth="1" />
+      <ellipse cx="20" cy="45" rx="15" ry="5" fill="#ec4899" />
 
       {/* Dimension Line */}
       <line x1="5" y1="25" x2="35" y2="25" stroke="#1e293b" strokeWidth="1" strokeDasharray="2 2" />
@@ -573,38 +575,38 @@ export const GeometryMeasurementSVG = ({ className = "w-full h-32" }: { classNam
 // 17. Exponential Growth & Decay
 export const ExponentialGrowthDecaySVG = ({ className = "w-full h-32" }: { className?: string }) => (
   <svg className={className} viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <circle cx="100" cy="60" r="45" fill="#ede9fe" opacity="0.5" />
-    <rect x="36" y="20" width="128" height="80" rx="12" fill="#ffffff" stroke="#c4b5fd" strokeWidth="2" />
+    <circle cx="100" cy="60" r="45" fill="#fce7f3" opacity="0.5" />
+    <rect x="36" y="20" width="128" height="80" rx="12" fill="#ffffff" stroke="#fbcfe8" strokeWidth="2" />
     {/* Axes */}
     <path d="M48,30 V90 H150" stroke="#cbd5e1" strokeWidth="2" strokeLinecap="round" />
 
     {/* Exponential Growth Curve (y = e^x) */}
-    <path d="M48,85 Q80,82 105,70 T145,35" stroke="#10b981" strokeWidth="3" strokeLinecap="round" fill="none" />
-    <text x="142" y="27" fill="#047857" fontSize="8" fontWeight="bold">Growth</text>
+    <path d="M48,85 Q80,82 105,70 T145,35" stroke="#db2777" strokeWidth="3" strokeLinecap="round" fill="none" />
+    <text x="142" y="27" fill="#be185d" fontSize="8" fontWeight="bold">Growth</text>
 
     {/* Exponential Decay Curve (y = e^-x) */}
-    <path d="M48,35 Q65,65 95,80 T148,88" stroke="#ef4444" strokeWidth="3" strokeLinecap="round" fill="none" />
-    <text x="98" y="66" fill="#b91c1c" fontSize="8" fontWeight="bold">Decay</text>
+    <path d="M48,35 Q65,65 95,80 T148,88" stroke="#e11d48" strokeWidth="3" strokeLinecap="round" fill="none" />
+    <text x="98" y="66" fill="#be185d" fontSize="8" fontWeight="bold">Decay</text>
   </svg>
 );
 
 // 18. Sampling & Measurement Error
 export const DataSamplingErrorSVG = ({ className = "w-full h-32" }: { className?: string }) => (
   <svg className={className} viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <circle cx="100" cy="60" r="45" fill="#ede9fe" opacity="0.5" />
+    <circle cx="100" cy="60" r="45" fill="#fce7f3" opacity="0.5" />
     {/* Bullseye target (representing precision vs accuracy) */}
     <g transform="translate(60, 60)">
       <circle cx="0" cy="0" r="35" stroke="#cbd5e1" strokeWidth="1.5" />
       <circle cx="0" cy="0" r="23" stroke="#cbd5e1" strokeWidth="1.5" />
-      <circle cx="0" cy="0" r="10" stroke="#fecdd3" strokeWidth="1" fill="#ffe4e6" />
-      <circle cx="0" cy="0" r="2" fill="#be123c" />
+      <circle cx="0" cy="0" r="10" stroke="#fbcfe8" strokeWidth="1" fill="#fce7f3" />
+      <circle cx="0" cy="0" r="2" fill="#db2777" />
 
       {/* Target hits: scattered with systematic error */}
-      <circle cx="-15" cy="-12" r="2" fill="#7c3aed" />
-      <circle cx="-13" cy="-16" r="2" fill="#7c3aed" />
-      <circle cx="-18" cy="-15" r="2" fill="#7c3aed" />
-      <circle cx="-14" cy="-9" r="2" fill="#7c3aed" />
-      <circle cx="-10" cy="-12" r="2" fill="#7c3aed" />
+      <circle cx="-15" cy="-12" r="2" fill="#db2777" />
+      <circle cx="-13" cy="-16" r="2" fill="#db2777" />
+      <circle cx="-18" cy="-15" r="2" fill="#db2777" />
+      <circle cx="-14" cy="-9" r="2" fill="#db2777" />
+      <circle cx="-10" cy="-12" r="2" fill="#db2777" />
     </g>
 
     {/* Bar Chart with Error Bars (Right) */}
@@ -613,14 +615,14 @@ export const DataSamplingErrorSVG = ({ className = "w-full h-32" }: { className?
       <path d="M0,0 V55 H55" stroke="#94a3b8" strokeWidth="1.5" strokeLinecap="round" />
 
       {/* Bar 1 */}
-      <rect x="8" y="20" width="12" height="35" fill="#c084fc" rx="1" />
+      <rect x="8" y="20" width="12" height="35" fill="#db2777" rx="1" />
       {/* Error Bar 1 */}
       <line x1="14" y1="12" x2="14" y2="28" stroke="#475569" strokeWidth="1.5" />
       <line x1="10" y1="12" x2="18" y2="12" stroke="#475569" strokeWidth="1.5" />
       <line x1="10" y1="28" x2="18" y2="28" stroke="#475569" strokeWidth="1.5" />
 
       {/* Bar 2 */}
-      <rect x="28" y="32" width="12" height="23" fill="#a78bfa" rx="1" />
+      <rect x="28" y="32" width="12" height="23" fill="#fbcfe8" rx="1" />
       {/* Error Bar 2 */}
       <line x1="34" y1="22" x2="34" y2="42" stroke="#475569" strokeWidth="1.5" />
       <line x1="30" y1="22" x2="38" y2="22" stroke="#475569" strokeWidth="1.5" />
@@ -632,8 +634,8 @@ export const DataSamplingErrorSVG = ({ className = "w-full h-32" }: { className?
 // 19. Quadratic Functions & Projectiles
 export const QuadraticProjectilesSVG = ({ className = "w-full h-32" }: { className?: string }) => (
   <svg className={className} viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <circle cx="100" cy="60" r="45" fill="#ede9fe" opacity="0.5" />
-    <rect x="36" y="20" width="128" height="80" rx="12" fill="#ffffff" stroke="#c4b5fd" strokeWidth="2" />
+    <circle cx="100" cy="60" r="45" fill="#fce7f3" opacity="0.5" />
+    <rect x="36" y="20" width="128" height="80" rx="12" fill="#ffffff" stroke="#fbcfe8" strokeWidth="2" />
     {/* Ground */}
     <line x1="42" y1="88" x2="158" y2="88" stroke="#e2e8f0" strokeWidth="2" />
 
@@ -644,51 +646,51 @@ export const QuadraticProjectilesSVG = ({ className = "w-full h-32" }: { classNa
     </g>
 
     {/* Parabolic Trajectory (y = -x^2) */}
-    <path d="M50,80 Q95,20 140,88" stroke="#7c3aed" strokeWidth="3" strokeLinecap="round" strokeDasharray="3 3" fill="none" />
+    <path d="M50,80 Q95,20 140,88" stroke="#db2777" strokeWidth="3" strokeLinecap="round" strokeDasharray="3 3" fill="none" />
 
     {/* Peak Vertex */}
-    <circle cx="95" cy="50" r="4" fill="#ef4444" stroke="#ffffff" strokeWidth="1" />
-    <text x="95" y="42" fill="#b91c1c" fontSize="7" fontWeight="bold" textAnchor="middle">Vertex</text>
+    <circle cx="95" cy="50" r="4" fill="#e11d48" stroke="#ffffff" strokeWidth="1" />
+    <text x="95" y="42" fill="#be185d" fontSize="7" fontWeight="bold" textAnchor="middle">Vertex</text>
 
     {/* Landing circle */}
-    <circle cx="140" cy="88" r="3" fill="#10b981" />
+    <circle cx="140" cy="88" r="3" fill="#ec4899" />
   </svg>
 );
 
 // 20. Logarithms & Scientific Scales
 export const LogarithmScalesSVG = ({ className = "w-full h-32" }: { className?: string }) => (
   <svg className={className} viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <circle cx="100" cy="60" r="45" fill="#ede9fe" opacity="0.5" />
+    <circle cx="100" cy="60" r="45" fill="#fce7f3" opacity="0.5" />
     {/* Slider scale background */}
-    <rect x="25" y="42" width="150" height="36" rx="8" fill="#ffffff" stroke="#c4b5fd" strokeWidth="2" />
+    <rect x="25" y="42" width="150" height="36" rx="8" fill="#ffffff" stroke="#fbcfe8" strokeWidth="2" />
 
     {/* Logarithmic scale markings (decreasing gap widths) */}
-    <line x1="35" y1="42" x2="35" y2="65" stroke="#7c3aed" strokeWidth="2" />
-    <text x="35" y="72" fill="#7c3aed" fontSize="7.5" fontWeight="black" textAnchor="middle">10⁰</text>
+    <line x1="35" y1="42" x2="35" y2="65" stroke="#db2777" strokeWidth="2" />
+    <text x="35" y="72" fill="#db2777" fontSize="7.5" fontWeight="black" textAnchor="middle">10⁰</text>
 
-    <line x1="75" y1="42" x2="75" y2="65" stroke="#7c3aed" strokeWidth="1.8" />
-    <text x="75" y="72" fill="#7c3aed" fontSize="7.5" fontWeight="black" textAnchor="middle">10¹</text>
+    <line x1="75" y1="42" x2="75" y2="65" stroke="#db2777" strokeWidth="1.8" />
+    <text x="75" y="72" fill="#db2777" fontSize="7.5" fontWeight="black" textAnchor="middle">10¹</text>
 
-    <line x1="105" y1="42" x2="105" y2="65" stroke="#7c3aed" strokeWidth="1.5" />
-    <text x="105" y="72" fill="#7c3aed" fontSize="7.5" fontWeight="black" textAnchor="middle">10²</text>
+    <line x1="105" y1="42" x2="105" y2="65" stroke="#db2777" strokeWidth="1.5" />
+    <text x="105" y="72" fill="#db2777" fontSize="7.5" fontWeight="black" textAnchor="middle">10²</text>
 
-    <line x1="128" y1="42" x2="128" y2="60" stroke="#7c3aed" strokeWidth="1.2" />
-    <text x="128" y="72" fill="#7c3aed" fontSize="7.5" fontWeight="black" textAnchor="middle">10³</text>
+    <line x1="128" y1="42" x2="128" y2="60" stroke="#db2777" strokeWidth="1.2" />
+    <text x="128" y="72" fill="#db2777" fontSize="7.5" fontWeight="black" textAnchor="middle">10³</text>
 
-    <line x1="145" y1="42" x2="145" y2="60" stroke="#7c3aed" strokeWidth="1" />
-    <line x1="158" y1="42" x2="158" y2="60" stroke="#7c3aed" strokeWidth="1" />
-    <line x1="168" y1="42" x2="168" y2="60" stroke="#7c3aed" strokeWidth="1" />
+    <line x1="145" y1="42" x2="145" y2="60" stroke="#db2777" strokeWidth="1" />
+    <line x1="158" y1="42" x2="158" y2="60" stroke="#db2777" strokeWidth="1" />
+    <line x1="168" y1="42" x2="168" y2="60" stroke="#db2777" strokeWidth="1" />
 
     {/* Label tag */}
-    <rect x="75" y="16" width="50" height="15" rx="5" fill="#f5f3ff" stroke="#7c3aed" strokeWidth="1" />
-    <text x="100" y="26" fill="#7c3aed" fontSize="7.5" fontWeight="black" textAnchor="middle">log₁₀(x)</text>
+    <rect x="75" y="16" width="50" height="15" rx="5" fill="#fff1f2" stroke="#fda4af" strokeWidth="1" />
+    <text x="100" y="26" fill="#be185d" fontSize="7.5" fontWeight="black" textAnchor="middle">log₁₀(x)</text>
   </svg>
 );
 
 // 21. Unit Conversion & Dimensional Analysis
 export const UnitConversionSVG = ({ className = "w-full h-32" }: { className?: string }) => (
   <svg className={className} viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <circle cx="100" cy="60" r="45" fill="#ede9fe" opacity="0.5" />
+    <circle cx="100" cy="60" r="45" fill="#fce7f3" opacity="0.5" />
     {/* Balancing Scales */}
     <path d="M100,85 L100,45 M80,45 L120,45" stroke="#475569" strokeWidth="3" strokeLinecap="round" />
     {/* Triangle Base */}
@@ -698,25 +700,25 @@ export const UnitConversionSVG = ({ className = "w-full h-32" }: { className?: s
     <line x1="80" y1="45" x2="60" y2="70" stroke="#475569" strokeWidth="1.5" />
     <line x1="80" y1="45" x2="100" y2="70" stroke="#475569" strokeWidth="1.5" />
     <ellipse cx="80" cy="70" rx="20" ry="3" fill="#94a3b8" />
-    <rect x="70" y="55" width="20" height="13" rx="2" fill="#7c3aed" stroke="#6d28d9" strokeWidth="1" />
+    <rect x="70" y="55" width="20" height="13" rx="2" fill="#db2777" stroke="#be185d" strokeWidth="1" />
     <text x="80" y="64" fill="#ffffff" fontSize="6.5" fontWeight="bold" textAnchor="middle">1 kg</text>
 
     {/* Right Pan (with weight '1000 g') */}
     <line x1="120" y1="45" x2="100" y2="70" stroke="#475569" strokeWidth="1.5" />
     <line x1="120" y1="45" x2="140" y2="70" stroke="#475569" strokeWidth="1.5" />
     <ellipse cx="120" cy="70" rx="20" ry="3" fill="#94a3b8" />
-    <rect x="108" y="57" width="24" height="11" rx="2" fill="#10b981" stroke="#059669" strokeWidth="1" />
+    <rect x="108" y="57" width="24" height="11" rx="2" fill="#ec4899" stroke="#db2777" strokeWidth="1" />
     <text x="120" y="65" fill="#ffffff" fontSize="5.5" fontWeight="bold" textAnchor="middle">1000 g</text>
 
     {/* Math Equals sign */}
-    <text x="100" y="72" fill="#475569" fontSize="13" fontWeight="bold" textAnchor="middle">=</text>
+    <text x="100" y="72" fill="#db2777" fontSize="13" fontWeight="bold" textAnchor="middle">=</text>
   </svg>
 );
 
 // 22. Matrix Transformations
 export const MatrixTransformationsSVG = ({ className = "w-full h-32" }: { className?: string }) => (
   <svg className={className} viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <circle cx="100" cy="60" r="45" fill="#ede9fe" opacity="0.5" />
+    <circle cx="100" cy="60" r="45" fill="#fce7f3" opacity="0.5" />
     {/* Coordinate grid */}
     <g transform="translate(50, 60)">
       <line x1="-35" y1="0" x2="35" y2="0" stroke="#cbd5e1" strokeWidth="1.5" />
@@ -726,16 +728,16 @@ export const MatrixTransformationsSVG = ({ className = "w-full h-32" }: { classN
       <rect x="0" y="-20" width="20" height="20" stroke="#cbd5e1" strokeWidth="1" strokeDasharray="2 2" fill="none" />
 
       {/* Transformed shape (Sheared/Rotated) */}
-      <polygon points="0,0 22,-8 30,-28 8,-20" fill="rgba(124, 58, 237, 0.35)" stroke="#7c3aed" strokeWidth="2" />
+      <polygon points="0,0 22,-8 30,-28 8,-20" fill="rgba(219, 39, 119, 0.3)" stroke="#db2777" strokeWidth="2" />
     </g>
 
     {/* Vector transformation symbol / matrix bracket */}
     <g transform="translate(115, 38)">
       <text x="0" y="24" fill="#475569" fontSize="18" fontWeight="light">[</text>
-      <text x="10" y="16" fill="#7c3aed" fontSize="9.5" fontWeight="bold">cos θ</text>
-      <text x="35" y="16" fill="#7c3aed" fontSize="9.5" fontWeight="bold">-sin θ</text>
-      <text x="10" y="30" fill="#7c3aed" fontSize="9.5" fontWeight="bold">sin θ</text>
-      <text x="35" y="30" fill="#7c3aed" fontSize="9.5" fontWeight="bold">cos θ</text>
+      <text x="10" y="16" fill="#be185d" fontSize="9.5" fontWeight="bold">cos θ</text>
+      <text x="35" y="16" fill="#be185d" fontSize="9.5" fontWeight="bold">-sin θ</text>
+      <text x="10" y="30" fill="#be185d" fontSize="9.5" fontWeight="bold">sin θ</text>
+      <text x="35" y="30" fill="#be185d" fontSize="9.5" fontWeight="bold">cos θ</text>
       <text x="65" y="24" fill="#475569" fontSize="18" fontWeight="light">]</text>
     </g>
   </svg>
@@ -744,37 +746,37 @@ export const MatrixTransformationsSVG = ({ className = "w-full h-32" }: { classN
 // 23. Sequences & Series Lab
 export const SequencesSeriesSVG = ({ className = "w-full h-32" }: { className?: string }) => (
   <svg className={className} viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <circle cx="100" cy="60" r="45" fill="#ede9fe" opacity="0.5" />
+    <circle cx="100" cy="60" r="45" fill="#fce7f3" opacity="0.5" />
 
     {/* Progression of Towers (Arithmetic/Geometric) */}
     {/* Tower 1 (height 1) */}
     <g transform="translate(30, 80)">
-      <rect x="0" y="0" width="15" height="15" rx="2" fill="#7c3aed" stroke="#6d28d9" strokeWidth="1" />
-      <text x="7.5" y="25" fill="#7c3aed" fontSize="9" fontWeight="bold" textAnchor="middle">1</text>
+      <rect x="0" y="0" width="15" height="15" rx="2" fill="#db2777" stroke="#be185d" strokeWidth="1" />
+      <text x="7.5" y="25" fill="#db2777" fontSize="9" fontWeight="bold" textAnchor="middle">1</text>
     </g>
 
     {/* Tower 2 (height 2) */}
     <g transform="translate(55, 65)">
-      <rect x="0" y="15" width="15" height="15" rx="2" fill="#a78bfa" stroke="#6d28d9" strokeWidth="1" />
-      <rect x="0" y="0" width="15" height="15" rx="2" fill="#7c3aed" stroke="#6d28d9" strokeWidth="1" />
-      <text x="7.5" y="40" fill="#7c3aed" fontSize="9" fontWeight="bold" textAnchor="middle">2</text>
+      <rect x="0" y="15" width="15" height="15" rx="2" fill="#ec4899" stroke="#db2777" strokeWidth="1" />
+      <rect x="0" y="0" width="15" height="15" rx="2" fill="#db2777" stroke="#be185d" strokeWidth="1" />
+      <text x="7.5" y="40" fill="#db2777" fontSize="9" fontWeight="bold" textAnchor="middle">2</text>
     </g>
 
     {/* Tower 3 (height 4 - geometric example) */}
     <g transform="translate(80, 35)">
-      <rect x="0" y="45" width="15" height="15" rx="2" fill="#ddd6fe" stroke="#6d28d9" strokeWidth="1" />
-      <rect x="0" y="30" width="15" height="15" rx="2" fill="#a78bfa" stroke="#6d28d9" strokeWidth="1" />
-      <rect x="0" y="15" width="15" height="15" rx="2" fill="#a78bfa" stroke="#6d28d9" strokeWidth="1" />
-      <rect x="0" y="0" width="15" height="15" rx="2" fill="#7c3aed" stroke="#6d28d9" strokeWidth="1" />
-      <text x="7.5" y="70" fill="#7c3aed" fontSize="9" fontWeight="bold" textAnchor="middle">4</text>
+      <rect x="0" y="45" width="15" height="15" rx="2" fill="#fbcfe8" stroke="#db2777" strokeWidth="1" />
+      <rect x="0" y="30" width="15" height="15" rx="2" fill="#ec4899" stroke="#db2777" strokeWidth="1" />
+      <rect x="0" y="15" width="15" height="15" rx="2" fill="#ec4899" stroke="#db2777" strokeWidth="1" />
+      <rect x="0" y="0" width="15" height="15" rx="2" fill="#db2777" stroke="#be185d" strokeWidth="1" />
+      <text x="7.5" y="70" fill="#db2777" fontSize="9" fontWeight="bold" textAnchor="middle">4</text>
     </g>
 
     {/* Sigma Summation sign representing Series */}
     <g transform="translate(125, 30)">
-      <path d="M5,10 L30,10 L18,22 L30,34 L5,34 L5,31 L20,31 L12,22 L20,13 L5,13 Z" fill="#6d28d9" />
+      <path d="M5,10 L30,10 L18,22 L30,34 L5,34 L5,31 L20,31 L12,22 L20,13 L5,13 Z" fill="#be185d" />
       <text x="18" y="8" fill="#475569" fontSize="7" fontWeight="bold" textAnchor="middle">∞</text>
       <text x="18" y="44" fill="#475569" fontSize="7" fontWeight="bold" textAnchor="middle">n=1</text>
-      <text x="42" y="27" fill="#7c3aed" fontSize="13" fontWeight="black">a·rⁿ</text>
+      <text x="42" y="27" fill="#be185d" fontSize="13" fontWeight="black">a·rⁿ</text>
     </g>
   </svg>
 );
@@ -782,103 +784,103 @@ export const SequencesSeriesSVG = ({ className = "w-full h-32" }: { className?: 
 // 24. Inequalities & Feasible Regions
 export const InequalitiesFeasibleSVG = ({ className = "w-full h-32" }: { className?: string }) => (
   <svg className={className} viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <circle cx="100" cy="60" r="45" fill="#ede9fe" opacity="0.5" />
-    <rect x="36" y="20" width="128" height="80" rx="12" fill="#ffffff" stroke="#c4b5fd" strokeWidth="2" />
+    <circle cx="100" cy="60" r="45" fill="#fce7f3" opacity="0.5" />
+    <rect x="36" y="20" width="128" height="80" rx="12" fill="#ffffff" stroke="#fbcfe8" strokeWidth="2" />
     {/* Grid / Axes */}
     <line x1="50" y1="90" x2="150" y2="90" stroke="#cbd5e1" strokeWidth="2" />
     <line x1="55" y1="25" x2="55" y2="95" stroke="#cbd5e1" strokeWidth="2" />
 
     {/* Feasible Region shaded polygon */}
-    <polygon points="55,90 55,45 95,55 125,90" fill="rgba(167, 139, 250, 0.45)" stroke="#7c3aed" strokeWidth="1.5" />
+    <polygon points="55,90 55,45 95,55 125,90" fill="rgba(219, 39, 119, 0.3)" stroke="#db2777" strokeWidth="1.5" />
 
     {/* Boundary Line 1 */}
-    <line x1="45" y1="40" x2="115" y2="60" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" />
+    <line x1="45" y1="40" x2="115" y2="60" stroke="#ec4899" strokeWidth="2" strokeLinecap="round" />
 
     {/* Boundary Line 2 */}
-    <line x1="75" y1="35" x2="135" y2="95" stroke="#f97316" strokeWidth="2" strokeLinecap="round" />
+    <line x1="75" y1="35" x2="135" y2="95" stroke="#e11d48" strokeWidth="2" strokeLinecap="round" />
 
-    <text x="82" y="75" fill="#6d28d9" fontSize="8" fontWeight="black" textAnchor="middle">FEASIBLE</text>
+    <text x="82" y="75" fill="#be185d" fontSize="8" fontWeight="black" textAnchor="middle">FEASIBLE</text>
   </svg>
 );
 
 // 25. Transformations & Symmetry
 export const TransformationsSymmetrySVG = ({ className = "w-full h-32" }: { className?: string }) => (
   <svg className={className} viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <circle cx="100" cy="60" r="45" fill="#ede9fe" opacity="0.5" />
+    <circle cx="100" cy="60" r="45" fill="#fce7f3" opacity="0.5" />
     {/* Symmetry line */}
     <line x1="100" y1="15" x2="100" y2="105" stroke="#94a3b8" strokeWidth="1.5" strokeDasharray="3 3" />
 
     {/* Left side shape (original) */}
-    <path d="M55,35 L90,45 L85,85 L55,75 Z" fill="rgba(124, 58, 237, 0.4)" stroke="#7c3aed" strokeWidth="2" />
+    <path d="M55,35 L90,45 L85,85 L55,75 Z" fill="rgba(219, 39, 119, 0.4)" stroke="#db2777" strokeWidth="2" />
 
     {/* Right side shape (reflected symmetry) */}
-    <path d="M145,35 L110,45 L115,85 L145,75 Z" fill="rgba(16, 185, 129, 0.4)" stroke="#10b981" strokeWidth="2" />
+    <path d="M145,35 L110,45 L115,85 L145,75 Z" fill="rgba(244, 114, 182, 0.4)" stroke="#ec4899" strokeWidth="2" />
 
     {/* Connection arrows indicating transformation */}
-    <path d="M75,55 Q100,48 125,55" stroke="#7c3aed" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="2 2" />
-    <path d="M125,55 L119,51 M125,55 L119,59" stroke="#7c3aed" strokeWidth="1.5" />
+    <path d="M75,55 Q100,48 125,55" stroke="#be185d" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="2 2" />
+    <path d="M125,55 L119,51 M125,55 L119,59" stroke="#be185d" strokeWidth="1.5" />
   </svg>
 );
 
 // 26. Angles & Circles Lab
 export const AnglesCirclesSVG = ({ className = "w-full h-32" }: { className?: string }) => (
   <svg className={className} viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <circle cx="100" cy="60" r="45" fill="#ede9fe" opacity="0.5" />
+    <circle cx="100" cy="60" r="45" fill="#fce7f3" opacity="0.5" />
     {/* Circle outline */}
-    <circle cx="100" cy="60" r="35" stroke="#7c3aed" strokeWidth="2.5" />
-    <circle cx="100" cy="60" r="2.5" fill="#6d28d9" />
+    <circle cx="100" cy="60" r="35" stroke="#db2777" strokeWidth="2.5" />
+    <circle cx="100" cy="60" r="2.5" fill="#be185d" />
 
     {/* Radius lines defining a sector */}
-    <line x1="100" y1="60" x2="135" y2="60" stroke="#7c3aed" strokeWidth="2" />
-    <line x1="100" y1="60" x2="124" y2="35" stroke="#7c3aed" strokeWidth="2" />
+    <line x1="100" y1="60" x2="135" y2="60" stroke="#db2777" strokeWidth="2" />
+    <line x1="100" y1="60" x2="124" y2="35" stroke="#db2777" strokeWidth="2" />
 
     {/* Shaded sector (arc/pie slice) */}
-    <path d="M100,60 L135,60 A35,35 0 0,0 124,35 Z" fill="#a78bfa" opacity="0.5" />
+    <path d="M100,60 L135,60 A35,35 0 0,0 124,35 Z" fill="#fbcfe8" opacity="0.6" />
 
     {/* Angle theta symbol */}
-    <path d="M112,60 A12,12 0 0,0 108,51" stroke="#ef4444" strokeWidth="1.5" fill="none" />
-    <text x="115" y="55" fill="#ef4444" fontSize="8" fontWeight="bold">θ</text>
+    <path d="M112,60 A12,12 0 0,0 108,51" stroke="#e11d48" strokeWidth="1.5" fill="none" />
+    <text x="115" y="55" fill="#e11d48" fontSize="8" fontWeight="bold">θ</text>
 
     {/* Radius annotation */}
-    <text x="116" y="70" fill="#7c3aed" fontSize="7" fontWeight="bold">r</text>
+    <text x="116" y="70" fill="#db2777" fontSize="7" fontWeight="bold">r</text>
   </svg>
 );
 
 // 27. Combinatorics & Counting
 export const CombinatoricsCountingSVG = ({ className = "w-full h-32" }: { className?: string }) => (
   <svg className={className} viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <circle cx="100" cy="60" r="45" fill="#ede9fe" opacity="0.5" />
+    <circle cx="100" cy="60" r="45" fill="#fce7f3" opacity="0.5" />
     {/* Counting Tree diagram */}
     <g transform="translate(18, 30)">
       {/* Root Node */}
-      <circle cx="15" cy="30" r="4.5" fill="#7c3aed" />
+      <circle cx="15" cy="30" r="4.5" fill="#db2777" />
 
       {/* Branch Level 1 */}
-      <line x1="15" y1="30" x2="45" y2="15" stroke="#a78bfa" strokeWidth="2" />
-      <line x1="15" y1="30" x2="45" y2="45" stroke="#a78bfa" strokeWidth="2" />
-      <circle cx="45" cy="15" r="4" fill="#a78bfa" />
-      <circle cx="45" cy="45" r="4" fill="#a78bfa" />
+      <line x1="15" y1="30" x2="45" y2="15" stroke="#ec4899" strokeWidth="2" />
+      <line x1="15" y1="30" x2="45" y2="45" stroke="#ec4899" strokeWidth="2" />
+      <circle cx="45" cy="15" r="4" fill="#ec4899" />
+      <circle cx="45" cy="45" r="4" fill="#ec4899" />
 
       {/* Branch Level 2 */}
-      <line x1="45" y1="15" x2="75" y2="7" stroke="#ddd6fe" strokeWidth="1.5" />
-      <line x1="45" y1="15" x2="75" y2="23" stroke="#ddd6fe" strokeWidth="1.5" />
-      <line x1="45" y1="45" x2="75" y2="37" stroke="#ddd6fe" strokeWidth="1.5" />
-      <line x1="45" y1="45" x2="75" y2="53" stroke="#ddd6fe" strokeWidth="1.5" />
+      <line x1="45" y1="15" x2="75" y2="7" stroke="#fbcfe8" strokeWidth="1.5" />
+      <line x1="45" y1="15" x2="75" y2="23" stroke="#fbcfe8" strokeWidth="1.5" />
+      <line x1="45" y1="45" x2="75" y2="37" stroke="#fbcfe8" strokeWidth="1.5" />
+      <line x1="45" y1="45" x2="75" y2="53" stroke="#fbcfe8" strokeWidth="1.5" />
 
-      <circle cx="75" cy="7" r="3" fill="#ddd6fe" />
-      <circle cx="75" cy="23" r="3" fill="#ddd6fe" />
-      <circle cx="75" cy="37" r="3" fill="#ddd6fe" />
-      <circle cx="75" cy="53" r="3" fill="#ddd6fe" />
+      <circle cx="75" cy="7" r="3" fill="#fbcfe8" />
+      <circle cx="75" cy="23" r="3" fill="#fbcfe8" />
+      <circle cx="75" cy="37" r="3" fill="#fbcfe8" />
+      <circle cx="75" cy="53" r="3" fill="#fbcfe8" />
     </g>
 
     {/* Formula panel box */}
     <g transform="translate(108, 32)">
-      <rect x="0" y="0" width="65" height="52" rx="10" fill="#ffffff" stroke="#c4b5fd" strokeWidth="2" />
-      <text x="32" y="17" fill="#6d28d9" fontSize="9.5" fontWeight="black" textAnchor="middle">nCr</text>
+      <rect x="0" y="0" width="65" height="52" rx="10" fill="#ffffff" stroke="#fbcfe8" strokeWidth="2" />
+      <text x="32" y="17" fill="#be185d" fontSize="9.5" fontWeight="black" textAnchor="middle">nCr</text>
       <line x1="10" y1="24" x2="55" y2="24" stroke="#e2e8f0" strokeWidth="1.5" />
-      <text x="32" y="35" fill="#7c3aed" fontSize="8" fontWeight="bold" textAnchor="middle">n!</text>
-      <line x1="15" y1="39" x2="50" y2="39" stroke="#7c3aed" strokeWidth="1" />
-      <text x="32" y="48" fill="#7c3aed" fontSize="7.5" fontWeight="bold" textAnchor="middle">r!(n-r)!</text>
+      <text x="32" y="35" fill="#db2777" fontSize="8" fontWeight="bold" textAnchor="middle">n!</text>
+      <line x1="15" y1="39" x2="50" y2="39" stroke="#db2777" strokeWidth="1" />
+      <text x="32" y="48" fill="#db2777" fontSize="7.5" fontWeight="bold" textAnchor="middle">r!(n-r)!</text>
     </g>
   </svg>
 );
@@ -886,29 +888,29 @@ export const CombinatoricsCountingSVG = ({ className = "w-full h-32" }: { classN
 // 28. Normal Distribution Lab
 export const NormalDistributionSVG = ({ className = "w-full h-32" }: { className?: string }) => (
   <svg className={className} viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <circle cx="100" cy="60" r="45" fill="#ede9fe" opacity="0.5" />
-    <rect x="36" y="20" width="128" height="80" rx="12" fill="#ffffff" stroke="#c4b5fd" strokeWidth="2" />
+    <circle cx="100" cy="60" r="45" fill="#fce7f3" opacity="0.5" />
+    <rect x="36" y="20" width="128" height="80" rx="12" fill="#ffffff" stroke="#fbcfe8" strokeWidth="2" />
 
     {/* Base line */}
     <line x1="44" y1="85" x2="156" y2="85" stroke="#cbd5e1" strokeWidth="2" />
 
     {/* Shaded standard dev areas (e.g. Center 68%) */}
-    <path d="M80,85 L80,62 C88,52 92,40 100,40 C108,40 112,52 120,62 L120,85 Z" fill="rgba(167, 139, 250, 0.4)" />
+    <path d="M80,85 L80,62 C88,52 92,40 100,40 C108,40 112,52 120,62 L120,85 Z" fill="rgba(219, 39, 119, 0.3)" />
 
     {/* Gaussian Bell Curve path */}
-    <path d="M48,85 Q75,85 85,60 T100,38 T115,60 T152,85" stroke="#7c3aed" strokeWidth="3" strokeLinecap="round" fill="none" />
+    <path d="M48,85 Q75,85 85,60 T100,38 T115,60 T152,85" stroke="#db2777" strokeWidth="3" strokeLinecap="round" fill="none" />
 
     {/* Mean μ axis line */}
-    <line x1="100" y1="38" x2="100" y2="85" stroke="#ef4444" strokeWidth="1.5" strokeDasharray="3 3" />
-    <text x="100" y="94" fill="#ef4444" fontSize="8.5" fontWeight="bold" textAnchor="middle">μ</text>
+    <line x1="100" y1="38" x2="100" y2="85" stroke="#e11d48" strokeWidth="1.5" strokeDasharray="3 3" />
+    <text x="100" y="94" fill="#e11d48" fontSize="8.5" fontWeight="bold" textAnchor="middle">μ</text>
   </svg>
 );
 
 // 29. Rates of Change Lab
 export const RatesOfChangeSVG = ({ className = "w-full h-32" }: { className?: string }) => (
   <svg className={className} viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <circle cx="100" cy="60" r="45" fill="#ede9fe" opacity="0.5" />
-    <rect x="36" y="20" width="128" height="80" rx="12" fill="#ffffff" stroke="#c4b5fd" strokeWidth="2" />
+    <circle cx="100" cy="60" r="45" fill="#fce7f3" opacity="0.5" />
+    <rect x="36" y="20" width="128" height="80" rx="12" fill="#ffffff" stroke="#fbcfe8" strokeWidth="2" />
     {/* Axis lines */}
     <path d="M48,30 V90 H150" stroke="#e2e8f0" strokeWidth="2" strokeLinecap="round" />
 
@@ -916,61 +918,61 @@ export const RatesOfChangeSVG = ({ className = "w-full h-32" }: { className?: st
     <path d="M48,85 Q90,80 110,55 T150,25" stroke="#cbd5e1" strokeWidth="2.5" fill="none" />
 
     {/* Tangent line at critical point */}
-    <line x1="80" y1="82" x2="140" y2="28" stroke="#7c3aed" strokeWidth="3" strokeLinecap="round" />
+    <line x1="80" y1="82" x2="140" y2="28" stroke="#db2777" strokeWidth="3" strokeLinecap="round" />
 
     {/* Point of tangency */}
-    <circle cx="110" cy="55" r="4.5" fill="#ef4444" stroke="#ffffff" strokeWidth="1.5" />
+    <circle cx="110" cy="55" r="4.5" fill="#e11d48" stroke="#ffffff" strokeWidth="1.5" />
 
     {/* Slope rate triangle labels */}
-    <path d="M110,55 H130 V37 Z" fill="none" stroke="#f97316" strokeWidth="1.5" strokeDasharray="2 2" />
-    <text x="135" y="49" fill="#ea580c" fontSize="7" fontWeight="bold">dy</text>
-    <text x="120" y="63" fill="#ea580c" fontSize="7" fontWeight="bold">dx</text>
+    <path d="M110,55 H130 V37 Z" fill="none" stroke="#ec4899" strokeWidth="1.5" strokeDasharray="2 2" />
+    <text x="135" y="49" fill="#be185d" fontSize="7" fontWeight="bold">dy</text>
+    <text x="120" y="63" fill="#be185d" fontSize="7" fontWeight="bold">dx</text>
   </svg>
 );
 
 // 30. Optimization & Constraints
 export const OptimizationConstraintsSVG = ({ className = "w-full h-32" }: { className?: string }) => (
   <svg className={className} viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <circle cx="100" cy="60" r="45" fill="#ede9fe" opacity="0.5" />
+    <circle cx="100" cy="60" r="45" fill="#fce7f3" opacity="0.5" />
     {/* 3D-like topological contour lines of profit/cost function */}
-    <ellipse cx="100" cy="65" rx="55" ry="32" stroke="#ddd6fe" strokeWidth="1.5" />
-    <ellipse cx="105" cy="60" rx="38" ry="22" stroke="#c4b5fd" strokeWidth="1.5" />
-    <ellipse cx="110" cy="55" rx="22" ry="12" stroke="#a78bfa" strokeWidth="1.5" />
+    <ellipse cx="100" cy="65" rx="55" ry="32" stroke="#fbcfe8" strokeWidth="1.5" />
+    <ellipse cx="105" cy="60" rx="38" ry="22" stroke="#fda4af" strokeWidth="1.5" />
+    <ellipse cx="110" cy="55" rx="22" ry="12" stroke="#f472b6" strokeWidth="1.5" />
 
     {/* Constraint boundary line cutting the loops */}
-    <line x1="50" y1="80" x2="160" y2="35" stroke="#ef4444" strokeWidth="2.5" strokeLinecap="round" />
-    <text x="155" y="30" fill="#ef4444" fontSize="6.5" fontWeight="bold">Constraint</text>
+    <line x1="50" y1="80" x2="160" y2="35" stroke="#db2777" strokeWidth="2.5" strokeLinecap="round" />
+    <text x="155" y="30" fill="#db2777" fontSize="6.5" fontWeight="bold">Constraint</text>
 
     {/* Optimal solution point (tangency of constraint to highest possible contour) */}
-    <circle cx="114" cy="54" r="5" fill="#10b981" stroke="#ffffff" strokeWidth="1.5" className="animate-pulse" />
-    <text x="114" y="44" fill="#047857" fontSize="7.5" fontWeight="black" textAnchor="middle">MAX</text>
+    <circle cx="114" cy="54" r="5" fill="#e11d48" stroke="#ffffff" strokeWidth="1.5" />
+    <text x="114" y="44" fill="#be185d" fontSize="7.5" fontWeight="black" textAnchor="middle">MAX</text>
   </svg>
 );
 
 // 31. Advanced Calculus & Optimization
 export const AdvancedCalculusSVG = ({ className = "w-full h-32" }: { className?: string }) => (
   <svg className={className} viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <circle cx="100" cy="60" r="45" fill="#ede9fe" opacity="0.5" />
-    <rect x="36" y="20" width="128" height="80" rx="12" fill="#ffffff" stroke="#c4b5fd" strokeWidth="2" />
+    <circle cx="100" cy="60" r="45" fill="#fce7f3" opacity="0.5" />
+    <rect x="36" y="20" width="128" height="80" rx="12" fill="#ffffff" stroke="#fbcfe8" strokeWidth="2" />
     {/* Axis lines */}
     <path d="M48,30 V90 H150" stroke="#cbd5e1" strokeWidth="1.5" />
 
     {/* Shaded Area under Curve (Integral) */}
-    <path d="M68,90 L68,68 Q90,45 110,65 L110,90 Z" fill="rgba(124, 58, 237, 0.4)" />
+    <path d="M68,90 L68,68 Q90,45 110,65 L110,90 Z" fill="rgba(219, 39, 119, 0.3)" />
 
     {/* Integration bounds lines */}
-    <line x1="68" y1="90" x2="68" y2="68" stroke="#7c3aed" strokeWidth="1.5" strokeDasharray="3 2" />
-    <line x1="110" y1="90" x2="110" y2="65" stroke="#7c3aed" strokeWidth="1.5" strokeDasharray="3 2" />
-    <text x="68" y="97" fill="#6d28d9" fontSize="7" fontWeight="bold" textAnchor="middle">a</text>
-    <text x="110" y="97" fill="#6d28d9" fontSize="7" fontWeight="bold" textAnchor="middle">b</text>
+    <line x1="68" y1="90" x2="68" y2="68" stroke="#db2777" strokeWidth="1.5" strokeDasharray="3 2" />
+    <line x1="110" y1="90" x2="110" y2="65" stroke="#db2777" strokeWidth="1.5" strokeDasharray="3 2" />
+    <text x="68" y="97" fill="#be185d" fontSize="7" fontWeight="bold" textAnchor="middle">a</text>
+    <text x="110" y="97" fill="#be185d" fontSize="7" fontWeight="bold" textAnchor="middle">b</text>
 
     {/* Curve f(x) */}
-    <path d="M48,80 Q68,65 90,60 T135,55" stroke="#7c3aed" strokeWidth="3" fill="none" strokeLinecap="round" />
+    <path d="M48,80 Q68,65 90,60 T135,55" stroke="#db2777" strokeWidth="3" fill="none" strokeLinecap="round" />
 
     {/* Integral Sign */}
     <g transform="translate(138, 25)">
-      <path d="M10,0 C12,0 14,3 12,8 L8,24 C6,29 8,32 10,32" stroke="#6d28d9" strokeWidth="3.5" strokeLinecap="round" fill="none" />
-      <text x="16" y="22" fill="#7c3aed" fontSize="10" fontWeight="black">∫</text>
+      <path d="M10,0 C12,0 14,3 12,8 L8,24 C6,29 8,32 10,32" stroke="#be185d" strokeWidth="3.5" strokeLinecap="round" fill="none" />
+      <text x="16" y="22" fill="#be185d" fontSize="10" fontWeight="black">∫</text>
     </g>
   </svg>
 );
@@ -978,33 +980,33 @@ export const AdvancedCalculusSVG = ({ className = "w-full h-32" }: { className?:
 // 32. Linear Algebra & Eigenvectors
 export const LinearAlgebraSVG = ({ className = "w-full h-32" }: { className?: string }) => (
   <svg className={className} viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <circle cx="100" cy="60" r="45" fill="#ede9fe" opacity="0.5" />
-    <rect x="36" y="20" width="128" height="80" rx="12" fill="#ffffff" stroke="#c4b5fd" strokeWidth="2" />
+    <circle cx="100" cy="60" r="45" fill="#fce7f3" opacity="0.5" />
+    <rect x="36" y="20" width="128" height="80" rx="12" fill="#ffffff" stroke="#fbcfe8" strokeWidth="2" />
     {/* Grid / Axes */}
     <line x1="100" y1="20" x2="100" y2="100" stroke="#e2e8f0" strokeWidth="1.5" />
     <line x1="36" y1="60" x2="164" y2="60" stroke="#e2e8f0" strokeWidth="1.5" />
 
     {/* Original Vector (v) */}
-    <path d="M100,60 L125,40" stroke="#3b82f6" strokeWidth="3.5" strokeLinecap="round" />
-    <path d="M125,40 L118,40 M125,40 L122,47" stroke="#3b82f6" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
-    <text x="112" y="46" fill="#2563eb" fontSize="8.5" fontWeight="bold">v</text>
+    <path d="M100,60 L125,40" stroke="#ec4899" strokeWidth="3.5" strokeLinecap="round" />
+    <path d="M125,40 L118,40 M125,40 L122,47" stroke="#ec4899" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
+    <text x="112" y="46" fill="#be185d" fontSize="8.5" fontWeight="bold">v</text>
 
     {/* Scaled Eigenvector (λv - stays on same span line) */}
-    <line x1="50" y1="100" x2="150" y2="20" stroke="#ef4444" strokeWidth="1" strokeDasharray="3 3" />
+    <line x1="50" y1="100" x2="150" y2="20" stroke="#be185d" strokeWidth="1" strokeDasharray="3 3" />
 
-    <path d="M100,60 L140,28" stroke="#ef4444" strokeWidth="3.5" strokeLinecap="round" />
-    <path d="M140,28 L133,28 M140,28 L137,35" stroke="#ef4444" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
-    <text x="135" y="24" fill="#b91c1c" fontSize="8.5" fontWeight="bold">λv</text>
+    <path d="M100,60 L140,28" stroke="#db2777" strokeWidth="3.5" strokeLinecap="round" />
+    <path d="M140,28 L133,28 M140,28 L137,35" stroke="#db2777" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
+    <text x="135" y="24" fill="#9d174d" fontSize="8.5" fontWeight="bold">λv</text>
 
-    <text x="50" y="32" fill="#475569" fontSize="8.5" fontWeight="black">A·v = λ·v</text>
+    <text x="50" y="32" fill="#be185d" fontSize="8.5" fontWeight="black">A·v = λ·v</text>
   </svg>
 );
 
 // 33. Differential Equations Lab
 export const DifferentialEquationsSVG = ({ className = "w-full h-32" }: { className?: string }) => (
   <svg className={className} viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <circle cx="100" cy="60" r="45" fill="#ede9fe" opacity="0.5" />
-    <rect x="36" y="20" width="128" height="80" rx="12" fill="#ffffff" stroke="#c4b5fd" strokeWidth="2" />
+    <circle cx="100" cy="60" r="45" fill="#fce7f3" opacity="0.5" />
+    <rect x="36" y="20" width="128" height="80" rx="12" fill="#ffffff" stroke="#fbcfe8" strokeWidth="2" />
 
     {/* Slope Field (Grid of tiny tick marks) */}
     {[45, 65, 85, 105, 125, 145].map((x) =>
@@ -1025,46 +1027,46 @@ export const DifferentialEquationsSVG = ({ className = "w-full h-32" }: { classN
     )}
 
     {/* Particular solution curve tracing the slope field */}
-    <path d="M50,75 C70,30 110,35 125,60 T155,80" stroke="#7c3aed" strokeWidth="3" fill="none" strokeLinecap="round" />
-    <circle cx="50" cy="75" r="3.5" fill="#ef4444" />
-    <text x="64" y="93" fill="#6d28d9" fontSize="8" fontWeight="bold">dy/dx = f(x,y)</text>
+    <path d="M50,75 C70,30 110,35 125,60 T155,80" stroke="#db2777" strokeWidth="3" fill="none" strokeLinecap="round" />
+    <circle cx="50" cy="75" r="3.5" fill="#e11d48" />
+    <text x="64" y="93" fill="#be185d" fontSize="8" fontWeight="bold">dy/dx = f(x,y)</text>
   </svg>
 );
 
 // 34. Numerical Methods Lab
 export const NumericalMethodsSVG = ({ className = "w-full h-32" }: { className?: string }) => (
   <svg className={className} viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <circle cx="100" cy="60" r="45" fill="#ede9fe" opacity="0.5" />
-    <rect x="36" y="20" width="128" height="80" rx="12" fill="#ffffff" stroke="#c4b5fd" strokeWidth="2" />
+    <circle cx="100" cy="60" r="45" fill="#fce7f3" opacity="0.5" />
+    <rect x="36" y="20" width="128" height="80" rx="12" fill="#ffffff" stroke="#fbcfe8" strokeWidth="2" />
     <line x1="44" y1="85" x2="156" y2="85" stroke="#cbd5e1" strokeWidth="1.5" />
 
     {/* Trapezoids approximating integral */}
     {/* Trapezoid 1 */}
-    <polygon points="56,85 56,65 76,55 76,85" fill="rgba(167, 139, 250, 0.3)" stroke="#7c3aed" strokeWidth="1" />
+    <polygon points="56,85 56,65 76,55 76,85" fill="rgba(219, 39, 119, 0.25)" stroke="#db2777" strokeWidth="1" />
     {/* Trapezoid 2 */}
-    <polygon points="76,85 76,55 96,40 96,85" fill="rgba(167, 139, 250, 0.4)" stroke="#7c3aed" strokeWidth="1" />
+    <polygon points="76,85 76,55 96,40 96,85" fill="rgba(219, 39, 119, 0.35)" stroke="#db2777" strokeWidth="1" />
     {/* Trapezoid 3 */}
-    <polygon points="96,85 96,40 116,42 116,85" fill="rgba(167, 139, 250, 0.3)" stroke="#7c3aed" strokeWidth="1" />
+    <polygon points="96,85 96,40 116,42 116,85" fill="rgba(219, 39, 119, 0.25)" stroke="#db2777" strokeWidth="1" />
     {/* Trapezoid 4 */}
-    <polygon points="116,85 116,42 136,52 136,85" fill="rgba(167, 139, 250, 0.2)" stroke="#7c3aed" strokeWidth="1" />
+    <polygon points="116,85 116,42 136,52 136,85" fill="rgba(219, 39, 119, 0.15)" stroke="#db2777" strokeWidth="1" />
 
     {/* True Curve overlay */}
-    <path d="M50,75 C70,55 90,34 110,40 T145,62" stroke="#ef4444" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-    <text x="135" y="32" fill="#7c3aed" fontSize="7" fontWeight="bold">Error Δ</text>
+    <path d="M50,75 C70,55 90,34 110,40 T145,62" stroke="#e11d48" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+    <text x="135" y="32" fill="#be185d" fontSize="7" fontWeight="bold">Error Δ</text>
   </svg>
 );
 
 // 35. Multivariable Calculus
 export const MultivariableCalculusSVG = ({ className = "w-full h-32" }: { className?: string }) => (
   <svg className={className} viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <circle cx="100" cy="60" r="45" fill="#ede9fe" opacity="0.5" />
+    <circle cx="100" cy="60" r="45" fill="#fce7f3" opacity="0.5" />
     {/* 3D grid/mesh curves for a saddle/paraboloid surface */}
     <g transform="translate(15, 0)">
       {/* Surface grid lines */}
       <path d="M50,60 Q80,25 110,60 Q110,60 140,80" stroke="#cbd5e1" strokeWidth="1" fill="none" />
-      <path d="M60,65 Q85,32 110,65" stroke="#c4b5fd" strokeWidth="1.5" fill="none" />
-      <path d="M70,70 Q90,38 110,70" stroke="#a78bfa" strokeWidth="2" fill="none" />
-      <path d="M80,75 Q95,45 110,75" stroke="#7c3aed" strokeWidth="1.5" fill="none" />
+      <path d="M60,65 Q85,32 110,65" stroke="#fbcfe8" strokeWidth="1.5" fill="none" />
+      <path d="M70,70 Q90,38 110,70" stroke="#fda4af" strokeWidth="2" fill="none" />
+      <path d="M80,75 Q95,45 110,75" stroke="#db2777" strokeWidth="1.5" fill="none" />
 
       {/* Vertical cross-section lines */}
       <path d="M50,60 Q80,85 110,75" stroke="#94a3b8" strokeWidth="1.2" fill="none" />
@@ -1073,11 +1075,11 @@ export const MultivariableCalculusSVG = ({ className = "w-full h-32" }: { classN
 
     {/* Partial Derivative Equation */}
     <g transform="translate(132, 30)">
-      <rect x="0" y="0" width="46" height="40" rx="8" fill="#ffffff" stroke="#c4b5fd" strokeWidth="1.5" />
+      <rect x="0" y="0" width="46" height="40" rx="8" fill="#ffffff" stroke="#fda4af" strokeWidth="1.5" />
       {/* ∂f/∂x */}
-      <text x="23" y="18" fill="#7c3aed" fontSize="13" fontWeight="black" textAnchor="middle">∂</text>
-      <line x1="8" y1="23" x2="38" y2="23" stroke="#7c3aed" strokeWidth="1.5" />
-      <text x="23" y="34" fill="#7c3aed" fontSize="10" fontWeight="bold" textAnchor="middle">∂x</text>
+      <text x="23" y="18" fill="#be185d" fontSize="13" fontWeight="black" textAnchor="middle">∂</text>
+      <line x1="8" y1="23" x2="38" y2="23" stroke="#be185d" strokeWidth="1.5" />
+      <text x="23" y="34" fill="#be185d" fontSize="10" fontWeight="bold" textAnchor="middle">∂x</text>
     </g>
   </svg>
 );
@@ -1085,20 +1087,20 @@ export const MultivariableCalculusSVG = ({ className = "w-full h-32" }: { classN
 // 36. Statistical Inference
 export const StatisticalInferenceSVG = ({ className = "w-full h-32" }: { className?: string }) => (
   <svg className={className} viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <circle cx="100" cy="60" r="45" fill="#ede9fe" opacity="0.5" />
-    <rect x="36" y="20" width="128" height="80" rx="12" fill="#ffffff" stroke="#c4b5fd" strokeWidth="2" />
+    <circle cx="100" cy="60" r="45" fill="#fce7f3" opacity="0.5" />
+    <rect x="36" y="20" width="128" height="80" rx="12" fill="#ffffff" stroke="#fbcfe8" strokeWidth="2" />
     <line x1="44" y1="85" x2="156" y2="85" stroke="#cbd5e1" strokeWidth="1.5" />
 
     {/* Overlapping Null Curve H0 */}
-    <path d="M48,85 Q70,85 80,60 T95,45 T110,70 T125,85" stroke="#3b82f6" strokeWidth="2" fill="none" />
-    <text x="75" y="40" fill="#2563eb" fontSize="7.5" fontWeight="bold">H₀</text>
+    <path d="M48,85 Q70,85 80,60 T95,45 T110,70 T125,85" stroke="#ec4899" strokeWidth="2" fill="none" />
+    <text x="75" y="40" fill="#be185d" fontSize="7.5" fontWeight="bold">H₀</text>
 
     {/* Overlapping Alt Curve H1 */}
-    <path d="M78,85 Q100,85 110,60 T125,45 T140,70 T152,85" stroke="#ef4444" strokeWidth="2" fill="none" />
-    <text x="125" y="40" fill="#b91c1c" fontSize="7.5" fontWeight="bold">H₁</text>
+    <path d="M78,85 Q100,85 110,60 T125,45 T140,70 T152,85" stroke="#db2777" strokeWidth="2" fill="none" />
+    <text x="125" y="40" fill="#be185d" fontSize="7.5" fontWeight="bold">H₁</text>
 
     {/* Shaded Rejection Critical Region */}
-    <path d="M116,85 L116,62 C120,68 122,80 125,85 Z" fill="#ef4444" opacity="0.5" />
+    <path d="M116,85 L116,62 C120,68 122,80 125,85 Z" fill="#e11d48" opacity="0.5" />
     <line x1="116" y1="45" x2="116" y2="85" stroke="#1e293b" strokeWidth="1.5" strokeDasharray="2 2" />
     <text x="116" y="93" fill="#1e293b" fontSize="7" fontWeight="bold" textAnchor="middle">α = 0.05</text>
   </svg>
@@ -1107,49 +1109,49 @@ export const StatisticalInferenceSVG = ({ className = "w-full h-32" }: { classNa
 // 37. Bayesian Reasoning Lab
 export const BayesianReasoningSVG = ({ className = "w-full h-32" }: { className?: string }) => (
   <svg className={className} viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <circle cx="100" cy="60" r="45" fill="#ede9fe" opacity="0.5" />
+    <circle cx="100" cy="60" r="45" fill="#fce7f3" opacity="0.5" />
 
     {/* Venn Diagram circles */}
-    <circle cx="85" cy="55" r="25" fill="rgba(59, 130, 246, 0.45)" stroke="#3b82f6" strokeWidth="2" />
-    <text x="70" y="58" fill="#1e3a8a" fontSize="10" fontWeight="bold" textAnchor="middle">A</text>
+    <circle cx="85" cy="55" r="25" fill="rgba(219, 39, 119, 0.4)" stroke="#db2777" strokeWidth="2" />
+    <text x="70" y="58" fill="#be185d" fontSize="10" fontWeight="bold" textAnchor="middle">A</text>
 
-    <circle cx="115" cy="55" r="25" fill="rgba(167, 139, 250, 0.45)" stroke="#7c3aed" strokeWidth="2" />
-    <text x="130" y="58" fill="#6d28d9" fontSize="10" fontWeight="bold" textAnchor="middle">B</text>
+    <circle cx="115" cy="55" r="25" fill="rgba(244, 114, 182, 0.4)" stroke="#ec4899" strokeWidth="2" />
+    <text x="130" y="58" fill="#db2777" fontSize="10" fontWeight="bold" textAnchor="middle">B</text>
 
     {/* Overlap area highlight */}
     <text x="100" y="58" fill="#475569" fontSize="7" fontWeight="black" textAnchor="middle">A∩B</text>
 
     {/* Conditional Probability Equation bottom */}
     <rect x="52" y="85" width="96" height="18" rx="5" fill="#ffffff" stroke="#cbd5e1" strokeWidth="1.5" />
-    <text x="100" y="97" fill="#7c3aed" fontSize="8" fontWeight="black" textAnchor="middle">P(A|B) = P(B|A)P(A)/P(B)</text>
+    <text x="100" y="97" fill="#be185d" fontSize="8" fontWeight="black" textAnchor="middle">P(A|B) = P(B|A)P(A)/P(B)</text>
   </svg>
 );
 
 // 38. Fourier Analysis & Signals
 export const FourierAnalysisSVG = ({ className = "w-full h-32" }: { className?: string }) => (
   <svg className={className} viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <circle cx="100" cy="60" r="45" fill="#ede9fe" opacity="0.5" />
-    <rect x="36" y="20" width="128" height="80" rx="12" fill="#ffffff" stroke="#c4b5fd" strokeWidth="2" />
+    <circle cx="100" cy="60" r="45" fill="#fce7f3" opacity="0.5" />
+    <rect x="36" y="20" width="128" height="80" rx="12" fill="#ffffff" stroke="#fbcfe8" strokeWidth="2" />
 
     {/* Square Wave (Signal Input) */}
-    <path d="M48,50 L68,50 L68,80 L88,80 L88,50 L108,50 L108,80 L128,80" stroke="#38bdf8" strokeWidth="2" strokeLinejoin="miter" fill="none" />
+    <path d="M48,50 L68,50 L68,80 L88,80 L88,50 L108,50 L108,80 L128,80" stroke="#db2777" strokeWidth="2" strokeLinejoin="miter" fill="none" />
 
     {/* Decomposing harmonics (Sine Waves of different frequencies) */}
-    {/* Fundamental Sine (Green) */}
-    <path d="M48,65 Q58,45 68,65 T88,65 T108,65 T128,65" stroke="#10b981" strokeWidth="1.5" fill="none" opacity="0.75" />
+    {/* Fundamental Sine */}
+    <path d="M48,65 Q58,45 68,65 T88,65 T108,65 T128,65" stroke="#ec4899" strokeWidth="1.5" fill="none" opacity="0.75" />
 
-    {/* 3rd Harmonic (Purple) */}
-    <path d="M48,65 Q51,55 55,65 T62,65 T68,65 T75,65 T82,65 T88,65 T95,65 T102,65 T108,65 T115,65 T122,65 T128,65" stroke="#7c3aed" strokeWidth="1" fill="none" opacity="0.6" />
+    {/* 3rd Harmonic */}
+    <path d="M48,65 Q51,55 55,65 T62,65 T68,65 T75,65 T82,65 T88,65 T95,65 T102,65 T108,65 T115,65 T122,65 T128,65" stroke="#fbcfe8" strokeWidth="1" fill="none" opacity="0.6" />
 
-    <text x="140" y="38" fill="#7c3aed" fontSize="11" fontWeight="black">f(t) = Σ</text>
+    <text x="140" y="38" fill="#be185d" fontSize="11" fontWeight="black">f(t) = Σ</text>
   </svg>
 );
 
 // 39. Complex Numbers & Phasors
 export const ComplexNumbersPhasorsSVG = ({ className = "w-full h-32" }: { className?: string }) => (
   <svg className={className} viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <circle cx="100" cy="60" r="45" fill="#ede9fe" opacity="0.5" />
-    <rect x="36" y="20" width="128" height="80" rx="12" fill="#ffffff" stroke="#c4b5fd" strokeWidth="2" />
+    <circle cx="100" cy="60" r="45" fill="#fce7f3" opacity="0.5" />
+    <rect x="36" y="20" width="128" height="80" rx="12" fill="#ffffff" stroke="#fbcfe8" strokeWidth="2" />
     {/* Complex Plane Axes (Re / Im) */}
     <line x1="100" y1="20" x2="100" y2="100" stroke="#cbd5e1" strokeWidth="1.5" />
     <line x1="36" y1="60" x2="164" y2="60" stroke="#cbd5e1" strokeWidth="1.5" />
@@ -1157,24 +1159,24 @@ export const ComplexNumbersPhasorsSVG = ({ className = "w-full h-32" }: { classN
     <text x="160" y="56" fill="#94a3b8" fontSize="6.5" fontWeight="bold">Re</text>
 
     {/* Phasor rotating vector (polar/exponential form) */}
-    <path d="M100,60 L135,35" stroke="#7c3aed" strokeWidth="3.5" strokeLinecap="round" />
-    <path d="M135,35 L128,36 M135,35 L133,42" stroke="#7c3aed" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
-    <text x="122" y="32" fill="#7c3aed" fontSize="8" fontWeight="bold">{"z = r·e^{iθ}"}</text>
+    <path d="M100,60 L135,35" stroke="#db2777" strokeWidth="3.5" strokeLinecap="round" />
+    <path d="M135,35 L128,36 M135,35 L133,42" stroke="#db2777" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
+    <text x="122" y="32" fill="#be185d" fontSize="8" fontWeight="bold">{"z = r·e^{iθ}"}</text>
 
     {/* Projection lines onto axes */}
-    <line x1="135" y1="35" x2="135" y2="60" stroke="#3b82f6" strokeWidth="1" strokeDasharray="2 2" />
-    <line x1="100" y1="35" x2="135" y2="35" stroke="#10b981" strokeWidth="1" strokeDasharray="2 2" />
+    <line x1="135" y1="35" x2="135" y2="60" stroke="#ec4899" strokeWidth="1" strokeDasharray="2 2" />
+    <line x1="100" y1="35" x2="135" y2="35" stroke="#fda4af" strokeWidth="1" strokeDasharray="2 2" />
 
     {/* Angle arc */}
-    <path d="M112,60 A12,12 0 0,0 110,51" stroke="#f97316" strokeWidth="1.5" fill="none" />
+    <path d="M112,60 A12,12 0 0,0 110,51" stroke="#e11d48" strokeWidth="1.5" fill="none" />
   </svg>
 );
 
 // 40. Vector Fields & Gradients
 export const VectorFieldsGradientsSVG = ({ className = "w-full h-32" }: { className?: string }) => (
   <svg className={className} viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <circle cx="100" cy="60" r="45" fill="#ede9fe" opacity="0.5" />
-    <rect x="36" y="20" width="128" height="80" rx="12" fill="#ffffff" stroke="#c4b5fd" strokeWidth="2" />
+    <circle cx="100" cy="60" r="45" fill="#fce7f3" opacity="0.5" />
+    <rect x="36" y="20" width="128" height="80" rx="12" fill="#ffffff" stroke="#fbcfe8" strokeWidth="2" />
 
     {/* Radial flow vector arrows field */}
     {/* Central source radiating outward */}
@@ -1195,22 +1197,22 @@ export const VectorFieldsGradientsSVG = ({ className = "w-full h-32" }: { classN
 
       return (
         <g key={i}>
-          <line x1={x} y1={y} x2={x2} y2={y2} stroke="#3b82f6" strokeWidth="2.5" strokeLinecap="round" />
-          <path d={`M${x2} ${y2} L${x2 - Math.cos(angle - 0.5) * 3} ${y2 - Math.sin(angle - 0.5) * 3} M${x2} ${y2} L${x2 - Math.cos(angle + 0.5) * 3} ${y2 - Math.sin(angle + 0.5) * 3}`} stroke="#3b82f6" strokeWidth="2.2" strokeLinecap="round" />
+          <line x1={x} y1={y} x2={x2} y2={y2} stroke="#db2777" strokeWidth="2.5" strokeLinecap="round" />
+          <path d={`M${x2} ${y2} L${x2 - Math.cos(angle - 0.5) * 3} ${y2 - Math.sin(angle - 0.5) * 3} M${x2} ${y2} L${x2 - Math.cos(angle + 0.5) * 3} ${y2 - Math.sin(angle + 0.5) * 3}`} stroke="#db2777" strokeWidth="2.2" strokeLinecap="round" />
         </g>
       );
     })}
 
     {/* Central source point */}
-    <circle cx="100" cy="60" r="4" fill="#ef4444" />
-    <text x="100" y="52" fill="#b91c1c" fontSize="8" fontWeight="bold" textAnchor="middle">∇F</text>
+    <circle cx="100" cy="60" r="4" fill="#e11d48" />
+    <text x="100" y="52" fill="#be185d" fontSize="8" fontWeight="bold" textAnchor="middle">∇F</text>
   </svg>
 );
 
 // 41. Discrete Graph Theory
 export const DiscreteGraphTheorySVG = ({ className = "w-full h-32" }: { className?: string }) => (
   <svg className={className} viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <circle cx="100" cy="60" r="45" fill="#ede9fe" opacity="0.5" />
+    <circle cx="100" cy="60" r="45" fill="#fce7f3" opacity="0.5" />
 
     {/* Network connections (Edges) */}
     <line x1="50" y1="40" x2="100" y2="25" stroke="#cbd5e1" strokeWidth="2" />
@@ -1218,38 +1220,38 @@ export const DiscreteGraphTheorySVG = ({ className = "w-full h-32" }: { classNam
     <line x1="100" y1="25" x2="150" y2="40" stroke="#cbd5e1" strokeWidth="2" />
     <line x1="80" y1="70" x2="120" y2="90" stroke="#cbd5e1" strokeWidth="2" />
 
-    {/* Shortest Path highlight (Orange edges) */}
-    <line x1="50" y1="40" x2="100" y2="55" stroke="#f97316" strokeWidth="4.5" strokeLinecap="round" />
-    <line x1="100" y1="55" x2="150" y2="40" stroke="#f97316" strokeWidth="4.5" strokeLinecap="round" />
+    {/* Shortest Path highlight (Pink edges) */}
+    <line x1="50" y1="40" x2="100" y2="55" stroke="#db2777" strokeWidth="4.5" strokeLinecap="round" />
+    <line x1="100" y1="55" x2="150" y2="40" stroke="#db2777" strokeWidth="4.5" strokeLinecap="round" />
     <line x1="100" y1="55" x2="120" y2="90" stroke="#cbd5e1" strokeWidth="2" />
 
     {/* Network Nodes */}
-    <circle cx="50" cy="40" r="7" fill="#7c3aed" stroke="#ffffff" strokeWidth="2" />
-    <circle cx="100" cy="25" r="5" fill="#a78bfa" stroke="#ffffff" strokeWidth="1.5" />
-    <circle cx="80" cy="70" r="5" fill="#a78bfa" stroke="#ffffff" strokeWidth="1.5" />
-    <circle cx="100" cy="55" r="7.5" fill="#ef4444" stroke="#ffffff" strokeWidth="2" /> {/* Path vertex */}
-    <circle cx="150" cy="40" r="7" fill="#7c3aed" stroke="#ffffff" strokeWidth="2" />
-    <circle cx="120" cy="90" r="5.5" fill="#a78bfa" stroke="#ffffff" strokeWidth="1.5" />
+    <circle cx="50" cy="40" r="7" fill="#db2777" stroke="#ffffff" strokeWidth="2" />
+    <circle cx="100" cy="25" r="5" fill="#ec4899" stroke="#ffffff" strokeWidth="1.5" />
+    <circle cx="80" cy="70" r="5" fill="#ec4899" stroke="#ffffff" strokeWidth="1.5" />
+    <circle cx="100" cy="55" r="7.5" fill="#e11d48" stroke="#ffffff" strokeWidth="2" /> {/* Path vertex */}
+    <circle cx="150" cy="40" r="7" fill="#db2777" stroke="#ffffff" strokeWidth="2" />
+    <circle cx="120" cy="90" r="5.5" fill="#ec4899" stroke="#ffffff" strokeWidth="1.5" />
   </svg>
 );
 
 // 42. Mathematical Modeling Lab
 export const MathematicalModelingSVG = ({ className = "w-full h-32" }: { className?: string }) => (
   <svg className={className} viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <circle cx="100" cy="60" r="45" fill="#ede9fe" opacity="0.5" />
+    <circle cx="100" cy="60" r="45" fill="#fce7f3" opacity="0.5" />
 
     {/* Flow boxes */}
     {/* Box 1: Real World */}
-    <rect x="25" y="16" width="56" height="24" rx="6" fill="#7c3aed" stroke="#6d28d9" strokeWidth="1.5" />
+    <rect x="25" y="16" width="56" height="24" rx="6" fill="#db2777" stroke="#be185d" strokeWidth="1.5" />
     <text x="53" y="31" fill="#ffffff" fontSize="7.5" fontWeight="bold" textAnchor="middle">REAL WORLD</text>
 
     {/* Box 2: Model formulation */}
-    <rect x="120" y="16" width="56" height="24" rx="6" fill="#10b981" stroke="#059669" strokeWidth="1.5" />
+    <rect x="120" y="16" width="56" height="24" rx="6" fill="#ec4899" stroke="#db2777" strokeWidth="1.5" />
     <text x="148" y="31" fill="#ffffff" fontSize="7.5" fontWeight="bold" textAnchor="middle">MATH MODEL</text>
 
     {/* Box 3: Solution */}
-    <rect x="72" y="76" width="56" height="24" rx="6" fill="#f97316" stroke="#ea580c" strokeWidth="1.5" />
-    <text x="100" y="91" fill="#ffffff" fontSize="7.5" fontWeight="bold" textAnchor="middle">SOLUTION</text>
+    <rect x="72" y="76" width="56" height="24" rx="6" fill="#fbcfe8" stroke="#db2777" strokeWidth="1.5" />
+    <text x="100" y="91" fill="#db2777" fontSize="7.5" fontWeight="bold" textAnchor="middle">SOLUTION</text>
 
     {/* Connecting Flow Arrows */}
     {/* Real World -> Model */}

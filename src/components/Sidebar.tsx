@@ -5,10 +5,12 @@ import Link from "next/link";
 import { 
   FlaskConical, 
   ClipboardCheck, 
+  LayoutDashboard,
   User,
   UsersRound,
 } from "lucide-react";
 import { useSidebar } from "@/context/SidebarContext";
+import { useAuth } from "@/context/AuthContext";
 
 interface SidebarProps {
   activeMenu: "ห้องแล็บ" | "ภารกิจนักวิทย์" | "โปรไฟล์" | string;
@@ -18,9 +20,11 @@ interface SidebarProps {
 
 export default function Sidebar({ activeMenu, forceCollapsed = false }: SidebarProps) {
   const { isCollapsed } = useSidebar();
+  const { role } = useAuth();
   const collapsed = forceCollapsed || isCollapsed;
 
   const sidebarMenu = [
+    ...(role === "teacher" ? [{ name: "แดชบอร์ด", icon: LayoutDashboard, href: "/dashboard" }] : []),
     { name: "ห้องแล็บ", icon: FlaskConical, href: "/labs" },
     { name: "ภารกิจนักวิทย์", icon: ClipboardCheck, href: "/missions" },
     { name: "ชั้นเรียน", icon: UsersRound, href: "/classrooms" },

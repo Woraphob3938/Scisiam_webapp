@@ -295,21 +295,21 @@ const FoundationKnowledgeSVG = ({ label, tone = "#0891b2" }: { label: string; to
 
 const MathConceptSVG = () => (
   <svg className="h-32 w-full" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <circle cx="100" cy="60" r="45" fill="#ede9fe" opacity="0.5" />
-    <rect x="35" y="24" width="130" height="72" rx="14" fill="#ffffff" stroke="#c4b5fd" strokeWidth="2" />
+    <circle cx="100" cy="60" r="45" fill="#fce7f3" opacity="0.5" />
+    <rect x="35" y="24" width="130" height="72" rx="14" fill="#ffffff" stroke="#fbcfe8" strokeWidth="2" />
     <path d="M52 78H150" stroke="#e2e8f0" strokeWidth="2" strokeLinecap="round" />
     <path d="M60 86V38" stroke="#e2e8f0" strokeWidth="2" strokeLinecap="round" />
-    <path d="M60 76 C82 70 92 56 108 58 C124 60 132 42 150 36" stroke="#7c3aed" strokeWidth="4" strokeLinecap="round" fill="none" />
-    <circle cx="60" cy="76" r="4" fill="#7c3aed" />
-    <circle cx="108" cy="58" r="4" fill="#2563eb" />
-    <circle cx="150" cy="36" r="4" fill="#10b981" />
+    <path d="M60 76 C82 70 92 56 108 58 C124 60 132 42 150 36" stroke="#ec4899" strokeWidth="4" strokeLinecap="round" fill="none" />
+    <circle cx="60" cy="76" r="4" fill="#ec4899" />
+    <circle cx="108" cy="58" r="4" fill="#db2777" />
+    <circle cx="150" cy="36" r="4" fill="#d946ef" />
     <g transform="translate(43 31)">
-      <rect width="42" height="20" rx="10" fill="#f5f3ff" stroke="#ddd6fe" />
-      <text x="21" y="14" textAnchor="middle" fontSize="9" fontWeight="900" fill="#6d28d9">y = mx+b</text>
+      <rect width="42" height="20" rx="10" fill="#fff1f2" stroke="#fda4af" />
+      <text x="21" y="14" textAnchor="middle" fontSize="9" fontWeight="900" fill="#be185d">y = mx+b</text>
     </g>
     <g transform="translate(116 68)">
-      <rect width="38" height="18" rx="9" fill="#eef2ff" stroke="#c7d2fe" />
-      <text x="19" y="12" textAnchor="middle" fontSize="8" fontWeight="900" fill="#4338ca">data</text>
+      <rect width="38" height="18" rx="9" fill="#fff1f2" stroke="#fda4af" />
+      <text x="19" y="12" textAnchor="middle" fontSize="8" fontWeight="900" fill="#9d174d">data</text>
     </g>
   </svg>
 );
@@ -318,19 +318,19 @@ const GraphingLinesCardSVG = () => (
   <svg data-testid="graphing-lines-card-svg" className="h-32 w-full" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <defs>
       <linearGradient id="gl-line-grad" x1="0" y1="1" x2="1" y2="0">
-        <stop offset="0%" stopColor="#4f46e5" />
-        <stop offset="100%" stopColor="#06b6d4" />
+        <stop offset="0%" stopColor="#db2777" />
+        <stop offset="100%" stopColor="#f472b6" />
       </linearGradient>
       <linearGradient id="gl-bg-grad" x1="0" y1="0" x2="1" y2="1">
         <stop offset="0%" stopColor="#f8fafc" />
-        <stop offset="100%" stopColor="#ede9fe" stopOpacity="0.4" />
+        <stop offset="100%" stopColor="#fff5f5" stopOpacity="0.4" />
       </linearGradient>
       <filter id="gl-shadow" x="-10%" y="-10%" width="120%" height="120%">
         <feDropShadow dx="1" dy="2" stdDeviation="1" floodColor="#0f172a" floodOpacity="0.1" />
       </filter>
     </defs>
 
-    <circle cx="100" cy="60" r="45" fill="#ede9fe" opacity="0.4" />
+    <circle cx="100" cy="60" r="45" fill="#fce7f3" opacity="0.4" />
     <rect x="25" y="15" width="150" height="90" rx="16" fill="url(#gl-bg-grad)" stroke="#cbd5e1" strokeWidth="1.5" />
 
     {/* Grid Lines */}
@@ -355,28 +355,28 @@ const GraphingLinesCardSVG = () => (
     <line x1="55" y1="20" x2="55" y2="102" stroke="#94a3b8" strokeWidth="1.5" strokeLinecap="round" />
 
     {/* Slope Triangle */}
-    <path d="M95,68H135V38" stroke="#f97316" strokeWidth="2" strokeDasharray="3 2" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M95,68H135V38" stroke="#e11d48" strokeWidth="2" strokeDasharray="3 2" strokeLinecap="round" strokeLinejoin="round" />
 
     {/* Function Line */}
     <line x1="45" y1="83" x2="155" y2="29" stroke="url(#gl-line-grad)" strokeWidth="4" strokeLinecap="round" />
 
     {/* Intercepts and Points */}
-    <circle cx="55" cy="78" r="4.5" fill="#3b82f6" stroke="#ffffff" strokeWidth="1.5" />
-    <circle cx="95" cy="68" r="4" fill="#a78bfa" stroke="#ffffff" strokeWidth="1.5" />
-    <circle cx="135" cy="38" r="4" fill="#10b981" stroke="#ffffff" strokeWidth="1.5" />
+    <circle cx="55" cy="78" r="4.5" fill="#be185d" stroke="#ffffff" strokeWidth="1.5" />
+    <circle cx="95" cy="68" r="4" fill="#ec4899" stroke="#ffffff" strokeWidth="1.5" />
+    <circle cx="135" cy="38" r="4" fill="#d946ef" stroke="#ffffff" strokeWidth="1.5" />
 
-    <text x="61" y="75" fill="#1e3a8a" fontSize="7" fontWeight="bold">b</text>
+    <text x="61" y="75" fill="#9d174d" fontSize="7" fontWeight="bold">b</text>
 
     {/* Labels */}
     <g transform="translate(100, 78)">
-      <rect x="0" y="0" width="46" height="15" rx="6.5" fill="#fff7ed" stroke="#fed7aa" strokeWidth="1" />
-      <text x="23" y="10.5" fill="#ea580c" fontSize="7" fontWeight="black" textAnchor="middle">rise/run</text>
+      <rect x="0" y="0" width="46" height="15" rx="6.5" fill="#fff1f2" stroke="#fda4af" strokeWidth="1" />
+      <text x="23" y="10.5" fill="#be185d" fontSize="7" fontWeight="black" textAnchor="middle">rise/run</text>
     </g>
 
     {/* Formula Card */}
     <g transform="translate(112, 90)" filter="url(#gl-shadow)">
-      <rect width="52" height="18" rx="7" fill="#ffffff" stroke="#c4b5fd" strokeWidth="1" />
-      <text x="26" y="12" fill="#4f46e5" fontSize="8" fontWeight="bold" textAnchor="middle">y = mx + b</text>
+      <rect width="52" height="18" rx="7" fill="#ffffff" stroke="#fbcfe8" strokeWidth="1" />
+      <text x="26" y="12" fill="#db2777" fontSize="8" fontWeight="bold" textAnchor="middle">y = mx + b</text>
     </g>
   </svg>
 );
@@ -385,23 +385,23 @@ const RatioProportionCardSVG = () => (
   <svg data-testid="ratio-and-proportion-card-svg" className="h-32 w-full" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <defs>
       <linearGradient id="rp-mix-1" x1="0" y1="1" x2="0" y2="0">
-        <stop offset="0%" stopColor="#7c3aed" />
-        <stop offset="100%" stopColor="#a855f7" />
+        <stop offset="0%" stopColor="#db2777" />
+        <stop offset="100%" stopColor="#f472b6" />
       </linearGradient>
       <linearGradient id="rp-mix-2" x1="0" y1="1" x2="0" y2="0">
-        <stop offset="0%" stopColor="#06b6d4" />
-        <stop offset="100%" stopColor="#34d399" />
+        <stop offset="0%" stopColor="#ec4899" />
+        <stop offset="100%" stopColor="#fda4af" />
       </linearGradient>
       <linearGradient id="rp-bg-grad" x1="0" y1="0" x2="1" y2="1">
         <stop offset="0%" stopColor="#f8fafc" />
-        <stop offset="100%" stopColor="#ede9fe" stopOpacity="0.4" />
+        <stop offset="100%" stopColor="#fff5f5" stopOpacity="0.4" />
       </linearGradient>
       <filter id="rp-shadow" x="-10%" y="-10%" width="120%" height="120%">
         <feDropShadow dx="1" dy="2" stdDeviation="1.5" floodColor="#0f172a" floodOpacity="0.1" />
       </filter>
     </defs>
 
-    <circle cx="100" cy="60" r="45" fill="#ede9fe" opacity="0.4" />
+    <circle cx="100" cy="60" r="45" fill="#fce7f3" opacity="0.4" />
     <rect x="25" y="15" width="150" height="90" rx="16" fill="url(#rp-bg-grad)" stroke="#cbd5e1" strokeWidth="1.5" />
 
     {/* Left Cylinder (Small) */}
@@ -435,19 +435,19 @@ const RatioProportionCardSVG = () => (
     </g>
 
     {/* Connecting Scaling Path */}
-    <path d="M72,52 Q100,32 128,52" stroke="#7c3aed" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="3 2" fill="none" />
-    <path d="M128,52 L121,48 M128,52 L124,58" stroke="#7c3aed" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M72,52 Q100,32 128,52" stroke="#db2777" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="3 2" fill="none" />
+    <path d="M128,52 L121,48 M128,52 L124,58" stroke="#db2777" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
 
     {/* Scale Factor Chip */}
     <g transform="translate(85, 23)" filter="url(#rp-shadow)">
-      <rect width="30" height="15" rx="7.5" fill="#ecfeff" stroke="#bae6fd" strokeWidth="1" />
-      <text x="15" y="10.5" fill="#0891b2" fontSize="8" fontWeight="black" textAnchor="middle">x4</text>
+      <rect width="30" height="15" rx="7.5" fill="#fff1f2" stroke="#fda4af" strokeWidth="1" />
+      <text x="15" y="10.5" fill="#db2777" fontSize="8" fontWeight="black" textAnchor="middle">x4</text>
     </g>
 
     {/* Ratio Equivalence Card */}
     <g transform="translate(74, 60)" filter="url(#rp-shadow)">
-      <rect width="52" height="20" rx="8" fill="#ffffff" stroke="#ddd6fe" strokeWidth="1.5" />
-      <text x="26" y="13.5" fill="#0f172a" fontSize="10" fontWeight="black" textAnchor="middle">2:3 = 8:12</text>
+      <rect width="52" height="20" rx="8" fill="#ffffff" stroke="#fbcfe8" strokeWidth="1.5" />
+      <text x="26" y="13.5" fill="#9d174d" fontSize="10" fontWeight="black" textAnchor="middle">2:3 = 8:12</text>
     </g>
   </svg>
 );
@@ -456,27 +456,27 @@ const VectorAdditionCardSVG = () => (
   <svg data-testid="vector-addition-card-svg" className="h-32 w-full" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <defs>
       <linearGradient id="va-a-grad" x1="0" y1="1" x2="1" y2="0">
-        <stop offset="0%" stopColor="#7c3aed" />
-        <stop offset="100%" stopColor="#a78bfa" />
+        <stop offset="0%" stopColor="#db2777" />
+        <stop offset="100%" stopColor="#f472b6" />
       </linearGradient>
       <linearGradient id="va-b-grad" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0%" stopColor="#06b6d4" />
-        <stop offset="100%" stopColor="#34d399" />
+        <stop offset="0%" stopColor="#ec4899" />
+        <stop offset="100%" stopColor="#fbcfe8" />
       </linearGradient>
       <linearGradient id="va-r-grad" x1="0" y1="1" x2="1" y2="0">
-        <stop offset="0%" stopColor="#f97316" />
-        <stop offset="100%" stopColor="#ef4444" />
+        <stop offset="0%" stopColor="#e11d48" />
+        <stop offset="100%" stopColor="#fda4af" />
       </linearGradient>
       <linearGradient id="va-bg-grad" x1="0" y1="0" x2="1" y2="1">
         <stop offset="0%" stopColor="#f8fafc" />
-        <stop offset="100%" stopColor="#ede9fe" stopOpacity="0.4" />
+        <stop offset="100%" stopColor="#fff5f5" stopOpacity="0.4" />
       </linearGradient>
       <filter id="va-shadow" x="-10%" y="-10%" width="120%" height="120%">
         <feDropShadow dx="1" dy="2" stdDeviation="1.5" floodColor="#0f172a" floodOpacity="0.15" />
       </filter>
     </defs>
 
-    <circle cx="100" cy="60" r="45" fill="#ede9fe" opacity="0.4" />
+    <circle cx="100" cy="60" r="45" fill="#fce7f3" opacity="0.4" />
     <rect x="25" y="15" width="150" height="90" rx="16" fill="url(#va-bg-grad)" stroke="#cbd5e1" strokeWidth="1.5" />
 
     {/* Grid Line background */}
@@ -499,23 +499,23 @@ const VectorAdditionCardSVG = () => (
 
     {/* Vector A */}
     <path d="M45,95 L105,55" stroke="url(#va-a-grad)" strokeWidth="4" strokeLinecap="round" filter="url(#va-shadow)" />
-    <path d="M105,55 L96,54 M105,55 L101,64" stroke="#7c3aed" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M105,55 L96,54 M105,55 L101,64" stroke="#db2777" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
 
     {/* Vector B */}
     <path d="M105,55 L145,85" stroke="url(#va-b-grad)" strokeWidth="4" strokeLinecap="round" filter="url(#va-shadow)" />
-    <path d="M145,85 L136,83 M145,85 L142,76" stroke="#0891b2" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M145,85 L136,83 M145,85 L142,76" stroke="#ec4899" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
 
     {/* Resultant Vector R */}
     <path d="M45,95 L145,85" stroke="url(#va-r-grad)" strokeWidth="3" strokeDasharray="4 3" strokeLinecap="round" filter="url(#va-shadow)" />
-    <path d="M145,85 L137,88 M145,85 L139,78" stroke="#ef4444" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M145,85 L137,88 M145,85 L139,78" stroke="#e11d48" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
 
     {/* Labels */}
-    <text x="68" y="70" fill="#6d28d9" fontSize="9" fontWeight="bold">A</text>
-    <text x="130" y="65" fill="#0891b2" fontSize="9" fontWeight="bold">B</text>
+    <text x="68" y="70" fill="#be185d" fontSize="9" fontWeight="bold">A</text>
+    <text x="130" y="65" fill="#ec4899" fontSize="9" fontWeight="bold">B</text>
 
     <g transform="translate(85, 98)">
-      <rect width="32" height="15" rx="6" fill="#fff5f5" stroke="#feb2b2" strokeWidth="1" />
-      <text x="16" y="10.5" fill="#e53e3e" fontSize="8" fontWeight="black" textAnchor="middle">R</text>
+      <rect width="32" height="15" rx="6" fill="#fff1f2" stroke="#fda4af" strokeWidth="1" />
+      <text x="16" y="10.5" fill="#e11d48" fontSize="8" fontWeight="black" textAnchor="middle">R</text>
     </g>
   </svg>
 );
@@ -524,19 +524,19 @@ const CenterVariabilityCardSVG = () => (
   <svg data-testid="center-and-variability-card-svg" className="h-32 w-full" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <defs>
       <linearGradient id="cv-box-grad" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0%" stopColor="#7c3aed" stopOpacity="0.15" />
-        <stop offset="100%" stopColor="#4f46e5" stopOpacity="0.45" />
+        <stop offset="0%" stopColor="#db2777" stopOpacity="0.15" />
+        <stop offset="100%" stopColor="#ec4899" stopOpacity="0.45" />
       </linearGradient>
       <linearGradient id="cv-bg-grad" x1="0" y1="0" x2="1" y2="1">
         <stop offset="0%" stopColor="#f8fafc" />
-        <stop offset="100%" stopColor="#ede9fe" stopOpacity="0.4" />
+        <stop offset="100%" stopColor="#fff5f5" stopOpacity="0.4" />
       </linearGradient>
       <filter id="cv-shadow" x="-10%" y="-10%" width="120%" height="120%">
         <feDropShadow dx="1" dy="2" stdDeviation="1.2" floodColor="#0f172a" floodOpacity="0.12" />
       </filter>
     </defs>
 
-    <circle cx="100" cy="60" r="45" fill="#ede9fe" opacity="0.4" />
+    <circle cx="100" cy="60" r="45" fill="#fce7f3" opacity="0.4" />
     <rect x="25" y="15" width="150" height="90" rx="16" fill="url(#cv-bg-grad)" stroke="#cbd5e1" strokeWidth="1.5" />
 
     {/* Axis scale */}
@@ -552,28 +552,28 @@ const CenterVariabilityCardSVG = () => (
       [40, 72], [60, 72], [80, 72], [100, 72], [120, 72], [140, 72], [160, 72],
       [80, 64], [100, 64], [120, 64], [100, 56]
     ].map(([x, y], idx) => (
-      <circle key={`${x}-${idx}`} cx={x} cy={y} r="3.8" fill="#06b6d4" stroke="#ffffff" strokeWidth="1" />
+      <circle key={`${x}-${idx}`} cx={x} cy={y} r="3.8" fill="#db2777" stroke="#ffffff" strokeWidth="1" />
     ))}
 
     {/* Whisker lines */}
-    <line x1="50" y1="36" x2="150" y2="36" stroke="#4f46e5" strokeWidth="1.5" strokeLinecap="round" />
-    <line x1="50" y1="30" x2="50" y2="42" stroke="#4f46e5" strokeWidth="1.5" />
-    <line x1="150" y1="30" x2="150" y2="42" stroke="#4f46e5" strokeWidth="1.5" />
+    <line x1="50" y1="36" x2="150" y2="36" stroke="#be185d" strokeWidth="1.5" strokeLinecap="round" />
+    <line x1="50" y1="30" x2="50" y2="42" stroke="#be185d" strokeWidth="1.5" />
+    <line x1="150" y1="30" x2="150" y2="42" stroke="#be185d" strokeWidth="1.5" />
 
     {/* Box Plot Body */}
     <g filter="url(#cv-shadow)">
-      <rect x="75" y="24" width="50" height="24" rx="3" fill="url(#cv-box-grad)" stroke="#7c3aed" strokeWidth="2" />
+      <rect x="75" y="24" width="50" height="24" rx="3" fill="url(#cv-box-grad)" stroke="#db2777" strokeWidth="2" />
       {/* Median line */}
-      <line x1="100" y1="24" x2="100" y2="48" stroke="#7c3aed" strokeWidth="2.5" />
+      <line x1="100" y1="24" x2="100" y2="48" stroke="#be185d" strokeWidth="2.5" />
     </g>
 
     {/* Brackets & text labels */}
-    <path d="M75,20 H125" stroke="#7c3aed" strokeWidth="1" strokeLinecap="round" />
-    <path d="M75,18 V22 M125,18 V22" stroke="#7c3aed" strokeWidth="1" />
+    <path d="M75,20 H125" stroke="#ec4899" strokeWidth="1" strokeLinecap="round" />
+    <path d="M75,18 V22 M125,18 V22" stroke="#ec4899" strokeWidth="1" />
 
-    <text x="100" y="14" fill="#6d28d9" fontSize="7" fontWeight="black" textAnchor="middle">IQR</text>
+    <text x="100" y="14" fill="#be185d" fontSize="7" fontWeight="black" textAnchor="middle">IQR</text>
     <text x="145" y="93" fill="#64748b" fontSize="6.5" fontWeight="bold">Center</text>
-    <text x="100" y="93" fill="#0891b2" fontSize="7" fontWeight="bold" textAnchor="middle">Median</text>
+    <text x="100" y="93" fill="#db2777" fontSize="7" fontWeight="bold" textAnchor="middle">Median</text>
   </svg>
 );
 
@@ -581,19 +581,19 @@ const CurveFittingCardSVG = () => (
   <svg data-testid="curve-fitting-card-svg" className="h-32 w-full" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <defs>
       <linearGradient id="cf-line-grad" x1="0" y1="1" x2="1" y2="0">
-        <stop offset="0%" stopColor="#4f46e5" />
-        <stop offset="100%" stopColor="#ec4899" />
+        <stop offset="0%" stopColor="#db2777" />
+        <stop offset="100%" stopColor="#f472b6" />
       </linearGradient>
       <linearGradient id="cf-bg-grad" x1="0" y1="0" x2="1" y2="1">
         <stop offset="0%" stopColor="#f8fafc" />
-        <stop offset="100%" stopColor="#ede9fe" stopOpacity="0.4" />
+        <stop offset="100%" stopColor="#fff5f5" stopOpacity="0.4" />
       </linearGradient>
       <filter id="cf-shadow" x="-10%" y="-10%" width="120%" height="120%">
         <feDropShadow dx="1" dy="2" stdDeviation="1.5" floodColor="#0f172a" floodOpacity="0.12" />
       </filter>
     </defs>
 
-    <circle cx="100" cy="60" r="45" fill="#ede9fe" opacity="0.4" />
+    <circle cx="100" cy="60" r="45" fill="#fce7f3" opacity="0.4" />
     <rect x="25" y="15" width="150" height="90" rx="16" fill="url(#cf-bg-grad)" stroke="#cbd5e1" strokeWidth="1.5" />
 
     {/* Grid Background */}
@@ -621,7 +621,7 @@ const CurveFittingCardSVG = () => (
       [135, 34, 38],
       [155, 26, 28]
     ].map(([x, y1, y2], idx) => (
-      <line key={idx} x1={x} y1={y1} x2={x} y2={y2} stroke="#f97316" strokeWidth="1.5" strokeDasharray="2 2" />
+      <line key={idx} x1={x} y1={y1} x2={x} y2={y2} stroke="#e11d48" strokeWidth="1.5" strokeDasharray="2 2" />
     ))}
 
     {/* Shaded Regression line */}
@@ -631,13 +631,13 @@ const CurveFittingCardSVG = () => (
     {[
       [55, 85], [75, 60], [95, 62], [115, 45], [135, 34], [155, 26]
     ].map(([x, y], idx) => (
-      <circle key={idx} cx={x} cy={y} r="4" fill="#06b6d4" stroke="#ffffff" strokeWidth="1.5" />
+      <circle key={idx} cx={x} cy={y} r="4" fill="#ec4899" stroke="#ffffff" strokeWidth="1.5" />
     ))}
 
     {/* R2 statistics card */}
     <g transform="translate(106, 68)" filter="url(#cf-shadow)">
-      <rect width="48" height="18" rx="8" fill="#ffffff" stroke="#bae6fd" strokeWidth="1.2" />
-      <text x="24" y="12" fill="#0891b2" fontSize="8" fontWeight="black" textAnchor="middle">R² = 0.98</text>
+      <rect width="48" height="18" rx="8" fill="#ffffff" stroke="#fda4af" strokeWidth="1.2" />
+      <text x="24" y="12" fill="#db2777" fontSize="8" fontWeight="black" textAnchor="middle">R² = 0.98</text>
     </g>
   </svg>
 );
@@ -646,61 +646,61 @@ const FunctionBuilderCardSVG = () => (
   <svg data-testid="function-builder-card-svg" className="h-32 w-full" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <defs>
       <linearGradient id="fb-in-grad" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0%" stopColor="#06b6d4" />
-        <stop offset="100%" stopColor="#3b82f6" />
+        <stop offset="0%" stopColor="#ec4899" />
+        <stop offset="100%" stopColor="#fda4af" />
       </linearGradient>
       <linearGradient id="fb-out-grad" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0%" stopColor="#f97316" />
-        <stop offset="100%" stopColor="#ef4444" />
+        <stop offset="0%" stopColor="#db2777" />
+        <stop offset="100%" stopColor="#f472b6" />
       </linearGradient>
       <linearGradient id="fb-box-grad" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0%" stopColor="#7c3aed" />
-        <stop offset="100%" stopColor="#4f46e5" />
+        <stop offset="0%" stopColor="#be185d" />
+        <stop offset="100%" stopColor="#db2777" />
       </linearGradient>
       <linearGradient id="fb-bg-grad" x1="0" y1="0" x2="1" y2="1">
         <stop offset="0%" stopColor="#f8fafc" />
-        <stop offset="100%" stopColor="#ede9fe" stopOpacity="0.4" />
+        <stop offset="100%" stopColor="#fff5f5" stopOpacity="0.4" />
       </linearGradient>
       <filter id="fb-shadow" x="-10%" y="-10%" width="120%" height="120%">
         <feDropShadow dx="1" dy="2" stdDeviation="1.5" floodColor="#0f172a" floodOpacity="0.15" />
       </filter>
     </defs>
 
-    <circle cx="100" cy="60" r="45" fill="#ede9fe" opacity="0.4" />
+    <circle cx="100" cy="60" r="45" fill="#fce7f3" opacity="0.4" />
     <rect x="25" y="15" width="150" height="90" rx="16" fill="url(#fb-bg-grad)" stroke="#cbd5e1" strokeWidth="1.5" />
 
     {/* Input x card */}
     <g transform="translate(36, 42)" filter="url(#fb-shadow)">
-      <rect width="26" height="26" rx="8" fill="#ffffff" stroke="#06b6d4" strokeWidth="1.5" />
-      <text x="13" y="18" fill="#0891b2" fontSize="12" fontWeight="black" textAnchor="middle">x</text>
+      <rect width="26" height="26" rx="8" fill="#ffffff" stroke="#db2777" strokeWidth="1.5" />
+      <text x="13" y="18" fill="#be185d" fontSize="12" fontWeight="black" textAnchor="middle">x</text>
     </g>
 
     {/* Input flow arrow */}
     <path d="M68,55 L82,55" stroke="url(#fb-in-grad)" strokeWidth="3" strokeLinecap="round" />
-    <path d="M82,55 L77,51 M82,55 L77,59" stroke="#3b82f6" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M82,55 L77,51 M82,55 L77,59" stroke="#db2777" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
 
     {/* Function Machine */}
     <g transform="translate(86, 32)" filter="url(#fb-shadow)">
-      <rect width="36" height="46" rx="10" fill="url(#fb-box-grad)" stroke="#c4b5fd" strokeWidth="1.5" />
+      <rect width="36" height="46" rx="10" fill="url(#fb-box-grad)" stroke="#fda4af" strokeWidth="1.5" />
       {/* Screen area */}
       <rect x="5" y="6" width="26" height="14" rx="4" fill="#1e1b4b" />
-      <text x="18" y="16" fill="#38bdf8" fontSize="8" fontWeight="bold" textAnchor="middle">f(x)</text>
+      <text x="18" y="16" fill="#f472b6" fontSize="8" fontWeight="bold" textAnchor="middle">f(x)</text>
 
       {/* Settings wheels/dots */}
-      <circle cx="11" cy="30" r="2.5" fill="#34d399" />
-      <circle cx="18" cy="30" r="2.5" fill="#fbbf24" />
-      <circle cx="25" cy="30" r="2.5" fill="#f87171" />
+      <circle cx="11" cy="30" r="2.5" fill="#ec4899" />
+      <circle cx="18" cy="30" r="2.5" fill="#db2777" />
+      <circle cx="25" cy="30" r="2.5" fill="#e11d48" />
       <line x1="8" y1="38" x2="28" y2="38" stroke="#ffffff" strokeWidth="1.5" opacity="0.4" strokeLinecap="round" />
     </g>
 
     {/* Output flow arrow */}
     <path d="M128,55 L142,55" stroke="url(#fb-out-grad)" strokeWidth="3" strokeLinecap="round" />
-    <path d="M142,55 L137,51 M142,55 L137,59" stroke="#ef4444" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M142,55 L137,51 M142,55 L137,59" stroke="#e11d48" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
 
     {/* Output y card */}
     <g transform="translate(148, 42)" filter="url(#fb-shadow)">
-      <rect width="26" height="26" rx="8" fill="#ffffff" stroke="#f97316" strokeWidth="1.5" />
-      <text x="13" y="18" fill="#ea580c" fontSize="12" fontWeight="black" textAnchor="middle">y</text>
+      <rect width="26" height="26" rx="8" fill="#ffffff" stroke="#e11d48" strokeWidth="1.5" />
+      <text x="13" y="18" fill="#9d174d" fontSize="12" fontWeight="black" textAnchor="middle">y</text>
     </g>
 
     {/* Formula indicator underneath */}
