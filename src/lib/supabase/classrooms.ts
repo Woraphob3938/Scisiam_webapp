@@ -551,16 +551,24 @@ async function selectClassroomCreatorNames(
 }
 
 async function getCurrentUserId(supabase: SupabaseClient): Promise<string | null> {
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
+  try {
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
 
-  if (error) {
-    throw new Error(error.message);
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return user?.id ?? null;
+  } catch (error) {
+    if (isSupabaseNetworkError(error)) {
+      return null;
+    }
+
+    throw error;
   }
-
-  return user?.id ?? null;
 }
 
 async function requireCurrentUserId(supabase: SupabaseClient): Promise<string> {
@@ -571,6 +579,10 @@ async function requireCurrentUserId(supabase: SupabaseClient): Promise<string> {
   }
 
   return userId;
+}
+
+function isSupabaseNetworkError(error: unknown): boolean {
+  return error instanceof TypeError || (error instanceof Error && /failed to fetch/i.test(error.message));
 }
 
 function buildClassroomSummary(input: {

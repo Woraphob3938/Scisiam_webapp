@@ -221,6 +221,9 @@ test("classroom client exposes owner actions, assignments, and creator names", (
   assert.match(source, /from\("classroom_notifications"\)/);
   assert.match(source, /export async function listMyClassroomNotifications/);
   assert.match(source, /Math\.max\(1, Math\.min\(limit, 20\)\)/);
+  assert.match(source, /isSupabaseNetworkError/);
+  assert.match(source, /error instanceof TypeError/);
+  assert.match(source, /failed to fetch/i);
   assert.match(source, /storage\.from\(CLASSROOM_FILES_BUCKET\)\.upload/);
   assert.match(source, /uploadClassroomFiles/);
   assert.match(source, /validateClassroomFile/);

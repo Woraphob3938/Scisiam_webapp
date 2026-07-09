@@ -100,9 +100,17 @@ test("mobile category filter stays inside the viewport", () => {
 test("navbar notifications do not reuse local lab keys for Supabase accounts", () => {
   const source = read("src", "components", "Navbar.tsx");
   const authProvider = read("src", "context", "AuthContext.tsx");
+  const profile = read("src", "app", "profile", "page.tsx");
 
   assert.match(source, /localNotificationMode/);
+  assert.match(authProvider, /isDemoModeEnabled[\s\S]*scisiam_demo_mode/);
   assert.match(authProvider, /localNotificationMode:\s*false/);
+  assert.match(source, /loadClassroomNotificationsSafely/);
+  assert.match(source, /if\s*\(!isAuthReady\s*\|\|\s*!isLoggedIn\s*\|\|\s*localNotificationMode\s*\|\|\s*!isSupabaseConfigured\(\)\)/);
+  assert.match(source, /auth\.getSession\(\)/);
+  assert.match(source, /if\s*\(!session\)\s*\{[\s\S]*?return \[\];/);
+  assert.match(source, /if\s*\(role === "teacher"\)\s*\{[\s\S]*?setNotifications\(\[\]\)/);
+  assert.match(profile, /if\s*\(storedRole !== "teacher"\)\s*\{[\s\S]*?readLocalLearningSnapshot/);
   assert.match(source, /listMyClassroomNotifications/);
   assert.match(source, /markClassroomNotificationsRead/);
   assert.match(source, /toNavbarClassroomNotification/);
@@ -112,6 +120,7 @@ test("navbar notifications do not reuse local lab keys for Supabase accounts", (
   assert.match(source, /window\.addEventListener\("focus", checkNotifications\)/);
   assert.match(source, /window\.setInterval\(checkNotifications, 30_000\)/);
   assert.match(source, /window\.clearInterval\(refreshIntervalId\)/);
+  assert.match(source, /\[isAuthReady,\s*isLoggedIn,\s*localNotificationMode,\s*loadClassroomNotificationsSafely,\s*role\]/);
   assert.match(source, /unreadNotificationCount/);
   assert.match(source, /closeNotifications/);
   assert.match(source, /dismissNotification/);

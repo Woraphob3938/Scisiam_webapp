@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Bell, ChevronDown, Award, Menu, User, X } from "lucide-react";
@@ -30,6 +30,7 @@ export default function Navbar() {
   const {
     isAuthReady,
     isLoggedIn,
+    role,
     userName,
     avatarPath,
     avatarVersion,
@@ -37,26 +38,51 @@ export default function Navbar() {
   } = useAuth();
   const [notifications, setNotifications] = useState<NavbarNotification[]>([]);
 
+  const loadClassroomNotificationsSafely = useCallback(async () => {
+    if (!isAuthReady || !isLoggedIn || localNotificationMode || !isSupabaseConfigured()) {
+      return [];
+    }
+
+    try {
+      const supabase = createClient();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session) {
+        return [];
+      }
+
+      return await listMyClassroomNotifications(10);
+    } catch {
+      return [];
+    }
+  }, [isAuthReady, isLoggedIn, localNotificationMode]);
+
   useEffect(() => {
     let cancelled = false;
 
     const loadSupabaseNotifications = async () => {
-      if (!isLoggedIn || !isSupabaseConfigured()) {
+      if (!isAuthReady || !isLoggedIn || !isSupabaseConfigured()) {
         setNotifications([]);
         return;
       }
-      try {
-        const items = await listMyClassroomNotifications(10);
-        if (!cancelled) setNotifications(items.map(toNavbarClassroomNotification));
-      } catch {
-        if (!cancelled) setNotifications([]);
-      }
+      const items = await loadClassroomNotificationsSafely();
+      if (!cancelled) setNotifications(items.map(toNavbarClassroomNotification));
     };
 
     const checkNotifications = () => {
       const items: NavbarNotification[] = [];
+      if (!isAuthReady) {
+        setNotifications([]);
+        return;
+      }
       if (!localNotificationMode) {
         void loadSupabaseNotifications();
+        return;
+      }
+      if (role === "teacher") {
+        setNotifications([]);
         return;
       }
 
@@ -109,7 +135,7 @@ export default function Navbar() {
       window.removeEventListener("storage", checkNotifications);
       window.removeEventListener("focus", checkNotifications);
     };
-  }, [isLoggedIn, localNotificationMode]);
+  }, [isAuthReady, isLoggedIn, localNotificationMode, loadClassroomNotificationsSafely, role]);
 
   const handleSignOut = async () => {
     setShowProfileMenu(false);
@@ -202,11 +228,10 @@ export default function Navbar() {
               }
               setShowNotification(true);
               if (!localNotificationMode) {
-                void listMyClassroomNotifications(10)
+                void loadClassroomNotificationsSafely()
                   .then((items) =>
                     setNotifications(items.map(toNavbarClassroomNotification)),
-                  )
-                  .catch(() => setNotifications([]));
+                  );
               }
             }}
             className="relative flex size-10 items-center justify-center rounded-xl text-slate-500 transition-all duration-200 hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
@@ -303,6 +328,15 @@ export default function Navbar() {
                   >
                     โปรไฟล์ของฉัน
                   </Link>
+                  {role === "teacher" ? (
+                    <Link
+                      href="/dashboard"
+                      onClick={() => setShowProfileMenu(false)}
+                      className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-indigo-600 transition-colors font-medium leading-normal"
+                    >
+                      แดชบอร์ดครู
+                    </Link>
+                  ) : null}
                   <button
                     type="button"
                     aria-label="Open Scisiam settings"
