@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=Prompt:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -6,10 +6,10 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --font-sans: 'Sukhumvit Set', SukhumvitSet, 'Noto Sans Thai', 'Prompt', 'Inter', sans-serif;
-  --font-heading: 'Sukhumvit Set', SukhumvitSet, 'Noto Sans Thai', 'Prompt', 'Inter', sans-serif;
-  --font-looped: 'Sukhumvit Set', SukhumvitSet, 'Noto Sans Thai', 'Prompt', 'Inter', sans-serif;
-  --font-mono: 'Chakra Petch', monospace;
+  --font-sans: 'Noto Sans Thai', sans-serif;
+  --font-heading: 'Noto Sans Thai', sans-serif;
+  --font-looped: 'Noto Sans Thai', sans-serif;
+  --font-mono: 'Noto Sans Thai', sans-serif;
 
   --animate-float-slow: float-slow 8s ease-in-out infinite;
   --animate-float-medium: float-medium 6s ease-in-out infinite;
