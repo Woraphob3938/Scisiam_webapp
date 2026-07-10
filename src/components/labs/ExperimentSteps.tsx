@@ -26,7 +26,7 @@ import {
   Target,
   LucideIcon
 } from "lucide-react";
-import { getLabDetails } from "@/data/labDetails";
+import type { StepItemData } from "@/data/labDetails";
 
 // Map string keys to Lucide icons dynamically
 const iconMap: Record<string, LucideIcon> = {
@@ -54,14 +54,10 @@ const iconMap: Record<string, LucideIcon> = {
 };
 
 interface ExperimentStepsProps {
-  labId: string;
+  steps: StepItemData[];
 }
 
-export default function ExperimentSteps({ labId }: ExperimentStepsProps) {
-  const details = getLabDetails(labId);
-  if (!details) return null;
-
-  const steps = details.steps;
+export default function ExperimentSteps({ steps }: ExperimentStepsProps) {
 
   return (
     <div className="bg-white rounded-2xl border border-slate-200/70 p-5 sm:p-6">

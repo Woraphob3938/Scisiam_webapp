@@ -9,10 +9,9 @@ import {
   Send,
   X,
 } from "lucide-react";
-import { labsById } from "@/data/labs";
 import { getScisiamAiSettings } from "@/components/SettingsModal";
-import { SCISIAM_AUTH_EVENT } from "@/lib/supabase/auth-cache";
-import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
+import { labsById } from "@/data/labs";
+import { useAuth } from "@/context/AuthContext";
 
 type ChatMessage = {
   id: string;
@@ -32,44 +31,13 @@ function createId() {
 
 export default function AIChatButton() {
   const pathname = usePathname();
+  const { isLoggedIn } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState("");
   const [isSending, setIsSending] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   
-  // Conditionally hide AI Chat Button based on login status and page route
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  useEffect(() => {
-    const checkLogin = async () => {
-      if (!isSupabaseConfigured()) {
-        setIsLoggedIn(localStorage.getItem("scisiam_logged_in") === "true");
-        return;
-      }
-
-      const {
-        data: { user },
-      } = await createClient().auth.getUser();
-      setIsLoggedIn(Boolean(user));
-    };
-
-    void checkLogin();
-    const supabase = isSupabaseConfigured() ? createClient() : null;
-    const authSubscription = supabase?.auth.onAuthStateChange(() => {
-      void checkLogin();
-    }).data.subscription;
-    const handleAuthUpdated = () => void checkLogin();
-
-    window.addEventListener(SCISIAM_AUTH_EVENT, handleAuthUpdated);
-    window.addEventListener("storage", handleAuthUpdated);
-    return () => {
-      window.removeEventListener(SCISIAM_AUTH_EVENT, handleAuthUpdated);
-      window.removeEventListener("storage", handleAuthUpdated);
-      authSubscription?.unsubscribe();
-    };
-  }, []);
-
   const isAuthPage = pathname === "/login" || pathname === "/register";
 
   const [messages, setMessages] = useState<ChatMessage[]>([

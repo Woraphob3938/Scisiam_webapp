@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Bell, ChevronDown, Award, Menu, User, X } from "lucide-react";
 import { useSidebar } from "@/context/SidebarContext";
 import SettingsModal from "@/components/SettingsModal";
-import { ClassroomActions } from "@/components/classrooms/ClassroomActions";
+import { ClassroomActionLauncher } from "@/components/classrooms/ClassroomActionLauncher";
 import { clearScisiamAuthCache } from "@/lib/supabase/auth-cache";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import { listMyClassroomNotifications, markClassroomNotificationsRead, type ClassroomNotification } from "@/lib/supabase/classrooms";
@@ -215,7 +215,7 @@ export default function Navbar() {
       {/* Right Navigation Controls */}
       <div className="flex shrink-0 items-center gap-1.5 sm:gap-5">
         <div className="hidden lg:block">
-          <ClassroomActions placement="desktop" />
+          <ClassroomActionLauncher placement="desktop" />
         </div>
 
         {/* Notification Bell */}

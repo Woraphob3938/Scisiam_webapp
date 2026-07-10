@@ -124,6 +124,13 @@ const accentClasses = {
   },
 };
 
+const categoryAccents: Record<string, keyof typeof accentClasses> = {
+  Physics: "blue",
+  Chemistry: "violet",
+  Biology: "emerald",
+  Mathematics: "pink",
+};
+
 const metricToneClasses: Record<NonNullable<SimulationMetric["tone"]>, string> = {
   blue: "bg-blue-50 text-blue-700",
   cyan: "bg-cyan-50 text-cyan-700",
@@ -165,7 +172,7 @@ export default function SharedSimulationShell({
   showSaveButton = true,
   onSave,
 }: SharedSimulationShellProps) {
-  const resolvedAccent = category === "Mathematics" ? "pink" : accent;
+  const resolvedAccent = categoryAccents[category] ?? accent;
   const tone = accentClasses[resolvedAccent];
   const stageShellRef = useRef<HTMLElement | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -173,7 +180,7 @@ export default function SharedSimulationShell({
   const [activeTab, setActiveTab] = useState<InfoTab>("about");
   const boundedProgress = Math.min(100, Math.max(0, progressPercent));
   const hasDrawerSummary = Boolean(drawerSummary) || showLiveMetrics || (showSaveButton && onSave);
-  const hasLabDetailContent = Boolean(getLabDetails(labId));
+  const labDetails = getLabDetails(labId);
   const collapsedControls = compactControls ?? controls;
   const hasCollapsedControls =
     collapsedControls !== null && collapsedControls !== undefined && collapsedControls !== false;
@@ -400,16 +407,16 @@ export default function SharedSimulationShell({
         {table}
       </div>
     ),
-    theory: hasLabDetailContent ? <TheoryCard labId={labId} /> : theory,
-    equipment: hasLabDetailContent ? (
-      <EquipmentList labId={labId} />
+    theory: labDetails ? <TheoryCard details={labDetails} /> : theory,
+    equipment: labDetails ? (
+      <EquipmentList labTitle={title} details={labDetails} />
     ) : (
       <section className="rounded-2xl border border-slate-200/70 bg-white p-5 text-sm font-semibold leading-relaxed text-slate-500 shadow-sm shadow-slate-200/40">
         ยังไม่มีข้อมูลอุปกรณ์สำหรับแล็บนี้
       </section>
     ),
-    steps: hasLabDetailContent ? (
-      <DetailExperimentSteps labId={labId} />
+    steps: labDetails ? (
+      <DetailExperimentSteps steps={labDetails.steps} />
     ) : (
       <section className="grid grid-cols-1 gap-3 rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40 sm:grid-cols-2 xl:grid-cols-5">
         {steps.map((step, index) => {

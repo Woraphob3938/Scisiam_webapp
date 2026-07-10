@@ -74,10 +74,11 @@ test("lab detail child components require an explicit lab id", () => {
   }
 });
 
-test("lab detail sidebar derives guidance from shared lab data", () => {
+test("lab detail sidebar derives guidance from the selected shared lab record", () => {
   const source = readProjectFile("src/components/labs/LabSidebar.tsx");
 
-  assert.match(source, /getLabDetails/);
+  assert.match(source, /details: LabDetailData/);
+  assert.match(source, /buildAdviceList\(details: LabDetailData\)/);
   assert.match(source, /equipments/);
   assert.match(source, /steps/);
   assert.doesNotMatch(source, /const isOhmsLaw/);
@@ -359,7 +360,9 @@ test("lab detail layout avoids a duplicate bottom start CTA", () => {
 
   assert.doesNotMatch(source, /FinalLabCta/);
   assert.doesNotMatch(source, /พร้อมเริ่มทดลอง/);
-  assert.match(source, /<LabHero[\s\S]*onStartExperiment=\{handleStartExperiment\}/);
+  assert.match(source, /hero: React\.ReactNode/);
+  assert.match(source, /\{hero\}/);
+  assert.doesNotMatch(source, /import LabHero/);
 });
 
 test("learning history redirects into profile and uses shared progress sources", () => {
@@ -837,13 +840,27 @@ test("teacher registration captures a selected school without granting teacher a
   assert.match(authForm, /\.from\("school_catalog"\)/);
   assert.match(authForm, /setSelectedSchool\(school\)/);
   assert.match(authForm, /role === "teacher"[\s\S]*?auth-school/);
+  assert.match(authForm, /คำขอบทบาทคุณครู/);
+  assert.match(authForm, /ได้รับการอนุมัติ/);
   assert.match(authForm, /schoolLookupError/);
   assert.match(authForm, /โหลดรายชื่อโรงเรียนไม่ได้/);
   assert.doesNotMatch(authForm, /catalogError \? \[\] : data \?\? \[\]/);
+  assert.match(authForm, /profile\.role === "teacher" \? "\/dashboard" : "\/labs"/);
   assert.match(signUpBlock, /school_id:\s*role === "teacher" \? selectedSchool\?\.id/);
   assert.match(signUpBlock, /school_name:\s*role === "teacher" \? selectedSchool\?\.name/);
   assert.match(signUpBlock, /requested_role:\s*role/);
   assert.doesNotMatch(signUpBlock, /\n\s+role\s*[:,]/);
+});
+
+test("login copy is role-neutral while registration still asks for role", () => {
+  const authForm = readProjectFile("src/components/auth/AuthForm.tsx");
+
+  assert.match(
+    authForm,
+    /ใช้อีเมลบัญชีเพื่อเข้าทำการทดลองหรือเป็นครูเพื่อจัดการห้องเรียนของคุณ/,
+  );
+  assert.match(authForm, /isRegister && !isForgotPassword && <div className="grid gap-2">/);
+  assert.match(authForm, /aria-label="เลือกบทบาท"/);
 });
 
 test("school catalog migration imports DMC school data with explicit API grants and profile linkage", () => {
@@ -908,6 +925,7 @@ test("local Supabase migrations mirror the deployed migration history", () => {
     "20260707212025",
     "20260708085729",
     "20260708194528",
+    "20260709200551",
   ];
 
   assert.deepEqual(

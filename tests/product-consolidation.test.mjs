@@ -27,6 +27,30 @@ test("Profile owns overview, history, and rewards", () => {
   assert.match(profile, /ภาพรวมความก้าวหน้า/);
   assert.match(profile, /ประวัติการเรียนรู้/);
   assert.match(profile, /รางวัล/);
+  assert.doesNotMatch(profile, /TeacherDashboardSection/);
+});
+
+test("Teacher dashboard is a separate Supabase-backed route", () => {
+  const dashboardPage = read("src/app/dashboard/page.tsx");
+  const dashboardSection = read("src/components/profile/TeacherDashboardSection.tsx");
+  const dashboard = read("src/components/profile/TeacherDashboard.tsx");
+  const proxy = read("src/lib/supabase/proxy.ts");
+  const classroomsPage = read("src/app/classrooms/page.tsx");
+
+  assert.match(dashboardPage, /<Sidebar activeMenu="แดชบอร์ด"/);
+  assert.match(dashboardPage, /role !== "teacher"/);
+  assert.match(proxy, /"\/dashboard"/);
+  assert.match(dashboardSection, /auth\.getUser\(\)/);
+  assert.match(dashboardSection, /เซสชันหมดอายุ/);
+  assert.match(dashboardSection, /clearScisiamAuthCache\(\{ emit: false \}\)/);
+  assert.match(classroomsPage, /clearScisiamAuthCache\(\)/);
+  assert.match(dashboardSection, /listMyClassrooms/);
+  assert.match(dashboardSection, /getClassroomAssignments/);
+  assert.match(dashboardSection, /getClassroomAssignmentSubmissions/);
+  assert.match(dashboardSection, /getClassroomMembers/);
+  assert.doesNotMatch(dashboardSection, /Demo|โหมดสาธิต|Hooke's Law of Elasticity/);
+  assert.match(dashboard, /ไปหน้าชั้นเรียน/);
+  assert.match(dashboard, /ข้อมูลจริงในระบบ/);
 });
 
 test("Lab cards are Thai-first and expose only Enter Lab", () => {

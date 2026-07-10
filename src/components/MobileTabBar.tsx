@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ClipboardCheck, FlaskConical, LayoutDashboard, User, UsersRound } from "lucide-react";
 
-import { ClassroomActions } from "@/components/classrooms/ClassroomActions";
+import { ClassroomActionLauncher } from "@/components/classrooms/ClassroomActionLauncher";
 import { useAuth } from "@/context/AuthContext";
 
 type MobileNavItem = {
@@ -87,7 +87,7 @@ export default function MobileTabBar() {
           ))}
 
           <div className="flex min-h-[56px] items-center justify-center">
-            <ClassroomActions placement="mobile" />
+            <ClassroomActionLauncher placement="mobile" />
           </div>
 
           <MobileNavLink

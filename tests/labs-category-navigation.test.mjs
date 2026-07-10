@@ -25,6 +25,18 @@ test("labs page can still open a requested category directly", () => {
   );
 });
 
+test("typing a Thai lab keyword searches every category and grade", () => {
+  const labsPage = readProjectFile("src/app/labs/page.tsx");
+
+  assert.match(labsPage, /const searchLabs = query \? labsData : categoryLabs/);
+  assert.match(labsPage, /lab\.thaiTitle/);
+  assert.match(labsPage, /lab\.id/);
+  assert.match(
+    labsPage,
+    /if \(query\.trim\(\)\) \{\s*setSelectedCategory\("All"\);\s*setSelectedGradeLevel\("All"\);/s,
+  );
+});
+
 test("lab detail and simulation pages do not render breadcrumbs", () => {
   const detailLayout = readProjectFile("src/components/labs/LabDetailLayout.tsx");
   const simulationDir = join(rootDir, "src/components/labs/simulation");

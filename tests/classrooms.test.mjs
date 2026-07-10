@@ -366,10 +366,10 @@ test("desktop and sidebar navigation expose classroom actions", () => {
   const navbar = fs.readFileSync(path.join(root, "src", "components", "Navbar.tsx"), "utf8");
   const sidebar = fs.readFileSync(path.join(root, "src", "components", "Sidebar.tsx"), "utf8");
 
-  assert.match(navbar, /import \{ ClassroomActions \} from "@\/components\/classrooms\/ClassroomActions"/);
-  assert.match(navbar, /<ClassroomActions placement="desktop" \/>/);
+  assert.match(navbar, /import \{ ClassroomActionLauncher \} from "@\/components\/classrooms\/ClassroomActionLauncher"/);
+  assert.match(navbar, /<ClassroomActionLauncher placement="desktop" \/>/);
   assert.ok(
-    navbar.indexOf('<ClassroomActions placement="desktop" />') < navbar.indexOf("{/* Notification Bell */}"),
+    navbar.indexOf('<ClassroomActionLauncher placement="desktop" />') < navbar.indexOf("{/* Notification Bell */}"),
     "desktop classroom action should appear immediately before notifications"
   );
 
@@ -381,11 +381,11 @@ test("mobile navigation uses a centered classroom action in five columns", () =>
   const source = fs.readFileSync(path.join(root, "src", "components", "MobileTabBar.tsx"), "utf8");
 
   assert.match(source, /grid-cols-5/);
-  assert.match(source, /<ClassroomActions placement="mobile" \/>/);
+  assert.match(source, /<ClassroomActionLauncher placement="mobile" \/>/);
   assert.match(source, /href: "\/classrooms"/);
   assert.match(source, /pathname\.startsWith\("\/classrooms"\)/);
   assert.ok(
-    source.indexOf('<ClassroomActions placement="mobile" />') < source.indexOf('href: "/classrooms"'),
+    source.indexOf('<ClassroomActionLauncher placement="mobile" />') < source.indexOf('href: "/classrooms"'),
     "mobile classroom action should occupy the center before the classroom link"
   );
 });
@@ -400,7 +400,7 @@ test("classroom list route authenticates and loads the current user's rooms", ()
   assert.match(source, /<Sidebar activeMenu="ชั้นเรียน" \/>/);
   assert.match(source, /เปิดห้อง/);
   assert.match(source, /ลองใหม่/);
-  assert.match(source, /<ClassroomActions placement="desktop" \/>/);
+  assert.match(source, /<ClassroomActionLauncher placement="desktop" \/>/);
 });
 
 test("classroom workspace loads private room data and exposes three stable tabs", () => {

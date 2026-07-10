@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import Link from "next/link";
 import { Atom, Calculator, CircuitBoard, FlaskConical, Gauge, Play, ArrowLeft, Snowflake, Thermometer, Leaf, Dna, Microscope, Weight, Sliders, Zap, Sun } from "lucide-react";
@@ -72,7 +70,7 @@ interface LabHeroProps {
   title: string;
   category: string;
   description: string;
-  onStartExperiment?: () => void;
+  simulationHref: string;
 }
 
 const OhmsHeroIllustration = () => (
@@ -1172,7 +1170,7 @@ export default function LabHero({
   title,
   category,
   description,
-  onStartExperiment,
+  simulationHref,
 }: LabHeroProps) {
   const isOhmsLaw = labId === "ohms-law";
   const isHookesLaw = labId === "hookes-law";
@@ -1205,7 +1203,7 @@ export default function LabHero({
   const isStefanBoltzmann = labId === "stefan-boltzmann";
   const isMathematics = category === "Mathematics" || mathConceptLabIds.has(labId);
 
-  const isBiology = category === "Biology" || isPhotosynthesis || isMendelian || isMitosis;
+  const isBiology = category === "Biology";
   const HeroIcon = isHookesLaw ? Weight
     : isMathematics ? Calculator
     : isOhmsLaw ? CircuitBoard
@@ -1227,13 +1225,17 @@ export default function LabHero({
     : isStefanBoltzmann ? Sun
     : Atom;
 
-  const chemistryTone = category === "Chemistry" || isPeriodicTable || isAcidBase || isBoylesLaw || isCharlesLaw || isIdealGas || isLeChateliers || isBeerLambert || isHesssLaw || isGalvanicCell || isChemicalKinetics || isSolubilityProduct || isAvogadrosLaw || isElectrolysis || isColligative;
+  const chemistryTone = category === "Chemistry";
   const readiness = getLabReadiness(labId);
   const iconClass = isMathematics ? "bg-pink-200 text-pink-900 shadow-pink-200/40" : isBiology ? "bg-emerald-600 text-white shadow-emerald-500/20" : chemistryTone ? "bg-violet-600 text-white shadow-violet-500/20" : "bg-blue-600 text-white shadow-blue-500/20";
   const badgeClass = isMathematics ? "bg-pink-50 text-pink-900 border-pink-200" : isBiology ? "bg-emerald-50 text-emerald-700 border-emerald-100" : chemistryTone ? "bg-violet-50 text-violet-700 border-violet-100" : "bg-blue-50 text-blue-700 border-blue-100";
   const primaryButtonClass = isMathematics
     ? "bg-pink-200 hover:bg-pink-300 text-pink-900 focus-visible:ring-pink-300 shadow-pink-200/40"
-    : "bg-blue-600 hover:bg-blue-700 text-white focus-visible:ring-blue-500 shadow-blue-600/10";
+    : isBiology
+      ? "bg-emerald-600 hover:bg-emerald-700 text-white focus-visible:ring-emerald-500 shadow-emerald-600/10"
+      : chemistryTone
+        ? "bg-violet-600 hover:bg-violet-700 text-white focus-visible:ring-violet-500 shadow-violet-600/10"
+        : "bg-blue-600 hover:bg-blue-700 text-white focus-visible:ring-blue-500 shadow-blue-600/10";
 
   return (
     <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-12 md:px-20 py-3 select-none">
@@ -1284,14 +1286,15 @@ export default function LabHero({
           {/* Buttons Row */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3.5 w-full sm:w-auto">
             {/* Start Lab Button */}
-            <button
-              onClick={onStartExperiment}
+            <Link
+              href={simulationHref}
+              prefetch={false}
               aria-label={`เริ่มทำการทดลองห้องแล็บ ${title}`}
               className={`flex items-center justify-center gap-2 rounded-xl px-7 py-3 text-sm font-bold shadow-sm transition-all duration-200 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${primaryButtonClass}`}
             >
               <Play className="w-4 h-4 fill-white" />
               <span>{readiness.isReady ? "เริ่มทดลอง" : "ดูสถานะการจัดทำ"}</span>
-            </button>
+            </Link>
 
             {/* Back Button */}
             <Link

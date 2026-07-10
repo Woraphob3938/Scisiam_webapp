@@ -104,18 +104,25 @@ function LabsContent() {
   );
 
   const filteredLabs = useMemo(() => {
-    const query = searchQuery.trim().toLowerCase();
+    const query = searchQuery.trim().toLocaleLowerCase("th");
+    const searchLabs = query ? labsData : categoryLabs;
 
-    return categoryLabs.filter((lab) => {
+    return searchLabs.filter((lab) => {
       const matchesGrade =
         selectedGradeLevel === "All" || lab.gradeLevel === selectedGradeLevel;
+      const searchableText = [
+        lab.thaiTitle,
+        lab.title,
+        lab.description,
+        lab.category,
+        lab.gradeLevel,
+        lab.id,
+        CATEGORY_LABELS[lab.category],
+      ]
+        .join(" ")
+        .toLocaleLowerCase("th");
       const matchesSearch =
-        !query ||
-        lab.title.toLowerCase().includes(query) ||
-        lab.description.toLowerCase().includes(query) ||
-        lab.category.toLowerCase().includes(query) ||
-        lab.gradeLevel.toLowerCase().includes(query) ||
-        CATEGORY_LABELS[lab.category].toLowerCase().includes(query);
+        !query || searchableText.includes(query);
 
       return matchesGrade && matchesSearch;
     });
@@ -170,6 +177,10 @@ function LabsContent() {
 
   const handleSearchQueryChange = (query: string) => {
     setSearchQuery(query);
+    if (query.trim()) {
+      setSelectedCategory("All");
+      setSelectedGradeLevel("All");
+    }
     setShowAllLabs(false);
   };
 

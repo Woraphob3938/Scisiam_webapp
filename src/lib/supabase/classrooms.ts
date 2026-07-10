@@ -24,6 +24,20 @@ type VisibleClassroomLabRow = Pick<ClassroomLabRow, "classroom_id" | "lab_id" | 
 const CLASSROOM_ACCESS_ERROR = "ไม่พบห้องเรียนหรือคุณไม่มีสิทธิ์เข้าถึง";
 const CLASSROOM_FILES_BUCKET = "classroom-files";
 const CLASSROOM_FILE_SIZE_LIMIT = 10 * 1024 * 1024;
+const CLASSROOM_FILE_MIME_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "application/pdf",
+  "text/plain",
+  "text/csv",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.ms-excel",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "application/vnd.ms-powerpoint",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+]);
 const GRADE_LEVELS: readonly GradeLevel[] = [
   "ประถม",
   "มัธยมต้น",
@@ -372,12 +386,24 @@ export async function createClassroomAssignment(
 export async function deleteClassroomAssignment(assignmentId: string): Promise<void> {
   const supabase = createClient();
   await requireCurrentUserId(supabase);
+  const safeAssignmentId = validateUuid(assignmentId, "ไม่พบงานที่ต้องการลบ");
+  const { data: assignment, error: assignmentError } = await supabase
+    .from("classroom_assignments")
+    .select("attachments, attachment_path, attachment_name, attachment_mime_type, attachment_size")
+    .eq("id", safeAssignmentId)
+    .maybeSingle();
+
+  if (assignmentError) throwClassroomActionError(assignmentError.code, assignmentError.message);
   const { data, error } = await supabase.rpc("delete_classroom_assignment", {
-    p_assignment_id: validateUuid(assignmentId, "ไม่พบงานที่ต้องการลบ"),
+    p_assignment_id: safeAssignmentId,
   });
 
   if (error) throwClassroomActionError(error.code, error.message);
   if (!data) throw new Error("ลบงานไม่สำเร็จ");
+
+  if (assignment) {
+    await removeClassroomFiles(supabase, attachmentPaths(assignment.attachments, assignment));
+  }
 }
 
 export async function getClassroomAssignmentSubmissions(id: string): Promise<ClassroomAssignmentSubmission[]> {
@@ -398,8 +424,19 @@ export async function submitClassroomAssignment(input: SubmitClassroomAssignment
   const supabase = createClient();
   const userId = await requireCurrentUserId(supabase);
   const classroomId = validateClassroomId(input.classroomId);
+  const assignmentId = validateUuid(input.assignmentId, "ไม่พบงานที่ต้องการส่ง");
   const note = input.note.trim();
   const linkUrls = normalizeOptionalUrls(input.linkUrls, "ลิงก์ส่งงาน");
+  const { data: existingSubmission, error: existingSubmissionError } = await supabase
+    .from("classroom_assignment_submissions")
+    .select("attachments, attachment_path, attachment_name, attachment_mime_type, attachment_size")
+    .eq("assignment_id", assignmentId)
+    .eq("student_id", userId)
+    .maybeSingle();
+
+  if (existingSubmissionError) {
+    throwClassroomActionError(existingSubmissionError.code, existingSubmissionError.message);
+  }
   const uploaded = await uploadClassroomFiles(supabase, classroomId, userId, input.attachmentFiles);
 
   if (!note && linkUrls.length === 0 && uploaded.length === 0) {
@@ -407,7 +444,7 @@ export async function submitClassroomAssignment(input: SubmitClassroomAssignment
   }
 
   const { data, error } = await supabase.rpc("submit_classroom_assignment", {
-    p_assignment_id: validateUuid(input.assignmentId, "ไม่พบงานที่ต้องการส่ง"),
+    p_assignment_id: assignmentId,
     p_note: note || null,
     p_link_urls: linkUrls,
     p_attachments: uploaded.map(toAttachmentJson),
@@ -418,6 +455,13 @@ export async function submitClassroomAssignment(input: SubmitClassroomAssignment
     throwClassroomActionError(error.code, error.message);
   }
   if (!data) throw new Error("ส่งงานไม่สำเร็จ");
+
+  if (existingSubmission) {
+    await removeClassroomFiles(
+      supabase,
+      attachmentPaths(existingSubmission.attachments, existingSubmission),
+    );
+  }
   return data;
 }
 
@@ -760,6 +804,9 @@ function validateClassroomFile(file: File) {
   if (file.size > CLASSROOM_FILE_SIZE_LIMIT) {
     throw new Error(`ไฟล์ ${file.name || "ที่เลือก"} ต้องมีขนาดไม่เกิน 10 MB`);
   }
+  if (!CLASSROOM_FILE_MIME_TYPES.has(file.type)) {
+    throw new Error(`ไฟล์ ${file.name || "ที่เลือก"} ไม่ใช่ชนิดไฟล์ที่รองรับ`);
+  }
 }
 
 function getSafeFileExtension(fileName: string) {
@@ -769,7 +816,19 @@ function getSafeFileExtension(fileName: string) {
 
 async function removeClassroomFiles(supabase: SupabaseClient, paths: string[]) {
   if (paths.length === 0) return;
-  await supabase.storage.from(CLASSROOM_FILES_BUCKET).remove(paths).catch(() => null);
+  const { error } = await supabase.storage.from(CLASSROOM_FILES_BUCKET).remove(paths);
+  if (error) throw new Error("ลบไฟล์ที่ไม่ถูกใช้งานไม่สำเร็จ");
+}
+
+function attachmentPaths(
+  storedValue: Json | undefined,
+  legacy: { path?: string | null; attachment_path?: string | null; name?: string | null; attachment_name?: string | null },
+) {
+  const paths = normalizeStoredAttachments(storedValue).map((attachment) => attachment.path);
+  const legacyPath = legacy.path ?? legacy.attachment_path;
+  const legacyName = legacy.name ?? legacy.attachment_name;
+  if (paths.length === 0 && legacyPath && legacyName) paths.push(legacyPath);
+  return paths;
 }
 
 async function createClassroomFileUrl(supabase: SupabaseClient, path: string): Promise<string | null> {

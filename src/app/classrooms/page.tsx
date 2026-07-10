@@ -13,7 +13,7 @@ import {
   UsersRound,
 } from "lucide-react";
 
-import { ClassroomActions } from "@/components/classrooms/ClassroomActions";
+import { ClassroomActionLauncher } from "@/components/classrooms/ClassroomActionLauncher";
 import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
 import { useSidebar } from "@/context/SidebarContext";
@@ -201,10 +201,10 @@ function ClassroomEmptyState() {
         </p>
       </div>
       <div className="hidden lg:block">
-        <ClassroomActions placement="desktop" />
+          <ClassroomActionLauncher placement="desktop" />
       </div>
       <div className="lg:hidden">
-        <ClassroomActions placement="mobile" />
+          <ClassroomActionLauncher placement="mobile" />
       </div>
     </div>
   );

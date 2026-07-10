@@ -109,18 +109,51 @@ function extractGeminiText(payload: unknown): string {
 }
 
 function getClientId(request: NextRequest): string {
-  const forwardedFor = request.headers.get("x-forwarded-for");
+  const forwardedFor =
+    request.headers.get("x-vercel-forwarded-for") ||
+    request.headers.get("x-real-ip") ||
+    request.headers.get("x-forwarded-for");
   if (forwardedFor) return forwardedFor.split(",")[0]?.trim() || "unknown";
-  return request.headers.get("x-real-ip") || "unknown";
+  return "unknown";
 }
 
-function getRateLimitKey(request: NextRequest): string {
-  const rawClient = [
-    getClientId(request),
-    request.headers.get("user-agent") || "unknown-agent",
-  ].join(":");
+function getRateLimitKey(request: NextRequest, context: UsageContext): string {
+  const rawClient = context.userId ? `user:${context.userId}` : `ip:${getClientId(request)}`;
 
   return createHash("sha256").update(rawClient).digest("hex");
+}
+
+async function readRequestBodyWithinLimit(request: NextRequest): Promise<string | null> {
+  const reader = request.body?.getReader();
+  if (!reader) return "";
+
+  const chunks: Uint8Array[] = [];
+  let totalBytes = 0;
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      if (!value) continue;
+
+      totalBytes += value.byteLength;
+      if (totalBytes > MAX_REQUEST_BYTES) {
+        await reader.cancel();
+        return null;
+      }
+      chunks.push(value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+
+  const body = new Uint8Array(totalBytes);
+  let offset = 0;
+  for (const chunk of chunks) {
+    body.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return new TextDecoder().decode(body);
 }
 
 function pruneMemoryRateLimitStore(now: number) {
@@ -265,7 +298,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  if (await isRateLimited(getRateLimitKey(request), usageContext)) {
+  if (await isRateLimited(getRateLimitKey(request, usageContext), usageContext)) {
     return NextResponse.json(
       {
         error:
@@ -275,7 +308,21 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const body = await request.json().catch(() => null);
+  const requestBody = await readRequestBodyWithinLimit(request).catch(() => "");
+  if (requestBody === null) {
+    return NextResponse.json(
+      { error: "ข้อความยาวเกินขนาดที่ระบบรองรับ กรุณาลดประวัติแชตแล้วลองใหม่" },
+      { status: 413 },
+    );
+  }
+
+  const body = (() => {
+    try {
+      return JSON.parse(requestBody) as unknown;
+    } catch {
+      return null;
+    }
+  })();
   if (!body || typeof body !== "object") {
     return NextResponse.json(
       { error: "รูปแบบคำขอไม่ถูกต้อง" },

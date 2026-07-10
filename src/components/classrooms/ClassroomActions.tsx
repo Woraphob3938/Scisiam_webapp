@@ -47,6 +47,9 @@ type ClassroomActionMode = "menu" | "create" | "join" | "created";
 
 type ClassroomActionsProps = {
   placement: "desktop" | "mobile";
+  initiallyOpen?: boolean;
+  hideTrigger?: boolean;
+  onClose?: () => void;
 };
 
 type ClassroomCategory = "All" | (typeof labsData)[number]["category"];
@@ -104,11 +107,16 @@ function getErrorMessage(error: unknown) {
   return error instanceof Error ? error.message : "เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง";
 }
 
-export function ClassroomActions({ placement }: ClassroomActionsProps) {
+export function ClassroomActions({
+  placement,
+  initiallyOpen = false,
+  hideTrigger = false,
+  onClose,
+}: ClassroomActionsProps) {
   const router = useRouter();
   const resetTimerRef = useRef<number | null>(null);
   const titleRef = useRef<HTMLHeadingElement | null>(null);
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(initiallyOpen);
   const [mode, setMode] = useState<ClassroomActionMode>("menu");
   const [busy, setBusy] = useState(false);
   const [name, setName] = useState("");
@@ -178,6 +186,7 @@ export function ClassroomActions({ placement }: ClassroomActionsProps) {
   async function handleOpenChange(nextOpen: boolean) {
     if (!nextOpen) {
       setOpen(false);
+      onClose?.();
       resetTimerRef.current = window.setTimeout(resetDialog, 150);
       return;
     }
@@ -370,20 +379,22 @@ export function ClassroomActions({ placement }: ClassroomActionsProps) {
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogTrigger asChild>
-        <Button
-          type="button"
-          size="icon"
-          className={cn(
-            "shadow-sm",
-            placement === "mobile" ? "size-14 rounded-full" : "size-10",
-          )}
-          aria-label="เปิดเมนูห้องเรียน"
-          aria-haspopup="dialog"
-        >
-          <Plus aria-hidden="true" />
-        </Button>
-      </DialogTrigger>
+      {!hideTrigger ? (
+        <DialogTrigger asChild>
+          <Button
+            type="button"
+            size="icon"
+            className={cn(
+              "shadow-sm",
+              placement === "mobile" ? "size-14 rounded-full" : "size-10",
+            )}
+            aria-label="เปิดเมนูห้องเรียน"
+            aria-haspopup="dialog"
+          >
+            <Plus aria-hidden="true" />
+          </Button>
+        </DialogTrigger>
+      ) : null}
 
       <DialogContent className="flex max-h-[calc(100dvh-2rem)] flex-col overflow-hidden p-0 sm:max-w-3xl">
         <DialogHeader className="border-b px-5 pt-5 pb-4 pr-14">

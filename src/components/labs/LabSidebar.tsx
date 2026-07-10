@@ -12,12 +12,17 @@ import {
   Sparkles,
 } from "lucide-react";
 
-import { getLabDetails } from "@/data/labDetails";
-import { getLabReadiness } from "@/data/labReadiness";
-import { labsById } from "@/data/labs";
+import type { LabData } from "@/components/LabCard";
+import type { LabDetailData } from "@/data/labDetails";
 
 interface LabSidebarProps {
-  labId: string;
+  lab: LabData;
+  details: LabDetailData;
+  readiness: {
+    isReady: boolean;
+    label: string;
+    description: string;
+  };
   hasSavedResult?: boolean;
 }
 
@@ -29,8 +34,7 @@ type InfoRow = {
   iconClass: string;
 };
 
-function buildAdviceList(labId: string) {
-  const details = getLabDetails(labId);
+function buildAdviceList(details: LabDetailData) {
   const primaryEquipment = details?.equipments[0];
   const firstStep = details?.steps[0];
   const finalStep = details?.steps.at(-1);
@@ -51,12 +55,11 @@ function buildAdviceList(labId: string) {
 }
 
 export default function LabSidebar({
-  labId,
+  lab,
+  details,
+  readiness,
   hasSavedResult = false,
 }: LabSidebarProps) {
-  const lab = labsById[labId];
-  const details = getLabDetails(labId);
-  const readiness = getLabReadiness(labId);
   const labProgress = hasSavedResult ? 100 : 0;
   const labProgressLabel = hasSavedResult
     ? "บันทึกผลทดลองล่าสุดแล้ว"
@@ -66,7 +69,7 @@ export default function LabSidebar({
   const firstStep = details?.steps[0];
   const finalStep = details?.steps.at(-1);
   const primaryEquation = details?.equationLabels[0];
-  const adviceList = buildAdviceList(labId);
+  const adviceList = buildAdviceList(details);
 
   const labInfoRows: InfoRow[] = [
     {
@@ -102,7 +105,7 @@ export default function LabSidebar({
               โฟกัสก่อนทดลอง
             </h3>
             <p className="mt-1 line-clamp-2 text-[11px] font-semibold leading-relaxed text-slate-500">
-              {lab?.title ?? "ห้องแล็บ Scisiam"}
+              {lab.title}
             </p>
           </div>
           <span

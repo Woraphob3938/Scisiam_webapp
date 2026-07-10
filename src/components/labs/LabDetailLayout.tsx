@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import {
   BarChart3,
   Beaker,
@@ -20,11 +19,11 @@ import type { LabData } from "@/components/LabCard";
 import Navbar from "@/components/Navbar";
 import EquipmentList from "@/components/labs/EquipmentList";
 import ExperimentSteps from "@/components/labs/ExperimentSteps";
-import LabHero from "@/components/labs/LabHero";
 import LabSidebar from "@/components/labs/LabSidebar";
 import TheoryCard from "@/components/labs/TheoryCard";
 import type { LabDetailData } from "@/data/labDetails";
 import { getSavedExperimentKey } from "@/data/labSavedExperiments";
+import { getLabReadiness } from "@/data/labReadiness";
 
 type SavedExperimentRecord = {
   labId?: string;
@@ -37,6 +36,7 @@ type LabDetailLayoutProps = {
   labId: string;
   lab: LabData;
   details: LabDetailData;
+  hero: React.ReactNode;
 };
 
 type SavedMetric = {
@@ -342,11 +342,11 @@ function SavedExperimentPanel({
   );
 }
 
-export default function LabDetailLayout({ labId, lab, details }: LabDetailLayoutProps) {
-  const router = useRouter();
+export default function LabDetailLayout({ labId, lab, details, hero }: LabDetailLayoutProps) {
   const [savedData, setSavedData] = useState<SavedExperimentRecord | null>(null);
   const [activeTab, setActiveTab] = useState<DetailTab>("overview");
   const theme = useMemo(() => getSubjectTheme(lab.category), [lab.category]);
+  const readiness = useMemo(() => getLabReadiness(labId), [labId]);
 
   const loadSavedData = useCallback(() => {
     const key = getSavedExperimentKey(labId);
@@ -388,10 +388,6 @@ export default function LabDetailLayout({ labId, lab, details }: LabDetailLayout
     };
   }, [loadSavedData]);
 
-  const handleStartExperiment = () => {
-    router.push(`/labs/${labId}/simulation`);
-  };
-
   const handleClearSavedData = () => {
     const key = getSavedExperimentKey(labId);
     if (!key) return;
@@ -414,9 +410,9 @@ export default function LabDetailLayout({ labId, lab, details }: LabDetailLayout
 
   const tabContent = {
     overview: <LearningOverviewPanel details={details} theme={theme} />,
-    equipment: <EquipmentList labId={labId} />,
-    theory: <TheoryCard labId={labId} />,
-    steps: <ExperimentSteps labId={labId} />,
+    equipment: <EquipmentList labTitle={lab.title} details={details} />,
+    theory: <TheoryCard details={details} />,
+    steps: <ExperimentSteps steps={details.steps} />,
     saved: savedData ? (
       <SavedExperimentPanel
         labId={labId}
@@ -434,20 +430,14 @@ export default function LabDetailLayout({ labId, lab, details }: LabDetailLayout
         </p>
       </section>
     ),
-    info: <LabSidebar labId={labId} hasSavedResult={Boolean(savedData)} />,
+    info: <LabSidebar lab={lab} details={details} readiness={readiness} hasSavedResult={Boolean(savedData)} />,
   } satisfies Record<DetailTab, React.ReactNode>;
 
   return (
     <div className="relative flex min-h-screen flex-col bg-[#f8fafc] pb-[calc(5rem+env(safe-area-inset-bottom))] lg:pb-12">
       <Navbar />
 
-      <LabHero
-        labId={labId}
-        title={lab.title}
-        category={lab.category}
-        description={lab.description}
-        onStartExperiment={handleStartExperiment}
-      />
+      {hero}
 
       <main className="relative z-10 mx-auto w-full max-w-[1440px] px-4 py-5 sm:px-12 md:px-20">
         <section className="space-y-4">

@@ -2,8 +2,7 @@
 
 import React from "react";
 import { Beaker, CheckCircle2, ChevronDown } from "lucide-react";
-import { labsById } from "@/data/labs";
-import { getLabDetails } from "@/data/labDetails";
+import type { LabDetailData } from "@/data/labDetails";
 
 type EquipmentTone = "rose" | "blue" | "amber" | "orange" | "cyan" | "violet" | "emerald";
 
@@ -383,7 +382,8 @@ const SpindleVisual = () => (
 );
 
 interface EquipmentListProps {
-  labId: string;
+  labTitle: string;
+  details: LabDetailData;
 }
 
 const SpringVisual = () => (
@@ -713,13 +713,8 @@ const visualMap: Record<string, React.ReactNode> = {
   HeartRateSVG: <HeartRateMonitorVisual />,
 };
 
-export default function EquipmentList({ labId }: EquipmentListProps) {
+export default function EquipmentList({ labTitle, details }: EquipmentListProps) {
   const [showDetails, setShowDetails] = React.useState(false);
-
-  const details = getLabDetails(labId);
-  if (!details) return null;
-
-  const lab = labsById[labId];
 
   const equipments: EquipmentItem[] = details.equipments.map((eq) => ({
     id: eq.id,
@@ -731,7 +726,7 @@ export default function EquipmentList({ labId }: EquipmentListProps) {
     visual: visualMap[eq.visualKey] || visualMap['BeakerVisual'],
   }));
 
-  const equipmentSubtitle = `รายการอุปกรณ์สำหรับการทดลอง ${lab?.title || "ห้องปฏิบัติการจำลอง"}`;
+  const equipmentSubtitle = `รายการอุปกรณ์สำหรับการทดลอง ${labTitle || "ห้องปฏิบัติการจำลอง"}`;
 
   const equipmentSummary = equipments
     .slice(0, 3)

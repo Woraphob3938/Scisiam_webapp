@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { SidebarProvider } from "@/context/SidebarContext";
 import { AuthProvider } from "@/context/AuthContext";
-import AIChatButton from "@/components/AIChatButton";
-import MobileTabBar from "@/components/MobileTabBar";
+import GlobalClientOverlays from "@/components/GlobalClientOverlays";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
@@ -58,9 +57,8 @@ export default function RootLayout({
           <AuthProvider>
             <SidebarProvider>
               {children}
-              <AIChatButton />
               <Suspense fallback={null}>
-                <MobileTabBar />
+                <GlobalClientOverlays />
               </Suspense>
             </SidebarProvider>
           </AuthProvider>

@@ -3,6 +3,7 @@ import { AlertTriangle, Home } from "lucide-react";
 
 import Navbar from "@/components/Navbar";
 import LabDetailLayout from "@/components/labs/LabDetailLayout";
+import LabHero from "@/components/labs/LabHero";
 import { labsById } from "@/data/labs";
 import { getLabDetails } from "@/data/labDetails";
 
@@ -20,7 +21,22 @@ export default async function LabDetailPage({ params }: LabDetailPageProps) {
     return <InvalidLabDetail labId={labId} />;
   }
 
-  return <LabDetailLayout labId={labId} lab={lab} details={details} />;
+  return (
+    <LabDetailLayout
+      labId={labId}
+      lab={lab}
+      details={details}
+      hero={
+        <LabHero
+          labId={labId}
+          title={lab.title}
+          category={lab.category}
+          description={lab.description}
+          simulationHref={`/labs/${labId}/simulation`}
+        />
+      }
+    />
+  );
 }
 
 function InvalidLabDetail({ labId }: { labId: string }) {

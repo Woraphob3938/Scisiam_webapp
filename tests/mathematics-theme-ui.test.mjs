@@ -21,7 +21,8 @@ test("Mathematics uses the shared Pastel Blush theme", () => {
   assert.match(hero, /isMathematics \? "bg-pink-50 text-pink-900 border-pink-200"/);
   assert.match(hero, /const primaryButtonClass = isMathematics[\s\S]*?bg-pink-200 hover:bg-pink-300[\s\S]*?text-pink-900/);
   assert.match(hero, /\$\{primaryButtonClass\}/);
-  assert.match(shell, /const resolvedAccent = category === "Mathematics" \? "pink" : accent/);
+  assert.match(shell, /Mathematics: "pink"/);
+  assert.match(shell, /const resolvedAccent = categoryAccents\[category\] \?\? accent/);
   assert.match(shell, /accentClasses\[resolvedAccent\]/);
   assert.match(shell, /metricToneClasses[\s\S]*?pink: "bg-pink-50 text-pink-900"/);
 });

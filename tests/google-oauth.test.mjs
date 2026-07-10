@@ -30,8 +30,9 @@ test("Google OAuth returns authenticated users to the student profile", () => {
 
   assert.match(callbackRoute, /exchangeCodeForSession\(code\)/);
   assert.match(callbackRoute, /searchParams\.get\("next"\)\s*\?\?\s*"\/profile"/);
-  assert.match(callbackRoute, /requestedNext\.startsWith\("\/"\)/);
-  assert.match(callbackRoute, /!requestedNext\.startsWith\("\/\/"\)/);
+  assert.match(callbackRoute, /function getSafeRedirectPath/);
+  assert.match(callbackRoute, /requestedNext\.includes\("\\\\"\)/);
+  assert.match(callbackRoute, /destination\.origin === base\.origin/);
   assert.match(callbackRoute, /NextResponse\.redirect\(new URL\(next, url\.origin\)\)/);
   assert.doesNotMatch(callbackRoute, /user_metadata|requested_role|role\s*:/);
 });
@@ -68,12 +69,11 @@ test("email login remember me persists the next login email only after success",
   assert.match(authCache, /localStorage\.removeItem\(SCISIAM_REMEMBER_EMAIL_KEY\)/);
 });
 
-test("email login sends authenticated users to the lab listing", () => {
+test("email login sends students to labs and teachers to dashboard", () => {
   const authForm = readProjectFile("src/components/auth/AuthForm.tsx");
 
-  assert.match(
-    authForm,
-    /cacheRememberedLogin\(normalizedEmail, rememberMe\);[\s\S]*router\.replace\("\/labs"\)/,
-  );
+  assert.match(authForm, /let nextPath = "\/labs"/);
+  assert.match(authForm, /nextPath = profile\.role === "teacher" \? "\/dashboard" : "\/labs"/);
+  assert.match(authForm, /cacheRememberedLogin\(normalizedEmail, rememberMe\);[\s\S]*router\.replace\(nextPath\)/);
   assert.doesNotMatch(authForm, /router\.push\("\/"\)/);
 });

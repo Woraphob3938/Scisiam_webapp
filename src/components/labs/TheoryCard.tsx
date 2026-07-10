@@ -2,10 +2,10 @@
 
 import React from "react";
 import { BookOpen } from "lucide-react";
-import { getLabDetails, GraphConfigData } from "@/data/labDetails";
+import type { GraphConfigData, LabDetailData } from "@/data/labDetails";
 
 interface TheoryCardProps {
-  labId: string;
+  details: LabDetailData;
 }
 
 interface TheoryGraphRendererProps {
@@ -281,10 +281,7 @@ function TheoryGraphRenderer({ config }: TheoryGraphRendererProps) {
   );
 }
 
-export default function TheoryCard({ labId }: TheoryCardProps) {
-  const details = getLabDetails(labId);
-  if (!details) return null;
-
+export default function TheoryCard({ details }: TheoryCardProps) {
   return (
     <div className="bg-white rounded-2xl border border-slate-200/70 p-5 sm:p-6">
       <h2 className="text-base font-bold text-slate-900 mb-5 border-b border-slate-100 pb-3 flex items-center gap-2">
