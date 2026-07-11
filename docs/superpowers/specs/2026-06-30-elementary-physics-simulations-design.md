@@ -1,3 +1,5 @@
+> Historical design record from 2026-06-30. It captures the decision at that time and is not the current operational specification.
+
 # Elementary Physics Simulations Design
 
 ## Scope

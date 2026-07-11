@@ -1,3 +1,5 @@
+> Historical QA snapshot from 2026-06-03. It is not evidence of the current dashboard state; use it only to understand the design review at that time.
+
 # Teacher Dashboard Design QA
 
 ## Evidence

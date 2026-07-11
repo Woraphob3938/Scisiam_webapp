@@ -1,3 +1,5 @@
+> Historical implementation plan from 2026-06-29. Read the active documentation and current source code before reusing any step.
+
 # Profile Navigation, Lab Cards, and Score Removal Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.

@@ -1,68 +1,36 @@
 ---
 title: Deploy PC Mobile Plan
-tags:
-  - scisiam
-  - deploy
-  - pc
-  - mobile
+status: active
 ---
 
 # Deploy PC Mobile Plan
 
-SciSiam ควรวางแผนเป็น 3 target แยกกัน แต่ใช้ codebase เดียวให้มากที่สุด
+SciSiam ใช้ Next.js web deployment เป็น canonical backend สำหรับ browser, PC และ mobile wrapper
 
-## Target 1: Web Demo
+## Web
 
-Purpose:
+- Deploy บน host ที่รองรับ Next.js Route Handlers และ middleware เช่น Vercel
+- Canonical fallback origin คือ https://scisiam-app.vercel.app
+- ตั้ง NEXT_PUBLIC_SITE_URL, NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY, GEMINI_API_KEY และ optional GEMINI_MODEL ใน hosting environment
+- ตั้ง Supabase redirect URL สำหรับ /auth/verify และ /auth/oauth-callback ของ local และ production origin
+- ก่อน deploy ให้ผ่าน npm test, npm run lint, npm run build, secret scan และตรวจ migration history
 
-- ให้กรรมการเปิดง่าย
-- ใช้ AI Tutor ผ่าน backend route
-- เป็น canonical production URL สำหรับ PC/mobile app เรียก API
+## PC
 
-Requirements:
+- มี Electron scaffold ใน main.js สำหรับการพัฒนา แต่ยังไม่ใช่ product decision สุดท้าย
+- Tauri อาจเหมาะเมื่อขนาด package และ memory สำคัญกว่าเวลา setup
+- package ต้องไม่มี provider key, service-role key หรือ private database credential
+- wrapper เรียก backend ของ SciSiam ผ่าน HTTPS และต้องทดสอบ sign-in, upload, notification และ offline state
 
-- Hosting ต้องรองรับ Next.js route handlers
-- Set `GEMINI_API_KEY` ใน hosting env
-- Run lint/build before deploy
-- No secrets in repo
+## Mobile
 
-## Target 2: PC App
+- เลือก PWA ก่อนเมื่อเป้าหมายคือ installable web experience ที่เร็ว
+- พิจารณา Capacitor เมื่อจำเป็นต้องเข้าถึงความสามารถ native มากขึ้น
+- ตรวจ mobile 390px, touch targets, keyboard, dialog, notification และ AI floating button ก่อน packaging
 
-Options:
+## ความเสี่ยงที่ต้องคุม
 
-- Electron: ทำเร็วกว่า เหมาะกับ prototype/competition
-- Tauri: เบากว่า แต่ setup ซับซ้อนกว่า
-
-Rule:
-
-- ห้ามใส่ AI key ใน PC package
-- App should call hosted backend for AI
-- Offline simulation can work, AI requires internet
-
-## Target 3: Mobile App
-
-Options:
-
-- Capacitor wrapper
-- PWA installable app
-- Native later if needed
-
-Rule:
-
-- Mobile app calls hosted backend for AI
-- Test 390px layout before packaging
-- Floating AI button must not cover core actions
-
-## Packaging Risks
-
-- Static export cannot use local Next API routes
-- API key in app package can be extracted
-- localStorage score/progress is not trustworthy for real accounts
-- In-memory rate limit is not enough for multi-instance production
-
-## Related Notes
-
-- [[03_AI_Tutor_Policy]]
-- [[01_Competition_Readiness]]
-- [[05_Backlog]]
-
+- Static export ใช้ built-in API route และ middleware แบบนี้ไม่ได้ ต้องแยก backend ก่อน
+- localStorage ไม่ใช่ source of truth ของ account หรือ authorization
+- in-memory fallback ของ rate limit ไม่เพียงพอสำหรับหลาย instance
+- SMTP, leaked-password protection, redirect URL และ OAuth consent ต้องตรวจซ้ำใน production

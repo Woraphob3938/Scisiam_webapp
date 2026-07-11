@@ -1,5 +1,7 @@
 ---
 title: Physics Labs
+status: historical
+superseded_by: ../../labs/00_Lab_Catalog.md
 tags:
   - scisiam
   - labs

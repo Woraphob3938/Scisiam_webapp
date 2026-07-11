@@ -22,6 +22,7 @@ import {
   Minimize2,
   Save,
   Target,
+  X,
 } from "lucide-react";
 
 export interface SimulationMetric {
@@ -48,6 +49,7 @@ interface SharedSimulationShellProps {
   controlsTitle: string;
   controls: React.ReactNode;
   compactControls?: React.ReactNode;
+  persistentControls?: boolean;
   drawerSummary?: React.ReactNode;
   metrics: SimulationMetric[];
   graph: React.ReactNode;
@@ -72,7 +74,6 @@ const accentClasses = {
     soft: "bg-blue-50 text-blue-700 border-blue-100",
     text: "text-blue-600",
     button: "bg-blue-600 text-white hover:bg-blue-700",
-    ring: "#2563eb",
   },
   cyan: {
     icon: "bg-cyan-600 text-white",
@@ -80,7 +81,6 @@ const accentClasses = {
     soft: "bg-cyan-50 text-cyan-700 border-cyan-100",
     text: "text-cyan-600",
     button: "bg-cyan-600 text-white hover:bg-cyan-700",
-    ring: "#0891b2",
   },
   emerald: {
     icon: "bg-emerald-600 text-white",
@@ -88,7 +88,6 @@ const accentClasses = {
     soft: "bg-emerald-50 text-emerald-700 border-emerald-100",
     text: "text-emerald-600",
     button: "bg-emerald-600 text-white hover:bg-emerald-700",
-    ring: "#10b981",
   },
   orange: {
     icon: "bg-orange-500 text-white",
@@ -96,7 +95,6 @@ const accentClasses = {
     soft: "bg-orange-50 text-orange-700 border-orange-100",
     text: "text-orange-600",
     button: "bg-orange-500 text-white hover:bg-orange-600",
-    ring: "#f97316",
   },
   rose: {
     icon: "bg-rose-600 text-white",
@@ -104,7 +102,6 @@ const accentClasses = {
     soft: "bg-rose-50 text-rose-700 border-rose-100",
     text: "text-rose-600",
     button: "bg-rose-600 text-white hover:bg-rose-700",
-    ring: "#e11d48",
   },
   pink: {
     icon: "bg-pink-200 text-pink-900",
@@ -112,7 +109,6 @@ const accentClasses = {
     soft: "bg-pink-50 text-pink-900 border-pink-200",
     text: "text-pink-800",
     button: "bg-pink-200 text-pink-900 hover:bg-pink-300",
-    ring: "#f9a8d4",
   },
   violet: {
     icon: "bg-violet-600 text-white",
@@ -120,7 +116,6 @@ const accentClasses = {
     soft: "bg-violet-50 text-violet-700 border-violet-100",
     text: "text-violet-600",
     button: "bg-violet-600 text-white hover:bg-violet-700",
-    ring: "#7c3aed",
   },
 };
 
@@ -156,6 +151,7 @@ export default function SharedSimulationShell({
   controlsTitle,
   controls,
   compactControls,
+  persistentControls = false,
   drawerSummary,
   metrics,
   graph,
@@ -163,9 +159,6 @@ export default function SharedSimulationShell({
   theory,
   steps,
   learningGoals,
-  progressLabel,
-  progressValue,
-  progressPercent,
   tips,
   showLiveMetrics = true,
   showInfoTabs = true,
@@ -178,17 +171,29 @@ export default function SharedSimulationShell({
   const [isExpanded, setIsExpanded] = useState(false);
   const [controlsOpen, setControlsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<InfoTab>("about");
-  const boundedProgress = Math.min(100, Math.max(0, progressPercent));
   const hasDrawerSummary = Boolean(drawerSummary) || showLiveMetrics || (showSaveButton && onSave);
   const labDetails = getLabDetails(labId);
+  const hasCompactControls =
+    compactControls !== null && compactControls !== undefined && compactControls !== false;
   const collapsedControls = compactControls ?? controls;
   const hasCollapsedControls =
     collapsedControls !== null && collapsedControls !== undefined && collapsedControls !== false;
-  const stageBottomClass = controlsOpen
-    ? "bottom-[calc(32vh+48px)]"
-    : hasCollapsedControls
-      ? "bottom-[210px] sm:bottom-[220px]"
-      : "bottom-[96px] sm:bottom-[104px]";
+  const usesPersistentControlDock = persistentControls || hasCollapsedControls;
+  const usesRegularControlDock = usesPersistentControlDock && !hasCompactControls;
+  const stageBottomClass = !usesPersistentControlDock
+    ? controlsOpen
+      ? "bottom-[calc(32vh+48px)]"
+      : hasCollapsedControls
+        ? "bottom-[210px] sm:bottom-[220px]"
+        : "bottom-[96px] sm:bottom-[104px]"
+    : usesRegularControlDock
+      ? "bottom-[272px] sm:bottom-[272px]"
+      : "bottom-[228px] sm:bottom-[220px]";
+  const fullscreenButtonBottomClass = usesRegularControlDock
+    ? "bottom-[272px] sm:bottom-[272px]"
+    : usesPersistentControlDock
+      ? "bottom-[188px] sm:bottom-[180px]"
+      : stageBottomClass;
 
   useEffect(() => {
     const syncFullscreen = () => setIsExpanded(document.fullscreenElement === stageShellRef.current);
@@ -244,18 +249,6 @@ export default function SharedSimulationShell({
           </div>
         ))}
       </div>
-      <div className="mt-3 flex items-center gap-3 border-t border-slate-100 pt-2">
-        <div
-          className="grid h-12 w-12 shrink-0 place-items-center rounded-full text-[11px] font-black text-slate-900"
-          style={{ background: `conic-gradient(${tone.ring} ${boundedProgress}%, #e2e8f0 0)` }}
-        >
-          <div className="grid h-9 w-9 place-items-center rounded-full bg-white">{boundedProgress.toFixed(0)}%</div>
-        </div>
-        <div className="min-w-0">
-          <p className="truncate text-[10px] font-bold text-slate-500">{progressLabel}</p>
-          <p className="truncate text-sm font-black text-slate-900">{progressValue}</p>
-        </div>
-      </div>
     </section>
   );
 
@@ -307,6 +300,63 @@ export default function SharedSimulationShell({
     </section>
   );
 
+  const persistentControlDock = (
+    <section
+      data-testid="persistent-control-dock"
+      className="rounded-2xl border border-white/70 bg-white/95 p-3 shadow-xl shadow-slate-900/10 backdrop-blur-md"
+    >
+      <div className="mb-2 flex items-center justify-between gap-3">
+        <h2 className="flex min-w-0 items-center gap-2 text-sm font-black text-slate-900 sm:text-base">
+          <Target className={`h-5 w-5 shrink-0 ${tone.text}`} />
+          <span className="truncate">{controlsTitle}</span>
+        </h2>
+        <button
+          type="button"
+          onClick={() => setControlsOpen((value) => !value)}
+          className={`inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-black transition hover:brightness-95 ${tone.soft}`}
+          aria-expanded={controlsOpen}
+          aria-controls="simulation-advanced-controls"
+        >
+          {controlsOpen ? "ปิดค่าขั้นสูง" : "ตั้งค่าขั้นสูง"}
+          {controlsOpen ? <ChevronsUp className="h-4 w-4" /> : <ChevronsDown className="h-4 w-4" />}
+        </button>
+      </div>
+      <div className={hasCompactControls ? "min-w-0" : "max-h-[170px] min-w-0 overflow-y-auto pr-1"}>
+        {collapsedControls}
+      </div>
+    </section>
+  );
+
+  const persistentAdvancedPanel = usesPersistentControlDock && controlsOpen && (
+    <section
+      id="simulation-advanced-controls"
+      data-testid="simulation-advanced-controls"
+      className={`absolute inset-x-4 bottom-[210px] top-[122px] z-40 overflow-y-auto rounded-2xl border bg-white p-4 shadow-xl shadow-slate-900/15 sm:inset-x-5 md:left-auto md:w-[min(720px,calc(100%-2.5rem))] ${tone.border}`}
+    >
+      <div className="mb-3 flex items-center justify-between gap-3 border-b border-slate-100 pb-3">
+        <h2 className="text-sm font-black text-slate-900">การตั้งค่าขั้นสูง</h2>
+        <button
+          type="button"
+          onClick={() => setControlsOpen(false)}
+          className="grid h-10 w-10 shrink-0 place-items-center rounded-xl text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+          aria-label="ปิดการตั้งค่าขั้นสูง"
+        >
+          <X className="h-4 w-4" />
+        </button>
+      </div>
+      {controls}
+      {showSaveButton && onSave && (
+        <button
+          onClick={onSave}
+          className={`mt-4 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-xs font-black shadow-sm ${tone.button}`}
+        >
+          <Save className="h-4 w-4" />
+          บันทึกผลการทดลอง
+        </button>
+      )}
+    </section>
+  );
+
   const simulationStage = (
     <section
       ref={stageShellRef}
@@ -319,8 +369,8 @@ export default function SharedSimulationShell({
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(59,130,246,0.18),transparent_30%),radial-gradient(circle_at_80%_20%,rgba(16,185,129,0.14),transparent_28%)]" />
       <div className={`absolute inset-px bg-slate-100 ${isExpanded ? "" : "rounded-[22px]"}`} />
 
-      <div className="absolute left-5 right-5 top-5 z-20 flex flex-wrap items-start justify-between gap-3 pointer-events-none">
-        <div className="min-w-0 max-w-[calc(100%-64px)] rounded-2xl border border-white/70 bg-white/92 px-4 py-3 shadow-lg shadow-slate-900/10 backdrop-blur-md sm:max-w-none pointer-events-auto">
+      <div className="pointer-events-none absolute left-5 right-5 top-5 z-20">
+          <div className="pointer-events-auto inline-block min-w-0 max-w-[calc(100%-64px)] rounded-2xl border border-white/70 bg-white/92 px-4 py-3 shadow-lg shadow-slate-900/10 backdrop-blur-md xl:max-w-[calc(100%-340px)]">
           <div className="mb-1 flex flex-wrap items-center gap-2">
             <Link
               href="/labs"
@@ -335,23 +385,13 @@ export default function SharedSimulationShell({
           <h1 className="max-w-[720px] text-lg font-black leading-relaxed text-slate-950 sm:text-2xl">{title}</h1>
         </div>
 
-        <div className="flex items-start gap-3 pointer-events-auto">
-          {showLiveMetrics && (
-            <div data-testid="simulation-stage-metrics" className="hidden w-[320px] shrink-0 xl:block">
-              {liveMetricsCard}
-            </div>
-          )}
-
-          <button
-            type="button"
-            onClick={toggleFullscreen}
-            className="grid h-11 w-11 place-items-center rounded-2xl border border-white/70 bg-white/92 text-slate-700 shadow-lg shadow-slate-900/10 backdrop-blur-md transition hover:text-slate-950"
-            aria-label={isExpanded ? "ออกจากโหมดเต็มจอ" : "ขยายห้องทดลอง"}
-          >
-            {isExpanded ? <Minimize2 className="h-5 w-5" /> : <Maximize2 className="h-5 w-5" />}
-          </button>
-        </div>
       </div>
+
+      {showLiveMetrics && (
+        <div data-testid="simulation-stage-metrics" className="absolute right-5 top-5 z-20 hidden w-[320px] xl:block">
+          {liveMetricsCard}
+        </div>
+      )}
 
       {showLiveMetrics && <div className="absolute right-5 top-[148px] z-20 sm:hidden pointer-events-none">
         <div className="inline-flex max-w-[180px] items-center gap-2 rounded-2xl border border-white/70 bg-white/92 px-3 py-2 text-[11px] font-black text-slate-900 shadow-lg shadow-slate-900/10 backdrop-blur-md pointer-events-auto">
@@ -363,15 +403,29 @@ export default function SharedSimulationShell({
       <div className={`absolute inset-x-4 top-[122px] z-10 transition-all duration-300 sm:inset-x-5 ${stageBottomClass}`}>
         <div
           data-testid="simulation-stage-content"
-          className="relative h-full min-h-0 overflow-hidden rounded-[22px] border border-white/70 bg-white p-3 shadow-inner shadow-slate-200/70"
+          className="relative h-full min-h-0 overflow-hidden rounded-[22px]"
         >
-          <div data-testid="simulation-stage-scene" className="h-full min-h-0 overflow-hidden rounded-[18px]">
+          <div data-testid="simulation-stage-scene" className="h-full min-h-0 overflow-hidden">
             {scene}
           </div>
         </div>
       </div>
 
-      <div className="absolute bottom-4 left-4 right-4 z-30 sm:bottom-5 sm:left-5 sm:right-5">{controlsDrawer}</div>
+      {persistentAdvancedPanel}
+
+      <button
+        type="button"
+        data-testid="simulation-fullscreen-toggle"
+        onClick={toggleFullscreen}
+        className={`absolute right-5 z-30 grid h-11 w-11 place-items-center rounded-2xl border border-white/70 bg-white/92 text-slate-700 shadow-lg shadow-slate-900/10 backdrop-blur-md transition hover:text-slate-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${fullscreenButtonBottomClass}`}
+        aria-label={isExpanded ? "ออกจากโหมดเต็มจอ" : "ขยายห้องทดลอง"}
+      >
+        {isExpanded ? <Minimize2 className="h-5 w-5" /> : <Maximize2 className="h-5 w-5" />}
+      </button>
+
+      <div className="absolute bottom-4 left-4 right-4 z-30 sm:bottom-5 sm:left-5 sm:right-5">
+        {usesPersistentControlDock ? persistentControlDock : controlsDrawer}
+      </div>
     </section>
   );
 
@@ -458,9 +512,9 @@ export default function SharedSimulationShell({
 
       <main className="mx-auto w-full max-w-[1440px] px-4 py-6 sm:px-12 md:px-20">
         <div className="flex flex-col gap-6">
-          {simulationStage}
+              {simulationStage}
 
-          {showInfoTabs && <section className="space-y-4">
+              {showInfoTabs && <section className="space-y-4">
             <div className="flex gap-2 overflow-x-auto rounded-2xl border border-slate-200 bg-white p-2 shadow-sm shadow-slate-200/40">
               {tabs.map((tab) => {
                 const TabIcon = tab.icon;

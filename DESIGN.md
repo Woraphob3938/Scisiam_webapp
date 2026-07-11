@@ -146,7 +146,7 @@ The palette is a restrained white-and-slate lab surface with one primary blue ac
 ### Tertiary
 
 - **Success Green** (`#10b981`): Completed actions, readiness, progress success, and valid states.
-- **Warning Amber** (`#f59e0b`): Caution, setup hints, points, and non-blocking warnings.
+- **Warning Amber** (`#f59e0b`): Caution, setup hints, due-date attention, and non-blocking warnings.
 - **Danger Red** (`#ef4444`): Error, unsafe/invalid input, or critical status only.
 
 ### Neutral

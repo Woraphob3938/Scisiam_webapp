@@ -107,8 +107,7 @@ test("navbar notifications do not reuse local lab keys for Supabase accounts", (
   assert.match(authProvider, /localNotificationMode:\s*false/);
   assert.match(source, /loadClassroomNotificationsSafely/);
   assert.match(source, /if\s*\(!isAuthReady\s*\|\|\s*!isLoggedIn\s*\|\|\s*localNotificationMode\s*\|\|\s*!isSupabaseConfigured\(\)\)/);
-  assert.match(source, /auth\.getSession\(\)/);
-  assert.match(source, /if\s*\(!session\)\s*\{[\s\S]*?return \[\];/);
+  assert.doesNotMatch(source, /auth\.getSession\(\)/);
   assert.match(source, /if\s*\(role === "teacher"\)\s*\{[\s\S]*?setNotifications\(\[\]\)/);
   assert.match(profile, /if\s*\(storedRole !== "teacher"\)\s*\{[\s\S]*?readLocalLearningSnapshot/);
   assert.match(source, /listMyClassroomNotifications/);

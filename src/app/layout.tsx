@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Kanit, Prompt } from "next/font/google";
 import { Suspense } from "react";
 import { SidebarProvider } from "@/context/SidebarContext";
 import { AuthProvider } from "@/context/AuthContext";
@@ -6,6 +7,20 @@ import GlobalClientOverlays from "@/components/GlobalClientOverlays";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
+
+const kanit = Kanit({
+  variable: "--font-kanit",
+  subsets: ["latin", "thai"],
+  weight: "800",
+  display: "swap",
+});
+
+const prompt = Prompt({
+  variable: "--font-prompt",
+  subsets: ["latin", "thai"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+});
 
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL?.startsWith("http")
@@ -51,7 +66,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="th" className="h-full antialiased">
+    <html lang="th" className={`${prompt.variable} ${kanit.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-slate-50 text-slate-900">
         <TooltipProvider>
           <AuthProvider>

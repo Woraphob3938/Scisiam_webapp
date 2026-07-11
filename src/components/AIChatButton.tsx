@@ -280,7 +280,14 @@ export default function AIChatButton() {
         {isOpen ? (
           <X className="h-5.5 w-5.5 sm:h-6.5 sm:w-6.5" />
         ) : (
-          <Image src="/ai-oon-avatar.png" alt="" fill sizes="56px" className="object-cover" />
+          <Image
+            src="/ai-oon-avatar.png"
+            alt=""
+            fill
+            sizes="56px"
+            loading="eager"
+            className="object-cover"
+          />
         )}
       </button>
     </div>

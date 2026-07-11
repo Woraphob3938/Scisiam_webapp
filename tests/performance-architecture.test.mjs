@@ -22,6 +22,15 @@ test("global interactive UI is deferred until the authenticated device needs it"
   assert.match(overlays, /window\.matchMedia\("\(max-width: 1023px\)"\)/);
 });
 
+test("the always-visible AI I-Oon avatar is loaded eagerly", () => {
+  const aiChat = readProjectFile("src/components/AIChatButton.tsx");
+
+  assert.match(
+    aiChat,
+    /<Image[\s\S]*?src="\/ai-oon-avatar\.png"[\s\S]*?alt=""[\s\S]*?fill[\s\S]*?sizes="56px"[\s\S]*?loading="eager"/,
+  );
+});
+
 test("classroom launcher keeps the full lab picker out of the initial navigation bundle", () => {
   const launcher = readProjectFile("src/components/classrooms/ClassroomActionLauncher.tsx");
   const dialog = readProjectFile("src/components/classrooms/ClassroomActions.tsx");

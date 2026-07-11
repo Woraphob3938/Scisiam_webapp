@@ -1,20 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import {
   AlertTriangle,
   ArrowRight,
-  BookOpenCheck,
-  ClipboardCheck,
-  LayoutDashboard,
-  Loader2,
+  CheckCircle2,
   RefreshCw,
   UsersRound,
 } from "lucide-react";
 
 export type TeacherDashboardStatus = "loading" | "ready" | "error";
-export type TeacherTab = "classrooms" | "submissions";
 
 export interface TeacherClassroom {
   id: string;
@@ -23,6 +19,9 @@ export interface TeacherClassroom {
   students: number;
   assignmentCount: number;
   labCount: number;
+  submissionCount: number;
+  expectedSubmissionCount: number;
+  pendingSubmissionCount: number;
   submissionRate: number;
   latestActivity: string;
   href: string;
@@ -43,6 +42,7 @@ interface TeacherDashboardProps {
   errorMessage: string;
   classrooms: TeacherClassroom[];
   submissions: TeacherSubmission[];
+  lastUpdatedAt: string;
   onRetry: () => void;
 }
 
@@ -52,230 +52,324 @@ export default function TeacherDashboard({
   errorMessage,
   classrooms,
   submissions,
+  lastUpdatedAt,
   onRetry,
 }: TeacherDashboardProps) {
-  const [activeTab, setActiveTab] = useState<TeacherTab>("classrooms");
-  const metrics = useMemo(() => {
-    const totalStudents = classrooms.reduce((total, room) => total + room.students, 0);
-    const totalAssignments = classrooms.reduce((total, room) => total + room.assignmentCount, 0);
-    const averageSubmissionRate =
-      classrooms.length === 0
-        ? 0
-        : Math.round(classrooms.reduce((total, room) => total + room.submissionRate, 0) / classrooms.length);
-
-    return [
-      { label: "ห้องเรียนที่ดูแล", value: classrooms.length.toLocaleString("th-TH"), icon: UsersRound },
-      { label: "นักเรียนทั้งหมด", value: totalStudents.toLocaleString("th-TH"), icon: BookOpenCheck },
-      { label: "งานที่มอบหมาย", value: totalAssignments.toLocaleString("th-TH"), icon: ClipboardCheck },
-      { label: "อัตราการส่งเฉลี่ย", value: `${averageSubmissionRate}%`, icon: LayoutDashboard },
-    ];
-  }, [classrooms]);
-
   return (
-    <div className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-8 lg:px-10">
-      <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div className="min-w-0">
-            <p className="text-xs font-extrabold text-blue-600">TEACHER DASHBOARD</p>
-            <h1 className="mt-2 text-3xl font-extrabold leading-[1.35] text-slate-950">
-              แดชบอร์ดคุณครู
-            </h1>
-            <p className="mt-2 max-w-3xl text-sm font-semibold leading-relaxed text-slate-500">
-              สวัสดีค่ะ {teacherName} ติดตามห้องเรียน งานที่มอบหมาย และการส่งงานล่าสุดจากข้อมูลจริงในระบบ
-            </p>
-          </div>
-
-          <div className="flex flex-wrap gap-2.5">
-            <Link
-              href="/classrooms"
-              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-extrabold text-slate-700 transition-colors hover:bg-slate-50 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
-            >
-              <UsersRound className="h-4 w-4" aria-hidden="true" />
-              ไปหน้าชั้นเรียน
-            </Link>
-            <Link
-              href="/classrooms"
-              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 text-sm font-extrabold text-white shadow-md shadow-blue-500/15 transition-colors hover:bg-blue-700 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
-            >
-              จัดการห้องเรียน
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </Link>
-          </div>
+    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-8 lg:px-10">
+      <header className="flex flex-col gap-4 border-b border-slate-200 pb-5 sm:flex-row sm:items-end sm:justify-between">
+        <div className="min-w-0">
+          <h1 className="text-3xl font-bold leading-[1.35] text-slate-950">ภาพรวมการส่งงาน</h1>
+          <p className="mt-2 max-w-2xl text-sm font-medium leading-relaxed text-slate-600">
+            สวัสดีค่ะ {teacherName} เปรียบเทียบการส่งงานจากห้องเรียนที่คุณดูแล
+          </p>
+          {lastUpdatedAt ? (
+            <p className="mt-1 text-xs font-medium text-slate-500">อัปเดตล่าสุด {lastUpdatedAt}</p>
+          ) : null}
         </div>
-      </section>
+        <Link
+          href="/classrooms"
+          className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 text-sm font-bold text-slate-800 transition-colors hover:bg-slate-50 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
+        >
+          จัดการชั้นเรียน
+          <ArrowRight className="size-4" aria-hidden="true" />
+        </Link>
+      </header>
 
       {status === "loading" ? <DashboardLoading /> : null}
       {status === "error" ? <DashboardError message={errorMessage} onRetry={onRetry} /> : null}
-
-      {status === "ready" ? (
-        <>
-          <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4" aria-label="ตัวชี้วัดแดชบอร์ดคุณครู">
-            {metrics.map((metric) => {
-              const Icon = metric.icon;
-              return (
-                <article key={metric.label} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-                  <div className="flex items-center gap-3">
-                    <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-blue-50 text-blue-600">
-                      <Icon className="h-5 w-5" aria-hidden="true" />
-                    </span>
-                    <div>
-                      <p className="text-xs font-extrabold text-slate-500">{metric.label}</p>
-                      <p className="mt-1 text-2xl font-extrabold text-slate-950">{metric.value}</p>
-                    </div>
-                  </div>
-                </article>
-              );
-            })}
-          </section>
-
-          <nav className="flex gap-2 overflow-x-auto" aria-label="มุมมองแดชบอร์ดคุณครู">
-            {[
-              { id: "classrooms", label: "ห้องเรียน", count: classrooms.length },
-              { id: "submissions", label: "งานที่ส่งล่าสุด", count: submissions.length },
-            ].map((tab) => {
-              const active = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => setActiveTab(tab.id as TeacherTab)}
-                  className={`inline-flex min-h-11 shrink-0 items-center gap-2 rounded-xl px-4 text-sm font-extrabold transition-colors focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100 ${
-                    active ? "bg-blue-600 text-white shadow-md shadow-blue-500/15" : "bg-white text-slate-500 hover:text-slate-900"
-                  }`}
-                >
-                  {tab.label}
-                  <span className={`rounded-full px-2 py-0.5 text-xs ${active ? "bg-white/20 text-white" : "bg-slate-100 text-slate-500"}`}>
-                    {tab.count}
-                  </span>
-                </button>
-              );
-            })}
-          </nav>
-
-          {activeTab === "classrooms" ? <ClassroomPanel classrooms={classrooms} /> : null}
-          {activeTab === "submissions" ? <SubmissionPanel submissions={submissions} /> : null}
-        </>
+      {status === "ready" && classrooms.length === 0 ? (
+        <EmptyPanel
+          title="ยังไม่มีห้องเรียนที่คุณสร้าง"
+          description="สร้างชั้นเรียน เลือกห้องแล็บ และเชิญนักเรียนเพื่อเริ่มติดตามการส่งงาน"
+          actionLabel="สร้างชั้นเรียน"
+        />
+      ) : null}
+      {status === "ready" && classrooms.length > 0 ? (
+        <div className="mt-6 space-y-6">
+          <DashboardSummary classrooms={classrooms} />
+          <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px] xl:items-start">
+            <ClassroomComparison classrooms={classrooms} />
+            <aside className="grid gap-5" aria-label="ข้อมูลสำหรับติดตาม">
+              <FollowUpPanel classrooms={classrooms} />
+              <RecentSubmissionPanel submissions={submissions} />
+            </aside>
+          </div>
+        </div>
       ) : null}
     </div>
   );
 }
 
+function DashboardSummary({ classrooms }: { classrooms: TeacherClassroom[] }) {
+  const totals = useMemo(
+    () =>
+      classrooms.reduce(
+        (summary, room) => ({
+          classrooms: summary.classrooms + 1,
+          students: summary.students + room.students,
+          submitted: summary.submitted + room.submissionCount,
+          expected: summary.expected + room.expectedSubmissionCount,
+        }),
+        { classrooms: 0, students: 0, submitted: 0, expected: 0 },
+      ),
+    [classrooms],
+  );
+  const rate =
+    totals.expected === 0
+      ? 0
+      : Math.min(100, Math.round((totals.submitted / totals.expected) * 100));
+
+  return (
+    <section
+      className="grid gap-px overflow-hidden rounded-2xl border border-slate-200 bg-slate-200 sm:grid-cols-2 xl:grid-cols-5"
+      aria-label="สรุปการส่งงานทั้งหมด"
+    >
+      <SummaryValue label="ห้องเรียน" value={totals.classrooms.toLocaleString("th-TH")} />
+      <SummaryValue label="นักเรียน" value={totals.students.toLocaleString("th-TH")} />
+      <SummaryValue label="ส่งแล้ว" value={totals.submitted.toLocaleString("th-TH")} />
+      <SummaryValue label="ควรส่ง" value={totals.expected.toLocaleString("th-TH")} />
+      <SummaryValue label="อัตราการส่งรวม" value={`${rate}%`} emphasis />
+    </section>
+  );
+}
+
+function SummaryValue({
+  label,
+  value,
+  emphasis = false,
+}: {
+  label: string;
+  value: string;
+  emphasis?: boolean;
+}) {
+  return (
+    <div className={`bg-white px-5 py-4 ${emphasis ? "sm:col-span-2 xl:col-span-1" : ""}`}>
+      <p className="text-xs font-medium text-slate-600">{label}</p>
+      <p className={`mt-1 text-2xl font-bold ${emphasis ? "text-blue-700" : "text-slate-950"}`}>{value}</p>
+    </div>
+  );
+}
+
+function ClassroomComparison({ classrooms }: { classrooms: TeacherClassroom[] }) {
+  return (
+    <section aria-labelledby="classroom-comparison-heading">
+      <div className="mb-4">
+        <h2 id="classroom-comparison-heading" className="text-xl font-bold text-slate-950">
+          เปรียบเทียบแต่ละห้องเรียน
+        </h2>
+        <p className="mt-1 text-sm font-medium leading-relaxed text-slate-600">
+          ดูจำนวนที่ส่งแล้ว เทียบกับจำนวนที่ควรส่งในแต่ละห้อง
+        </p>
+      </div>
+
+      <div className="hidden overflow-hidden rounded-2xl border border-slate-200 bg-white md:block">
+        <table className="w-full border-collapse">
+          <caption className="sr-only">เปรียบเทียบผลการส่งงานของแต่ละห้องเรียน</caption>
+          <thead>
+            <tr className="border-b border-slate-200 bg-slate-50 text-left text-xs font-bold text-slate-600">
+              <th scope="col" className="px-5 py-3">ห้องเรียน</th>
+              <th scope="col" className="px-3 py-3">นักเรียน</th>
+              <th scope="col" className="px-3 py-3">งาน</th>
+              <th scope="col" className="px-3 py-3">ส่งแล้ว / ควรส่ง</th>
+              <th scope="col" className="px-3 py-3">ค้างส่ง</th>
+              <th scope="col" className="px-3 py-3">อัตราการส่ง</th>
+              <th scope="col" className="px-5 py-3 text-right">จัดการ</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-100">
+            {classrooms.map((room) => (
+              <tr key={room.id} className="align-middle transition-colors hover:bg-slate-50/70">
+                <th scope="row" className="max-w-60 px-5 py-4 text-left">
+                  <span className="block truncate text-sm font-bold text-slate-950">{room.name}</span>
+                  <span className="mt-1 block truncate text-xs font-medium text-slate-500">
+                    {room.gradeLevel} · {room.labCount} แล็บ · {room.latestActivity}
+                  </span>
+                </th>
+                <td className="px-3 py-4 text-sm font-bold text-slate-800">{room.students.toLocaleString("th-TH")}</td>
+                <td className="px-3 py-4 text-sm font-bold text-slate-800">{room.assignmentCount.toLocaleString("th-TH")}</td>
+                <td className="px-3 py-4 text-sm font-bold text-slate-800">
+                  {room.submissionCount.toLocaleString("th-TH")} / {room.expectedSubmissionCount.toLocaleString("th-TH")}
+                </td>
+                <td className="px-3 py-4 text-sm font-bold text-slate-800">{room.pendingSubmissionCount.toLocaleString("th-TH")}</td>
+                <td className="px-3 py-4"><SubmissionProgress room={room} /></td>
+                <td className="px-5 py-4 text-right">
+                  <ClassroomLink room={room} />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <ul className="grid gap-3 md:hidden">
+        {classrooms.map((room) => (
+          <li key={room.id} className="rounded-2xl border border-slate-200 bg-white p-4">
+            <h3 className="break-words text-base font-bold leading-relaxed text-slate-950">{room.name}</h3>
+            <p className="mt-1 text-xs font-medium leading-relaxed text-slate-500">
+              {room.gradeLevel} · {room.labCount} แล็บ · {room.latestActivity}
+            </p>
+            <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 border-y border-slate-100 py-4">
+              <MobileMetric label="นักเรียน" value={room.students.toLocaleString("th-TH")} />
+              <MobileMetric label="งาน" value={room.assignmentCount.toLocaleString("th-TH")} />
+              <MobileMetric label="ส่งแล้ว / ควรส่ง" value={`${room.submissionCount.toLocaleString("th-TH")} / ${room.expectedSubmissionCount.toLocaleString("th-TH")}`} />
+              <MobileMetric label="ค้างส่ง" value={room.pendingSubmissionCount.toLocaleString("th-TH")} />
+            </dl>
+            <div className="mt-4">
+              <SubmissionProgress room={room} />
+            </div>
+            <div className="mt-4">
+              <ClassroomLink room={room} fullWidth />
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+function MobileMetric({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <dt className="text-xs font-medium text-slate-500">{label}</dt>
+      <dd className="mt-1 text-sm font-bold text-slate-900">{value}</dd>
+    </div>
+  );
+}
+
+function SubmissionProgress({ room }: { room: TeacherClassroom }) {
+  return (
+    <div className="min-w-28">
+      <div className="flex items-center justify-between gap-2 text-xs font-bold text-slate-700">
+        <span>{room.submissionRate}%</span>
+      </div>
+      <div
+        className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-100"
+        role="progressbar"
+        aria-label={`อัตราการส่งงานของ ${room.name}`}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={room.submissionRate}
+      >
+        <span
+          className="block h-full rounded-full bg-blue-600"
+          style={{ width: `${room.submissionRate}%` }}
+        />
+      </div>
+    </div>
+  );
+}
+
+function ClassroomLink({ room, fullWidth = false }: { room: TeacherClassroom; fullWidth?: boolean }) {
+  return (
+    <Link
+      href={room.href}
+      className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-3 text-sm font-bold text-blue-700 transition-colors hover:bg-blue-50 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100 ${fullWidth ? "w-full border border-blue-100" : ""}`}
+      aria-label={`เปิดชั้นเรียน ${room.name}`}
+    >
+      เปิดชั้นเรียน
+      <ArrowRight className="size-4" aria-hidden="true" />
+    </Link>
+  );
+}
+
+function FollowUpPanel({ classrooms }: { classrooms: TeacherClassroom[] }) {
+  const roomsToFollow = useMemo(
+    () =>
+      [...classrooms]
+        .filter((room) => room.pendingSubmissionCount > 0)
+        .sort(
+          (left, right) =>
+            right.pendingSubmissionCount - left.pendingSubmissionCount ||
+            left.submissionRate - right.submissionRate,
+        )
+        .slice(0, 3),
+    [classrooms],
+  );
+
+  return (
+    <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white" aria-labelledby="follow-up-heading">
+      <div className="border-b border-slate-100 px-5 py-4">
+        <h2 id="follow-up-heading" className="text-lg font-bold text-slate-950">ควรติดตาม</h2>
+        <p className="mt-1 text-xs font-medium leading-relaxed text-slate-500">เรียงจากจำนวนงานค้างมากที่สุด</p>
+      </div>
+      {roomsToFollow.length > 0 ? (
+        <ul className="divide-y divide-slate-100">
+          {roomsToFollow.map((room) => (
+            <li key={room.id}>
+              <Link href={room.href} className="block px-5 py-4 transition-colors hover:bg-slate-50 focus:outline-none focus-visible:ring-3 focus-visible:ring-inset focus-visible:ring-blue-100">
+                <span className="block break-words text-sm font-bold text-slate-900">{room.name}</span>
+                <span className="mt-1 block text-xs font-medium leading-relaxed text-slate-600">
+                  ค้าง {room.pendingSubmissionCount.toLocaleString("th-TH")} รายการ · ส่งแล้ว {room.submissionRate}%
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <div className="flex items-start gap-3 px-5 py-5 text-sm text-slate-600">
+          <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-emerald-600" aria-hidden="true" />
+          <p className="font-medium leading-relaxed">ขณะนี้ไม่มีรายการค้างส่งที่ต้องติดตาม</p>
+        </div>
+      )}
+    </section>
+  );
+}
+
+function RecentSubmissionPanel({ submissions }: { submissions: TeacherSubmission[] }) {
+  return (
+    <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white" aria-labelledby="recent-submissions-heading">
+      <div className="border-b border-slate-100 px-5 py-4">
+        <h2 id="recent-submissions-heading" className="text-lg font-bold text-slate-950">งานส่งล่าสุด</h2>
+        <p className="mt-1 text-xs font-medium leading-relaxed text-slate-500">เรียงจากเวลาที่ส่งล่าสุด</p>
+      </div>
+      {submissions.length > 0 ? (
+        <ul className="divide-y divide-slate-100">
+          {submissions.slice(0, 5).map((submission) => (
+            <li key={submission.id}>
+              <Link href={submission.href} className="block px-5 py-4 transition-colors hover:bg-slate-50 focus:outline-none focus-visible:ring-3 focus-visible:ring-inset focus-visible:ring-blue-100">
+                <span className="block break-words text-sm font-bold leading-relaxed text-slate-900">{submission.assignmentTitle}</span>
+                <span className="mt-1 block text-xs font-medium leading-relaxed text-slate-600">{submission.studentName} · {submission.room}</span>
+                <span className="mt-1 block text-xs font-medium text-slate-500">{submission.submittedAt}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="px-5 py-5 text-sm font-medium leading-relaxed text-slate-600">ยังไม่มีงานที่นักเรียนส่งเข้ามา</p>
+      )}
+    </section>
+  );
+}
+
 function DashboardLoading() {
   return (
-    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4" role="status">
+    <div className="mt-6 space-y-6" role="status">
       <span className="sr-only">กำลังโหลดแดชบอร์ดคุณครู</span>
-      {[0, 1, 2, 3].map((item) => (
-        <div key={item} className="h-28 animate-pulse rounded-2xl border border-slate-200 bg-white p-4">
-          <div className="h-4 w-24 rounded bg-slate-100" />
-          <div className="mt-4 h-8 w-16 rounded bg-slate-100" />
-        </div>
-      ))}
+      <div className="h-24 animate-pulse rounded-2xl border border-slate-200 bg-white" />
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="h-72 animate-pulse rounded-2xl border border-slate-200 bg-white" />
+        <div className="h-56 animate-pulse rounded-2xl border border-slate-200 bg-white" />
+      </div>
     </div>
   );
 }
 
 function DashboardError({ message, onRetry }: { message: string; onRetry: () => void }) {
   return (
-    <section className="rounded-2xl border border-rose-200 bg-white p-6 text-center" role="alert">
-      <AlertTriangle className="mx-auto h-10 w-10 text-rose-500" aria-hidden="true" />
-      <h2 className="mt-3 text-lg font-extrabold text-slate-950">โหลดแดชบอร์ดไม่สำเร็จ</h2>
-      <p className="mx-auto mt-2 max-w-xl break-words text-sm font-semibold leading-relaxed text-slate-500">{message}</p>
+    <section className="mt-6 rounded-2xl border border-rose-200 bg-white p-6 text-center" role="alert">
+      <AlertTriangle className="mx-auto size-10 text-rose-500" aria-hidden="true" />
+      <h2 className="mt-3 text-lg font-bold text-slate-950">โหลดแดชบอร์ดไม่สำเร็จ</h2>
+      <p className="mx-auto mt-2 max-w-xl break-words text-sm font-medium leading-relaxed text-slate-600">{message}</p>
       <button
         type="button"
         onClick={onRetry}
-        className="mt-4 inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 text-sm font-extrabold text-white hover:bg-blue-700 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
+        className="mt-4 inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 text-sm font-bold text-white hover:bg-blue-700 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
       >
-        <RefreshCw className="h-4 w-4" aria-hidden="true" />
+        <RefreshCw className="size-4" aria-hidden="true" />
         ลองใหม่
       </button>
     </section>
-  );
-}
-
-function ClassroomPanel({ classrooms }: { classrooms: TeacherClassroom[] }) {
-  if (classrooms.length === 0) {
-    return (
-      <EmptyPanel
-        title="ยังไม่มีห้องเรียนที่คุณสร้าง"
-        description="ไปที่หน้าชั้นเรียนเพื่อสร้างห้องใหม่ เลือกแล็บ และเชิญนักเรียนเข้าร่วม"
-        actionLabel="สร้างห้องเรียน"
-      />
-    );
-  }
-
-  return (
-    <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-      <div className="hidden grid-cols-[1.2fr_0.8fr_0.8fr_0.8fr_1fr] gap-4 border-b border-slate-100 bg-slate-50 px-5 py-3 text-xs font-extrabold text-slate-500 md:grid">
-        <span>ห้องเรียน</span>
-        <span>นักเรียน</span>
-        <span>งาน</span>
-        <span>ส่งงาน</span>
-        <span className="text-right">จัดการ</span>
-      </div>
-      <div className="divide-y divide-slate-100">
-        {classrooms.map((room) => (
-          <article key={room.id} className="grid gap-3 px-5 py-4 md:grid-cols-[1.2fr_0.8fr_0.8fr_0.8fr_1fr] md:items-center">
-            <div className="min-w-0">
-              <h3 className="truncate text-base font-extrabold text-slate-950">{room.name}</h3>
-              <p className="mt-1 text-xs font-semibold text-slate-500">{room.gradeLevel} · {room.labCount} แล็บ · {room.latestActivity}</p>
-            </div>
-            <MetricText label="นักเรียน" value={room.students.toLocaleString("th-TH")} />
-            <MetricText label="งาน" value={room.assignmentCount.toLocaleString("th-TH")} />
-            <MetricText label="ส่งงาน" value={`${room.submissionRate}%`} />
-            <div className="flex justify-start md:justify-end">
-              <Link
-                href={room.href}
-                className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl bg-blue-50 px-3 text-sm font-extrabold text-blue-700 transition-colors hover:bg-blue-100 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
-              >
-                เปิดชั้นเรียน
-                <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </Link>
-            </div>
-          </article>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function SubmissionPanel({ submissions }: { submissions: TeacherSubmission[] }) {
-  if (submissions.length === 0) {
-    return (
-      <EmptyPanel
-        title="ยังไม่มีงานที่นักเรียนส่ง"
-        description="เมื่อนักเรียนส่งไฟล์หรือลิงก์ในงานชั้นเรียน รายการล่าสุดจะแสดงที่นี่"
-        actionLabel="ไปหน้าชั้นเรียน"
-      />
-    );
-  }
-
-  return (
-    <section className="divide-y divide-slate-100 rounded-2xl border border-slate-200 bg-white shadow-sm">
-      {submissions.slice(0, 12).map((submission) => (
-        <Link
-          key={submission.id}
-          href={submission.href}
-          className="flex flex-col gap-2 px-5 py-4 transition-colors hover:bg-slate-50 sm:flex-row sm:items-center sm:justify-between"
-        >
-          <div className="min-w-0">
-            <h3 className="truncate text-base font-extrabold text-slate-950">{submission.assignmentTitle}</h3>
-            <p className="mt-1 text-sm font-semibold text-slate-500">
-              {submission.studentName} · {submission.room}
-            </p>
-          </div>
-          <span className="text-sm font-bold text-slate-400">{submission.submittedAt}</span>
-        </Link>
-      ))}
-    </section>
-  );
-}
-
-function MetricText({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <p className="text-[11px] font-bold text-slate-400 md:hidden">{label}</p>
-      <p className="text-sm font-extrabold text-slate-800">{value}</p>
-    </div>
   );
 }
 
@@ -289,16 +383,16 @@ function EmptyPanel({
   actionLabel: string;
 }) {
   return (
-    <section className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center">
-      <Loader2 className="mx-auto h-9 w-9 text-slate-300" aria-hidden="true" />
-      <h2 className="mt-3 text-lg font-extrabold text-slate-950">{title}</h2>
-      <p className="mx-auto mt-2 max-w-xl text-sm font-semibold leading-relaxed text-slate-500">{description}</p>
+    <section className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center">
+      <UsersRound className="mx-auto size-10 text-slate-400" aria-hidden="true" />
+      <h2 className="mt-3 text-lg font-bold text-slate-950">{title}</h2>
+      <p className="mx-auto mt-2 max-w-xl text-sm font-medium leading-relaxed text-slate-600">{description}</p>
       <Link
         href="/classrooms"
-        className="mt-5 inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 text-sm font-extrabold text-white hover:bg-blue-700 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
+        className="mt-5 inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 text-sm font-bold text-white hover:bg-blue-700 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
       >
         {actionLabel}
-        <ArrowRight className="h-4 w-4" aria-hidden="true" />
+        <ArrowRight className="size-4" aria-hidden="true" />
       </Link>
     </section>
   );

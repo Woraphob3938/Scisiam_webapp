@@ -543,9 +543,10 @@ test("shared simulation shell overlays live metrics without shrinking the stage"
   assert.doesNotMatch(source, /xl:mr-\[336px\]/);
   assert.match(source, /\? "fixed inset-0 z-\[100\] h-screen min-h-screen w-screen rounded-none border-0 shadow-none"/);
   assert.match(source, /data-testid="simulation-stage-content"[\s\S]*className="relative h-full/);
-  assert.match(source, /data-testid="simulation-stage-scene"[\s\S]*className="h-full min-h-0 overflow-hidden rounded-\[18px\]"/);
-  assert.match(source, /data-testid="simulation-stage-metrics" className="hidden w-\[320px\] shrink-0 xl:block"/);
+  assert.match(source, /data-testid="simulation-stage-scene"[\s\S]*className="h-full min-h-0 overflow-hidden"/);
+  assert.match(source, /data-testid="simulation-stage-metrics" className="absolute right-5 top-5 z-20 hidden w-\[320px\] xl:block"/);
   assert.match(source, /drawerSummary \?\? \(showLiveMetrics && liveMetricsCard\)/);
+  assert.match(source, /\{persistentAdvancedPanel\}[\s\S]*usesPersistentControlDock \? persistentControlDock : controlsDrawer/);
 });
 
 test("graphing lines math lab uses its own interactive simulation", () => {
@@ -984,6 +985,18 @@ test("foundation simulations keep exploration-only chrome", () => {
     assert.match(source, /showLiveMetrics=\{false\}/, `${file} should hide real-time metrics`);
     assert.match(source, /showInfoTabs=\{false\}/, `${file} should hide detail tabs`);
     assert.match(source, /showSaveButton=\{false\}/, `${file} should hide save buttons`);
+  }
+
+  for (const file of [
+    "src/components/labs/simulation/AtmosphereLayersSimulation.tsx",
+    "src/components/labs/simulation/FoundationExplorerSimulation.tsx",
+  ]) {
+    const source = readProjectFile(file);
+    assert.match(
+      source,
+      /compactControls=\{controls\}/,
+      `${file} should keep its exploration controls compact`,
+    );
   }
 });
 

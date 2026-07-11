@@ -7,11 +7,21 @@ const globalsCss = fs.readFileSync(
   path.join(process.cwd(), "src", "app", "globals.css"),
   "utf8",
 );
+const rootLayout = fs.readFileSync(
+  path.join(process.cwd(), "src", "app", "layout.tsx"),
+  "utf8",
+);
 
-test("uses Noto Sans Thai as the global Thai UI font", () => {
-  assert.match(globalsCss, /--font-sans:\s*'Noto Sans Thai', sans-serif;/);
-  assert.match(globalsCss, /--font-heading:\s*'Noto Sans Thai', sans-serif;/);
-  assert.match(globalsCss, /--font-looped:\s*'Noto Sans Thai', sans-serif;/);
-  assert.match(globalsCss, /--font-mono:\s*'Noto Sans Thai', sans-serif;/);
+test("uses Prompt for Thai UI text and Kanit for the Scisiam wordmark", () => {
+  assert.match(rootLayout, /import \{ Kanit, Prompt \} from "next\/font\/google"/);
+  assert.match(rootLayout, /variable:\s*"--font-prompt"/);
+  assert.match(rootLayout, /variable:\s*"--font-kanit"/);
+  assert.match(rootLayout, /\$\{prompt\.variable\} \$\{kanit\.variable\} h-full antialiased/);
+  assert.doesNotMatch(globalsCss, /fonts\.googleapis\.com/);
+  assert.match(globalsCss, /--font-sans:\s*var\(--font-prompt\), sans-serif;/);
+  assert.match(globalsCss, /--font-heading:\s*var\(--font-prompt\), sans-serif;/);
+  assert.match(globalsCss, /--font-looped:\s*var\(--font-prompt\), sans-serif;/);
+  assert.match(globalsCss, /--font-mono:\s*var\(--font-prompt\), sans-serif;/);
   assert.match(globalsCss, /body\s*\{[^}]*font-family:\s*var\(--font-sans\)/s);
+  assert.match(globalsCss, /\.scisiam-wordmark\s*\{[^}]*font-family:\s*var\(--font-kanit\)/s);
 });

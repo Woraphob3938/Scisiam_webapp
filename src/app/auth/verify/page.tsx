@@ -33,7 +33,7 @@ export default async function VerifyEmailLinkPage({
             />
           </span>
           <div>
-            <p className="text-lg font-extrabold leading-[1.2] text-blue-600">Scisiam</p>
+            <p className="scisiam-wordmark text-xl text-blue-600">Scisiam</p>
             <p className="text-xs font-semibold leading-relaxed text-slate-500">ระบบบัญชีที่ปลอดภัย</p>
           </div>
         </header>

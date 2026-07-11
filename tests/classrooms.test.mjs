@@ -221,6 +221,11 @@ test("classroom client exposes owner actions, assignments, and creator names", (
   assert.match(source, /from\("classroom_notifications"\)/);
   assert.match(source, /export async function listMyClassroomNotifications/);
   assert.match(source, /Math\.max\(1, Math\.min\(limit, 20\)\)/);
+  const notificationLoader = source.match(
+    /export async function listMyClassroomNotifications[\s\S]*?\n\}/,
+  )?.[0];
+  assert.ok(notificationLoader);
+  assert.doesNotMatch(notificationLoader, /requireCurrentUserId/);
   assert.match(source, /isSupabaseNetworkError/);
   assert.match(source, /error instanceof TypeError/);
   assert.match(source, /failed to fetch/i);
@@ -398,12 +403,12 @@ test("classroom list route authenticates and loads the current user's rooms", ()
   assert.match(source, /AUTH_CHECK_TIMEOUT_MS\s*=\s*6_000/);
   assert.match(source, /router\.replace\("\/login\?next=\/classrooms"\)/);
   assert.match(source, /<Sidebar activeMenu="ชั้นเรียน" \/>/);
-  assert.match(source, /เปิดห้อง/);
+  assert.match(source, /เปิดชั้นเรียน/);
   assert.match(source, /ลองใหม่/);
   assert.match(source, /<ClassroomActionLauncher placement="desktop" \/>/);
 });
 
-test("classroom workspace loads private room data and exposes three stable tabs", () => {
+test("classroom workspace loads private room data and exposes four stable tabs", () => {
   const source = fs.readFileSync(
     path.join(root, "src", "app", "classrooms", "[id]", "page.tsx"),
     "utf8"

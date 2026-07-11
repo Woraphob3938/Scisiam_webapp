@@ -1,42 +1,47 @@
 ---
-title: SciSiam Knowledge Base
-tags:
-  - scisiam
-  - moc
+title: SciSiam Documentation
+status: active
 ---
 
-# SciSiam Knowledge Base
+# SciSiam Documentation
 
-นี่คือแผนที่ความรู้สำหรับเปิดใน Obsidian หรืออ่านตรงจาก GitHub เพื่อคุมทิศทางโปรเจกต์ SciSiam ก่อนส่งแข่งขันและก่อนต่อยอดเป็น web/PC/mobile app
+เอกสารชุดนี้อธิบายผลิตภัณฑ์และการปฏิบัติงานของ SciSiam ในสถานะปัจจุบัน เอกสารที่มีวันที่และอยู่ในส่วน Historical ใช้เพื่อดูที่มาเท่านั้น ไม่ใช่แหล่งอ้างอิงในการพัฒนารอบใหม่
 
-## Project Maps
+## แหล่งอ้างอิงหลัก
 
-- [[00_Project_Overview]]
-- [[PRD]]
-- [[01_Competition_Readiness]]
-- [[02_Design_System]]
-- [[03_AI_Tutor_Policy]]
-- [[04_Deploy_PC_Mobile]]
-- [[05_Backlog]]
+| เรื่อง | แหล่งอ้างอิง |
+| --- | --- |
+| การเริ่มต้นใช้งาน, environment, route และคำสั่งตรวจสอบ | [README](../README.md) |
+| วิสัยทัศน์, ผู้ใช้, ขอบเขตผลิตภัณฑ์ | [PRODUCT](../PRODUCT.md) |
+| รูปแบบ UI และภาษาไทย | [DESIGN](../DESIGN.md) |
+| กติกาเทคนิค, Supabase, ความปลอดภัย และการตรวจสอบ | [AGENTS](../AGENTS.md) |
+| รายชื่อและ metadata ของแล็บ | [src/data/labs.ts](../src/data/labs.ts) |
 
-## Lab Catalog
+## เอกสารปัจจุบัน
 
-- [[labs/00_Lab_Catalog]]
-- [[labs/Physics]]
-- [[labs/Chemistry]]
-- [[labs/Biology]]
-- [[labs/_Lab_Template]]
+- [ภาพรวมโครงการ](00_Project_Overview.md)
+- [PRD](PRD.md)
+- [Checklist ก่อน demo หรือแข่งขัน](01_Competition_Readiness.md)
+- [ทางลัดไปยัง Design System](02_Design_System.md)
+- [นโยบาย AI ไออุ่น](03_AI_Tutor_Policy.md)
+- [แนวทาง deploy, PC และ mobile](04_Deploy_PC_Mobile.md)
+- [Roadmap ผลิตภัณฑ์](05_Backlog.md)
 
-## Source Of Truth
+## เอกสารแล็บ
 
-- Code rules: [[AGENTS]]
-- Product design system: [[DESIGN]]
-- Lab data source: `src/data/labs.ts`
-- AI Tutor API: `src/app/api/ai-tutor/route.ts`
+- [คู่มือ catalog และแหล่งข้อมูลแล็บ](labs/00_Lab_Catalog.md)
+- [Template สำหรับสร้างแล็บใหม่](labs/_Lab_Template.md)
 
-## How To Use
+รายการแล็บไม่ถูกคัดลอกลง Markdown เพราะ src/data/labs.ts เป็นแหล่งข้อมูลเดียวที่เชื่อถือได้ และ regression suite ตรวจความสอดคล้องของ registry และ save key อยู่แล้ว
 
-1. Start with [[00_Project_Overview]] to understand what SciSiam is.
-2. Use [[01_Competition_Readiness]] before demos, commits, and judging.
-3. Use [[labs/00_Lab_Catalog]] when adding or checking labs.
-4. Update [[05_Backlog]] when audit findings are fixed or new risks appear.
+## เอกสารประวัติ
+
+- [Archive guide](archive/README.md) รวม PRD, project overview, backlog, catalog และ QA รุ่นก่อน
+- เอกสารใน docs/superpowers/specs และ docs/superpowers/plans เป็น design/implementation record ตามวันที่ ไม่ใช่คู่มือปฏิบัติงานปัจจุบัน
+
+## กติกาการดูแลเอกสาร
+
+1. เปลี่ยนข้อเท็จจริงของผลิตภัณฑ์ให้แก้ code source และเอกสารหลักในงานเดียวกัน
+2. อย่าคัดลอก catalog, readiness หรือ status ของแล็บแบบ manual จาก code ลงหลายไฟล์
+3. แผนที่ทำเสร็จแล้วให้ระบุสถานะ Implemented หรือ Archived แทนการปล่อย checklist ว่าง
+4. ผล QA ต้องมีวันที่, route, viewport และขอบเขตหลักฐานเสมอ

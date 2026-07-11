@@ -1,3 +1,5 @@
+> Historical implementation plan from 2026-07-02. Read the active documentation and current source code before reusing any step.
+
 # Login Entry, Account History, and Elementary Chemistry Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.

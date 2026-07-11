@@ -1,3 +1,5 @@
+> Historical design record from 2026-07-02. It captures the decision at that time and is not the current operational specification.
+
 # SciSiam Signup Redirect And Confirmation Email Design
 
 ## Goal

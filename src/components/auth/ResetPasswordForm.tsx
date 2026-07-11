@@ -91,7 +91,7 @@ export default function ResetPasswordForm({
           <Image src="/ai-oon-logo.png" alt="โลโก้ Scisiam น้องไออุ่น" fill sizes="44px" className="object-contain p-0.5" priority />
         </span>
         <div>
-          <p className="text-lg font-extrabold leading-[1.2] text-blue-600">Scisiam</p>
+          <p className="scisiam-wordmark text-xl text-blue-600">Scisiam</p>
           <p className="text-xs font-semibold leading-relaxed text-slate-500">ระบบบัญชีที่ปลอดภัย</p>
         </div>
       </header>

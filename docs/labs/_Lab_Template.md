@@ -1,73 +1,57 @@
 ---
 title: Lab Template
-tags:
-  - scisiam
-  - template
+status: active
 ---
 
 # Lab Template
 
-Use this template when creating an individual lab note.
+ใช้ template นี้ก่อนเพิ่ม lab id ใหม่ หรือก่อนเปลี่ยน simulation เดิมอย่างมีนัยสำคัญ
 
-## Metadata
+## Product Metadata
 
-- ID:
-- Title:
-- Category:
-- Source route:
-- Status: Ready / Partial / Placeholder Needed / Not Started
+- Lab ID:
+- Thai title:
+- English title:
+- Category: Physics / Chemistry / Biology / Mathematics / Foundation
+- Grade range:
+- Learning objective:
+- Student outcome:
 
-## Learning Objective
-
-- What should the student understand after this lab?
-
-## Apparatus
-
-- Item 1:
-- Item 2:
-- Item 3:
-
-## Variables
+## Scientific Model
 
 - Independent variable:
 - Dependent variable:
 - Controlled variables:
 - Units:
+- Formula, rule, or conceptual model:
+- Assumptions and limits:
+- Common misconception to address:
 
-## Formula Or Model
+## Learning Experience
 
-```text
-Add formula here
-```
-
-## Simulation Behavior
-
-- Start state:
+- Stage or viewport description:
 - Controls:
-- Live values:
-- Graph/table:
-- Save result:
+- Visible real-time feedback:
+- Graph or table:
+- Theory, equipment, and steps:
+- Save-result behavior:
+- AI ไออุ่น context and safety caveat:
 
-## AI Tutor Context
+## Visual Brief
 
-- Key concepts:
-- Common student questions:
-- Warning/caveat:
-
-## UI Notes
-
-- Hero visual:
+- LabCard SVG concept:
+- Simulation SVG or Canvas concept:
 - Subject accent:
+- Important labels or accessible text:
 - Mobile concern:
 
 ## Implementation Checklist
 
-- `src/data/labs.ts`
-- Detail page content
-- Equipment list
-- Theory card
-- Experiment steps
-- Simulation selector
-- Save/profile integration
-- Browser QA
-
+- Update src/data/labs.ts
+- Update src/data/labDetails.ts
+- Update src/data/labSimulationRegistry.ts
+- Update src/data/labSavedExperiments.ts
+- Confirm lab route and simulation selector
+- Add or update the matching simulation component
+- Verify saved runs stay account-owned
+- Run npm test, npm run lint, and browser QA at 390px

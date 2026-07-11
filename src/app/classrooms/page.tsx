@@ -8,8 +8,6 @@ import {
   BookOpenCheck,
   FlaskConical,
   RefreshCw,
-  ShieldCheck,
-  UserRound,
   UsersRound,
 } from "lucide-react";
 
@@ -18,6 +16,7 @@ import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
 import { useSidebar } from "@/context/SidebarContext";
 import { clearScisiamAuthCache } from "@/lib/supabase/auth-cache";
+import { getClassroomPresentation } from "@/lib/classroom-presentation";
 import {
   listMyClassrooms,
   type ClassroomSummary,
@@ -157,11 +156,13 @@ function ClassroomLoadingState() {
     <div role="status" className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
       <span className="sr-only">กำลังโหลดรายชื่อชั้นเรียน</span>
       {[0, 1, 2].map((item) => (
-        <div key={item} className="min-h-52 animate-pulse rounded-lg border border-slate-200 bg-white p-5">
-          <div className="h-5 w-2/3 rounded bg-slate-100" />
-          <div className="mt-4 h-3 w-1/3 rounded bg-slate-100" />
-          <div className="mt-8 h-3 w-full rounded bg-slate-100" />
-          <div className="mt-2 h-3 w-4/5 rounded bg-slate-100" />
+        <div key={item} className="min-h-72 animate-pulse overflow-hidden rounded-2xl border border-slate-200 bg-white">
+          <div className="h-36 bg-blue-100" />
+          <div className="p-5">
+            <div className="h-3 w-full rounded bg-slate-100" />
+            <div className="mt-2 h-3 w-4/5 rounded bg-slate-100" />
+            <div className="mt-7 h-11 rounded-xl bg-slate-100" />
+          </div>
         </div>
       ))}
     </div>
@@ -211,30 +212,29 @@ function ClassroomEmptyState() {
 }
 
 function ClassroomCard({ classroom }: { classroom: ClassroomSummary }) {
+  const presentation = getClassroomPresentation(classroom.labIds);
+
   return (
-    <article className="flex min-h-60 flex-col rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-      <div className="flex items-start justify-between gap-3">
-        <span className="inline-flex min-h-7 items-center rounded-full border border-blue-100 bg-blue-50 px-2.5 text-xs font-extrabold text-blue-700">
-          {classroom.gradeLevel}
-        </span>
-        <span className="inline-flex min-h-7 items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-2.5 text-xs font-extrabold text-slate-600">
-          {classroom.isCreator ? <ShieldCheck className="size-3.5" aria-hidden="true" /> : <UsersRound className="size-3.5" aria-hidden="true" />}
-          {classroom.isCreator ? "ผู้สร้าง" : "สมาชิก"}
-        </span>
+    <article className="group flex min-h-72 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-lg hover:shadow-slate-200/70">
+      <div className={`relative min-h-36 overflow-hidden bg-gradient-to-br px-5 py-4 text-white ${presentation.coverClassName}`}>
+        <span aria-hidden="true" className="absolute -right-7 -top-10 size-40 rounded-full bg-white/10" />
+        <span aria-hidden="true" className="absolute bottom-[-2.5rem] right-16 size-24 rounded-full border-[14px] border-white/10" />
+        <div className="relative flex items-start justify-between gap-3">
+          <span className="rounded-full bg-white/15 px-2.5 py-1 text-xs font-bold backdrop-blur-sm">{presentation.label}</span>
+          <span className="rounded-full bg-white/15 px-2.5 py-1 text-xs font-bold backdrop-blur-sm">{classroom.gradeLevel}</span>
+        </div>
+        <h2 className="relative mt-5 line-clamp-2 break-words text-xl font-bold leading-snug text-white">{classroom.name}</h2>
+        <p className="relative mt-1 truncate text-sm font-medium text-white/85">{classroom.creatorName}</p>
       </div>
 
-      <h2 className="mt-4 break-words text-lg font-extrabold leading-relaxed text-slate-950">{classroom.name}</h2>
-      <p className="mt-1 flex items-center gap-1.5 text-xs font-bold text-slate-500">
-        <UserRound className="size-3.5 shrink-0" aria-hidden="true" />
-        สร้างโดย {classroom.creatorName}
-      </p>
-      {classroom.description ? (
-        <p className="mt-1 line-clamp-2 text-sm font-semibold leading-relaxed text-slate-500">{classroom.description}</p>
-      ) : (
-        <p className="mt-1 text-sm font-semibold leading-relaxed text-slate-400">ไม่มีรายละเอียดเพิ่มเติม</p>
-      )}
+      <div className="flex flex-1 flex-col p-5">
+        {classroom.description ? (
+          <p className="line-clamp-2 text-sm font-medium leading-relaxed text-slate-600">{classroom.description}</p>
+        ) : (
+          <p className="text-sm font-medium leading-relaxed text-slate-500">พื้นที่เรียนรู้ร่วมกันสำหรับทดลองและทบทวนผล</p>
+        )}
 
-      <dl className="mt-5 grid grid-cols-2 gap-3 border-t border-slate-100 pt-4">
+        <dl className="mt-5 grid grid-cols-2 gap-3 border-t border-slate-100 pt-4">
         <div className="flex items-center gap-2">
           <FlaskConical className="size-4 text-blue-600" aria-hidden="true" />
           <div>
@@ -253,12 +253,13 @@ function ClassroomCard({ classroom }: { classroom: ClassroomSummary }) {
 
       <Link
         href={`/classrooms/${classroom.id}`}
-        className="mt-5 inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 text-sm font-extrabold text-white transition-colors hover:bg-blue-700 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
+        className="mt-5 inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 text-sm font-bold text-white transition-colors hover:bg-blue-700 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
       >
         <BookOpenCheck className="size-4" aria-hidden="true" />
-        เปิดห้อง
+        เปิดชั้นเรียน
         <ArrowRight className="size-4" aria-hidden="true" />
       </Link>
+      </div>
     </article>
   );
 }

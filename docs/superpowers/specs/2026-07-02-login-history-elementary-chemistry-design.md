@@ -1,3 +1,5 @@
+> Historical design record from 2026-07-02. It captures the decision at that time and is not the current operational specification.
+
 # SciSiam Login Entry, Account History, and Elementary Chemistry Simulations
 
 Date: 2026-07-02

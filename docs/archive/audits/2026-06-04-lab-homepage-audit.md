@@ -1,3 +1,5 @@
+> Historical UX and accessibility snapshot from 2026-06-04. The root route and lab experience have changed since this audit; do not treat it as current QA.
+
 # SciSiam Lab Homepage Audit
 
 Date: 2026-06-04  

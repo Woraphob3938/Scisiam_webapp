@@ -1,63 +1,38 @@
 ---
 title: AI Tutor Policy
-tags:
-  - scisiam
-  - ai
-  - security
+status: active
 ---
 
 # AI Tutor Policy
 
-SciSiam AI Tutor ช่วยตอบคำถามวิทยาศาสตร์และอธิบายบริบท lab แต่ต้องไม่ทำให้โปรเจกต์เสี่ยงเรื่อง API key, quota, หรือความถูกต้องทางการศึกษา
+AI ไออุ่นช่วยผู้เรียนอธิบายวิทยาศาสตร์ในบริบทของแล็บ ไม่ใช่ผู้ตัดสินคำตอบหรือแหล่งข้อมูลที่ถูกต้องเสมอ
 
-## Security Rules
+## Architecture
 
-- ห้ามฝัง API key ใน client code
-- ห้ามฝัง API key ใน PC/mobile package
-- ใช้ `.env.local` เฉพาะ dev
-- Production ต้องใช้ Environment Variables บน server/hosting
-- Client เรียก backend route เท่านั้น
+- Client เรียก src/app/api/ai-tutor/route.ts เท่านั้น
+- GEMINI_API_KEY และ GEMINI_MODEL อยู่บน server environment เท่านั้น
+- Route ตรวจ Supabase session, จำกัด input/history, ใช้ timeout และ rate limit ตาม verified user id
+- labId ต้องผ่านการตรวจสอบกับ labsById ก่อนนำไปสร้าง context
 
-## Current API Route
+## Guardrails ปัจจุบัน
 
-- Route: `src/app/api/ai-tutor/route.ts`
-- Env: `GEMINI_API_KEY`
-- Optional env: `GEMINI_MODEL`
-- Default model: `gemini-2.5-flash`
+- ไม่ส่ง provider key ไป client, URL query, log หรือ package PC/mobile
+- จำกัด 10 messages, 900 characters ต่อ message และ request body 16 KB
+- ยกเลิก provider request หลัง 15 วินาที
+- จำกัด 12 requests ต่อ 60 วินาทีผ่าน check_ai_rate_limit RPC โดยมี fallback เพื่อความพร้อมใช้งาน
+- telemetry เก็บเฉพาะ latency, จำนวนตัวอักษร, success และ error code ไม่เก็บ prompt, token, header หรือ provider payload
 
-## Required Guards
+## พฤติกรรมของผู้ช่วย
 
-- Input validation
-- Message length limit
-- Max history
-- Timeout
-- Rate limit
-- Safe error messages
-- No key in query string
+- ตอบภาษาไทยที่ชัดเจนและเป็นขั้นตอน
+- อธิบายสูตร, หน่วย, ตัวแปร และข้อจำกัดของแบบจำลองเมื่อเกี่ยวข้อง
+- ยึดตาม lab ปัจจุบันเมื่อระบบส่ง context มาให้
+- ไม่แต่งผลทดลองหรืออ้างว่าตรวจสอบข้อมูลภายนอกแล้ว
+- บอกผู้เรียนให้ตรวจสอบกับครูหรือแหล่งที่เชื่อถือได้เมื่อคำตอบอาจมีผลต่อความปลอดภัยหรือการตัดสินใจสำคัญ
 
-## Tutor Behavior
+## Production Checklist
 
-AI Tutor should:
-
-- ตอบภาษาไทย
-- อธิบายเป็นขั้นตอน
-- ผูกคำตอบกับ lab ปัจจุบันเมื่อมี `labId`
-- แสดงสูตร ตัวแปร หน่วย เมื่อถามคำนวณ
-- ไม่อ้างว่ามีข้อมูลจริงที่ระบบไม่ได้ให้
-- เตือนว่า AI อาจผิดพลาด
-
-## PC/Mobile Rule
-
-PC/mobile app ต้องเรียก production backend เช่น:
-
-```text
-App -> https://scisiam.example.com/api/ai-tutor -> Gemini/OpenAI
-```
-
-ตัว app ต้องไม่มี provider key
-
-## Related Notes
-
-- [[04_Deploy_PC_Mobile]]
-- [[01_Competition_Readiness]]
-- [[AGENTS]]
+- ตั้ง GEMINI_API_KEY และ optional GEMINI_MODEL ใน hosting environment
+- ยืนยันว่า CSP และ image policy ไม่เปิด provider origin เกินจำเป็น
+- ตรวจ AI usage events และ rate-limit RPC หลัง deploy
+- rotate key ทุกครั้งที่สงสัยว่าอาจรั่ว และอย่าเก็บ key ใน git history ใหม่

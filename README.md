@@ -8,14 +8,14 @@ SciSiam is built so learners explore science through **doing**, not just reading
 
 ## Highlights
 
-- **103 labs** across Physics, Chemistry, Biology, and Mathematics, plus a Foundation entry; **61** currently ship a ready interactive simulation.
+- **103 labs** across Physics, Chemistry, Biology, Mathematics, and Foundation; every registered lab has a ready, topic-matched simulation route.
 - Lab listing with search, subject filters, grade-level filters, and honest readiness labels.
 - Lab detail pages with objectives, equipment, theory, steps, readiness, and start actions.
-- Interactive simulation routes resolved by `labId` through a typed registry — unsupported labs get a matching placeholder, never a wrong-lab fallback.
+- Interactive simulation routes resolved by `labId` through a typed registry: 61 direct simulations, 6 shared chemistry-concept simulations, and 36 shared mathematics-concept simulations.
 - Shared `SharedSimulationShell` for consistent simulator UX (stage, controls, live metrics, graph/table, theory, steps, save).
 - AI ไออุ่น tutor through a hardened server-side API route (`/api/ai-tutor`).
-- Profile, missions, points, learning history, and teacher-oriented progress surfaces.
-- Supabase integration for auth, experiment runs, missions, rewards, learning snapshots, and durable rate limiting.
+- Profile editing, learning history, missions/rewards, and teacher-oriented progress surfaces. Active score and point mutation are intentionally disabled.
+- Supabase integration for auth, profiles, experiment runs, classrooms, assignments, notifications, learning snapshots, and AI rate limiting.
 - Responsive UI tuned for desktop, tablet, and **390px mobile**.
 
 ---
@@ -39,14 +39,15 @@ SciSiam is built so learners explore science through **doing**, not just reading
 ## Project Structure
 
 ```text
-src/app/page.tsx                            Home dashboard
+src/app/page.tsx                            Redirects the root route to /login
 src/app/labs/page.tsx                       Lab listing, search, filters
 src/app/labs/[id]/page.tsx                  Lab detail route
 src/app/labs/[id]/simulation/page.tsx       Simulation selector by labId
 src/app/api/ai-tutor/route.ts               Server-side AI ไออุ่น route
-src/app/auth/*                              Supabase email auth + password reset
+src/app/auth/*                              Email confirmation, recovery, and OAuth callback routes
 src/app/{login,register,reset-password}     Auth surfaces
-src/app/{profile,missions,history}          Progress surfaces
+src/app/{profile,dashboard,missions,history} Profile, teacher dashboard, and progress surfaces
+src/app/classrooms/                         Classroom list and workspace routes
 src/components/                             Shared UI components
 src/components/labs/                        Lab detail components
 src/components/labs/simulation/             Simulation components + SharedSimulationShell
@@ -66,7 +67,7 @@ Companion documents:
 - `AGENTS.md` — working rules for coding agents
 - `DESIGN.md` — design system and visual language
 - `PRODUCT.md` — product vision and users
-- `docs/` — design notes and flow documentation
+- `docs/README.md` — current documentation map and operational notes
 
 ---
 
@@ -131,21 +132,22 @@ The project ships migrations for:
 - experiment run saving (RPC-hardened)
 - missions and rewards (claim via RPC)
 - AI usage analytics + rate-limit support
-- progress and rewards hardening
+- classrooms, assignments, notifications, and file-access hardening
 - missing foreign-key indexes
 
 Apply migrations to the target Supabase project before using the app as a real multi-user product. Seed mission data with `supabase/seed.sql` when needed.
 
 **Client-side code must use the publishable Supabase key only.** Any service-role or secret key must stay server-side.
 
-### Password recovery
+### Authentication redirect URLs
 
 Add these URLs in Supabase Dashboard → Authentication → URL Configuration → Redirect URLs:
 
-- `http://localhost:3000/auth/callback`
-- The `/auth/callback` path on the canonical deployed origin
+- `http://localhost:3000/auth/verify`
+- `http://localhost:3000/auth/oauth-callback`
+- The matching `/auth/verify` and `/auth/oauth-callback` paths on the canonical deployed origin
 
-The recovery flow is `/auth/callback` → `/reset-password`. Production password-reset email requires custom SMTP or a Supabase Send Email Hook; the default sender is suitable only for limited development testing.
+Email confirmation and recovery use `/auth/verify` → `POST /auth/confirm` → `/login` or `/reset-password`. Google OAuth returns through `/auth/oauth-callback`. Production password-reset email requires custom SMTP or a Supabase Send Email Hook; the default sender is suitable only for limited development testing.
 
 ---
 
@@ -159,7 +161,7 @@ Security posture (already implemented):
 - Requests require an authenticated Supabase session when Supabase is configured.
 - Input is validated and capped (max 10 messages, 900 chars each, 16 KB payload).
 - A 15s abort timeout prevents hanging requests.
-- Rate limiting uses the `check_ai_rate_limit` RPC with an in-memory fallback (12 req / 60s).
+- Rate limiting is keyed to the verified user through the `check_ai_rate_limit` RPC (12 requests / 60s), with an in-memory fallback only for availability during local or transient failures.
 - `labId` is validated against `labsById`; the system prompt is scoped to the current lab.
 - Only latency, char counts, success, and error codes are logged to `ai_usage_events` — never secrets, headers, or provider payloads.
 
@@ -173,7 +175,7 @@ Before any production go-live: rotate any key that may have leaked, switch to a 
 - A lab route must never show content from a different lab as a fallback.
 - Readiness is governed by `src/data/labSimulationRegistry.ts` (direct, chemistry-concept, math-concept groups).
 - Detail content, equipment, theory, steps, hero imagery, and simulation visuals must match the lab title.
-- If a lab is not ready, show a matching placeholder or disabled state.
+- Future unregistered labs must show a matching placeholder or disabled state, never another lab's simulation.
 - When adding or updating a lab, check both:
   - `/labs/[id]`
   - `/labs/[id]/simulation`
@@ -216,6 +218,8 @@ For UI changes, manually inspect:
 - `/missions`
 - `/history`
 - `/profile`
+- `/dashboard`
+- `/classrooms` and one classroom workspace
 - `/login`, `/register`, `/reset-password`
 
 Check mobile width around 390px, browser console errors, hydration warnings, layout overflow, search/filter behavior, enter-lab actions, save-result actions, AI tutor behavior, and password-reset redirects.

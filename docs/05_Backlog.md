@@ -1,45 +1,34 @@
 ---
-title: SciSiam Backlog
-tags:
-  - scisiam
-  - backlog
+title: SciSiam Product Roadmap
+status: active
 ---
 
-# SciSiam Backlog
+# SciSiam Product Roadmap
 
-## P0 - Blockers
+เอกสารนี้เป็น roadmap ระดับผลิตภัณฑ์ ไม่ใช่ task tracker รายวัน รายการเชิงวิศวกรรมที่มีลำดับความสำคัญล่าสุดอยู่ใน AGENTS.md
 
-- Rotate/revoke any API key that was ever exposed
-- Ensure no API key exists in packaged app files
-- Stop unsupported labs from silently showing Newton cooling content
+## Now: Reliability And Classroom Trust
 
-## P1 - Before Competition Demo
+- ทำให้ profile, teacher dashboard, classroom และ notification แสดงเฉพาะข้อมูล Supabase ที่ผู้ใช้มีสิทธิ์เห็น
+- ปิด flow ที่ยังพา session กลับ login หรือแสดง error แบบไม่ช่วยผู้ใช้แก้ปัญหา
+- ตรวจ permission ของ assignment, submission และ file storage ด้วย migration, RLS/RPC และ browser QA
+- รักษา 103 แล็บให้ metadata, detail, route, simulation และ save key สอดคล้องกัน
 
-- Make all 36 labs show correct detail content or a clear coming-soon state
-- Fix save flow for simulations with unused `handleSaveResults`
-- Make Profile data match real saved progress or mark clearly as placeholder
-- Resolve mobile AI floating button overlap
-- Clean git state before push/deploy
+## Next: Learning Quality And Accessibility
 
-## P2 - Product Polish
+- ยกระดับ simulation ที่ใช้ shared engine ให้ภาพ, ตัวแปร, ทฤษฎี และผลลัพธ์เฉพาะหัวข้อชัดเจน
+- ตรวจ mobile 390px, keyboard navigation, contrast, reduced motion และ screen-reader labels ใน flow หลัก
+- เพิ่ม regression/browser QA สำหรับ auth, classroom, notification, save flow และ wrong-lab routing
 
-- Build shared lab detail data model
-- Build shared simulation shell for not-yet-custom labs
-- Add stronger browser QA for mobile/tablet/desktop
-- Improve accessibility for icon-only controls and focus states
-- Add repeatable lab consistency audit
+## Later: Production Operations And Packaging
 
-## P3 - Production Direction
+- เปิด leaked-password protection และตรวจ SMTP/redirect URL สำหรับ production auth
+- เปลี่ยน rate-limit fallback ที่อยู่ใน memory เป็น durable store สำหรับ deployment หลาย instance
+- ตัดสินใจ packaging ระหว่าง Electron/Tauri สำหรับ PC และ PWA/Capacitor สำหรับ mobile
+- วาง observability, backup, incident response และ deployment checklist ก่อนเปิดใช้จริง
 
-- Move score/progress to backend/database if accounts matter
-- Use production rate limit storage for AI Tutor
-- Decide PC packaging route: Electron or Tauri
-- Decide mobile route: Capacitor or PWA
+## Decision Rules
 
-## Related Notes
-
-- [[01_Competition_Readiness]]
-- [[03_AI_Tutor_Policy]]
-- [[04_Deploy_PC_Mobile]]
-- [[labs/00_Lab_Catalog]]
-
+- ความถูกต้องและสิทธิ์ของข้อมูลมาก่อน UI ที่หวือหวา
+- ไม่เพิ่ม dependency ใหญ่ถ้า shared component หรือ data model เดิมแก้ปัญหาได้
+- ทุก feature ที่กระทบข้อมูลผู้ใช้ต้องมี migration, RLS/RPC review และ regression coverage

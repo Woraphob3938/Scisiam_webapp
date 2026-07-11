@@ -44,15 +44,6 @@ export default function Navbar() {
     }
 
     try {
-      const supabase = createClient();
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      if (!session) {
-        return [];
-      }
-
       return await listMyClassroomNotifications(10);
     } catch {
       return [];
@@ -206,7 +197,7 @@ export default function Navbar() {
           <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-xl bg-white shadow-md shadow-blue-500/20 transition-all duration-300 group-hover:scale-105">
             <Image src="/ai-oon-logo.png" alt="โลโก้ Scisiam น้องไออุ่น" fill sizes="40px" className="object-contain p-0.5" priority />
           </div>
-          <span className="truncate whitespace-nowrap bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 bg-clip-text text-lg font-bold tracking-tight text-transparent select-none sm:text-xl">
+          <span className="scisiam-wordmark truncate whitespace-nowrap bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 bg-clip-text text-xl text-transparent select-none sm:text-2xl">
             Scisiam
           </span>
         </Link>

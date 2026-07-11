@@ -14,6 +14,7 @@ import {
   type ClassroomSummary,
 } from "@/lib/supabase/classrooms";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
+import { calculateTeacherSubmissionMetrics } from "@/lib/teacher-dashboard-metrics";
 
 import TeacherDashboard, {
   type TeacherClassroom,
@@ -56,6 +57,7 @@ export default function TeacherDashboardSection() {
   const [errorMessage, setErrorMessage] = useState("");
   const [classrooms, setClassrooms] = useState<TeacherClassroom[]>([]);
   const [submissions, setSubmissions] = useState<TeacherSubmission[]>([]);
+  const [lastUpdatedAt, setLastUpdatedAt] = useState("");
 
   const loadDashboard = useCallback(async () => {
     setStatus("loading");
@@ -64,6 +66,7 @@ export default function TeacherDashboardSection() {
     if (!isSupabaseConfigured()) {
       setClassrooms([]);
       setSubmissions([]);
+      setLastUpdatedAt("");
       setStatus("ready");
       return;
     }
@@ -71,13 +74,19 @@ export default function TeacherDashboardSection() {
     try {
       const {
         data: { user },
+        error: userError,
       } = await createClient().auth.getUser();
+
+      if (userError) {
+        throw new Error(userError.message);
+      }
 
       if (!user) {
         clearScisiamAuthCache({ emit: false });
         if (!mountedRef.current) return;
         setClassrooms([]);
         setSubmissions([]);
+        setLastUpdatedAt("");
         setErrorMessage("เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่เพื่อโหลดแดชบอร์ดคุณครู");
         setStatus("error");
         return;
@@ -104,12 +113,14 @@ export default function TeacherDashboardSection() {
       if (!mountedRef.current) return;
       setClassrooms(bundles.map(toTeacherClassroom));
       setSubmissions(toTeacherSubmissions(bundles));
+      setLastUpdatedAt(formatThaiDateTime(new Date().toISOString()));
       setStatus("ready");
     } catch (error) {
       if (!mountedRef.current) return;
       setErrorMessage(error instanceof Error ? error.message : "โหลดข้อมูลแดชบอร์ดไม่สำเร็จ");
       setClassrooms([]);
       setSubmissions([]);
+      setLastUpdatedAt("");
       setStatus("error");
     }
   }, []);
@@ -133,6 +144,7 @@ export default function TeacherDashboardSection() {
       errorMessage={errorMessage}
       classrooms={classrooms}
       submissions={submissions}
+      lastUpdatedAt={lastUpdatedAt}
       onRetry={() => void loadDashboard()}
     />
   );
@@ -141,8 +153,11 @@ export default function TeacherDashboardSection() {
 function toTeacherClassroom(bundle: ClassroomBundle): TeacherClassroom {
   const { classroom, assignments, submissions, members } = bundle;
   const studentCount = countStudents(classroom, members);
-  const possibleSubmissions = assignments.length * Math.max(studentCount, 1);
-  const submissionRate = possibleSubmissions === 0 ? 0 : Math.min(100, Math.round((submissions.length / possibleSubmissions) * 100));
+  const metrics = calculateTeacherSubmissionMetrics({
+    studentCount,
+    assignmentCount: assignments.length,
+    submissionCount: submissions.length,
+  });
 
   return {
     id: classroom.id,
@@ -151,7 +166,7 @@ function toTeacherClassroom(bundle: ClassroomBundle): TeacherClassroom {
     students: studentCount,
     assignmentCount: assignments.length,
     labCount: classroom.labIds.length,
-    submissionRate,
+    ...metrics,
     latestActivity: assignments[0]?.title ?? (classroom.labIds.length > 0 ? `${classroom.labIds.length} แล็บที่เลือกไว้` : "ยังไม่มีงาน"),
     href: `/classrooms/${classroom.id}?tab=classwork`,
   };

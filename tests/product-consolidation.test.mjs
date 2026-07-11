@@ -34,6 +34,7 @@ test("Teacher dashboard is a separate Supabase-backed route", () => {
   const dashboardPage = read("src/app/dashboard/page.tsx");
   const dashboardSection = read("src/components/profile/TeacherDashboardSection.tsx");
   const dashboard = read("src/components/profile/TeacherDashboard.tsx");
+  const dashboardMetrics = read("src/lib/teacher-dashboard-metrics.ts");
   const proxy = read("src/lib/supabase/proxy.ts");
   const classroomsPage = read("src/app/classrooms/page.tsx");
 
@@ -41,6 +42,8 @@ test("Teacher dashboard is a separate Supabase-backed route", () => {
   assert.match(dashboardPage, /role !== "teacher"/);
   assert.match(proxy, /"\/dashboard"/);
   assert.match(dashboardSection, /auth\.getUser\(\)/);
+  assert.match(dashboardSection, /userError/);
+  assert.match(dashboardSection, /throw new Error\(userError\.message\)/);
   assert.match(dashboardSection, /เซสชันหมดอายุ/);
   assert.match(dashboardSection, /clearScisiamAuthCache\(\{ emit: false \}\)/);
   assert.match(classroomsPage, /clearScisiamAuthCache\(\)/);
@@ -48,9 +51,25 @@ test("Teacher dashboard is a separate Supabase-backed route", () => {
   assert.match(dashboardSection, /getClassroomAssignments/);
   assert.match(dashboardSection, /getClassroomAssignmentSubmissions/);
   assert.match(dashboardSection, /getClassroomMembers/);
+  assert.match(dashboardSection, /calculateTeacherSubmissionMetrics/);
+  assert.match(dashboardMetrics, /submissionCount:/);
+  assert.match(dashboardMetrics, /expectedSubmissionCount:/);
+  assert.match(dashboardMetrics, /pendingSubmissionCount:/);
+  assert.match(dashboardSection, /lastUpdatedAt/);
   assert.doesNotMatch(dashboardSection, /Demo|โหมดสาธิต|Hooke's Law of Elasticity/);
-  assert.match(dashboard, /ไปหน้าชั้นเรียน/);
-  assert.match(dashboard, /ข้อมูลจริงในระบบ/);
+  assert.match(dashboard, /ภาพรวมการส่งงาน/);
+  assert.match(dashboard, /function ClassroomComparison/);
+  assert.match(dashboard, /<table/);
+  assert.match(dashboard, /<caption/);
+  assert.match(dashboard, /scope="col"/);
+  assert.match(dashboard, /ส่งแล้ว/);
+  assert.match(dashboard, /ควรส่ง/);
+  assert.match(dashboard, /ค้างส่ง/);
+  assert.match(dashboard, /function FollowUpPanel/);
+  assert.match(dashboard, /ควรติดตาม/);
+  assert.match(dashboard, /งานส่งล่าสุด/);
+  assert.doesNotMatch(dashboard, /TEACHER DASHBOARD/);
+  assert.doesNotMatch(dashboard, /TeacherTab/);
 });
 
 test("Lab cards are Thai-first and expose only Enter Lab", () => {

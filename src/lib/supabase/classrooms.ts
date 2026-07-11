@@ -482,7 +482,6 @@ export async function getClassroomNotifications(id: string): Promise<ClassroomNo
 
 export async function listMyClassroomNotifications(limit = 10): Promise<ClassroomNotification[]> {
   const supabase = createClient();
-  await requireCurrentUserId(supabase);
   const safeLimit = Math.max(1, Math.min(limit, 20));
   const { data, error } = await supabase
     .from("classroom_notifications")

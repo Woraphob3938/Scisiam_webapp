@@ -1,3 +1,5 @@
+> Historical design record from 2026-06-27. It captures the decision at that time and is not the current operational specification.
+
 # SciSiam Password Reset Design
 
 ## Goal

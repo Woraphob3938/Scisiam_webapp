@@ -1,56 +1,50 @@
 ---
 title: Competition Readiness
-tags:
-  - scisiam
-  - competition
-  - readiness
+status: active
 ---
 
 # Competition Readiness
 
-ใช้ note นี้เป็น checklist ก่อนส่งงานหรือก่อนให้กรรมการทดลองใช้
+ใช้ checklist นี้ก่อน demo, deploy หรือให้กรรมการทดลองใช้
 
-## Must Fix Before Judging
+## Product Flow
 
-- Lab ที่ยังไม่ implement ต้องไม่ fallback เป็น Newton cooling แบบผิดหัวข้อ
-- AI key ต้องไม่อยู่ใน client, package app, public assets, หรือ git history ใหม่
-- หน้า Profile ต้องไม่แสดง mock data เป็นข้อมูลจริง
-- Simulation หลักต้องบันทึกผล/รีเซ็ต/เริ่มหยุดได้ครบ
-- Mobile UI ต้องไม่มีปุ่ม AI ทับ action หลัก
+- สมัครบัญชี, ยืนยันอีเมล, login และ password recovery ทำงานตาม redirect URL ที่ตั้งไว้
+- Login อ่าน role จาก profile; register เท่านั้นที่ให้เลือก student หรือ teacher
+- เปิด lab detail และ simulation ที่ตรงกับ lab id โดยไม่มี wrong-lab fallback
+- บันทึก experiment run แล้วเห็นเฉพาะใน history ของบัญชีเดียวกัน
+- คุณครูสร้าง classroom และ assignment ได้; นักเรียนได้รับ notification, เปิดปลายทาง และส่งงานได้
 
-## Demo Flow To Prepare
+## Demo Flow
 
-1. เปิดหน้าแรกและค้นหา lab
-2. เปิด Newton cooling detail
-3. เข้า simulation และปรับค่า
-4. เปิด AI Tutor ถามเรื่องกราฟ/สูตร
-5. เปิด Chemistry lab อย่าง Acid-Base Titration
-6. เปิด Biology lab อย่าง Mendelian Genetics หรือ Mitosis
-7. เปิด Profile เพื่อโชว์ความคืบหน้า
+1. Login ด้วยบัญชีที่ยืนยันแล้ว
+2. ค้นหาและเปิด lab detail
+3. ปรับค่าใน simulation และบันทึกผล
+4. ถาม AI ไออุ่นเกี่ยวกับตัวแปรหรือกราฟ
+5. เปิด classroom, สร้างหรือดู assignment, และตรวจ notification
+6. เปิด profile หรือ teacher dashboard เพื่อยืนยันข้อมูลจริงของบัญชี
 
 ## Technical Checks
 
 ```powershell
+npm test
 npm run lint
 npm run build
 npm audit --omit=dev
-rg -n --hidden -g '!node_modules' -g '!.next' -g '!dist' -g '!.git' "AIza|sk-proj|GEMINI_API_KEY\\s*="
+rg -n --hidden -g '!node_modules' -g '!.next' -g '!dist' -g '!.git' "AIza|sk-proj|GEMINI_API_KEY\s*="
 ```
 
 ## UI Checks
 
-- Desktop 1440px
-- Tablet 768px
-- Mobile 390px
-- Console has no errors
-- No horizontal scroll
-- Thai text does not overlap or clip
-- Buttons have visible loading/disabled/focus states
+- Desktop 1440px, tablet 768px และ mobile 390px
+- ไม่มี console error, hydration warning หรือ horizontal scroll
+- Thai text ไม่ทับกันหรือถูกตัด และปุ่มมี loading, disabled และ focus state เมื่อจำเป็น
+- keyboard focus เข้าออก dialog, dropdown, notification และ AI Tutor ได้ถูกต้อง
+- floating AI และ mobile navigation ไม่ทับ action หลัก
 
-## Related Notes
+## Security Checks
 
-- [[05_Backlog]]
-- [[03_AI_Tutor_Policy]]
-- [[04_Deploy_PC_Mobile]]
-- [[labs/00_Lab_Catalog]]
-
+- ไม่มี API key ใน browser bundle, public assets หรือ package
+- Supabase ใช้ publishable key ฝั่ง client เท่านั้น
+- ผู้ใช้เปิดไฟล์ assignment หรือ submission ได้เฉพาะตามสิทธิ์ของ classroom
+- OAuth และ auth redirect รับเฉพาะ relative path ที่ปลอดภัย

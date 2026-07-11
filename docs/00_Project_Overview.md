@@ -1,58 +1,38 @@
 ---
 title: Project Overview
-tags:
-  - scisiam
-  - overview
+status: active
 ---
 
 # Project Overview
 
-SciSiam Virtual Lab เป็นแอปทดลองวิทยาศาสตร์สำหรับนักเรียนไทย มีเป้าหมายให้ผู้ใช้เลือกห้องแล็บ ปรับตัวแปรในการทดลอง ดูผลลัพธ์ กราฟ ตาราง ทฤษฎี และถาม SciSiam AI Tutor ได้
+SciSiam Virtual Lab เป็นแพลตฟอร์มทดลองวิทยาศาสตร์เสมือนจริงแบบ Thai-first สำหรับนักเรียนและคุณครู ระบบมีแล็บที่ลงทะเบียนแล้ว 103 แล็บใน Physics, Chemistry, Biology, Mathematics และ Foundation
 
-## Product Goal
+## เป้าหมาย
 
-สร้างแอป virtual science lab ที่ดูน่าเชื่อถือ ใช้งานง่าย และพร้อมเป็นงานส่งแข่งขัน โดยต่อยอดได้ 3 target:
+ผู้เรียนควรเข้าใจแนวคิดจากการทดลองจริงในระบบ: อ่านเป้าหมายและทฤษฎี ปรับตัวแปร สังเกตผลลัพธ์ ดูกราฟหรือตาราง บันทึกผล และขอคำแนะนำจาก AI ไออุ่นได้อย่างปลอดภัย
 
-- Web demo
-- PC app
-- Mobile app
+## เส้นทางผู้ใช้หลัก
 
-## Core User Flow
+1. ผู้ใช้ใหม่สมัครเป็นนักเรียนหรือคุณครูและยืนยันอีเมล
+2. ผู้ใช้เข้าสู่ระบบ แล้วระบบอ่านบทบาทจาก profile ที่บันทึกไว้
+3. ผู้ใช้ค้นหาแล็บ เปิดรายละเอียด และเข้า simulation ที่ตรงหัวข้อ
+4. ผู้ใช้บันทึกผลการทดลองเพื่อดูใน learning history ของบัญชีตนเอง
+5. ใน classroom คุณครูสร้างงานและนักเรียนได้รับการแจ้งเตือน ส่งไฟล์หรือลิงก์ และติดตามงานในห้องเดียวกัน
 
-1. ผู้ใช้เข้า `หน้าแรก`
-2. ค้นหา/กรอง lab ตามหมวด
-3. เปิด `หน้า detail`
-4. อ่าน objective, equipment, theory, steps
-5. เข้าห้อง simulation
-6. ปรับตัวแปร ทดลอง ดูกราฟ/ตาราง
-7. บันทึกผลหรือถาม AI Tutor
-8. กลับมาดู progress/profile
+## โครงสร้างข้อมูล
 
-## Main Features
+- src/data/labs.ts เป็นแหล่งข้อมูล metadata ของแล็บทั้งหมด
+- src/data/labDetails.ts เก็บเนื้อหา detail page
+- src/data/labSimulationRegistry.ts กำหนด simulation ที่รองรับ
+- src/data/labSavedExperiments.ts กำหนด save key ของแล็บที่พร้อมใช้
+- Supabase เป็น canonical store สำหรับ session, profile, experiment run, classroom, assignment และ notification
 
-- 36 labs แบ่งเป็น Physics, Chemistry, Biology
-- Lab detail pages
-- Lab simulation pages
-- AI Tutor
-- Score/progress/profile
-- Responsive UI สำหรับ web/mobile
+## ขอบเขตที่ตั้งใจไม่ทำ
 
-## Important Source Files
+- คะแนน, XP, level และการให้คะแนนโดยคุณครูไม่มีการใช้งานเชิงผลิตภัณฑ์
+- localStorage ไม่ใช่สิทธิ์การเข้าถึงหรือข้อมูลบัญชีหลัก
+- แล็บในอนาคตที่ยังไม่ลงทะเบียนต้องไม่ fallback ไปยัง simulation ของหัวข้ออื่น
 
-- `src/data/labs.ts`: รายชื่อ lab ทั้ง 36 ห้อง
-- `src/app/page.tsx`: หน้าแรก
-- `src/app/labs/[id]/page.tsx`: detail route
-- `src/app/labs/[id]/simulation/page.tsx`: simulation route
-- `src/app/api/ai-tutor/route.ts`: AI Tutor backend route
-- `src/components/labs/`: detail components
-- `src/components/labs/simulation/`: simulation components
+## จุดเริ่มต้น
 
-## Related Notes
-
-- [[PRD]]
-- [[01_Competition_Readiness]]
-- [[02_Design_System]]
-- [[03_AI_Tutor_Policy]]
-- [[04_Deploy_PC_Mobile]]
-- [[labs/00_Lab_Catalog]]
-
+อ่าน [PRD](PRD.md) เพื่อดู requirements, [README](../README.md) เพื่อเริ่มรันระบบ และ [AGENTS](../AGENTS.md) ก่อนแก้โค้ดหรือ Supabase

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useId, useRef } from "react";
 import { useRouter } from "next/navigation";
 import {
   Thermometer,
@@ -22,6 +22,7 @@ import {
   Wind,
 } from "lucide-react";
 import SharedSimulationShell from "@/components/labs/simulation/SharedSimulationShell";
+import { BoundedNumberInput } from "@/components/labs/simulation/ManualNumberInput";
 import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";
 
 // --- TYPES ---
@@ -29,6 +30,13 @@ export interface CoolingDataPoint {
   time: number;     // in minutes
   temp: number;     // in °C
   ambient: number;  // in °C
+}
+
+const MIN_TEMPERATURE_C = -50;
+const MAX_TEMPERATURE_C = 100;
+
+function clampNumber(value: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, value));
 }
 
 // --- LOCAL VIEWPORT ---
@@ -47,241 +55,200 @@ function CoolingViewport({
   isHeaterOn,
   isRunning,
 }: ViewportProps) {
-  // Dynamic Liquid Color
-  const getLiquidColor = (temp: number) => {
-    if (temp >= 75) {
-      const ratio = (temp - 75) / 25;
-      const r = Math.round(239 + ratio * 16);
-      const g = Math.round(68 - ratio * 18);
-      const b = Math.round(68 - ratio * 18);
-      return `rgb(${r}, ${g}, ${b})`;
-    } else if (temp >= 40) {
-      const ratio = (temp - 40) / 35;
-      const r = Math.round(251 - ratio * 12);
-      const g = Math.round(191 - ratio * 123);
-      const b = Math.round(36 + ratio * 32);
-      return `rgb(${r}, ${g}, ${b})`;
-    } else {
-      const ratio = Math.max(0, (temp - ambientTemp) / (40 - ambientTemp));
-      const r = Math.round(96 + ratio * 155);
-      const g = Math.round(165 + ratio * 26);
-      const b = Math.round(250 - ratio * 214);
-      return `rgb(${r}, ${g}, ${b})`;
-    }
-  };
+  const svgId = useId();
+  const liquidGradientId = `${svgId}-liquid`;
+  const glassGradientId = `${svgId}-glass`;
+  const metalGradientId = `${svgId}-metal`;
+  const sensorGradientId = `${svgId}-sensor`;
+  const coolingRateGradientId = `${svgId}-cooling-rate`;
+  const shadowId = `${svgId}-shadow`;
 
-  const getMercuryHeight = (temp: number) => {
-    const minTemp = 0;
-    const maxTemp = 100;
-    const minHeight = 8;
-    const maxHeight = 78;
-    const percentage = (temp - minTemp) / (maxTemp - minTemp);
-    return minHeight + percentage * (maxHeight - minHeight);
-  };
-
-  const liquidColor = getLiquidColor(currentTemp);
-  const mercuryHeight = getMercuryHeight(currentTemp);
+  const temperatureDelta = currentTemp - ambientTemp;
+  const equilibriumTolerance = 0.5;
+  const thermalDirection =
+    Math.abs(temperatureDelta) <= equilibriumTolerance
+      ? "equilibrium"
+      : temperatureDelta > 0
+        ? "outward"
+        : "inward";
+  const flowMagnitude = Math.min(
+    1,
+    (Math.abs(temperatureDelta) / 60) * (0.5 + coolingConstant * 2),
+  );
+  const thermalStatus =
+    thermalDirection === "outward"
+      ? "กำลังเย็นลง"
+      : thermalDirection === "inward"
+        ? "กำลังอุ่นขึ้น"
+        : "ใกล้สมดุล";
+  const thermalSummary =
+    thermalDirection === "outward"
+      ? "ความร้อนถ่ายเทออกจากตัวอย่างสู่สิ่งแวดล้อม"
+      : thermalDirection === "inward"
+        ? "ความร้อนถ่ายเทจากสิ่งแวดล้อมเข้าสู่ตัวอย่าง"
+        : "อุณหภูมิตัวอย่างและสิ่งแวดล้อมใกล้เคียงกัน";
+  const flowColor =
+    thermalDirection === "outward"
+      ? "#c2410c"
+      : thermalDirection === "inward"
+        ? "#2563eb"
+        : "#64748b";
+  const liquidColor =
+    currentTemp >= 65 ? "#ef4444" : currentTemp >= 30 ? "#f59e0b" : currentTemp >= 0 ? "#38bdf8" : "#2563eb";
+  const mercuryHeight = 18 + ((currentTemp - MIN_TEMPERATURE_C) / (MAX_TEMPERATURE_C - MIN_TEMPERATURE_C)) * 112;
+  const thermometerTop = 207 - mercuryHeight;
   const environmentLabel =
     ambientTemp <= 8 ? "อ่างน้ำแข็ง" : ambientTemp <= 18 ? "ห้องเย็น" : ambientTemp >= 32 ? "ห้องอุ่น" : "ห้องทดลอง";
-  const airflowLabel =
-    coolingConstant >= 0.22 ? "ถ่ายเทเร็วมาก" : coolingConstant >= 0.16 ? "มีลมพัด" : "อากาศนิ่ง";
+  const airflowLabel = coolingConstant >= 0.22 ? "พัดลมแรง" : coolingConstant >= 0.16 ? "ลมหมุนเวียน" : "อากาศนิ่ง";
+  const coolingRatePercent = Math.round(clampNumber((coolingConstant - 0.05) / 0.25, 0, 1) * 100);
+  const coolingRateMarkerX = 4 + coolingRatePercent * 1.24;
 
   return (
-    <div className="relative flex h-full min-h-[300px] items-center justify-center overflow-hidden rounded-2xl border border-blue-100 bg-[linear-gradient(135deg,#f8fbff_0%,#eefcff_48%,#fff7fb_100%)] p-4">
-      {/* Dynamic tech grid background */}
-      <div className="absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:16px_16px] opacity-40" />
-
-      {/* Ambient glows based on state */}
-      <div className="absolute -left-20 -top-20 w-80 h-80 rounded-full bg-blue-500/5 blur-[80px]" />
-      <div className="absolute -right-20 -bottom-20 w-80 h-80 rounded-full bg-rose-500/5 blur-[80px]" />
-      {isHeaterOn && (
-        <div className="absolute -bottom-20 left-1/3 w-80 h-80 rounded-full bg-orange-500/5 blur-[80px]" />
-      )}
-
-      {/* Environmental Info Panel (Left Overlay) */}
-      <div className="absolute top-4 left-4 bg-white/75 backdrop-blur-md p-3.5 rounded-2xl border border-slate-200 text-left text-xs sm:text-sm text-slate-700 font-bold space-y-1.5 shadow-sm z-10">
-        <span className="text-[10px] font-black text-indigo-600 uppercase tracking-widest block mb-0.5">
-          environmental chamber
-        </span>
-        <div className="flex items-center gap-2 text-slate-700">
-          <Snowflake className="w-4 h-4 text-blue-500" />
-          <span>{environmentLabel}</span>
-        </div>
-        <div className="flex items-center gap-2 text-slate-700">
-          <Wind className="w-4 h-4 text-cyan-600" />
-          <span>{airflowLabel}</span>
-        </div>
-      </div>
-
-      {/* Ice / Ambient Cooler Display (Bottom Left Overlay) */}
-      <div className="absolute bottom-4 left-4 bg-white/75 backdrop-blur-md p-2.5 rounded-2xl border border-slate-200 flex items-center gap-3 shadow-sm z-10">
-        <div className="text-right select-none">
-          <span className="text-[9px] font-black text-slate-400 block -mb-0.5 tracking-wider">AMBIENT</span>
-          <span className="text-base sm:text-lg font-extrabold text-blue-600 font-mono">{ambientTemp.toFixed(1)}°C</span>
-        </div>
-        <svg className="w-8 h-8 animate-pulse" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12,2 L3,6 L12,10 L21,6 Z" fill="#38bdf8" opacity="0.3" />
-          <path d="M3,6 L12,10 L12,20 L3,16 Z" fill="#0284c7" opacity="0.6" />
-          <path d="M12,10 L21,6 L21,16 L12,20 Z" fill="#0369a1" opacity="0.8" />
-        </svg>
-      </div>
-
-      {/* Active Science Visual SVGs */}
-      <svg className="relative z-10 w-full h-full max-w-[300px] sm:max-w-[620px] select-none" viewBox="0 0 260 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <div className="relative min-h-[180px] overflow-hidden bg-slate-100 sm:h-full sm:min-h-[300px]">
+      <svg
+        role="img"
+        aria-labelledby={`${svgId}-title ${svgId}-description`}
+        data-thermal-direction={thermalDirection}
+        data-flow-magnitude={flowMagnitude.toFixed(2)}
+        className="h-auto min-h-[160px] w-full select-none sm:h-full sm:min-h-[280px]"
+        viewBox="0 0 600 320"
+        preserveAspectRatio="xMidYMid meet"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <style>{`
+          @keyframes newton-fan-spin { to { transform: rotate(360deg); } }
+          @keyframes newton-surface-shimmer { 50% { opacity: 0.98; } }
+          .newton-chamber-fan { transform-box: fill-box; transform-origin: center; animation: newton-fan-spin 1.3s linear infinite; }
+          .newton-sample-surface { animation: newton-surface-shimmer 1.8s ease-in-out infinite; }
+          [data-running="false"].newton-chamber-fan,
+          [data-running="false"] .newton-sample-surface { animation-play-state: paused; }
+          @media (prefers-reduced-motion: reduce) {
+            .newton-chamber-fan, .newton-sample-surface { animation: none !important; }
+          }
+        `}</style>
+        <title id={`${svgId}-title`}>ชุดทดลองกฎการเย็นตัวของนิวตัน</title>
+        <desc id={`${svgId}-description`}>
+          ชุดทดลองพร้อมตัวอย่าง เทอร์โมมิเตอร์ และพัดลมควบคุมสภาพแวดล้อม อุณหภูมิตัวอย่าง {currentTemp.toFixed(1)} องศาเซลเซียส สิ่งแวดล้อม {ambientTemp.toFixed(1)} องศาเซลเซียส สถานะ {thermalStatus} {thermalSummary} ฮีตเตอร์{isHeaterOn ? "เปิด" : "ปิด"}
+        </desc>
         <defs>
-          <linearGradient id="coolingLiquid" x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0%" stopColor={liquidColor} stopOpacity="0.95" />
-            <stop offset="45%" stopColor={liquidColor} stopOpacity="0.75" />
-            <stop offset="100%" stopColor="#450a0a" stopOpacity="0.5" />
+          <linearGradient id={liquidGradientId} x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stopColor={liquidColor} stopOpacity="0.82" />
+            <stop offset="100%" stopColor={liquidColor} stopOpacity="0.46" />
           </linearGradient>
-          <linearGradient id="glassSurface" x1="0" x2="1" y1="0" y2="0">
-            <stop offset="0%" stopColor="#ffffff" stopOpacity="0.15" />
-            <stop offset="20%" stopColor="#ffffff" stopOpacity="0.3" />
-            <stop offset="50%" stopColor="#ffffff" stopOpacity="0" />
-            <stop offset="85%" stopColor="#38bdf8" stopOpacity="0.2" />
-            <stop offset="100%" stopColor="#ffffff" stopOpacity="0.05" />
+          <linearGradient id={glassGradientId} x1="0" x2="1" y1="0" y2="0">
+            <stop offset="0%" stopColor="#ffffff" stopOpacity="0.64" />
+            <stop offset="36%" stopColor="#ffffff" stopOpacity="0.12" />
+            <stop offset="100%" stopColor="#bae6fd" stopOpacity="0.28" />
           </linearGradient>
-          <linearGradient id="steel" x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0%" stopColor="#94a3b8" />
-            <stop offset="25%" stopColor="#cbd5e1" />
-            <stop offset="65%" stopColor="#475569" />
+          <linearGradient id={metalGradientId} x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stopColor="#e2e8f0" />
+            <stop offset="46%" stopColor="#94a3b8" />
+            <stop offset="100%" stopColor="#334155" />
+          </linearGradient>
+          <linearGradient id={sensorGradientId} x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stopColor="#0f172a" />
             <stop offset="100%" stopColor="#1e293b" />
           </linearGradient>
-          <linearGradient id="mercuryGrad" x1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#fda4af" />
-            <stop offset="40%" stopColor="#f43f5e" />
-            <stop offset="100%" stopColor="#9f1239" />
+          <linearGradient id={coolingRateGradientId} x1="0" x2="1" y1="0" y2="0">
+            <stop offset="0%" stopColor="#93c5fd" />
+            <stop offset="50%" stopColor="#38bdf8" />
+            <stop offset="100%" stopColor="#7c3aed" />
           </linearGradient>
-          <filter id="labShadow" x="-20%" y="-20%" width="140%" height="140%">
-            <feDropShadow dx="0" dy="6" stdDeviation="4.5" floodColor="#020617" floodOpacity="0.65" />
-          </filter>
-          <filter id="laserGlow" x="-30%" y="-30%" width="160%" height="160%">
-            <feGaussianBlur stdDeviation="2.5" result="blur" />
-            <feMerge>
-              <feMergeNode in="blur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
+          <filter id={shadowId} x="-15%" y="-15%" width="130%" height="130%">
+            <feDropShadow dx="0" dy="3" stdDeviation="2" floodColor="#0f172a" floodOpacity="0.18" />
           </filter>
         </defs>
 
-        {/* Ambient base platform shadows */}
-        <ellipse cx="130" cy="183" rx="98" ry="15" fill="#020617" opacity="0.45" />
+        <path d="M14 245 H586 V290 H14 Z" fill="#e2e8f0" />
+        <path d="M14 245 H586" stroke="#94a3b8" strokeWidth="2" />
+        <path d="M32 55 H568" stroke="#e2e8f0" strokeWidth="2" strokeDasharray="4 8" />
 
-        {/* Dynamic environmental airflow particles */}
-        {coolingConstant >= 0.16 && (
-          <g className="animate-pulse" opacity="0.35">
-            <path d="M30 65 C55 50 74 50 92 65" stroke="#38bdf8" strokeWidth="2.5" strokeLinecap="round" strokeDasharray="3 4" />
-            <path d="M175 69 C191 54 207 56 222 70" stroke="#38bdf8" strokeWidth="2.5" strokeLinecap="round" strokeDasharray="3 4" />
-          </g>
-        )}
-
-        {/* Hot / Cold outer radiation waves */}
-        {currentTemp > ambientTemp + 8 && (
-          <g className="animate-pulse" opacity="0.65">
-            <path d="M50 92 C32 88 30 74 44 66" stroke="#fb7185" strokeWidth="1.8" strokeLinecap="round" strokeDasharray="4 6" />
-            <path d="M210 102 C230 99 230 80 216 72" stroke="#fb7185" strokeWidth="1.8" strokeLinecap="round" strokeDasharray="4 6" />
-          </g>
-        )}
-
-        {/* Induction Heating Plate Base */}
-        <g filter="url(#labShadow)">
-          {/* Main housing */}
-          <rect x="68" y="156" width="124" height="18" rx="5" fill="url(#steel)" stroke="#334155" strokeWidth="1.5" />
-          {/* Induction element top plate */}
-          <rect x="74" y="151" width="112" height="6" rx="2" fill={isHeaterOn ? "#b91c1c" : "#1e293b"} className="transition-all duration-500" />
-          <ellipse cx="130" cy="151" rx="50" ry="2" fill={isHeaterOn ? "#f43f5e" : "#020617"} opacity="0.8" />
-          {/* Control LEDs */}
-          <circle cx="84" cy="165" r="1.5" fill={isHeaterOn ? "#ef4444" : "#475569"} />
-          <circle cx="92" cy="165" r="1.5" fill={isRunning ? "#22c55e" : "#475569"} />
+        <g aria-hidden="true">
+          <rect x="34" y="72" width="144" height="70" rx="10" fill="#ffffff" stroke="#cbd5e1" />
+          <text x="50" y="96" fill="#475569" fontSize="12" fontWeight="700">สภาพแวดล้อม</text>
+          <text x="50" y="119" fill="#0f172a" fontSize="18" fontWeight="800">Tₛ {ambientTemp.toFixed(1)}°C</text>
+          <text x="50" y="132" fill="#64748b" fontSize="10" fontWeight="600">{environmentLabel} • {airflowLabel}</text>
         </g>
 
-        {/* Heating Induction Coil Glow Effects */}
+        <g aria-hidden="true" data-running={isRunning}>
+          <circle cx="92" cy="206" r="36" fill="#e0f2fe" stroke="#7dd3fc" strokeWidth="2" />
+          <g className="newton-chamber-fan" data-running={isRunning}>
+            {[0, 90, 180, 270].map((rotation) => (
+              <path key={rotation} d="M92 206 C105 180 127 187 115 205 C106 216 101 218 92 206 Z" fill="#38bdf8" opacity="0.8" transform={`rotate(${rotation} 92 206)`} />
+            ))}
+          </g>
+          <circle cx="92" cy="206" r="7" fill="#0f172a" />
+        </g>
+
+        <g filter={`url(#${shadowId})`}>
+          <rect x="245" y="225" width="110" height="22" rx="7" fill={`url(#${metalGradientId})`} stroke="#334155" strokeWidth="1.5" />
+          <rect x="254" y="219" width="92" height="8" rx="4" fill={isHeaterOn ? "#dc2626" : "#334155"} />
+          <ellipse cx="300" cy="219" rx="39" ry="4" fill={isHeaterOn ? "#fb923c" : "#0f172a"} opacity={isHeaterOn ? 0.9 : 0.55} />
+          <circle cx="264" cy="237" r="3" fill={isHeaterOn ? "#ef4444" : "#64748b"} />
+          <circle cx="276" cy="237" r="3" fill={isRunning ? "#22c55e" : "#94a3b8"} />
+        </g>
+
         {isHeaterOn && (
-          <g className="animate-pulse" opacity="0.85">
-            {/* Red-hot spiral glows */}
-            <ellipse cx="130" cy="151" rx="42" ry="3" fill="none" stroke="#f97316" strokeWidth="1.8" filter="url(#laserGlow)" />
-            <ellipse cx="130" cy="151" rx="26" ry="1.8" fill="none" stroke="#ef4444" strokeWidth="1.5" filter="url(#laserGlow)" />
-
-            {/* Heat conduction rays */}
-            <path d="M100,146 Q96,134 104,122" stroke="#f97316" strokeWidth="1.5" strokeLinecap="round" opacity="0.7" />
-            <path d="M130,144 Q135,130 128,118" stroke="#ef4444" strokeWidth="1.8" strokeLinecap="round" opacity="0.8" />
-            <path d="M160,146 Q156,134 164,122" stroke="#facc15" strokeWidth="1.5" strokeLinecap="round" opacity="0.7" />
+          <g aria-hidden="true" stroke="#ea580c" strokeWidth="2" strokeLinecap="round" opacity="0.85">
+            <path d="M278 214 Q272 202 280 192" />
+            <path d="M300 214 Q306 199 300 188" />
+            <path d="M322 214 Q328 202 320 192" />
           </g>
         )}
 
-        {/* Beaker Container (Pyrex look) */}
-        <path d="M82,50 L82,143 C82,149 87,153 93,153 L167,153 C173,153 178,149 178,143 L178,50" fill="url(#glassSurface)" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" filter="url(#labShadow)" />
-        {/* Beaker scale marks */}
-        <line x1="164" y1="74" x2="171" y2="74" stroke="#64748b" strokeWidth="1.2" />
-        <line x1="157" y1="94" x2="171" y2="94" stroke="#64748b" strokeWidth="1.5" />
-        <line x1="164" y1="114" x2="171" y2="114" stroke="#64748b" strokeWidth="1.2" />
-        <line x1="157" y1="134" x2="171" y2="134" stroke="#64748b" strokeWidth="1.5" strokeLinecap="round" />
-
-        {/* Beaker Top Lip Flange */}
-        <path d="M77,50 C77,50 88,47 96,47 C104,47 156,47 164,47 C172,47 183,50 183,50" stroke="#94a3b8" strokeWidth="2.5" strokeLinecap="round" />
-
-        {/* Volumetric Liquid */}
-        <path d="M85,86 L85,142 C85,146 89,150 94,150 L166,150 C171,150 175,146 175,142 L175,86 Z" fill="url(#coolingLiquid)" className="transition-all duration-500" />
-        {/* Liquid Surface Meniscus */}
-        <ellipse cx="130" cy="86" rx="45" ry="4.5" fill={liquidColor} opacity="0.85" stroke="#ffffff" strokeWidth="0.5" />
-        {/* Convection Bubbles */}
-        {[97, 114, 137, 158].map((x, index) => (
-          <circle key={x} cx={x} cy={118 + (index % 2) * 16} r="1.5" fill="#fecaca" opacity="0.55" className="animate-pulse" />
-        ))}
-        {/* Glass reflection highlight overlay */}
-        <path d="M96 92 C108 101 108 132 96 142" stroke="#ffffff" strokeWidth="2.2" opacity="0.2" strokeLinecap="round" />
-
-        {/* Animated steam columns for hot liquid */}
-        {currentTemp > 45 && (
-          <g className="animate-pulse" opacity="0.65">
-            <path d="M106,38 Q111,25 105,12 T 110 -2" fill="none" stroke="#cbd5e1" strokeWidth="1.5" strokeLinecap="round" />
-            <path d="M130,36 Q137,22 129,8 T 134 -6" fill="none" stroke="#f1f5f9" strokeWidth="2" strokeLinecap="round" />
-            <path d="M154,38 Q150,25 156,13 T 150 -1" fill="none" stroke="#cbd5e1" strokeWidth="1.5" strokeLinecap="round" />
-          </g>
-        )}
-
-        {/* Retort Stand Support Rod & Clamps */}
-        <line x1="187" y1="40" x2="187" y2="155" stroke="url(#steel)" strokeWidth="3" />
-        {/* Horizontal Clamp bracket holding thermometer */}
-        <path d="M187,50 L142,50" stroke="#334155" strokeWidth="3" />
-        <rect x="139" y="47" width="5" height="6" fill="#0f172a" rx="0.5" />
-
-        {/* Digital Micro-Controller Instrument Panel */}
-        <g transform="translate(191, 16)" filter="url(#labShadow)">
-          <rect x="0" y="0" width="58" height="42" rx="6" fill="#020617" stroke="#1e293b" strokeWidth="1.8" />
-          {/* LED screen background */}
-          <rect x="4" y="4" width="50" height="20" rx="4" fill="#042f1a" />
-          {/* Labeled overlay */}
-          <text x="29" y="9" fill="#22c55e" fontSize="5" fontWeight="black" fontFamily="monospace" textAnchor="middle" letterSpacing="0.2">TEMPERATURE</text>
-          <text x="29" y="20" fill="#4ade80" fontSize="10" fontWeight="950" fontFamily="monospace" textAnchor="middle" filter="url(#laserGlow)">
-            {currentTemp.toFixed(1)}°C
-          </text>
-          {/* Status readouts below LED */}
-          <rect x="4" y="27" width="23" height="11" rx="2" fill="#0f172a" />
-          <text x="15" y="34" fill="#64748b" fontSize="4.5" fontWeight="bold" fontFamily="monospace" textAnchor="middle">
-            k:{coolingConstant.toFixed(3)}
-          </text>
-          <rect x="31" y="27" width="23" height="11" rx="2" fill="#0f172a" />
-          <text x="42" y="34" fill={isHeaterOn ? "#f43f5e" : "#3b82f6"} fontSize="4" fontWeight="black" fontFamily="sans-serif" textAnchor="middle">
-            {isHeaterOn ? "HEATING" : "DECAY"}
-          </text>
+        <g filter={`url(#${shadowId})`}>
+          <path d="M242 94 V208 C242 217 249 223 258 223 H342 C351 223 358 217 358 208 V94" fill={`url(#${glassGradientId})`} stroke="#64748b" strokeWidth="2.2" strokeLinecap="round" />
+          <path d="M235 94 C251 89 270 90 300 90 C330 90 349 89 365 94" stroke="#64748b" strokeWidth="3" strokeLinecap="round" />
+          <path d="M247 145 V207 C247 214 252 218 259 218 H341 C348 218 353 214 353 207 V145 Z" fill={`url(#${liquidGradientId})`} />
+          <ellipse className="newton-sample-surface" data-running={isRunning} cx="300" cy="145" rx="53" ry="5.5" fill={liquidColor} opacity="0.82" stroke="#ffffff" strokeWidth="1" />
+          <path d="M262 156 C276 170 276 194 265 207" stroke="#ffffff" strokeWidth="3" strokeLinecap="round" opacity="0.4" />
+          {[165, 185, 205].map((y) => <line key={y} x1="347" y1={y} x2="355" y2={y} stroke="#475569" strokeWidth="1.4" />)}
         </g>
 
-        {/* Lab Thermometer */}
-        <g transform="translate(122, 16)">
-          {/* Glass tube housing */}
-          <rect x="5" y="0" width="7" height="112" rx="3.5" fill="rgba(255, 255, 255, 0.15)" stroke="#94a3b8" strokeWidth="1" />
-          {/* Thermometer scale graduation markings */}
-          {Array.from({ length: 6 }).map((_, i) => (
-            <line key={i} x1="5" y1={15 + i * 15} x2="8" y2={15 + i * 15} stroke="#64748b" strokeWidth="0.5" />
+        <g>
+          <line x1="382" y1="72" x2="382" y2="222" stroke={`url(#${metalGradientId})`} strokeWidth="5" />
+          <path d="M382 94 H322" stroke="#334155" strokeWidth="4" strokeLinecap="round" />
+          <rect x="317" y="89" width="10" height="10" rx="2" fill="#0f172a" />
+          <rect x="296" y="70" width="10" height="141" rx="5" fill="#ffffff" stroke="#64748b" strokeWidth="1.5" />
+          {Array.from({ length: 6 }).map((_, index) => (
+            <line key={index} x1="296" y1={88 + index * 18} x2="301" y2={88 + index * 18} stroke="#64748b" strokeWidth="1" />
           ))}
-          {/* Mercury liquid column bulb */}
-          <circle cx="8.5" cy="115" r="8" fill="url(#mercuryGrad)" stroke="#64748b" strokeWidth="1.2" filter="url(#dropShadow)" />
-          <circle cx="8.5" cy="115" r="5.5" fill="url(#mercuryGrad)" />
-          <circle cx="6.5" cy="113" r="1.5" fill="#ffffff" opacity="0.6" />
-          {/* Mercury fluid level line */}
-          <rect x="7.5" y={105 - mercuryHeight} width="2" height={mercuryHeight} fill="url(#mercuryGrad)" className="transition-all duration-500" />
+          <rect x="299" y={thermometerTop} width="4" height={mercuryHeight} rx="2" fill={liquidColor} />
+          <circle cx="301" cy="214" r="11" fill={liquidColor} stroke="#475569" strokeWidth="1.5" />
+          <circle cx="297" cy="210" r="3" fill="#ffffff" opacity="0.72" />
         </g>
+
+        <g data-testid="temperature-sensor" transform="translate(438 86)" filter={`url(#${shadowId})`}>
+          <rect width="104" height="64" rx="9" fill={`url(#${sensorGradientId})`} stroke="#334155" strokeWidth="2" />
+          <rect x="9" y="10" width="86" height="28" rx="5" fill="#052e16" />
+          <text x="52" y="21" fill="#86efac" fontSize="7" fontWeight="700" textAnchor="middle">TEMPERATURE SENSOR</text>
+          <text x="52" y="34" fill="#dcfce7" fontSize="15" fontWeight="800" fontFamily="monospace" textAnchor="middle">{currentTemp.toFixed(1)}°C</text>
+          <circle cx="15" cy="50" r="3.5" fill={isRunning ? "#22c55e" : "#64748b"} />
+          <text x="25" y="54" fill="#cbd5e1" fontSize="8" fontWeight="700">{thermalStatus}</text>
+        </g>
+
+        <g data-testid="cooling-coefficient-readout" transform="translate(18 248)">
+          <text x="0" y="10" fill="#475569" fontSize="10" fontWeight="700">ค่า k ควบคุมความเร็วการเย็น</text>
+          <g data-testid="cooling-rate-scale" aria-hidden="true">
+            <path d="M4 23 H128" stroke="#dbeafe" strokeWidth="8" strokeLinecap="round" />
+            <path d="M4 23 H128" stroke={`url(#${coolingRateGradientId})`} strokeWidth="4" strokeLinecap="round" />
+            {[4, 66, 128].map((x) => <circle key={x} cx={x} cy="23" r="2.5" fill="#ffffff" stroke="#60a5fa" strokeWidth="1" />)}
+            <circle cx={coolingRateMarkerX} cy="23" r="6" fill="#7c3aed" stroke="#ffffff" strokeWidth="2" />
+          </g>
+          <text x="0" y="39" fill="#64748b" fontSize="8" fontWeight="700">เย็นช้า</text>
+          <text x="128" y="39" fill="#64748b" fontSize="8" fontWeight="700" textAnchor="end">เย็นเร็ว</text>
+          <text x="0" y="56" fill="#0f172a" fontSize="14" fontWeight="800">k = {coolingConstant.toFixed(3)} / นาที</text>
+          <text x="128" y="56" fill="#7c3aed" fontSize="9" fontWeight="800" textAnchor="end">{airflowLabel}</text>
+        </g>
+
+        <g>
+          <rect x="210" y="34" width="180" height="38" rx="19" fill="#ffffff" stroke={flowColor} strokeWidth="1.5" />
+          <circle cx="232" cy="53" r="7" fill={flowColor} />
+          <text x="246" y="50" fill="#334155" fontSize="11" fontWeight="700">การถ่ายเทความร้อน</text>
+          <text x="246" y="63" fill={flowColor} fontSize="12" fontWeight="800">{thermalStatus}</text>
+        </g>
+
       </svg>
     </div>
   );
@@ -293,8 +260,28 @@ interface GraphProps {
 }
 
 function CoolingGraph({ dataPoints }: GraphProps) {
-  const timeToSvgX = React.useCallback((t: number) => 30 + (t / 60) * 150, []);
-  const tempToSvgY = React.useCallback((temp: number) => 100 - (temp / 100) * 85, []);
+  const graphScale = React.useMemo(() => {
+    const temperatures = dataPoints.flatMap((point) => [point.temp, point.ambient]);
+    const rawMin = Math.min(0, ...temperatures);
+    const rawMax = Math.max(0, ...temperatures);
+    const span = Math.max(10, rawMax - rawMin);
+    const padding = span * 0.1;
+    const min = Math.floor((rawMin - padding) / 10) * 10;
+    const max = Math.ceil((rawMax + padding) / 10) * 10;
+    const maxTime = Math.max(1, ...dataPoints.map((point) => point.time));
+    const ticks = Array.from({ length: 5 }, (_, index) => max - ((max - min) * index) / 4);
+
+    return { min, max, maxTime, ticks };
+  }, [dataPoints]);
+  const timeToSvgX = React.useCallback(
+    (time: number) => 30 + (time / graphScale.maxTime) * 150,
+    [graphScale.maxTime],
+  );
+  const tempToSvgY = React.useCallback(
+    (temperature: number) => 15 + ((graphScale.max - temperature) / (graphScale.max - graphScale.min)) * 85,
+    [graphScale.max, graphScale.min],
+  );
+  const zeroAxisY = tempToSvgY(0);
 
   // Build the SVG path for the Object Temperature curve
   const tempPath = React.useMemo(() => {
@@ -332,28 +319,40 @@ function CoolingGraph({ dataPoints }: GraphProps) {
           </div>
         ) : (
           <svg className="w-full h-full min-h-[140px]" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-            {/* Grid subdivisions lines (horizontal) */}
-            <line x1="30" y1="100" x2="180" y2="100" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
-            <line x1="30" y1="78.75" x2="180" y2="78.75" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
-            <line x1="30" y1="57.5" x2="180" y2="57.5" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
-            <line x1="30" y1="36.25" x2="180" y2="36.25" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
-            <line x1="30" y1="15" x2="180" y2="15" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
-
-            {/* Y-Axis Label metrics (Temperature) */}
-            <text x="27" y="17.5" fill="#475569" fontSize="6.5" fontWeight="bold" textAnchor="end">100</text>
-            <text x="27" y="38.75" fill="#475569" fontSize="6.5" fontWeight="bold" textAnchor="end">75</text>
-            <text x="27" y="60" fill="#475569" fontSize="6.5" fontWeight="bold" textAnchor="end">50</text>
-            <text x="27" y="81.25" fill="#475569" fontSize="6.5" fontWeight="bold" textAnchor="end">25</text>
-            <text x="27" y="102" fill="#475569" fontSize="6.5" fontWeight="bold" textAnchor="end">0</text>
+            {graphScale.ticks.map((tick) => {
+              const y = tempToSvgY(tick);
+              return (
+                <g key={tick}>
+                  <line x1="30" y1={y} x2="180" y2={y} stroke="rgba(255,255,255,0.06)" strokeWidth="1" />
+                  <text x="27" y={y + 2.5} fill="#64748b" fontSize="6.5" fontWeight="bold" textAnchor="end">
+                    {tick.toFixed(0)}
+                  </text>
+                </g>
+              );
+            })}
+            {zeroAxisY >= 15 && zeroAxisY <= 100 && (
+              <line
+                data-testid="temperature-zero-axis"
+                x1="30"
+                y1={zeroAxisY}
+                x2="180"
+                y2={zeroAxisY}
+                stroke="rgba(255,255,255,0.4)"
+                strokeWidth="1.2"
+              />
+            )}
 
             <text x="32" y="10" fill="#64748b" fontSize="5.5" fontWeight="extrabold">Temp (°C)</text>
 
             {/* X-Axis Label metrics (Time mins) */}
-            <text x="30" y="108" fill="#94a3b8" fontSize="6" fontWeight="bold" textAnchor="middle">0</text>
-            <text x="67.5" y="108" fill="#94a3b8" fontSize="6" fontWeight="bold" textAnchor="middle">15</text>
-            <text x="105" y="108" fill="#94a3b8" fontSize="6" fontWeight="bold" textAnchor="middle">30</text>
-            <text x="142.5" y="108" fill="#94a3b8" fontSize="6" fontWeight="bold" textAnchor="middle">45</text>
-            <text x="180" y="108" fill="#94a3b8" fontSize="6" fontWeight="bold" textAnchor="middle">60</text>
+            {Array.from({ length: 5 }, (_, index) => {
+              const time = (graphScale.maxTime * index) / 4;
+              return (
+                <text key={time} x={30 + index * 37.5} y="108" fill="#94a3b8" fontSize="6" fontWeight="bold" textAnchor="middle">
+                  {time.toFixed(time < 10 ? 1 : 0)}
+                </text>
+              );
+            })}
 
             <text x="190" y="108" fill="#94a3b8" fontSize="5.5" fontWeight="extrabold" textAnchor="start">t (min)</text>
 
@@ -493,7 +492,7 @@ function CoolingFormulaCard() {
           </div>
         </div>
         <p className="text-xs font-semibold leading-relaxed text-slate-500 leading-[1.6]">
-          อัตราการเปลี่ยนแปลงอุณหภูมิของวัตถุจะแปรผันตรงกับผลต่างระหว่างอุณหภูมิของตัววัตถุ (T) และอุณหภูมิสภาพแวดล้อม (Tₛ) ค่าอัตราดังกล่าวจะมีค่าเป็นลบเสมอยามที่ระบบกำลังสูญเสียความร้อนสู่ภายนอก
+          อัตราการเปลี่ยนแปลงอุณหภูมิของวัตถุแปรผันกับผลต่างระหว่างอุณหภูมิวัตถุ (T) และสิ่งแวดล้อม (Tₛ) หากวัตถุร้อนกว่า อุณหภูมิจะลดลง แต่หากวัตถุเย็นกว่า อุณหภูมิจะเพิ่มขึ้นและค่อย ๆ เข้าใกล้ Tₛ
         </p>
         <div className="grid grid-cols-2 gap-2 text-[10px] font-bold text-slate-500">
           <span className="rounded-lg bg-slate-50 px-2 py-1.5">T: อุณหภูมิวัตถุ</span>
@@ -586,11 +585,15 @@ export default function NewtonsCoolingSimulation() {
         let nextTemp = currentTempRef.current;
         if (isHeaterOnRef.current) {
           const heatingRate = 18; // 18°C per min
-          nextTemp = Math.min(100, currentTempRef.current + (heatingRate * deltaSeconds) / 60);
+          nextTemp = Math.min(MAX_TEMPERATURE_C, currentTempRef.current + (heatingRate * deltaSeconds) / 60);
         } else {
           // Newton's law: dT = -k(T - Ts)*dt
           const coolingAmount = coolingConstantRef.current * (currentTempRef.current - ambientTempRef.current) * (deltaSeconds / 60);
-          nextTemp = Math.max(ambientTempRef.current, currentTempRef.current - coolingAmount);
+          nextTemp = clampNumber(
+            currentTempRef.current - coolingAmount,
+            MIN_TEMPERATURE_C,
+            MAX_TEMPERATURE_C,
+          );
         }
 
         setCurrentTemp(nextTemp);
@@ -808,16 +811,10 @@ export default function NewtonsCoolingSimulation() {
   };
 
   const timeLabel = `${Math.floor(elapsedSeconds / 60).toString().padStart(2, "0")}:${Math.floor(elapsedSeconds % 60).toString().padStart(2, "0")}`;
-  const clampNumber = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
-  const commitNumber = (set: (value: number) => void, min: number, max: number, raw: string) => {
-    const value = Number(raw);
-    if (!Number.isFinite(value)) return;
-    set(clampNumber(value, min, max));
-  };
   const commitCurrentTemp = (raw: string) => {
     const value = Number(raw);
     if (!Number.isFinite(value)) return;
-    const next = clampNumber(value, 0, 100);
+    const next = clampNumber(value, MIN_TEMPERATURE_C, MAX_TEMPERATURE_C);
     setCurrentTemp(next);
     currentTempRef.current = next;
     if (!isRunning) {
@@ -831,8 +828,8 @@ export default function NewtonsCoolingSimulation() {
     { label: "อ่างน้ำแข็ง", helper: "5°C / k 0.260", ambient: 5, k: 0.26, icon: Snowflake },
   ];
   const coolingControls = [
-    { label: "อุณหภูมิเริ่มต้น (T₀)", shortLabel: "T₀", value: initialTemp, set: setInitialTemp, min: 20, max: 100, step: 1, suffix: "°C", color: "accent-rose-500", icon: Thermometer },
-    { label: "อุณหภูมิสิ่งแวดล้อม (Tₛ)", shortLabel: "Tₛ", value: ambientTemp, set: setAmbientTemp, min: 0, max: 40, step: 1, suffix: "°C", color: "accent-blue-500", icon: Thermometer },
+    { label: "อุณหภูมิเริ่มต้น (T₀)", shortLabel: "T₀", value: initialTemp, set: setInitialTemp, min: MIN_TEMPERATURE_C, max: MAX_TEMPERATURE_C, step: 1, suffix: "°C", color: "accent-rose-500", icon: Thermometer },
+    { label: "อุณหภูมิสิ่งแวดล้อม (Tₛ)", shortLabel: "Tₛ", value: ambientTemp, set: setAmbientTemp, min: MIN_TEMPERATURE_C, max: 50, step: 1, suffix: "°C", color: "accent-blue-500", icon: Thermometer },
     { label: "ค่าคงที่การเย็นตัว (k)", shortLabel: "k", value: coolingConstant, set: setCoolingConstant, min: 0.001, max: 1.000, step: 0.005, suffix: "/นาที", color: "accent-purple-500", icon: Sliders },
   ];
 
@@ -874,43 +871,6 @@ export default function NewtonsCoolingSimulation() {
           })}
         </div>
       </div>
-
-      {coolingControls.map((control) => {
-        const ControlIcon = control.icon;
-        const disabled = isRunning && control.shortLabel === "T₀";
-
-        return (
-          <label key={control.label} className="block">
-            <div className="mb-1 flex items-center justify-between text-xs font-bold text-slate-600">
-              <span className="inline-flex items-center gap-1.5">
-                <ControlIcon className="h-3.5 w-3.5 text-blue-600" />
-                {control.label}
-              </span>
-              <input
-                type="number"
-                min={control.min}
-                max={control.max}
-                step={control.step}
-                value={control.shortLabel === "k" ? control.value.toFixed(3) : control.value.toFixed(0)}
-                disabled={disabled}
-                onChange={(event) => commitNumber(control.set, control.min, control.max, event.target.value)}
-                className="h-8 w-24 rounded-lg border border-slate-200 bg-white px-2 text-right text-xs font-black text-slate-800 outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100 disabled:bg-slate-50 disabled:text-slate-400"
-                aria-label={`กรอก${control.label}`}
-              />
-            </div>
-            <input
-              type="range"
-              min={control.min}
-              max={control.max}
-              step={control.step}
-              value={control.value}
-              disabled={disabled}
-              onChange={(event) => control.set(Number(event.target.value))}
-              className={`h-1.5 w-full rounded-full bg-slate-100 ${control.color} disabled:opacity-45`}
-            />
-          </label>
-        );
-      })}
 
       <div className="grid grid-cols-2 gap-3 pt-1">
         <label className="block">
@@ -965,86 +925,88 @@ export default function NewtonsCoolingSimulation() {
         </button>
       </div>
 
-      <div className="grid grid-cols-4 gap-2 pt-1">
-        <button onClick={handleStartStop} className={`col-span-2 inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-xs font-black text-white shadow-sm transition active:scale-95 cursor-pointer ${isRunning ? "bg-slate-700 hover:bg-slate-800" : "bg-blue-600 hover:bg-blue-700"}`}>
+    </div>
+  );
+
+  const compactControls = (
+    <div className="grid gap-2 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+      <div className="grid auto-cols-[minmax(210px,1fr)] grid-flow-col gap-2 overflow-x-auto pb-1 lg:grid-flow-row lg:grid-cols-3 lg:overflow-visible lg:pb-0">
+        {coolingControls.map((control) => {
+          const ControlIcon = control.icon;
+          const disabled = isRunning && control.shortLabel === "T₀";
+
+          return (
+            <label key={control.label} className="rounded-xl border border-slate-100 bg-slate-50/80 px-3 py-2">
+              <div className="mb-2 flex items-center justify-between gap-2">
+                <span className="inline-flex min-w-0 items-center gap-1.5 text-xs font-black text-slate-700">
+                  <ControlIcon className="h-3.5 w-3.5 shrink-0 text-blue-600" />
+                  <span className="truncate">{control.shortLabel}</span>
+                </span>
+                <BoundedNumberInput
+                  min={control.min}
+                  max={control.max}
+                  step={control.step}
+                  precision={control.shortLabel === "k" ? 3 : 0}
+                  value={control.value}
+                  disabled={disabled}
+                  onChange={control.set}
+                  className="h-8 w-24 rounded-lg border border-slate-200 bg-white px-2 text-right text-xs font-black text-slate-800 outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100 disabled:bg-slate-50 disabled:text-slate-400"
+                  ariaLabel={`กรอก${control.label}`}
+                />
+              </div>
+              <input
+                type="range"
+                min={control.min}
+                max={control.max}
+                step={control.step}
+                value={control.value}
+                disabled={disabled}
+                onChange={(event) => control.set(Number(event.target.value))}
+                className={`h-1.5 w-full rounded-full bg-slate-100 ${control.color} disabled:opacity-45`}
+                aria-label={`เลื่อน${control.label}`}
+              />
+            </label>
+          );
+        })}
+      </div>
+      <div className="grid grid-cols-4 gap-2 lg:w-[330px]">
+        <button onClick={handleStartStop} className={`col-span-2 inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-xs font-black text-white shadow-sm transition active:scale-95 ${isRunning ? "bg-slate-700 hover:bg-slate-800" : "bg-blue-600 hover:bg-blue-700"}`}>
           {isRunning ? <Pause className="h-4 w-4 fill-white stroke-none" /> : <Play className="h-4 w-4 fill-white stroke-none" />}
-          {isRunning ? "หยุดชั่วคราว" : "เริ่มจำลอง"}
+          {isRunning ? "หยุดชั่วคราว" : "เริ่มทดลอง"}
         </button>
-        <button onClick={handleAddPoint} className="inline-flex items-center justify-center rounded-xl border border-blue-100 bg-blue-50 text-xs font-black text-blue-700 hover:bg-blue-100 transition active:scale-95 cursor-pointer">บันทึกจุด</button>
-        <button onClick={handleReset} className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition active:scale-95 cursor-pointer" aria-label="รีเซ็ต">
+        <button onClick={handleAddPoint} className="inline-flex min-h-11 items-center justify-center rounded-xl border border-blue-100 bg-blue-50 px-2 text-xs font-black text-blue-700 transition hover:bg-blue-100 active:scale-95">บันทึกจุด</button>
+        <button onClick={handleReset} className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:bg-slate-50 active:scale-95" aria-label="รีเซ็ตการทดลอง">
           <RotateCcw className="h-4 w-4" />
         </button>
       </div>
     </div>
   );
 
-  const compactControls = (
-    <div className="grid gap-3 lg:grid-cols-3">
-      {coolingControls.map((control) => {
-        const ControlIcon = control.icon;
-        const disabled = isRunning && control.shortLabel === "T₀";
-
-        return (
-          <label key={control.label} className="rounded-xl border border-slate-100 bg-slate-50/80 px-3 py-2">
-            <div className="mb-2 flex items-center justify-between gap-2">
-              <span className="inline-flex min-w-0 items-center gap-1.5 text-xs font-black text-slate-700">
-                <ControlIcon className="h-3.5 w-3.5 shrink-0 text-blue-600" />
-                <span className="truncate">{control.shortLabel}</span>
-              </span>
-              <input
-                type="number"
-                min={control.min}
-                max={control.max}
-                step={control.step}
-                value={control.shortLabel === "k" ? control.value.toFixed(3) : control.value.toFixed(0)}
-                disabled={disabled}
-                onChange={(event) => commitNumber(control.set, control.min, control.max, event.target.value)}
-                className="h-7 w-20 rounded-lg border border-slate-200 bg-white px-2 text-right text-xs font-black text-slate-800 outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100 disabled:bg-slate-50 disabled:text-slate-400"
-                aria-label={`กรอก${control.label}`}
-              />
-            </div>
-            <input
-              type="range"
-              min={control.min}
-              max={control.max}
-              step={control.step}
-              value={control.value}
-              disabled={disabled}
-              onChange={(event) => control.set(Number(event.target.value))}
-              className={`h-1.5 w-full rounded-full bg-slate-100 ${control.color} disabled:opacity-45`}
-            />
-          </label>
-        );
-      })}
-    </div>
-  );
-
   const drawerSummary = (
     <div className="grid grid-cols-2 gap-2 text-[11px] font-bold text-slate-500">
       <label className="rounded-xl bg-rose-50 px-3 py-2 text-rose-700">
-        <span className="block opacity-75">อุณหภูมิน้ำ</span>
-        <input
-          type="number"
-          min={0}
-          max={100}
+        <span className="block opacity-75">อุณหภูมิตัวอย่าง</span>
+        <BoundedNumberInput
+          min={MIN_TEMPERATURE_C}
+          max={MAX_TEMPERATURE_C}
           step={0.5}
-          value={currentTemp.toFixed(1)}
-          onChange={(event) => commitCurrentTemp(event.target.value)}
+          precision={1}
+          value={currentTemp}
+          onChange={(value) => commitCurrentTemp(String(value))}
           className="mt-1 h-8 w-full rounded-lg border border-rose-100 bg-white/80 px-2 text-right text-sm font-black text-rose-700 outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100"
-          aria-label="กรอกอุณหภูมิน้ำ"
+          ariaLabel="กรอกอุณหภูมิตัวอย่าง"
         />
       </label>
       <label className="rounded-xl bg-blue-50 px-3 py-2 text-blue-700">
         <span className="block opacity-75">สิ่งแวดล้อม</span>
-        <input
-          type="number"
-          min={0}
-          max={40}
+        <BoundedNumberInput
+          min={MIN_TEMPERATURE_C}
+          max={50}
           step={1}
-          value={ambientTemp.toFixed(0)}
-          onChange={(event) => commitNumber(setAmbientTemp, 0, 40, event.target.value)}
+          value={ambientTemp}
+          onChange={setAmbientTemp}
           className="mt-1 h-8 w-full rounded-lg border border-blue-100 bg-white/80 px-2 text-right text-sm font-black text-blue-700 outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100"
-          aria-label="กรอกอุณหภูมิสิ่งแวดล้อม"
+          ariaLabel="กรอกอุณหภูมิสิ่งแวดล้อม"
         />
       </label>
       <div className="rounded-xl bg-cyan-50 px-3 py-2 text-cyan-700">
@@ -1053,15 +1015,15 @@ export default function NewtonsCoolingSimulation() {
       </div>
       <label className="rounded-xl bg-violet-50 px-3 py-2 text-violet-700">
         <span className="block opacity-75">ค่า k</span>
-        <input
-          type="number"
+        <BoundedNumberInput
           min={0.001}
           max={1}
           step={0.005}
-          value={coolingConstant.toFixed(3)}
-          onChange={(event) => commitNumber(setCoolingConstant, 0.001, 1, event.target.value)}
+          precision={3}
+          value={coolingConstant}
+          onChange={setCoolingConstant}
           className="mt-1 h-8 w-full rounded-lg border border-violet-100 bg-white/80 px-2 text-right text-sm font-black text-violet-700 outline-none focus:border-violet-300 focus:ring-2 focus:ring-violet-100"
-          aria-label="กรอกค่าคงที่การเย็นตัว"
+          ariaLabel="กรอกค่าคงที่การเย็นตัว"
         />
       </label>
       <div className="col-span-2 rounded-xl bg-slate-50 px-3 py-2 text-slate-700">
@@ -1092,9 +1054,10 @@ export default function NewtonsCoolingSimulation() {
       controlsTitle="แผงควบคุมอุณหภูมิ"
       controls={controls}
       compactControls={compactControls}
+      persistentControls
       drawerSummary={drawerSummary}
       metrics={[
-        { label: "อุณหภูมิน้ำ", value: `${currentTemp.toFixed(1)}°C`, tone: "rose" },
+        { label: "อุณหภูมิตัวอย่าง", value: `${currentTemp.toFixed(1)}°C`, tone: "rose" },
         { label: "สิ่งแวดล้อม", value: `${ambientTemp.toFixed(1)}°C`, tone: "blue" },
         { label: "เวลา", value: timeLabel, tone: "cyan" },
         { label: "สถานะฮีตเตอร์", value: isHeaterOn ? "🔥 เปิดทำความร้อน" : "❄️ ปิด/เย็นลง", tone: isHeaterOn ? "orange" : "blue" },

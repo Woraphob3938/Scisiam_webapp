@@ -23,7 +23,6 @@ import {
   Pencil,
   Plus,
   RefreshCw,
-  School,
   Share2,
   ShieldCheck,
   Trash2,
@@ -49,6 +48,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSidebar } from "@/context/SidebarContext";
 import { getLabReadiness } from "@/data/labReadiness";
 import { labsById } from "@/data/labs";
+import { getClassroomPresentation } from "@/lib/classroom-presentation";
 import {
   createClassroomAssignment,
   deleteClassroomAssignment,
@@ -78,7 +78,7 @@ const AUTH_CHECK_TIMEOUT_MS = 6_000;
 const CLASSROOM_ACCESS_ERROR = "ไม่พบห้องเรียนหรือคุณไม่มีสิทธิ์เข้าถึง";
 
 type WorkspaceStatus = "loading" | "ready" | "error" | "unavailable";
-type ClassroomTab = "labs" | "classwork" | "people";
+type ClassroomTab = "overview" | "labs" | "classwork" | "people";
 
 async function hasAuthenticatedUser() {
   const supabase = createClient();
@@ -105,7 +105,11 @@ export default function ClassroomWorkspacePage() {
   const requestedTab = searchParams.get("tab");
   const mountedRef = useRef(false);
   const headingRef = useRef<HTMLHeadingElement>(null);
-  const [activeTab, setActiveTab] = useState<ClassroomTab>(requestedTab === "classwork" || requestedTab === "people" ? requestedTab : "labs");
+  const [activeTab, setActiveTab] = useState<ClassroomTab>(
+    requestedTab === "classwork" || requestedTab === "labs" || requestedTab === "people"
+      ? requestedTab
+      : "overview",
+  );
   const [status, setStatus] = useState<WorkspaceStatus>("loading");
   const [room, setRoom] = useState<ClassroomDetail | null>(null);
   const [members, setMembers] = useState<ClassroomMember[]>([]);
@@ -133,6 +137,11 @@ export default function ClassroomWorkspacePage() {
   const orderedMembers = useMemo(
     () => [...members].sort((left, right) => Number(right.isCreator) - Number(left.isCreator)),
     [members],
+  );
+
+  const classroomPresentation = useMemo(
+    () => (room ? getClassroomPresentation(room.labIds) : null),
+    [room],
   );
 
   const loadWorkspace = useCallback(async () => {
@@ -384,110 +393,138 @@ export default function ClassroomWorkspacePage() {
         {status === "unavailable" ? <WorkspaceUnavailableState headingRef={headingRef} /> : null}
         {status === "ready" && room ? (
           <>
-            <section
-              className="border-b border-slate-200 bg-white"
-              aria-labelledby="classroom-overview-heading"
-            >
-              <div className="mx-auto max-w-7xl px-4 py-6 sm:px-8 lg:px-10 lg:py-8">
+            <section className="border-b border-slate-200 bg-white" aria-labelledby="classroom-overview-heading">
+              <div className="mx-auto max-w-7xl px-4 py-5 sm:px-8 lg:px-10 lg:py-7">
                 <Link
                   href="/classrooms"
                   className="inline-flex min-h-10 items-center gap-2 rounded-lg px-2 text-sm font-bold text-slate-600 transition-colors hover:bg-slate-100 hover:text-blue-700 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
                 >
                   <ArrowLeft className="size-4" aria-hidden="true" />
-                  กลับไปชั้นเรียน
+                  ชั้นเรียนของฉัน
                 </Link>
-                <div className="mt-4 grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-stretch">
-                  <div className="flex min-w-0 gap-4 sm:gap-5">
-                    <span className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-blue-600 text-white shadow-sm sm:size-14">
-                      <School className="size-6 sm:size-7" aria-hidden="true" />
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap gap-2 text-xs font-extrabold">
-                        <span className="inline-flex min-h-7 items-center rounded-full border border-blue-100 bg-blue-50 px-3 text-blue-700">
-                          {room.gradeLevel}
-                        </span>
-                        <span className="inline-flex min-h-7 items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-3 text-slate-600">
-                          {room.isCreator ? <ShieldCheck className="size-3.5" aria-hidden="true" /> : <UsersRound className="size-3.5" aria-hidden="true" />}
-                          {room.isCreator ? "ผู้สร้างห้อง" : "สมาชิก"}
-                        </span>
-                      </div>
-                      <h1
-                        id="classroom-overview-heading"
-                        ref={headingRef}
-                        tabIndex={-1}
-                        className="mt-3 break-words text-2xl font-extrabold leading-[1.45] text-slate-950 outline-none sm:text-3xl"
-                      >
-                        {room.name}
-                      </h1>
-                      <p className="mt-2 max-w-3xl text-sm font-semibold leading-relaxed text-slate-500 sm:text-base">
-                        {room.description || "พื้นที่เรียนรู้ร่วมกันสำหรับทดลอง สังเกต และทบทวนผลจากห้องแล็บ"}
-                      </p>
-                      <p className="mt-2 flex items-center gap-1.5 text-xs font-bold text-slate-500">
-                        <UserRound className="size-3.5" aria-hidden="true" />
-                        สร้างโดย {room.creatorName}
-                      </p>
-                      <dl className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-3 border-t border-slate-100 pt-4">
-                        <HeaderStat icon={FlaskConical} label="ห้องแล็บ" value={`${roomLabs.length} แล็บ`} />
-                        <HeaderStat icon={UsersRound} label="สมาชิก" value={`${room.memberCount} คน`} />
-                      </dl>
-                      {room.isCreator ? (
-                        <div className="mt-4 flex flex-wrap gap-2">
-                          <button
-                            type="button"
-                            onClick={openRenameDialog}
-                            className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-3 text-sm font-extrabold text-blue-700 transition-colors hover:bg-blue-100 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
-                          >
-                            <Pencil className="size-4" aria-hidden="true" />
-                            เปลี่ยนชื่อห้อง
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setDisbandOpen(true)}
-                            className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-rose-200 bg-white px-3 text-sm font-extrabold text-rose-700 transition-colors hover:bg-rose-50 focus:outline-none focus-visible:ring-3 focus-visible:ring-rose-100"
-                          >
-                            <Trash2 className="size-4" aria-hidden="true" />
-                            ยุบห้องเรียน
-                          </button>
+
+                {classroomPresentation ? (
+                  <div className={`relative mt-3 overflow-hidden rounded-3xl bg-gradient-to-br px-5 py-6 text-white shadow-sm sm:px-8 sm:py-8 ${classroomPresentation.coverClassName}`}>
+                    <span aria-hidden="true" className="absolute -right-12 -top-20 size-64 rounded-full bg-white/10" />
+                    <span aria-hidden="true" className={`absolute -bottom-24 right-28 size-52 rounded-full ${classroomPresentation.glowClassName}`} />
+                    <span aria-hidden="true" className="absolute bottom-8 right-8 hidden size-28 rotate-12 rounded-[28px] border-[18px] border-white/10 sm:block" />
+
+                    <div className="relative grid gap-6 lg:grid-cols-[minmax(0,1fr)_260px] lg:items-end">
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap gap-2 text-xs font-bold">
+                          <span className="rounded-full bg-white/15 px-3 py-1.5 backdrop-blur-sm">{classroomPresentation.label}</span>
+                          <span className="rounded-full bg-white/15 px-3 py-1.5 backdrop-blur-sm">{room.gradeLevel}</span>
+                          <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1.5 backdrop-blur-sm">
+                            {room.isCreator ? <ShieldCheck className="size-3.5" aria-hidden="true" /> : <UsersRound className="size-3.5" aria-hidden="true" />}
+                            {room.isCreator ? "ผู้สร้างห้อง" : "สมาชิก"}
+                          </span>
                         </div>
-                      ) : null}
+                        <h1
+                          id="classroom-overview-heading"
+                          ref={headingRef}
+                          tabIndex={-1}
+                          className="mt-4 max-w-3xl break-words text-3xl font-bold leading-tight text-white outline-none sm:text-4xl"
+                        >
+                          {room.name}
+                        </h1>
+                        <p className="mt-3 max-w-3xl text-sm font-medium leading-relaxed text-white/85 sm:text-base">
+                          {room.description || "พื้นที่เรียนรู้ร่วมกันสำหรับทดลอง สังเกต และทบทวนผลจากห้องแล็บ"}
+                        </p>
+                        <p className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-white/80">
+                          <UserRound className="size-4" aria-hidden="true" />
+                          {room.creatorName}
+                        </p>
+                      </div>
+
+                      <dl className="grid grid-cols-2 gap-3 rounded-2xl bg-white/12 p-4 backdrop-blur-sm">
+                        <div>
+                          <dt className="text-xs font-medium text-white/70">ห้องแล็บ</dt>
+                          <dd className="mt-1 text-2xl font-bold text-white">{roomLabs.length}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-xs font-medium text-white/70">สมาชิก</dt>
+                          <dd className="mt-1 text-2xl font-bold text-white">{room.memberCount}</dd>
+                        </div>
+                      </dl>
                     </div>
                   </div>
-                  {room.isCreator && joinCode ? (
-                    <JoinCodePanel
-                      joinCode={joinCode}
-                      shareStatus={shareStatus}
-                      onCopy={() => void copyJoinCode()}
-                      onShare={() => void shareJoinCode()}
-                    />
-                  ) : null}
-                </div>
+                ) : null}
+
+                {room.isCreator ? (
+                  <div className="mt-3 flex flex-wrap items-start gap-2">
+                    <button
+                      type="button"
+                      onClick={openRenameDialog}
+                      className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-50 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
+                    >
+                      <Pencil className="size-4" aria-hidden="true" />
+                      เปลี่ยนชื่อห้อง
+                    </button>
+                    {joinCode ? (
+                      <details className="group rounded-lg border border-slate-200 bg-white">
+                        <summary className="flex min-h-10 cursor-pointer list-none items-center gap-2 px-3 text-sm font-bold text-blue-700 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100 [&::-webkit-details-marker]:hidden">
+                          <UsersRound className="size-4" aria-hidden="true" />
+                          เชิญสมาชิก
+                        </summary>
+                        <div className="w-[min(92vw,340px)] border-t border-slate-100 p-2">
+                          <JoinCodePanel
+                            joinCode={joinCode}
+                            shareStatus={shareStatus}
+                            onCopy={() => void copyJoinCode()}
+                            onShare={() => void shareJoinCode()}
+                          />
+                        </div>
+                      </details>
+                    ) : null}
+                    <button
+                      type="button"
+                      onClick={() => setDisbandOpen(true)}
+                      className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-rose-200 bg-white px-3 text-sm font-bold text-rose-700 transition-colors hover:bg-rose-50 focus:outline-none focus-visible:ring-3 focus-visible:ring-rose-100"
+                    >
+                      <Trash2 className="size-4" aria-hidden="true" />
+                      ยุบห้องเรียน
+                    </button>
+                  </div>
+                ) : null}
               </div>
             </section>
 
             <section className="mx-auto max-w-7xl px-4 py-6 sm:px-8 lg:px-10">
               <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as ClassroomTab)} className="gap-0">
-                <TabsList variant="line" className="grid h-auto w-full grid-cols-3 rounded-lg border border-slate-200 bg-white p-1 shadow-sm" aria-label="เนื้อหาในชั้นเรียน">
-                  <TabsTrigger value="labs" className="min-h-12 min-w-0 rounded-md px-1 text-xs font-extrabold after:bottom-0 after:inset-x-3 after:rounded-full after:bg-blue-600 data-active:bg-blue-50 data-active:text-blue-700 sm:px-4 sm:text-sm">ห้องแล็บ</TabsTrigger>
-                  <TabsTrigger value="classwork" className="min-h-12 min-w-0 rounded-md px-1 text-xs font-extrabold after:bottom-0 after:inset-x-3 after:rounded-full after:bg-blue-600 data-active:bg-blue-50 data-active:text-blue-700 sm:px-4 sm:text-sm">งานของชั้นเรียน</TabsTrigger>
-                  <TabsTrigger value="people" className="min-h-12 min-w-0 rounded-md px-1 text-xs font-extrabold after:bottom-0 after:inset-x-3 after:rounded-full after:bg-blue-600 data-active:bg-blue-50 data-active:text-blue-700 sm:px-4 sm:text-sm">สมาชิก</TabsTrigger>
-                </TabsList>
+                <div className="-mx-4 overflow-x-auto px-4 sm:-mx-8 sm:px-8 lg:-mx-10 lg:px-10">
+                  <TabsList variant="line" className="h-auto min-w-max justify-start gap-1 rounded-none border-b border-slate-200 bg-transparent p-0" aria-label="เนื้อหาในชั้นเรียน">
+                    <TabsTrigger value="overview" className="min-h-12 rounded-none px-4 text-sm font-bold after:bottom-0 after:inset-x-3 after:bg-blue-600 data-active:text-blue-700">ภาพรวม</TabsTrigger>
+                    <TabsTrigger value="classwork" className="min-h-12 rounded-none px-4 text-sm font-bold after:bottom-0 after:inset-x-3 after:bg-blue-600 data-active:text-blue-700">งานของชั้นเรียน</TabsTrigger>
+                    <TabsTrigger value="labs" className="min-h-12 rounded-none px-4 text-sm font-bold after:bottom-0 after:inset-x-3 after:bg-blue-600 data-active:text-blue-700">ห้องแล็บ</TabsTrigger>
+                    <TabsTrigger value="people" className="min-h-12 rounded-none px-4 text-sm font-bold after:bottom-0 after:inset-x-3 after:bg-blue-600 data-active:text-blue-700">สมาชิก</TabsTrigger>
+                  </TabsList>
+                </div>
 
-                <TabsContent value="labs" className="pt-6">
-                  <LabsPanel labs={roomLabs} />
+                <TabsContent value="overview" className="pt-6">
+                  <OverviewPanel
+                    assignments={assignments}
+                    submissions={submissions}
+                    notifications={notifications}
+                    isCreator={room.isCreator}
+                    isSubmitting={pendingAction === "assignment"}
+                    onOpenClasswork={() => setActiveTab("classwork")}
+                    onMarkNotificationsRead={handleMarkNotificationsRead}
+                  />
                 </TabsContent>
                 <TabsContent value="classwork" className="pt-6">
                   <ClassworkPanel
                     assignments={assignments}
                     submissions={submissions}
-                    notifications={notifications}
                     members={members}
                     isCreator={room.isCreator}
                     isSubmitting={pendingAction === "assignment"}
                     onCreate={handleCreateAssignment}
                     onDelete={handleDeleteAssignment}
                     onSubmit={handleSubmitAssignment}
-                    onMarkNotificationsRead={handleMarkNotificationsRead}
                   />
+                </TabsContent>
+                <TabsContent value="labs" className="pt-6">
+                  <LabsPanel labs={roomLabs} />
                 </TabsContent>
                 <TabsContent value="people" className="pt-6">
                   <PeoplePanel
@@ -528,20 +565,6 @@ export default function ClassroomWorkspacePage() {
           </>
         ) : null}
       </main>
-    </div>
-  );
-}
-
-function HeaderStat({ icon: Icon, label, value }: { icon: typeof FlaskConical; label: string; value: string }) {
-  return (
-    <div className="flex min-w-32 items-center gap-3">
-      <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-blue-600">
-        <Icon className="size-4" aria-hidden="true" />
-      </span>
-      <div>
-        <dt className="text-[11px] font-bold text-slate-400">{label}</dt>
-        <dd className="mt-0.5 text-sm font-extrabold text-slate-800">{value}</dd>
-      </div>
     </div>
   );
 }
@@ -671,28 +694,150 @@ function LabsPanel({ labs }: { labs: Array<(typeof labsById)[string]> }) {
   );
 }
 
-function ClassworkPanel({
+function OverviewPanel({
   assignments,
   submissions,
   notifications,
+  isCreator,
+  isSubmitting,
+  onOpenClasswork,
+  onMarkNotificationsRead,
+}: {
+  assignments: ClassroomAssignment[];
+  submissions: ClassroomAssignmentSubmission[];
+  notifications: ClassroomNotification[];
+  isCreator: boolean;
+  isSubmitting: boolean;
+  onOpenClasswork: () => void;
+  onMarkNotificationsRead: () => void;
+}) {
+  const submittedAssignmentIds = new Set(submissions.map((submission) => submission.assignmentId));
+  const latestAssignments = [...assignments]
+    .sort((left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime())
+    .slice(0, 4);
+  const pendingAssignments = assignments.filter((assignment) => !submittedAssignmentIds.has(assignment.id));
+  const unreadNotifications = notifications.filter((notification) => !notification.readAt);
+
+  return (
+    <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
+      <section className="min-w-0" aria-labelledby="classroom-latest-heading">
+        <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-xs font-bold text-blue-600">STREAM</p>
+            <h2 id="classroom-latest-heading" className="mt-1 text-xl font-bold leading-relaxed text-slate-950">อัปเดตล่าสุด</h2>
+          </div>
+          {assignments.length > 0 ? (
+            <button
+              type="button"
+              onClick={onOpenClasswork}
+              className="inline-flex min-h-10 items-center gap-2 rounded-lg px-3 text-sm font-bold text-blue-700 hover:bg-blue-50 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
+            >
+              ดูงานทั้งหมด
+              <ArrowRight className="size-4" aria-hidden="true" />
+            </button>
+          ) : null}
+        </div>
+
+        {latestAssignments.length > 0 ? (
+          <ul className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            {latestAssignments.map((assignment) => {
+              const isSubmitted = submittedAssignmentIds.has(assignment.id);
+              return (
+                <li key={assignment.id} className="border-b border-slate-100 last:border-b-0">
+                  <button
+                    type="button"
+                    onClick={onOpenClasswork}
+                    className="flex w-full items-start gap-3 px-4 py-4 text-left transition-colors hover:bg-slate-50 focus:outline-none focus-visible:ring-3 focus-visible:ring-inset focus-visible:ring-blue-100 sm:px-5"
+                  >
+                    <span className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-700">
+                      <ClipboardList className="size-5" aria-hidden="true" />
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block break-words text-sm font-bold leading-relaxed text-slate-900">{assignment.title}</span>
+                      <span className="mt-1 block text-xs font-medium text-slate-600">
+                        {assignment.dueAt ? `กำหนดส่ง ${formatClassroomDate(assignment.dueAt)}` : `เพิ่มเมื่อ ${formatClassroomDate(assignment.createdAt)}`}
+                      </span>
+                    </span>
+                    {!isCreator ? (
+                      <span className={`mt-1 shrink-0 rounded-full px-2.5 py-1 text-[11px] font-bold ${isSubmitted ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-800"}`}>
+                        {isSubmitted ? "ส่งแล้ว" : "ยังไม่ส่ง"}
+                      </span>
+                    ) : null}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        ) : (
+          <div className="flex min-h-52 flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white p-6 text-center">
+            <span className="flex size-12 items-center justify-center rounded-full bg-blue-50 text-blue-600">
+              <Megaphone className="size-6" aria-hidden="true" />
+            </span>
+            <h3 className="mt-3 text-base font-bold text-slate-950">ยังไม่มีอัปเดตในชั้นเรียน</h3>
+            <p className="mt-1 max-w-md text-sm font-medium leading-relaxed text-slate-600">
+              {isCreator ? "เพิ่มงานแรกเพื่อเริ่มกิจกรรมร่วมกับสมาชิก" : "งานใหม่จากคุณครูจะแสดงที่นี่"}
+            </p>
+          </div>
+        )}
+      </section>
+
+      <aside className="grid gap-4" aria-label="สรุปชั้นเรียน">
+        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm" aria-labelledby="my-classwork-heading">
+          <div className="flex items-center justify-between gap-3">
+            <h2 id="my-classwork-heading" className="text-lg font-bold text-slate-950">{isCreator ? "งานที่ต้องติดตาม" : "งานของฉัน"}</h2>
+            <ClipboardList className="size-5 text-blue-600" aria-hidden="true" />
+          </div>
+          <dl className="mt-4 grid grid-cols-2 gap-3">
+            <div className="rounded-xl bg-blue-50 p-3">
+              <dt className="text-xs font-medium text-blue-700">{isCreator ? "งานทั้งหมด" : "ยังไม่ส่ง"}</dt>
+              <dd className="mt-1 text-2xl font-bold text-blue-950">{isCreator ? assignments.length : pendingAssignments.length}</dd>
+            </div>
+            <div className="rounded-xl bg-emerald-50 p-3">
+              <dt className="text-xs font-medium text-emerald-700">{isCreator ? "การส่งงาน" : "ส่งแล้ว"}</dt>
+              <dd className="mt-1 text-2xl font-bold text-emerald-950">{isCreator ? submissions.length : submittedAssignmentIds.size}</dd>
+            </div>
+          </dl>
+          <button
+            type="button"
+            onClick={onOpenClasswork}
+            className="mt-4 inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-lg border border-blue-200 bg-white px-3 text-sm font-bold text-blue-700 hover:bg-blue-50 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
+          >
+            เปิดงานของชั้นเรียน
+            <ArrowRight className="size-4" aria-hidden="true" />
+          </button>
+        </section>
+
+        {notifications.length > 0 ? (
+          <NotificationPanel
+            notifications={notifications}
+            unreadCount={unreadNotifications.length}
+            isSubmitting={isSubmitting}
+            onMarkRead={onMarkNotificationsRead}
+          />
+        ) : null}
+      </aside>
+    </div>
+  );
+}
+
+function ClassworkPanel({
+  assignments,
+  submissions,
   members,
   isCreator,
   isSubmitting,
   onCreate,
   onDelete,
   onSubmit,
-  onMarkNotificationsRead,
 }: {
   assignments: ClassroomAssignment[];
   submissions: ClassroomAssignmentSubmission[];
-  notifications: ClassroomNotification[];
   members: ClassroomMember[];
   isCreator: boolean;
   isSubmitting: boolean;
   onCreate: (input: CreateClassroomAssignmentInput) => Promise<boolean>;
   onDelete: (assignment: ClassroomAssignment) => void;
   onSubmit: (input: SubmitClassroomAssignmentInput) => Promise<boolean>;
-  onMarkNotificationsRead: () => void;
 }) {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
@@ -701,7 +846,6 @@ function ClassworkPanel({
   const [linkUrls, setLinkUrls] = useState("");
   const [attachmentFiles, setAttachmentFiles] = useState<File[]>([]);
   const [attachmentInputKey, setAttachmentInputKey] = useState(0);
-  const unreadNotifications = notifications.filter((notification) => !notification.readAt);
   const memberNameById = useMemo(
     () => new Map(members.map((member) => [member.userId, member.displayName])),
     [members],
@@ -744,14 +888,6 @@ function ClassworkPanel({
           </button>
         ) : null}
       </div>
-      {notifications.length > 0 ? (
-        <NotificationPanel
-          notifications={notifications}
-          unreadCount={unreadNotifications.length}
-          isSubmitting={isSubmitting}
-          onMarkRead={onMarkNotificationsRead}
-        />
-      ) : null}
       {assignments.length === 0 ? (
         <div className="flex min-h-64 flex-col items-center justify-center gap-4 rounded-lg border border-dashed border-slate-300 bg-white p-6 text-center">
           <span className="flex size-12 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
@@ -768,50 +904,63 @@ function ClassworkPanel({
         </div>
       ) : (
         <ul className="grid gap-3">
-          {assignments.map((assignment) => (
-            <li key={assignment.id} className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
-              <div className="flex items-start gap-3">
-                <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-700">
-                  <ClipboardList className="size-5" aria-hidden="true" />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <h3 className="break-words text-base font-extrabold leading-relaxed text-slate-950">{assignment.title}</h3>
-                  {assignment.description ? (
-                    <p className="mt-1 whitespace-pre-wrap text-sm font-semibold leading-relaxed text-slate-500">{assignment.description}</p>
-                  ) : null}
-                  <p className="mt-3 flex flex-wrap items-center gap-1.5 text-xs font-bold text-slate-500">
-                    <CalendarDays className="size-3.5" aria-hidden="true" />
-                    {assignment.dueAt ? `กำหนดส่ง ${formatClassroomDate(assignment.dueAt)}` : "ไม่กำหนดวันส่ง"}
-                  </p>
-                  <AttachmentLinks linkUrls={assignment.linkUrls} attachments={assignment.attachments} />
-                  {isCreator ? (
-                    <button
-                      type="button"
-                      onClick={() => onDelete(assignment)}
-                      disabled={isSubmitting}
-                      className="mt-3 inline-flex min-h-9 items-center gap-2 rounded-lg border border-rose-200 bg-white px-3 text-xs font-extrabold text-rose-700 hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus-visible:ring-3 focus-visible:ring-rose-100"
-                    >
-                      <Trash2 className="size-3.5" aria-hidden="true" />
-                      ลบงาน
-                    </button>
-                  ) : null}
-                  {isCreator ? (
-                    <SubmissionList
-                      submissions={submissions.filter((submission) => submission.assignmentId === assignment.id)}
-                      memberNameById={memberNameById}
-                    />
-                  ) : (
-                    <AssignmentSubmissionForm
-                      assignment={assignment}
-                      existingSubmission={submissions.find((submission) => submission.assignmentId === assignment.id) ?? null}
-                      isSubmitting={isSubmitting}
-                      onSubmit={onSubmit}
-                    />
-                  )}
-                </div>
-              </div>
-            </li>
-          ))}
+          {assignments.map((assignment) => {
+            const assignmentSubmissions = submissions.filter((submission) => submission.assignmentId === assignment.id);
+            const existingSubmission = assignmentSubmissions[0] ?? null;
+
+            return (
+              <li key={assignment.id}>
+                <details className="group overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm open:border-blue-200">
+                  <summary className="flex min-h-20 cursor-pointer list-none items-center gap-3 px-4 py-3 focus:outline-none focus-visible:ring-3 focus-visible:ring-inset focus-visible:ring-blue-100 [&::-webkit-details-marker]:hidden sm:px-5">
+                    <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-700">
+                      <ClipboardList className="size-5" aria-hidden="true" />
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block break-words text-sm font-bold leading-relaxed text-slate-950 sm:text-base">{assignment.title}</span>
+                      <span className="mt-1 flex flex-wrap items-center gap-1.5 text-xs font-medium text-slate-600">
+                        <CalendarDays className="size-3.5" aria-hidden="true" />
+                        {assignment.dueAt ? `กำหนดส่ง ${formatClassroomDate(assignment.dueAt)}` : "ไม่กำหนดวันส่ง"}
+                      </span>
+                    </span>
+                    <span className={`hidden shrink-0 rounded-full px-2.5 py-1 text-[11px] font-bold sm:inline-flex ${isCreator || existingSubmission ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-800"}`}>
+                      {isCreator ? `ส่งแล้ว ${assignmentSubmissions.length}` : existingSubmission ? "ส่งแล้ว" : "ยังไม่ส่ง"}
+                    </span>
+                    <ArrowRight className="size-4 shrink-0 text-slate-500 transition-transform group-open:rotate-90" aria-hidden="true" />
+                  </summary>
+
+                  <div className="border-t border-slate-100 px-4 py-4 sm:px-5">
+                    {assignment.description ? (
+                      <p className="whitespace-pre-wrap text-sm font-medium leading-relaxed text-slate-600">{assignment.description}</p>
+                    ) : (
+                      <p className="text-sm font-medium text-slate-500">ไม่มีรายละเอียดเพิ่มเติม</p>
+                    )}
+                    <AttachmentLinks linkUrls={assignment.linkUrls} attachments={assignment.attachments} />
+                    {isCreator ? (
+                      <button
+                        type="button"
+                        onClick={() => onDelete(assignment)}
+                        disabled={isSubmitting}
+                        className="mt-3 inline-flex min-h-9 items-center gap-2 rounded-lg border border-rose-200 bg-white px-3 text-xs font-bold text-rose-700 hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus-visible:ring-3 focus-visible:ring-rose-100"
+                      >
+                        <Trash2 className="size-3.5" aria-hidden="true" />
+                        ลบงาน
+                      </button>
+                    ) : null}
+                    {isCreator ? (
+                      <SubmissionList submissions={assignmentSubmissions} memberNameById={memberNameById} />
+                    ) : (
+                      <AssignmentSubmissionForm
+                        assignment={assignment}
+                        existingSubmission={existingSubmission}
+                        isSubmitting={isSubmitting}
+                        onSubmit={onSubmit}
+                      />
+                    )}
+                  </div>
+                </details>
+              </li>
+            );
+          })}
         </ul>
       )}
 
@@ -914,7 +1063,7 @@ function NotificationPanel({
   onMarkRead: () => void;
 }) {
   return (
-    <section className="mb-4 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3" aria-labelledby="classroom-notifications-heading">
+    <section className="rounded-2xl border border-blue-200 bg-blue-50 px-4 py-4" aria-labelledby="classroom-notifications-heading">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 id="classroom-notifications-heading" className="inline-flex items-center gap-2 text-sm font-extrabold text-blue-900">
           <Bell className="size-4" aria-hidden="true" />
@@ -1006,7 +1155,7 @@ function SelectedFilesList({
             <button
               type="button"
               onClick={() => onRemove(index)}
-              className="grid size-7 shrink-0 place-items-center rounded-md text-slate-400 hover:bg-rose-50 hover:text-rose-600 focus:outline-none focus-visible:ring-3 focus-visible:ring-rose-100"
+              className="grid size-7 shrink-0 place-items-center rounded-md text-slate-600 hover:bg-rose-50 hover:text-rose-600 focus:outline-none focus-visible:ring-3 focus-visible:ring-rose-100"
               aria-label={`เอาไฟล์ ${file.name} ออก`}
             >
               <X className="size-3.5" aria-hidden="true" />
@@ -1373,25 +1522,17 @@ function WorkspaceLoadingState() {
     <div role="status">
       <span className="sr-only">กำลังโหลดชั้นเรียน</span>
       <div className="border-b border-slate-200 bg-white">
-        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-8 lg:px-10">
+        <div className="mx-auto max-w-7xl px-4 py-5 sm:px-8 lg:px-10 lg:py-7">
           <div className="h-10 w-36 animate-pulse rounded-lg bg-slate-100" />
-          <div className="mt-5 grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
-            <div className="flex gap-4">
-              <div className="size-14 shrink-0 animate-pulse rounded-lg bg-blue-100" />
-              <div className="w-full max-w-2xl">
-                <div className="h-7 w-2/3 animate-pulse rounded bg-slate-100" />
-                <div className="mt-3 h-4 w-full animate-pulse rounded bg-slate-100" />
-                <div className="mt-5 h-12 w-72 max-w-full animate-pulse rounded bg-slate-100" />
-              </div>
-            </div>
-            <div className="h-44 animate-pulse rounded-lg bg-blue-50" />
-          </div>
+          <div className="mt-3 h-56 animate-pulse rounded-3xl bg-blue-100" />
+          <div className="mt-3 h-10 w-72 max-w-full animate-pulse rounded-lg bg-slate-100" />
         </div>
       </div>
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-8 lg:px-10">
         <div className="h-12 animate-pulse border-b border-slate-200 bg-slate-100/60" />
-        <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {[0, 1, 2].map((item) => <div key={item} className="h-72 animate-pulse rounded-lg border border-slate-200 bg-white" />)}
+        <div className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
+          <div className="h-60 animate-pulse rounded-2xl border border-slate-200 bg-white" />
+          <div className="h-44 animate-pulse rounded-2xl border border-slate-200 bg-white" />
         </div>
       </div>
     </div>

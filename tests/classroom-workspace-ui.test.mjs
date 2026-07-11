@@ -7,13 +7,17 @@ const source = fs.readFileSync(
   path.join(process.cwd(), "src", "app", "classrooms", "[id]", "page.tsx"),
   "utf8",
 );
+const classroomsIndexSource = fs.readFileSync(
+  path.join(process.cwd(), "src", "app", "classrooms", "page.tsx"),
+  "utf8",
+);
 
 test("classroom workspace presents a compact room overview with useful counts", () => {
   assert.match(source, /aria-labelledby="classroom-overview-heading"/);
   assert.match(source, /id="classroom-overview-heading"/);
   assert.match(source, /<JoinCodePanel/);
-  assert.match(source, /HeaderStat icon=\{FlaskConical\}/);
-  assert.match(source, /HeaderStat icon=\{UsersRound\}/);
+  assert.match(source, /roomLabs\.length/);
+  assert.match(source, /room\.memberCount/);
 });
 
 test("classroom owner can manage the room, members, and classwork", () => {
@@ -23,6 +27,17 @@ test("classroom owner can manage the room, members, and classwork", () => {
   assert.match(source, /room\.isCreator/);
   assert.match(source, /removeClassroomMember/);
   assert.match(source, /createClassroomAssignment/);
+});
+
+test("classroom uses a subject-aware cover and an overview for the next action", () => {
+  assert.match(source, /getClassroomPresentation/);
+  assert.match(source, /<TabsTrigger value="overview"/);
+  assert.match(source, />ภาพรวม<\/TabsTrigger>/);
+  assert.match(source, /function OverviewPanel/);
+  assert.match(source, /งานของฉัน/);
+  assert.match(source, /<details/);
+  assert.match(classroomsIndexSource, /getClassroomPresentation/);
+  assert.match(classroomsIndexSource, /เปิดชั้นเรียน/);
 });
 
 test("classroom classwork supports assignment files, links, and student submissions", () => {
@@ -62,6 +77,7 @@ test("classroom classwork supports assignment files, links, and student submissi
 });
 
 test("classroom tabs are prominent, count-free, and keep the active line inside", () => {
+  assert.match(source, /ภาพรวม<\/TabsTrigger>/);
   assert.match(source, /ห้องแล็บ<\/TabsTrigger>/);
   assert.match(source, /งานของชั้นเรียน<\/TabsTrigger>/);
   assert.match(source, /สมาชิก<\/TabsTrigger>/);
@@ -71,7 +87,8 @@ test("classroom tabs are prominent, count-free, and keep the active line inside"
   assert.doesNotMatch(source, /ห้องแล็บ \{roomLabs\.length\}/);
   assert.doesNotMatch(source, /บุคคล \{orderedMembers\.length\}/);
   assert.match(source, /after:bottom-0/);
-  assert.match(source, /data-active:bg-blue-50/);
+  assert.match(source, /data-active:text-blue-700/);
+  assert.doesNotMatch(source, /data-active:bg-blue-50/);
 });
 
 test("classroom lab cards expose readiness and keep one clear entry action", () => {
