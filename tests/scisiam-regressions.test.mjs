@@ -927,6 +927,7 @@ test("local Supabase migrations mirror the deployed migration history", () => {
     "20260708085729",
     "20260708194528",
     "20260709200551",
+    "20260711182651",
   ];
 
   assert.deepEqual(

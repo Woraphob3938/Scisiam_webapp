@@ -89,6 +89,32 @@ test("classroom tabs are prominent, count-free, and keep the active line inside"
   assert.match(source, /after:bottom-0/);
   assert.match(source, /data-active:text-blue-700/);
   assert.doesNotMatch(source, /data-active:bg-blue-50/);
+  assert.match(source, /grid-cols-2/);
+  assert.match(source, /sm:grid-cols-4/);
+  assert.doesNotMatch(source, /-mx-4 overflow-x-auto/);
+  assert.doesNotMatch(source, /min-w-max justify-start/);
+});
+
+test("lab assignments require a selected lab, max score, saved run, and conclusion", () => {
+  for (const label of [
+    "มอบหมายห้องแล็บ",
+    "ห้องแล็บที่มอบหมาย",
+    "คะแนนเต็ม",
+    "ส่งผลการทดลอง",
+    "ผลการทดลองที่บันทึกไว้",
+    "สรุปผลการทดลอง",
+    "ตรวจและให้คะแนน",
+    "ตรวจแล้ว",
+  ]) {
+    assert.match(source, new RegExp(label));
+  }
+
+  assert.match(source, /listMyExperimentRunsForLab/);
+  assert.match(source, /gradeClassroomAssignmentSubmission/);
+  assert.match(source, /experimentRunId:/);
+  assert.match(source, /existingSubmission\?\.gradedAt/);
+  assert.match(source, /minLength=\{20\}/);
+  assert.match(source, /maxLength=\{1000\}/);
 });
 
 test("classroom lab cards expose readiness and keep one clear entry action", () => {

@@ -48,6 +48,12 @@ function classroomBulkAttachmentsMigration() {
   return fs.readFileSync(path.join(migrations, files[0]), "utf8");
 }
 
+function classroomExperimentGradingMigration() {
+  const files = fs.readdirSync(migrations).filter((name) => name.endsWith("_classroom_experiment_grading.sql"));
+  assert.equal(files.length, 1, "expected exactly one classroom experiment grading migration");
+  return fs.readFileSync(path.join(migrations, files[0]), "utf8");
+}
+
 function atmosphereLayersCatalogMigration() {
   const files = fs.readdirSync(migrations).filter((name) => name.endsWith("_add_atmosphere_layers_lab_catalog.sql"));
   assert.equal(files.length, 1, "expected exactly one atmosphere layers catalog migration");
@@ -196,6 +202,54 @@ test("classroom assignments support deletion, multiple files, multiple links, an
   assert.match(sql, /set deleted_at = now\(\)/i);
   assert.match(sql, /create or replace function public\.mark_classroom_notifications_read/i);
   assert.match(sql, /set read_at = now\(\)/i);
+});
+
+test("classroom experiment grading is bound to owned runs and owner-defined scores", () => {
+  const sql = classroomExperimentGradingMigration();
+
+  assert.match(sql, /add column lab_id text/i);
+  assert.match(sql, /foreign key \(classroom_id, lab_id\)[\s\S]*references public\.classroom_labs/i);
+  assert.match(sql, /add column max_score smallint/i);
+  assert.match(sql, /add column experiment_run_id uuid/i);
+  assert.match(sql, /create or replace function public\.grade_classroom_assignment_submission/i);
+  assert.match(sql, /create or replace function public\.get_classroom_submission_experiment_run/i);
+  assert.match(sql, /get_classroom_submission_experiment_run[\s\S]+private\.is_class_creator/i);
+  assert.match(sql, /runs\.user_id = v_user_id/i);
+  assert.match(sql, /runs\.lab_id = v_lab_id/i);
+  assert.match(sql, /private\.is_class_creator\(v_classroom_id\)/i);
+  assert.match(sql, /v_score > v_max_score/i);
+  assert.match(sql, /revoke all on function public\.grade_classroom_assignment_submission/i);
+  assert.match(sql, /grant execute on function public\.grade_classroom_assignment_submission[\s\S]*to authenticated/i);
+  assert.match(sql, /grant execute on function public\.get_classroom_submission_experiment_run[\s\S]*to authenticated/i);
+});
+
+test("classroom database types expose experiment grading fields and RPCs", () => {
+  const source = fs.readFileSync(
+    path.join(root, "src", "lib", "supabase", "database.types.ts"),
+    "utf8",
+  );
+
+  assert.match(source, /classroom_assignments:[\s\S]*lab_id: string \| null;[\s\S]*max_score: number \| null;/);
+  assert.match(source, /classroom_assignment_submissions:[\s\S]*experiment_run_id: string \| null;[\s\S]*score: number \| null;[\s\S]*graded_by: string \| null;[\s\S]*graded_at: string \| null;/);
+  assert.match(source, /create_classroom_assignment:[\s\S]*p_lab_id\?: string \| null;[\s\S]*p_max_score\?: number \| null;/);
+  assert.match(source, /submit_classroom_assignment:[\s\S]*p_experiment_run_id\?: string \| null;/);
+  assert.match(source, /grade_classroom_assignment_submission:[\s\S]*p_submission_id: string;[\s\S]*p_score: number;/);
+});
+
+test("classroom client wires experiment runs and grading through guarded RPCs", () => {
+  const source = fs.readFileSync(path.join(root, "src", "lib", "supabase", "classrooms.ts"), "utf8");
+
+  assert.match(source, /export async function listMyExperimentRunsForLab/);
+  assert.match(source, /\.from\("experiment_runs"\)/);
+  assert.match(source, /\.eq\("lab_id", labId\)/);
+  assert.match(source, /\.eq\("user_id", userId\)/);
+  assert.match(source, /p_lab_id:\s*input\.labId/);
+  assert.match(source, /p_max_score:\s*input\.maxScore/);
+  assert.match(source, /p_experiment_run_id:\s*input\.experimentRunId/);
+  assert.match(source, /export async function gradeClassroomAssignmentSubmission/);
+  assert.match(source, /rpc\("grade_classroom_assignment_submission"/);
+  assert.match(source, /export async function getClassroomSubmissionExperimentRun/);
+  assert.match(source, /rpc\("get_classroom_submission_experiment_run"/);
 });
 
 test("classroom client exposes owner actions, assignments, and creator names", () => {

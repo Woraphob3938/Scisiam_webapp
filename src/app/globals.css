@@ -5,10 +5,10 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --font-sans: var(--font-prompt), sans-serif;
-  --font-heading: var(--font-prompt), sans-serif;
-  --font-looped: var(--font-prompt), sans-serif;
-  --font-mono: var(--font-prompt), sans-serif;
+  --font-sans: var(--font-noto-sans-thai), sans-serif;
+  --font-heading: var(--font-noto-sans-thai), sans-serif;
+  --font-looped: var(--font-noto-sans-thai), sans-serif;
+  --font-mono: var(--font-noto-sans-thai), sans-serif;
 
   --animate-float-slow: float-slow 8s ease-in-out infinite;
   --animate-float-medium: float-medium 6s ease-in-out infinite;

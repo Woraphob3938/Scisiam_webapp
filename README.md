@@ -14,8 +14,8 @@ SciSiam is built so learners explore science through **doing**, not just reading
 - Interactive simulation routes resolved by `labId` through a typed registry: 61 direct simulations, 6 shared chemistry-concept simulations, and 36 shared mathematics-concept simulations.
 - Shared `SharedSimulationShell` for consistent simulator UX (stage, controls, live metrics, graph/table, theory, steps, save).
 - AI ไออุ่น tutor through a hardened server-side API route (`/api/ai-tutor`).
-- Profile editing, learning history, missions/rewards, and teacher-oriented progress surfaces. Active score and point mutation are intentionally disabled.
-- Supabase integration for auth, profiles, experiment runs, classrooms, assignments, notifications, learning snapshots, and AI rate limiting.
+- Profile editing, learning history, missions/rewards, and teacher-oriented progress surfaces. Gamification score and point mutation remain disabled.
+- Supabase integration for auth, profiles, experiment runs, classrooms, assignment submissions and lab grading, notifications, learning snapshots, and AI rate limiting.
 - Responsive UI tuned for desktop, tablet, and **390px mobile**.
 
 ---
@@ -132,7 +132,7 @@ The project ships migrations for:
 - experiment run saving (RPC-hardened)
 - missions and rewards (claim via RPC)
 - AI usage analytics + rate-limit support
-- classrooms, assignments, notifications, and file-access hardening
+- classrooms, assignments, owned experiment-run submissions, teacher grading, notifications, and file-access hardening
 - missing foreign-key indexes
 
 Apply migrations to the target Supabase project before using the app as a real multi-user product. Seed mission data with `supabase/seed.sql` when needed.

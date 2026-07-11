@@ -12,8 +12,8 @@ SciSiam is ready for a believable competition demo today and is being designed f
 
 ## Users
 
-- **Students** discover a lab, learn the theory, run a simulation, save results, review their own learning history, and receive classroom assignments and notifications.
-- **Teachers** create or join classrooms, choose labs, publish assignments with files or links, review student submissions, and use the teacher dashboard for real classroom activity.
+- **Students** discover a lab, learn the theory, run a simulation, save results, review their own learning history, and submit a saved run with a written conclusion for classroom lab assignments.
+- **Teachers** create or join classrooms, choose labs, publish assignments with files or links, define lab-assignment scores, review student submissions, and use the teacher dashboard for real classroom activity.
 - **Judges and school stakeholders** should be able to understand the value and complete a credible end-to-end learning flow without mock data being presented as real.
 
 ## Core Product Flow
@@ -22,12 +22,12 @@ SciSiam is ready for a believable competition demo today and is being designed f
 2. A returning user signs in without choosing a role; the stored profile role determines the experience.
 3. The user finds a lab, reads its objectives, equipment, theory, and steps, then runs the matching simulation.
 4. The user saves a run and sees account-owned learning history.
-5. In a classroom, teachers create assignments and students receive notifications, submit files or links, and review the result in the appropriate workspace.
+5. In a classroom, teachers create general or scored lab assignments. Students receive notifications, submit files/links or an owned saved experiment run with a conclusion, and teachers review and grade lab submissions.
 
 ## Product Boundaries
 
 - Supabase Auth and database records are canonical for accounts, profiles, experiment runs, classrooms, assignments, and notifications. Browser storage is only a responsive UI/offline convenience and never authorization.
-- Active scores, points, levels, XP, and teacher grading are intentionally out of scope. Legacy database columns remain only for compatibility.
+- Gamification scores, points, levels, and XP remain intentionally disabled. Classroom lab grades are a separate teacher-owned record bounded by each assignment's maximum score; legacy experiment score columns remain compatibility-only.
 - AI ไออุ่น is a guided educational assistant, not an authority. It must identify uncertainty and stay scoped to the current lab when context is available.
 
 ## Product Purpose

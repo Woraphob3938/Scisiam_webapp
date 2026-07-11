@@ -376,6 +376,8 @@ export type Database = {
           attachment_size: number | null;
           link_urls: Json;
           attachments: Json;
+          lab_id: string | null;
+          max_score: number | null;
           deleted_at: string | null;
           created_at: string;
         };
@@ -393,6 +395,8 @@ export type Database = {
           attachment_size?: number | null;
           link_urls?: Json;
           attachments?: Json;
+          lab_id?: string | null;
+          max_score?: number | null;
           deleted_at?: string | null;
           created_at?: string;
         };
@@ -407,6 +411,8 @@ export type Database = {
           attachment_size?: number | null;
           link_urls?: Json;
           attachments?: Json;
+          lab_id?: string | null;
+          max_score?: number | null;
           deleted_at?: string | null;
         };
         Relationships: [];
@@ -425,6 +431,10 @@ export type Database = {
           attachment_size: number | null;
           link_urls: Json;
           attachments: Json;
+          experiment_run_id: string | null;
+          score: number | null;
+          graded_by: string | null;
+          graded_at: string | null;
           submitted_at: string;
           updated_at: string;
         };
@@ -600,6 +610,8 @@ export type Database = {
           p_due_at?: string | null;
           p_link_urls?: Json;
           p_attachments?: Json;
+          p_lab_id?: string | null;
+          p_max_score?: number | null;
         };
         Returns: string;
       };
@@ -609,8 +621,22 @@ export type Database = {
           p_note?: string | null;
           p_link_urls?: Json;
           p_attachments?: Json;
+          p_experiment_run_id?: string | null;
         };
         Returns: string;
+      };
+      grade_classroom_assignment_submission: {
+        Args: {
+          p_submission_id: string;
+          p_score: number;
+        };
+        Returns: string;
+      };
+      get_classroom_submission_experiment_run: {
+        Args: {
+          p_submission_id: string;
+        };
+        Returns: Json;
       };
       delete_classroom_assignment: {
         Args: {

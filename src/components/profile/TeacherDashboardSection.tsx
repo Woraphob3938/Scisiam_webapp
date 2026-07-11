@@ -178,15 +178,23 @@ function toTeacherSubmissions(bundles: ClassroomBundle[]): TeacherSubmission[] {
       const assignmentById = new Map(bundle.assignments.map((assignment) => [assignment.id, assignment]));
       const memberById = new Map(bundle.members.map((member) => [member.userId, member]));
 
-      return bundle.submissions.map((submission) => ({
-        id: submission.id,
-        studentName: memberById.get(submission.studentId)?.displayName ?? "นักเรียน",
-        room: bundle.classroom.name,
-        assignmentTitle: assignmentById.get(submission.assignmentId)?.title ?? "งานชั้นเรียน",
-        submittedAt: formatThaiDateTime(submission.submittedAt),
-        href: `/classrooms/${bundle.classroom.id}?tab=classwork`,
-        sortAt: submission.submittedAt,
-      }));
+      return bundle.submissions.map((submission) => {
+        const assignment = assignmentById.get(submission.assignmentId);
+        const requiresReview = Boolean(assignment?.labId);
+        return {
+          id: submission.id,
+          studentName: memberById.get(submission.studentId)?.displayName ?? "นักเรียน",
+          room: bundle.classroom.name,
+          assignmentTitle: assignment?.title ?? "งานชั้นเรียน",
+          submittedAt: formatThaiDateTime(submission.submittedAt),
+          href: requiresReview
+            ? `/classrooms/${bundle.classroom.id}?tab=classwork&submission=${submission.id}`
+            : `/classrooms/${bundle.classroom.id}?tab=classwork`,
+          requiresReview,
+          isGraded: Boolean(submission.gradedAt),
+          sortAt: submission.submittedAt,
+        };
+      });
     })
     .sort((a, b) => new Date(b.sortAt).getTime() - new Date(a.sortAt).getTime())
     .map((submission) => ({
@@ -196,6 +204,8 @@ function toTeacherSubmissions(bundles: ClassroomBundle[]): TeacherSubmission[] {
       assignmentTitle: submission.assignmentTitle,
       submittedAt: submission.submittedAt,
       href: submission.href,
+      requiresReview: submission.requiresReview,
+      isGraded: submission.isGraded,
     }));
 }
 

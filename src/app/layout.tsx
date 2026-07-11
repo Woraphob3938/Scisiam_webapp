@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Kanit, Prompt } from "next/font/google";
+import { Kanit, Noto_Sans_Thai } from "next/font/google";
 import { Suspense } from "react";
 import { SidebarProvider } from "@/context/SidebarContext";
 import { AuthProvider } from "@/context/AuthContext";
@@ -15,10 +15,10 @@ const kanit = Kanit({
   display: "swap",
 });
 
-const prompt = Prompt({
-  variable: "--font-prompt",
+const notoSansThai = Noto_Sans_Thai({
+  variable: "--font-noto-sans-thai",
   subsets: ["latin", "thai"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600", "700", "800"],
   display: "swap",
 });
 
@@ -66,7 +66,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="th" className={`${prompt.variable} ${kanit.variable} h-full antialiased`}>
+    <html lang="th" className={`${notoSansThai.variable} ${kanit.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-slate-50 text-slate-900">
         <TooltipProvider>
           <AuthProvider>

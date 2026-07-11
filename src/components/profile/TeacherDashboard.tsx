@@ -34,6 +34,8 @@ export interface TeacherSubmission {
   assignmentTitle: string;
   submittedAt: string;
   href: string;
+  requiresReview: boolean;
+  isGraded: boolean;
 }
 
 interface TeacherDashboardProps {
@@ -328,7 +330,12 @@ function RecentSubmissionPanel({ submissions }: { submissions: TeacherSubmission
           {submissions.slice(0, 5).map((submission) => (
             <li key={submission.id}>
               <Link href={submission.href} className="block px-5 py-4 transition-colors hover:bg-slate-50 focus:outline-none focus-visible:ring-3 focus-visible:ring-inset focus-visible:ring-blue-100">
-                <span className="block break-words text-sm font-bold leading-relaxed text-slate-900">{submission.assignmentTitle}</span>
+                <span className="flex items-center justify-between gap-3">
+                  <span className="block break-words text-sm font-bold leading-relaxed text-slate-900">{submission.assignmentTitle}</span>
+                  <span className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-bold ${submission.isGraded || !submission.requiresReview ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-800"}`}>
+                    {submission.requiresReview ? submission.isGraded ? "ตรวจแล้ว" : "รอตรวจ" : "ส่งแล้ว"}
+                  </span>
+                </span>
                 <span className="mt-1 block text-xs font-medium leading-relaxed text-slate-600">{submission.studentName} · {submission.room}</span>
                 <span className="mt-1 block text-xs font-medium text-slate-500">{submission.submittedAt}</span>
               </Link>

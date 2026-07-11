@@ -10,6 +10,7 @@ type ClassroomMemberRow = Database["public"]["Tables"]["classroom_members"]["Row
 type ClassroomLabRow = Database["public"]["Tables"]["classroom_labs"]["Row"];
 type ClassroomAssignmentRow = Database["public"]["Tables"]["classroom_assignments"]["Row"];
 type ClassroomSubmissionRow = Database["public"]["Tables"]["classroom_assignment_submissions"]["Row"];
+type ExperimentRunRow = Database["public"]["Tables"]["experiment_runs"]["Row"];
 type ClassroomNotificationRow = Database["public"]["Tables"]["classroom_notifications"]["Row"];
 type ClassroomMemberRpcRow = Database["public"]["Functions"]["get_classroom_members"]["Returns"][number];
 type ClassroomCreatorRpcRow = Database["public"]["Functions"]["get_classroom_creator_names"]["Returns"][number];
@@ -86,6 +87,8 @@ export type ClassroomAssignment = {
   title: string;
   description: string | null;
   dueAt: string | null;
+  labId: string | null;
+  maxScore: number | null;
   linkUrls: string[];
   attachments: ClassroomFileAttachment[];
   createdAt: string;
@@ -103,6 +106,8 @@ export type CreateClassroomAssignmentInput = {
   title: string;
   description: string;
   dueAt: string | null;
+  labId: string | null;
+  maxScore: number | null;
   linkUrls: string;
   attachmentFiles: File[];
 };
@@ -112,9 +117,13 @@ export type ClassroomAssignmentSubmission = {
   assignmentId: string;
   classroomId: string;
   studentId: string;
+  experimentRunId: string | null;
   note: string | null;
   linkUrls: string[];
   attachments: ClassroomFileAttachment[];
+  score: number | null;
+  gradedBy: string | null;
+  gradedAt: string | null;
   submittedAt: string;
   updatedAt: string;
 };
@@ -122,10 +131,16 @@ export type ClassroomAssignmentSubmission = {
 export type SubmitClassroomAssignmentInput = {
   assignmentId: string;
   classroomId: string;
+  experimentRunId: string | null;
   note: string;
   linkUrls: string;
   attachmentFiles: File[];
 };
+
+export type ClassroomExperimentRun = Pick<
+  ExperimentRunRow,
+  "id" | "lab_id" | "title" | "variables" | "live_values" | "graph_points" | "table_rows" | "summary" | "created_at"
+>;
 
 export type ClassroomNotification = {
   id: string;
@@ -339,7 +354,7 @@ export async function getClassroomAssignments(id: string): Promise<ClassroomAssi
   const classroomId = validateClassroomId(id);
   const { data, error } = await supabase
     .from("classroom_assignments")
-    .select("id, classroom_id, created_by, title, description, due_at, link_url, attachment_path, attachment_name, attachment_mime_type, attachment_size, link_urls, attachments, created_at")
+    .select("id, classroom_id, created_by, title, description, due_at, lab_id, max_score, link_url, attachment_path, attachment_name, attachment_mime_type, attachment_size, link_urls, attachments, created_at")
     .eq("classroom_id", classroomId)
     .order("created_at", { ascending: false });
 
@@ -359,6 +374,15 @@ export async function createClassroomAssignment(
   if (description.length > 1000) {
     throw new Error("รายละเอียดงานต้องไม่เกิน 1,000 ตัวอักษร");
   }
+  if ((input.labId === null) !== (input.maxScore === null)) {
+    throw new Error("งานห้องแล็บต้องระบุห้องแล็บและคะแนนเต็มให้ครบ");
+  }
+  if (input.labId && !labsById[input.labId]) {
+    throw new Error("ไม่พบห้องแล็บที่เลือก");
+  }
+  if (input.maxScore !== null && (!Number.isInteger(input.maxScore) || input.maxScore < 1 || input.maxScore > 100)) {
+    throw new Error("คะแนนเต็มต้องเป็นจำนวนเต็ม 1-100 คะแนน");
+  }
 
   const supabase = createClient();
   const userId = await requireCurrentUserId(supabase);
@@ -371,6 +395,8 @@ export async function createClassroomAssignment(
     p_title: title,
     p_description: description || null,
     p_due_at: input.dueAt,
+    p_lab_id: input.labId,
+    p_max_score: input.maxScore,
     p_link_urls: linkUrls,
     p_attachments: uploaded.map(toAttachmentJson),
   });
@@ -412,7 +438,7 @@ export async function getClassroomAssignmentSubmissions(id: string): Promise<Cla
   const classroomId = validateClassroomId(id);
   const { data, error } = await supabase
     .from("classroom_assignment_submissions")
-    .select("id, assignment_id, classroom_id, student_id, note, link_url, attachment_path, attachment_name, attachment_mime_type, attachment_size, link_urls, attachments, submitted_at, updated_at")
+    .select("id, assignment_id, classroom_id, student_id, experiment_run_id, note, link_url, attachment_path, attachment_name, attachment_mime_type, attachment_size, link_urls, attachments, score, graded_by, graded_at, submitted_at, updated_at")
     .eq("classroom_id", classroomId)
     .order("submitted_at", { ascending: false });
 
@@ -445,6 +471,7 @@ export async function submitClassroomAssignment(input: SubmitClassroomAssignment
 
   const { data, error } = await supabase.rpc("submit_classroom_assignment", {
     p_assignment_id: assignmentId,
+    p_experiment_run_id: input.experimentRunId,
     p_note: note || null,
     p_link_urls: linkUrls,
     p_attachments: uploaded.map(toAttachmentJson),
@@ -463,6 +490,58 @@ export async function submitClassroomAssignment(input: SubmitClassroomAssignment
     );
   }
   return data;
+}
+
+export async function listMyExperimentRunsForLab(labIdValue: string): Promise<ClassroomExperimentRun[]> {
+  const labId = labIdValue.trim();
+  if (!labsById[labId]) throw new Error("ไม่พบห้องแล็บที่เลือก");
+
+  const supabase = createClient();
+  const userId = await requireCurrentUserId(supabase);
+  const { data, error } = await supabase
+    .from("experiment_runs")
+    .select("id, lab_id, title, variables, live_values, graph_points, table_rows, summary, created_at")
+    .eq("lab_id", labId)
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false })
+    .limit(20);
+
+  if (error) throwClassroomActionError(error.code, error.message);
+  return (data ?? []) as ClassroomExperimentRun[];
+}
+
+export async function gradeClassroomAssignmentSubmission(
+  submissionId: string,
+  score: number,
+): Promise<string> {
+  if (!Number.isFinite(score) || score < 0) throw new Error("คะแนนต้องเป็นศูนย์หรือมากกว่า");
+
+  const supabase = createClient();
+  await requireCurrentUserId(supabase);
+  const { data, error } = await supabase.rpc("grade_classroom_assignment_submission", {
+    p_submission_id: validateUuid(submissionId, "ไม่พบงานที่ต้องการตรวจ"),
+    p_score: score,
+  });
+
+  if (error) throwClassroomActionError(error.code, error.message);
+  if (!data) throw new Error("บันทึกคะแนนไม่สำเร็จ");
+  return data;
+}
+
+export async function getClassroomSubmissionExperimentRun(
+  submissionId: string,
+): Promise<ClassroomExperimentRun> {
+  const supabase = createClient();
+  await requireCurrentUserId(supabase);
+  const { data, error } = await supabase.rpc("get_classroom_submission_experiment_run", {
+    p_submission_id: validateUuid(submissionId, "ไม่พบผลการทดลองที่ส่ง"),
+  });
+
+  if (error) throwClassroomActionError(error.code, error.message);
+  if (!isJsonObject(data) || typeof data.id !== "string" || typeof data.lab_id !== "string") {
+    throw new Error("ไม่พบผลการทดลองที่ส่ง");
+  }
+  return data as ClassroomExperimentRun;
 }
 
 export async function getClassroomNotifications(id: string): Promise<ClassroomNotification[]> {
@@ -684,6 +763,8 @@ async function mapClassroomAssignment(supabase: SupabaseClient, assignment: Clas
     title: assignment.title,
     description: assignment.description,
     dueAt: assignment.due_at,
+    labId: assignment.lab_id,
+    maxScore: assignment.max_score,
     linkUrls: normalizeStoredLinks(assignment.link_urls, assignment.link_url),
     attachments: await buildAttachments(supabase, assignment.attachments, {
       path: assignment.attachment_path,
@@ -704,6 +785,7 @@ async function mapClassroomSubmission(
     assignmentId: submission.assignment_id,
     classroomId: submission.classroom_id,
     studentId: submission.student_id,
+    experimentRunId: submission.experiment_run_id,
     note: submission.note,
     linkUrls: normalizeStoredLinks(submission.link_urls, submission.link_url),
     attachments: await buildAttachments(supabase, submission.attachments, {
@@ -712,6 +794,9 @@ async function mapClassroomSubmission(
       mimeType: submission.attachment_mime_type,
       size: submission.attachment_size,
     }),
+    score: submission.score,
+    gradedBy: submission.graded_by,
+    gradedAt: submission.graded_at,
     submittedAt: submission.submitted_at,
     updatedAt: submission.updated_at,
   };

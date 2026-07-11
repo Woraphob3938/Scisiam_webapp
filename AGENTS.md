@@ -16,7 +16,7 @@ Core product surfaces:
 - Simulation pages where learners change variables, observe live results, review graphs/tables, and save experiment runs.
 - Auth-first navigation: `/` redirects to `/login`; successful email login opens `/labs` and Google OAuth returns to `/profile` by default.
 - AI ไออุ่น support through the authenticated server-side AI route.
-- Profile editing, rewards, missions, learning history, and Supabase-backed experiment progress. Active scoring and points are intentionally disabled; legacy score columns remain only for schema compatibility.
+- Profile editing, rewards, missions, learning history, and Supabase-backed experiment progress. Gamification scoring and points are intentionally disabled; teacher-owned classroom lab grades are active and separate from legacy experiment score columns.
 - Shared classrooms for teachers and students, including invite codes, selected labs, member profiles, classroom assignments, and guarded owner actions.
 - Future packaging targets for web, PC, and mobile distribution.
 
@@ -179,7 +179,7 @@ Supabase is the canonical store for sessions, profiles, avatar storage, experime
 - Google login uses `/auth/oauth-callback`, validates the relative `next` path, and requests account selection.
 - `auth-cache.ts` mirrors display name/avatar/role and remembered email only for responsive UI. It is not authorization and must never unlock private data.
 - Read `window`, `document`, and `localStorage` only in mounted client code. Authenticated history must come from Supabase, not another account's device-local runs.
-- Active score/point mutation is disabled. Do not reintroduce score UI, trust client-provided scores, or treat legacy `total_points`, `score`, `points_awarded`, level, or XP columns as active product state.
+- Gamification score/point mutation is disabled. Do not trust client-provided points or treat legacy experiment `total_points`, `score`, `points_awarded`, level, or XP columns as active product state. Classroom lab grades are allowed only through owner-guarded RPCs and must remain bounded by the assignment's server-stored maximum score.
 - Authoritative experiment writes go through `save_experiment_run`; mission claims are server-derived and idempotent through `claim_mission_reward` but no longer award points.
 - Apply schema changes through ordered files in `supabase/migrations/`. Use a new forward migration instead of editing an applied migration. Keep local filenames aligned with deployed migration history; regression tests assert that alignment.
 
@@ -187,7 +187,7 @@ Supabase is the canonical store for sessions, profiles, avatar storage, experime
 
 - Teachers and students may create or join rooms. A room contains a name, grade level, description, 1-24 selected labs, an owner-only invite code, members, and assignments.
 - Room members may read room labs, member profile details, creator name, and assignments through RLS/guarded RPCs.
-- Only the creator may read the invite code, rename or disband the room, remove a non-owner member, or create an assignment. Enforce this with `private.is_class_creator` inside database RPCs, not only by hiding buttons.
+- Only the creator may read the invite code, rename or disband the room, remove a non-owner member, create an assignment, read a submitted experiment run, or grade a lab submission. Enforce this with `private.is_class_creator` inside database RPCs, not only by hiding buttons.
 - Disbanding sets `is_active = false` and invalidates the join code; it does not hard-delete classroom history.
 - Never expose private join codes in list queries, client caches, logs, or public profile data.
 - Any classroom schema/RPC change requires a migration, corresponding `database.types.ts` update, and regression coverage in `tests/classrooms.test.mjs` and/or `tests/classroom-workspace-ui.test.mjs`.

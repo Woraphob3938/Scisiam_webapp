@@ -25,31 +25,31 @@ colors:
   danger: "#ef4444"
 typography:
   display:
-    fontFamily: "Prompt, Inter, sans-serif"
+    fontFamily: "Noto Sans Thai, Inter, sans-serif"
     fontSize: "1.875rem"
     fontWeight: 800
     lineHeight: 1.25
     letterSpacing: "normal"
   headline:
-    fontFamily: "Prompt, Inter, sans-serif"
+    fontFamily: "Noto Sans Thai, Inter, sans-serif"
     fontSize: "1.5rem"
     fontWeight: 800
     lineHeight: 1.3
     letterSpacing: "normal"
   title:
-    fontFamily: "Prompt, Inter, sans-serif"
+    fontFamily: "Noto Sans Thai, Inter, sans-serif"
     fontSize: "1.125rem"
     fontWeight: 700
     lineHeight: 1.45
     letterSpacing: "normal"
   body:
-    fontFamily: "Prompt, Inter, sans-serif"
+    fontFamily: "Noto Sans Thai, Inter, sans-serif"
     fontSize: "1rem"
     fontWeight: 400
     lineHeight: 1.6
     letterSpacing: "normal"
   label:
-    fontFamily: "Prompt, Inter, sans-serif"
+    fontFamily: "Noto Sans Thai, Inter, sans-serif"
     fontSize: "0.875rem"
     fontWeight: 700
     lineHeight: 1.45
@@ -122,7 +122,7 @@ SciSiam explicitly rejects the PRODUCT.md anti-references: a loud game UI with s
 **Key Characteristics:**
 
 - Clean white surfaces, soft borders, and restrained science accents.
-- Thai-first readability with Prompt as the main UI typeface.
+- Thai-first readability with Noto Sans Thai as the main UI typeface.
 - Apparatus-specific visuals for each lab, never generic atmosphere.
 - Product density that supports scanning instead of exhausting the student.
 - Honest readiness states for incomplete labs and incomplete production data.
@@ -168,8 +168,8 @@ The palette is a restrained white-and-slate lab surface with one primary blue ac
 
 ## 3. Typography
 
-**Display Font:** Prompt with Inter fallback.<br>
-**Body Font:** Prompt with Inter fallback.<br>
+**Display Font:** Noto Sans Thai with Inter fallback.<br>
+**Body Font:** Noto Sans Thai with Inter fallback.<br>
 **Label/Mono Font:** Inter or browser monospace only for numbers, formulas, and table-like data when needed.
 
 **Character:** The type system is friendly, clear, and Thai-first. It should read like a student-facing science dashboard, not a marketing poster. Hierarchy comes from weight, size, and spacing; never from cramped Thai letter spacing.

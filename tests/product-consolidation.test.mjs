@@ -50,6 +50,7 @@ test("Teacher dashboard is a separate Supabase-backed route", () => {
   assert.match(dashboardSection, /listMyClassrooms/);
   assert.match(dashboardSection, /getClassroomAssignments/);
   assert.match(dashboardSection, /getClassroomAssignmentSubmissions/);
+  assert.match(dashboardSection, /submission=\$\{submission\.id\}/);
   assert.match(dashboardSection, /getClassroomMembers/);
   assert.match(dashboardSection, /calculateTeacherSubmissionMetrics/);
   assert.match(dashboardMetrics, /submissionCount:/);
@@ -58,6 +59,7 @@ test("Teacher dashboard is a separate Supabase-backed route", () => {
   assert.match(dashboardSection, /lastUpdatedAt/);
   assert.doesNotMatch(dashboardSection, /Demo|โหมดสาธิต|Hooke's Law of Elasticity/);
   assert.match(dashboard, /ภาพรวมการส่งงาน/);
+  assert.match(dashboard, /รอตรวจ/);
   assert.match(dashboard, /function ClassroomComparison/);
   assert.match(dashboard, /<table/);
   assert.match(dashboard, /<caption/);
