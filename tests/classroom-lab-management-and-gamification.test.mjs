@@ -24,6 +24,7 @@ test("classroom owners can add an unused lab through a guarded RPC", () => {
   assert.match(workspace, /onAddLab/);
   assert.match(workspace, /type="search"/);
   assert.match(workspace, /setLabSearch/);
+  assert.match(workspace, /setSelectedLabId\(matchingLab\?\.id \?\? ""\)/);
 });
 
 test("classroom submission action has an immediate loading state", () => {

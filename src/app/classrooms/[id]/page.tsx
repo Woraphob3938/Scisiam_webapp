@@ -760,7 +760,18 @@ function LabsPanel({
                 id="add-classroom-lab-search"
                 type="search"
                 value={labSearch}
-                onChange={(event) => setLabSearch(event.target.value)}
+                onChange={(event) => {
+                  const nextSearch = event.target.value;
+                  setLabSearch(nextSearch);
+                  const query = nextSearch.trim().toLocaleLowerCase("th");
+                  const matchingLab = query
+                    ? availableLabs.find((lab) => [lab.thaiTitle, lab.title, lab.description, lab.category]
+                      .join(" ")
+                      .toLocaleLowerCase("th")
+                      .includes(query))
+                    : null;
+                  setSelectedLabId(matchingLab?.id ?? "");
+                }}
                 placeholder="ค้นหาแล็บที่จะเพิ่ม"
                 className="min-h-10 min-w-48 rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-700 outline-none placeholder:text-slate-400 focus:border-blue-500 focus:ring-3 focus:ring-blue-100"
               />
