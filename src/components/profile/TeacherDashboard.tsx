@@ -59,7 +59,7 @@ export default function TeacherDashboard({
 }: TeacherDashboardProps) {
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-8 lg:px-10">
-      <header className="flex flex-col gap-4 border-b border-slate-200 pb-5 sm:flex-row sm:items-end sm:justify-between">
+      <header data-tour="teacher-dashboard" className="flex flex-col gap-4 border-b border-slate-200 pb-5 sm:flex-row sm:items-end sm:justify-between">
         <div className="min-w-0">
           <h1 className="text-3xl font-bold leading-[1.35] text-slate-950">ภาพรวมการส่งงาน</h1>
           <p className="mt-2 max-w-2xl text-sm font-medium leading-relaxed text-slate-600">

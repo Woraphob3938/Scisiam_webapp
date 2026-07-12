@@ -1920,6 +1920,7 @@ export default function LabCard({
       {/* Card action */}
       <div className="mt-auto w-full">
         <button
+          data-tour="lab-enter"
           type="button"
           onClick={() => onEnterRoom?.(lab.id)}
           aria-label={`เข้าห้องทดลอง ${lab.title}`}

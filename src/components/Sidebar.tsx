@@ -4,7 +4,6 @@ import React from "react";
 import Link from "next/link";
 import { 
   FlaskConical, 
-  ClipboardCheck, 
   LayoutDashboard,
   User,
   UsersRound,
@@ -13,7 +12,7 @@ import { useSidebar } from "@/context/SidebarContext";
 import { useAuth } from "@/context/AuthContext";
 
 interface SidebarProps {
-  activeMenu: "ห้องแล็บ" | "ภารกิจนักวิทย์" | "โปรไฟล์" | string;
+  activeMenu: string;
   flushLeft?: boolean;
   forceCollapsed?: boolean;
 }
@@ -26,7 +25,6 @@ export default function Sidebar({ activeMenu, forceCollapsed = false }: SidebarP
   const sidebarMenu = [
     ...(role === "teacher" ? [{ name: "แดชบอร์ด", icon: LayoutDashboard, href: "/dashboard" }] : []),
     { name: "ห้องแล็บ", icon: FlaskConical, href: "/labs" },
-    { name: "ภารกิจนักวิทย์", icon: ClipboardCheck, href: "/missions" },
     { name: "ชั้นเรียน", icon: UsersRound, href: "/classrooms" },
     { name: "โปรไฟล์", icon: User, href: "/profile" },
   ];

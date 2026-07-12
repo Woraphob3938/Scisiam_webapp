@@ -62,13 +62,20 @@ export default function SimulationClassroomSubmission({ labId }: { labId: string
     return () => window.cancelAnimationFrame(frame);
   }, []);
 
-  if (
-    !assignment
-    || !classroomId
-    || !assignmentId
-    || assignment.id !== assignmentId
-    || assignment.classroomId !== classroomId
-  ) return null;
+  if (!classroomId || !assignmentId) return null;
+
+  const loadingAction = (
+    <div className={submissionSlot ? "shrink-0" : "fixed inset-x-3 bottom-20 z-40 mx-auto flex max-w-xl justify-end md:bottom-5"} aria-live="polite">
+      <button type="button" disabled className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-slate-300 px-4 text-sm font-extrabold text-white">
+        กำลังเตรียมส่งงาน...
+      </button>
+    </div>
+  );
+
+  if (!assignment || assignment.id !== assignmentId || assignment.classroomId !== classroomId) {
+    if (submissionSlot) return createPortal(loadingAction, submissionSlot);
+    return submissionSlot === undefined ? null : loadingAction;
+  }
   const activeClassroomId = classroomId;
   const activeAssignmentId = assignmentId;
 

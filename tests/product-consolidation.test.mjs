@@ -14,19 +14,18 @@ test("Login is the site entry and legacy History redirects into Profile", () => 
   for (const path of ["src/components/Sidebar.tsx", "src/components/MobileTabBar.tsx"]) {
     const source = read(path);
     assert.match(source, /ห้องแล็บ/);
-    assert.match(source, /ภารกิจ/);
     assert.match(source, /โปรไฟล์/);
-    assert.doesNotMatch(source, /หน้าหลัก|คะแนนและรางวัล|ประวัติการเรียนรู้|href:\s*"\/history"/);
+    assert.doesNotMatch(source, /ภารกิจ|หน้าหลัก|คะแนนและรางวัล|ประวัติการเรียนรู้|href:\s*"\/history"/);
   }
 });
 
-test("Profile owns overview, history, and rewards", () => {
+test("Profile owns overview and history without rewards", () => {
   const profile = read("src/app/profile/page.tsx");
-  assert.match(profile, /"overview" \| "history" \| "rewards"/);
+  assert.match(profile, /"overview" \| "history"/);
   assert.match(profile, /<LearningHistoryPage embedded/);
   assert.match(profile, /ภาพรวมความก้าวหน้า/);
   assert.match(profile, /ประวัติการเรียนรู้/);
-  assert.match(profile, /รางวัล/);
+  assert.doesNotMatch(profile, /รางวัล|rewards/);
   assert.doesNotMatch(profile, /TeacherDashboardSection/);
 });
 

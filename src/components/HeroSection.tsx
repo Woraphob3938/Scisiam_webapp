@@ -40,6 +40,7 @@ export default function HeroSection({
                 }`}
               />
               <input
+                data-tour="lab-search"
                 ref={inputRef}
                 type="text"
                 value={searchQuery}

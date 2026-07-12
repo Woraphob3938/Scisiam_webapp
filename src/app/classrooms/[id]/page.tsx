@@ -48,9 +48,10 @@ import {
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSidebar } from "@/context/SidebarContext";
-import { labsById } from "@/data/labs";
+import { labsById, labsData } from "@/data/labs";
 import { getClassroomPresentation } from "@/lib/classroom-presentation";
 import {
+  addClassroomLab,
   createClassroomAssignment,
   deleteClassroomAssignment,
   disbandClassroom,
@@ -129,7 +130,7 @@ export default function ClassroomWorkspacePage() {
   const [renameName, setRenameName] = useState("");
   const [disbandOpen, setDisbandOpen] = useState(false);
   const [memberToRemove, setMemberToRemove] = useState<ClassroomMember | null>(null);
-  const [pendingAction, setPendingAction] = useState<"rename" | "disband" | "remove" | "assignment" | null>(null);
+  const [pendingAction, setPendingAction] = useState<"rename" | "disband" | "remove" | "assignment" | "labs" | null>(null);
 
   useEffect(() => {
     const list = document.querySelector<HTMLElement>("[data-testid='classroom-tabs-list']");
@@ -348,6 +349,24 @@ export default function ClassroomWorkspacePage() {
       return true;
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "เพิ่มงานไม่สำเร็จ");
+      return false;
+    } finally {
+      setPendingAction(null);
+    }
+  }
+
+  async function handleAddLab(labId: string) {
+    if (!room) return false;
+    setPendingAction("labs");
+    try {
+      const addedLabId = await addClassroomLab(room.id, labId);
+      setRoom((current) => current && !current.labIds.includes(addedLabId)
+        ? { ...current, labIds: [...current.labIds, addedLabId] }
+        : current);
+      toast.success("เพิ่มห้องแล็บแล้ว");
+      return true;
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "เพิ่มห้องแล็บไม่สำเร็จ");
       return false;
     } finally {
       setPendingAction(null);
@@ -589,6 +608,8 @@ export default function ClassroomWorkspacePage() {
                     assignments={assignments}
                     submissions={submissions}
                     isCreator={room.isCreator}
+                    isAddingLab={pendingAction === "labs"}
+                    onAddLab={handleAddLab}
                   />
                 </TabsContent>
                 <TabsContent value="people" className="pt-6">
@@ -701,24 +722,27 @@ function LabsPanel({
   assignments,
   submissions,
   isCreator,
+  isAddingLab,
+  onAddLab,
 }: {
   labs: Array<(typeof labsById)[string]>;
   classroomId: string;
   assignments: ClassroomAssignment[];
   submissions: ClassroomAssignmentSubmission[];
   isCreator: boolean;
+  isAddingLab: boolean;
+  onAddLab: (labId: string) => Promise<boolean>;
 }) {
-  if (labs.length === 0) {
-    return (
-      <section className="flex min-h-64 flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-slate-300 bg-white p-6 text-center" aria-labelledby="empty-labs-heading">
-        <span className="flex size-12 items-center justify-center rounded-lg bg-slate-100 text-slate-400">
-          <FlaskConical className="size-6" aria-hidden="true" />
-        </span>
-        <h2 id="empty-labs-heading" className="text-lg font-extrabold text-slate-950">ยังไม่มีห้องแล็บในชั้นเรียนนี้</h2>
-        <p className="max-w-md text-sm font-semibold leading-relaxed text-slate-500">เมื่อผู้สร้างเพิ่มแล็บ รายการสำหรับเรียนและทดลองจะแสดงที่นี่</p>
-      </section>
-    );
-  }
+  const [selectedLabId, setSelectedLabId] = useState("");
+  const [labSearch, setLabSearch] = useState("");
+  const availableLabs = labsData.filter((lab) => !labs.some((roomLab) => roomLab.id === lab.id));
+  const filteredAvailableLabs = availableLabs.filter((lab) => {
+    const query = labSearch.trim().toLocaleLowerCase("th");
+    return !query || [lab.thaiTitle, lab.title, lab.description, lab.category]
+      .join(" ")
+      .toLocaleLowerCase("th")
+      .includes(query);
+  });
 
   return (
     <section aria-labelledby="labs-heading">
@@ -727,9 +751,54 @@ function LabsPanel({
           <p className="text-xs font-extrabold text-blue-600">LAB COLLECTION</p>
           <h2 id="labs-heading" className="mt-1 text-xl font-extrabold leading-relaxed text-slate-950">แล็บที่ใช้ในชั้นเรียน</h2>
         </div>
-        <p className="text-sm font-bold text-slate-500">ทั้งหมด {labs.length} แล็บ</p>
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          <p className="text-sm font-bold text-slate-500">ทั้งหมด {labs.length} แล็บ</p>
+          {isCreator ? (
+            <>
+              <label htmlFor="add-classroom-lab-search" className="sr-only">ค้นหาแล็บที่จะเพิ่ม</label>
+              <input
+                id="add-classroom-lab-search"
+                type="search"
+                value={labSearch}
+                onChange={(event) => setLabSearch(event.target.value)}
+                placeholder="ค้นหาแล็บที่จะเพิ่ม"
+                className="min-h-10 min-w-48 rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-700 outline-none placeholder:text-slate-400 focus:border-blue-500 focus:ring-3 focus:ring-blue-100"
+              />
+              <label htmlFor="add-classroom-lab" className="sr-only">เลือกแล็บที่จะเพิ่ม</label>
+              <select
+                id="add-classroom-lab"
+                value={selectedLabId}
+                onChange={(event) => setSelectedLabId(event.target.value)}
+                disabled={isAddingLab || labs.length >= 24}
+                className="min-h-10 max-w-56 rounded-lg border border-slate-300 bg-white px-3 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-100 disabled:cursor-not-allowed disabled:bg-slate-100"
+              >
+                <option value="">เลือกแล็บเพิ่ม</option>
+                {filteredAvailableLabs.map((lab) => <option key={lab.id} value={lab.id}>{lab.thaiTitle}</option>)}
+              </select>
+              <button
+                type="button"
+                onClick={async () => {
+                  if (selectedLabId && await onAddLab(selectedLabId)) setSelectedLabId("");
+                }}
+                disabled={!selectedLabId || isAddingLab || labs.length >= 24}
+                className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-blue-600 px-3 text-sm font-extrabold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-300 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
+              >
+                <Plus className="size-4" aria-hidden="true" />
+                {isAddingLab ? "กำลังเพิ่ม..." : "เพิ่มแล็บ"}
+              </button>
+            </>
+          ) : null}
+        </div>
       </div>
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+      {labs.length === 0 ? (
+        <div className="mt-4 flex min-h-64 flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-slate-300 bg-white p-6 text-center" aria-labelledby="empty-labs-heading">
+          <span className="flex size-12 items-center justify-center rounded-lg bg-slate-100 text-slate-400">
+            <FlaskConical className="size-6" aria-hidden="true" />
+          </span>
+          <h3 id="empty-labs-heading" className="text-lg font-extrabold text-slate-950">ยังไม่มีห้องแล็บในชั้นเรียนนี้</h3>
+          <p className="max-w-md text-sm font-semibold leading-relaxed text-slate-500">ผู้สร้างสามารถเลือกแล็บจากเมนูด้านบนเพื่อเพิ่มได้ทันที</p>
+        </div>
+      ) : <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {labs.map((lab) => {
           const theme = CATEGORY_STYLES[lab.category];
           const matchingAssignments = assignments.filter((assignment) => assignment.labId === lab.id);
@@ -771,7 +840,7 @@ function LabsPanel({
             </article>
           );
         })}
-      </div>
+      </div>}
     </section>
   );
 }

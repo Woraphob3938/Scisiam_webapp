@@ -929,6 +929,8 @@ test("local Supabase migrations mirror the deployed migration history", () => {
     "20260711182651",
     "20260712072936",
     "20260712074502",
+    "20260712103406",
+    "20260712114647",
   ];
 
   assert.deepEqual(
@@ -1103,10 +1105,11 @@ test("profile authorization cannot be changed through query parameters", () => {
   assert.doesNotMatch(source, /localStorage\.setItem\("scisiam_user_role",\s*roleParam\)/);
 });
 
-test("profile progress uses recorded lab ids without fabricated rankings", () => {
+test("profile progress uses recorded experiment summaries without fabricated rankings", () => {
   const source = readProjectFile("src/app/profile/page.tsx");
 
-  assert.match(source, /setCompletedLabIds\(snapshot\.completedLabIds\)/);
+  assert.match(source, /setCompletedCount\(snapshot\.completedCount\)/);
+  assert.match(source, /setRecentRuns\(snapshot\.recentRuns\)/);
   assert.doesNotMatch(source, /520\s*-\s*Math\.floor\(points\s*\*\s*1\.5\)/);
   assert.doesNotMatch(source, /อันดับเซิร์ฟเวอร์จำลอง/);
 });

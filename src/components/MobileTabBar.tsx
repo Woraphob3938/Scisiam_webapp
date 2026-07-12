@@ -3,7 +3,7 @@
 import { useEffect, useState, type ElementType } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ClipboardCheck, FlaskConical, LayoutDashboard, User, UsersRound } from "lucide-react";
+import { FlaskConical, LayoutDashboard, User, UsersRound } from "lucide-react";
 
 import { ClassroomActionLauncher } from "@/components/classrooms/ClassroomActionLauncher";
 import { useAuth } from "@/context/AuthContext";
@@ -16,7 +16,6 @@ type MobileNavItem = {
 
 const leftNavItems: MobileNavItem[] = [
   { name: "ห้องแล็บ", href: "/labs", icon: FlaskConical },
-  { name: "ภารกิจ", href: "/missions", icon: ClipboardCheck },
 ];
 
 const teacherLeftNavItems: MobileNavItem[] = [
@@ -27,7 +26,6 @@ const teacherLeftNavItems: MobileNavItem[] = [
 function getActiveItem(pathname: string) {
   if (pathname.startsWith("/labs")) return "ห้องแล็บ";
   if (pathname === "/dashboard") return "แดชบอร์ด";
-  if (pathname === "/missions") return "ภารกิจ";
   if (pathname.startsWith("/classrooms")) return "ชั้นเรียน";
   if (pathname === "/profile") return "โปรไฟล์";
   return "ห้องแล็บ";
@@ -81,7 +79,7 @@ export default function MobileTabBar() {
         className="fixed inset-x-0 bottom-0 z-50 border-t border-slate-200/80 bg-white/95 px-2 pt-1.5 pb-[calc(0.4rem+env(safe-area-inset-bottom))] shadow-[0_-14px_35px_rgba(15,23,42,0.08)] backdrop-blur-xl lg:hidden"
         aria-label="เมนูหลักบนมือถือ"
       >
-        <div className="mx-auto grid max-w-md grid-cols-5 items-center gap-1">
+        <div className={`mx-auto grid max-w-md items-center gap-1 ${role === "teacher" ? "grid-cols-5" : "grid-cols-4"}`}>
           {navItems.map((item) => (
             <MobileNavLink key={item.name} item={item} activeItem={activeItem} />
           ))}

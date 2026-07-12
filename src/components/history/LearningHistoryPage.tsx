@@ -15,7 +15,6 @@ import {
   LayoutGrid,
   Play,
   Search,
-  Trophy,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
@@ -361,13 +360,6 @@ export default function LearningHistoryPage({ embedded = false }: LearningHistor
                 >
                   <LayoutGrid className="h-4 w-4" />
                   ห้องแล็บ
-                </Link>
-                <Link
-                  href="/missions"
-                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-extrabold leading-[1.45] text-slate-700 shadow-sm transition-colors hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
-                >
-                  <Trophy className="h-4 w-4" />
-                  ภารกิจ
                 </Link>
               </div>
             </div>

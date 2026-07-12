@@ -556,6 +556,13 @@ export type Database = {
         };
         Returns: Json;
       };
+      add_classroom_lab: {
+        Args: {
+          p_classroom_id: string;
+          p_lab_id: string;
+        };
+        Returns: string;
+      };
       join_classroom: {
         Args: {
           p_code: string;

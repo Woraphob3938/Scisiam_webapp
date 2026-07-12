@@ -260,6 +260,28 @@ export async function createClassroom(input: CreateClassroomInput): Promise<Clas
   return loadClassroomDetailById(supabase, userId, classroomId);
 }
 
+export async function addClassroomLab(id: string, labId: string): Promise<string> {
+  const classroomId = validateClassroomId(id);
+  const normalizedLabId = labId.trim();
+
+  if (!normalizedLabId || !labsById[normalizedLabId]) {
+    throw new Error("พบรหัสห้องทดลองที่ไม่อยู่ในรายการ Scisiam");
+  }
+
+  const supabase = createClient();
+  await requireCurrentUserId(supabase);
+  const { data, error } = await supabase.rpc("add_classroom_lab", {
+    p_classroom_id: classroomId,
+    p_lab_id: normalizedLabId,
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return typeof data === "string" ? data : normalizedLabId;
+}
+
 export async function joinClassroom(code: string): Promise<ClassroomDetail> {
   const supabase = createClient();
   const userId = await requireCurrentUserId(supabase);

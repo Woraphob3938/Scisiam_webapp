@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 
 const AIChatButton = dynamic(() => import("@/components/AIChatButton"), { ssr: false });
+const FirstLoginTour = dynamic(() => import("@/components/FirstLoginTour"), { ssr: false });
 const MobileTabBar = dynamic(() => import("@/components/MobileTabBar"), { ssr: false });
 
 function isAuthRoute(pathname: string) {
@@ -16,6 +17,7 @@ function isAuthRoute(pathname: string) {
 export default function GlobalClientOverlays() {
   const pathname = usePathname();
   const { isAuthReady, isLoggedIn } = useAuth();
+  const { role } = useAuth();
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -36,6 +38,7 @@ export default function GlobalClientOverlays() {
   return (
     <>
       <AIChatButton />
+      <FirstLoginTour role={role} />
       {isMobile ? <MobileTabBar /> : null}
     </>
   );
