@@ -144,7 +144,6 @@ export default function SharedSimulationShell({
   category,
   title,
   subtitle,
-  statusLabel,
   icon: Icon,
   sceneTitle,
   scene,
@@ -254,21 +253,24 @@ export default function SharedSimulationShell({
 
   const controlsDrawer = (
     <section className={`rounded-2xl border border-white/70 bg-white/95 shadow-xl shadow-slate-900/10 backdrop-blur-md ${controlsOpen ? "max-h-[32vh] overflow-y-auto" : ""}`}>
-      <button
-        type="button"
-        onClick={() => setControlsOpen((value) => !value)}
-        className="flex w-full items-center justify-between gap-3 px-4 py-4 text-left"
-        aria-expanded={controlsOpen}
-      >
-        <span className="flex items-center gap-2 text-base font-black text-slate-900">
-          <Target className={`h-5 w-5 ${tone.text}`} />
-          {controlsTitle}
+      <div className="flex items-center justify-between gap-3 px-4 py-4">
+        <span className="flex min-w-0 items-center gap-2 text-base font-black text-slate-900">
+          <Target className={`h-5 w-5 shrink-0 ${tone.text}`} />
+          <span className="truncate">{controlsTitle}</span>
         </span>
-        <span className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-xs font-black sm:text-sm ${tone.soft}`}>
-          {controlsOpen ? "ย่อแผง" : "เปิดแผง"}
-          {controlsOpen ? <ChevronsDown className="h-4 w-4" /> : <ChevronsUp className="h-4 w-4" />}
-        </span>
-      </button>
+        <div className="flex shrink-0 items-center gap-2">
+          <div data-testid="simulation-classroom-submission-slot" />
+          <button
+            type="button"
+            onClick={() => setControlsOpen((value) => !value)}
+            className={`inline-flex min-h-10 items-center gap-1.5 rounded-full border px-3.5 py-2 text-xs font-black sm:text-sm ${tone.soft}`}
+            aria-expanded={controlsOpen}
+          >
+            {controlsOpen ? "ย่อแผง" : "เปิดแผง"}
+            {controlsOpen ? <ChevronsDown className="h-4 w-4" /> : <ChevronsUp className="h-4 w-4" />}
+          </button>
+        </div>
+      </div>
 
       {controlsOpen && (
         <div className={`grid gap-4 border-t border-slate-100 p-4 ${hasDrawerSummary ? "lg:grid-cols-[minmax(0,1fr)_320px]" : ""}`}>
@@ -310,16 +312,19 @@ export default function SharedSimulationShell({
           <Target className={`h-5 w-5 shrink-0 ${tone.text}`} />
           <span className="truncate">{controlsTitle}</span>
         </h2>
-        <button
-          type="button"
-          onClick={() => setControlsOpen((value) => !value)}
-          className={`inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-black transition hover:brightness-95 ${tone.soft}`}
-          aria-expanded={controlsOpen}
-          aria-controls="simulation-advanced-controls"
-        >
-          {controlsOpen ? "ปิดค่าขั้นสูง" : "ตั้งค่าขั้นสูง"}
-          {controlsOpen ? <ChevronsUp className="h-4 w-4" /> : <ChevronsDown className="h-4 w-4" />}
-        </button>
+        <div className="flex shrink-0 items-center gap-2">
+          <div data-testid="simulation-classroom-submission-slot" />
+          <button
+            type="button"
+            onClick={() => setControlsOpen((value) => !value)}
+            className={`inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-black transition hover:brightness-95 ${tone.soft}`}
+            aria-expanded={controlsOpen}
+            aria-controls="simulation-advanced-controls"
+          >
+            {controlsOpen ? "ปิดค่าขั้นสูง" : "ตั้งค่าขั้นสูง"}
+            {controlsOpen ? <ChevronsUp className="h-4 w-4" /> : <ChevronsDown className="h-4 w-4" />}
+          </button>
+        </div>
       </div>
       <div className={hasCompactControls ? "min-w-0" : "max-h-[170px] min-w-0 overflow-y-auto pr-1"}>
         {collapsedControls}
@@ -380,7 +385,6 @@ export default function SharedSimulationShell({
               ย้อนกลับ
             </Link>
             <span className={`rounded-full border px-2.5 py-1 text-[10px] font-black ${tone.soft}`}>{category}</span>
-            <span className="hidden rounded-full border border-emerald-100 bg-emerald-50 px-2.5 py-1 text-[10px] font-black text-emerald-700 sm:inline-flex">{statusLabel}</span>
           </div>
           <h1 className="max-w-[720px] text-lg font-black leading-relaxed text-slate-950 sm:text-2xl">{title}</h1>
         </div>

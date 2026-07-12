@@ -128,11 +128,6 @@ function LabsContent() {
     });
   }, [categoryLabs, searchQuery, selectedGradeLevel]);
 
-  const unfinishedLabs = useMemo(
-    () => filteredLabs.filter((lab) => !isLabReady(lab.id)),
-    [filteredLabs]
-  );
-  const readyFilteredLabCount = filteredLabs.length - unfinishedLabs.length;
   const visibleLabs = showAllLabs ? filteredLabs : filteredLabs.slice(0, INITIAL_VISIBLE_LABS);
   const hiddenLabCount = filteredLabs.length - visibleLabs.length;
   const hasNoResults = filteredLabs.length === 0;
@@ -236,35 +231,9 @@ function LabsContent() {
 
           {filteredLabs.length > 0 && (
             <section className="mb-5 rounded-2xl border border-slate-200 bg-white px-4 py-4 md:px-5">
-              <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-                <div className="min-w-0">
-                  <p className="text-sm font-extrabold leading-[1.45] text-slate-950">
-                    แล็บในมุมมองนี้ {filteredLabs.length} แล็บ
-                  </p>
-                  <p className="mt-1 text-xs font-semibold leading-relaxed text-slate-600">
-                    พร้อมทดลอง {readyFilteredLabCount} แล็บ · ยังไม่เสร็จ {unfinishedLabs.length} แล็บ
-                  </p>
-                </div>
-
-                {unfinishedLabs.length > 0 ? (
-                  <details className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-amber-900 lg:min-w-[320px] lg:max-w-[520px]">
-                    <summary className="cursor-pointer text-sm font-extrabold leading-[1.45] focus:outline-none focus-visible:ring-3 focus-visible:ring-amber-200">
-                      เหลือแล็บที่ยังไม่เสร็จ {unfinishedLabs.length} แล็บ
-                    </summary>
-                    <ul className="mt-2 max-h-44 space-y-1 overflow-y-auto pr-1 text-xs font-semibold leading-relaxed text-amber-950">
-                      {unfinishedLabs.map((lab) => (
-                        <li key={lab.id} className="break-words">
-                          {lab.title}
-                        </li>
-                      ))}
-                    </ul>
-                  </details>
-                ) : (
-                  <p className="rounded-xl border border-emerald-100 bg-emerald-50 px-3 py-2 text-sm font-extrabold leading-[1.45] text-emerald-700">
-                    ทุกแล็บในมุมมองนี้พร้อมทดลองแล้ว
-                  </p>
-                )}
-              </div>
+              <p className="text-sm font-extrabold leading-[1.45] text-slate-950">
+                แล็บในมุมมองนี้ {filteredLabs.length} แล็บ
+              </p>
             </section>
           )}
 

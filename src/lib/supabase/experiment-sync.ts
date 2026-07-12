@@ -1,5 +1,6 @@
 import { createClient, isSupabaseConfigured } from "./client";
 import type { Json } from "./database.types";
+import { captureExperimentSnapshot, uploadExperimentSnapshot } from "../experiment-snapshot";
 
 export type SyncExperimentInput = {
   labId: string;
@@ -77,6 +78,24 @@ export async function syncExperimentRun(input: SyncExperimentInput): Promise<Syn
       reason: "supabase_error",
       message: error.message,
     };
+  }
+
+  try {
+    const snapshot = await captureExperimentSnapshot();
+    if (snapshot) {
+      const path = await uploadExperimentSnapshot(supabase, user.id, data, snapshot);
+      if (path) {
+        const { error: attachError } = await supabase.rpc("attach_experiment_run_snapshot", {
+          p_run_id: data,
+          p_snapshot_path: path,
+        });
+        if (attachError) {
+          await supabase.storage.from("experiment-snapshots").remove([path]);
+        }
+      }
+    }
+  } catch {
+    // The experiment run is authoritative; an optional image must never invalidate it.
   }
 
   return { ok: true, runId: data };

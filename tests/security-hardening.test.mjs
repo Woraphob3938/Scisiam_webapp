@@ -24,6 +24,19 @@ test("classroom storage protects student submissions and bounds unlinked uploads
   );
 });
 
+test("experiment snapshots use a private bounded bucket with guarded reads", () => {
+  const source = migrationSource();
+
+  assert.match(source, /'experiment-snapshots'[\s\S]{0,160}false[\s\S]{0,80}3145728/i);
+  assert.match(source, /bucket_id = 'experiment-snapshots'[\s\S]+\(storage\.foldername\(name\)\)\[1\] = \(select auth\.uid\(\)\)::text/i);
+  assert.match(source, /create or replace function private\.can_read_experiment_snapshot/i);
+  assert.match(source, /private\.is_class_creator\(submissions\.classroom_id\)/i);
+  assert.match(source, /revoke all on function public\.attach_experiment_run_snapshot/i);
+  assert.match(source, /grant execute on function public\.attach_experiment_run_snapshot[\s\S]*to authenticated/i);
+  assert.match(source, /split_part\(split_part\(p_snapshot_path, '\/', 2\), '\.', 1\) <> p_run_id::text/i);
+  assert.match(source, /from storage\.objects as objects[\s\S]+objects\.bucket_id = 'experiment-snapshots'[\s\S]+objects\.name = p_snapshot_path/i);
+});
+
 test("classroom client validates supported files and does not hide failed cleanup", () => {
   const source = read("src/lib/supabase/classrooms.ts");
 

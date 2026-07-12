@@ -11,7 +11,6 @@ import {
   CalendarDays,
   CheckCheck,
   CheckCircle2,
-  Clock3,
   ClipboardList,
   Copy,
   DoorOpen,
@@ -36,6 +35,9 @@ import { toast } from "sonner";
 
 import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
+import ClassroomLabSubmissionDialog, {
+  ExperimentRunPreview,
+} from "@/components/classrooms/ClassroomLabSubmissionDialog";
 import {
   Dialog,
   DialogContent,
@@ -46,7 +48,6 @@ import {
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSidebar } from "@/context/SidebarContext";
-import { getLabReadiness } from "@/data/labReadiness";
 import { labsById } from "@/data/labs";
 import { getClassroomPresentation } from "@/lib/classroom-presentation";
 import {
@@ -62,7 +63,6 @@ import {
   getClassroomNotifications,
   markClassroomNotificationsRead,
   gradeClassroomAssignmentSubmission,
-  listMyExperimentRunsForLab,
   removeClassroomMember,
   renameClassroom,
   submitClassroomAssignment,
@@ -83,6 +83,7 @@ const CLASSROOM_ACCESS_ERROR = "ไม่พบห้องเรียนหร
 
 type WorkspaceStatus = "loading" | "ready" | "error" | "unavailable";
 type ClassroomTab = "overview" | "labs" | "classwork" | "people";
+type ClassroomTabIndicator = { left: number; top: number; width: number; height: number };
 
 async function hasAuthenticatedUser() {
   const supabase = createClient();
@@ -115,6 +116,7 @@ export default function ClassroomWorkspacePage() {
       ? requestedTab
       : "overview",
   );
+  const [classroomTabIndicator, setClassroomTabIndicator] = useState<ClassroomTabIndicator | null>(null);
   const [status, setStatus] = useState<WorkspaceStatus>("loading");
   const [room, setRoom] = useState<ClassroomDetail | null>(null);
   const [members, setMembers] = useState<ClassroomMember[]>([]);
@@ -128,6 +130,32 @@ export default function ClassroomWorkspacePage() {
   const [disbandOpen, setDisbandOpen] = useState(false);
   const [memberToRemove, setMemberToRemove] = useState<ClassroomMember | null>(null);
   const [pendingAction, setPendingAction] = useState<"rename" | "disband" | "remove" | "assignment" | null>(null);
+
+  useEffect(() => {
+    const list = document.querySelector<HTMLElement>("[data-testid='classroom-tabs-list']");
+    if (!list) return;
+
+    const syncIndicator = () => {
+      const activeTrigger = list.querySelector<HTMLElement>("[data-state='active']");
+      if (!activeTrigger) return;
+      const listRect = list.getBoundingClientRect();
+      const triggerRect = activeTrigger.getBoundingClientRect();
+      setClassroomTabIndicator({
+        left: triggerRect.left - listRect.left,
+        top: triggerRect.top - listRect.top,
+        width: triggerRect.width,
+        height: triggerRect.height,
+      });
+    };
+
+    const frame = window.requestAnimationFrame(syncIndicator);
+    const observer = new ResizeObserver(syncIndicator);
+    observer.observe(list);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      observer.disconnect();
+    };
+  }, [activeTab]);
 
   const roomLabs = useMemo(() => {
     if (!room) {
@@ -512,11 +540,20 @@ export default function ClassroomWorkspacePage() {
 
             <section className="mx-auto max-w-7xl px-4 py-6 sm:px-8 lg:px-10">
               <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as ClassroomTab)} className="gap-0">
-                <TabsList variant="line" className="grid h-auto w-full grid-cols-2 gap-1 rounded-xl border border-slate-200 bg-white p-1 shadow-sm sm:grid-cols-4" aria-label="เนื้อหาในชั้นเรียน">
-                  <TabsTrigger value="overview" className="min-h-12 rounded-lg px-2 text-sm font-bold after:bottom-0 after:inset-x-3 after:bg-blue-600 data-active:text-blue-700">ภาพรวม</TabsTrigger>
-                  <TabsTrigger value="classwork" className="min-h-12 rounded-lg px-2 text-sm font-bold after:bottom-0 after:inset-x-3 after:bg-blue-600 data-active:text-blue-700">งานของชั้นเรียน</TabsTrigger>
-                  <TabsTrigger value="labs" className="min-h-12 rounded-lg px-2 text-sm font-bold after:bottom-0 after:inset-x-3 after:bg-blue-600 data-active:text-blue-700">ห้องแล็บ</TabsTrigger>
-                  <TabsTrigger value="people" className="min-h-12 rounded-lg px-2 text-sm font-bold after:bottom-0 after:inset-x-3 after:bg-blue-600 data-active:text-blue-700">สมาชิก</TabsTrigger>
+                <TabsList data-testid="classroom-tabs-list" className="relative grid h-auto w-full grid-cols-2 gap-1 overflow-hidden rounded-xl border border-slate-200 bg-white p-1 shadow-sm sm:grid-cols-4" aria-label="เนื้อหาในชั้นเรียน">
+                  <span
+                    aria-hidden="true"
+                    className="pointer-events-none absolute z-0 rounded-lg border border-blue-100 bg-blue-50 shadow-sm transition-[transform,width,height] duration-300 ease-out motion-reduce:transition-none"
+                    style={classroomTabIndicator ? {
+                      width: `${classroomTabIndicator.width}px`,
+                      height: `${classroomTabIndicator.height}px`,
+                      transform: `translate3d(${classroomTabIndicator.left}px, ${classroomTabIndicator.top}px, 0)`,
+                    } : { opacity: 0 }}
+                  />
+                  <TabsTrigger value="overview" className="relative z-10 h-12 min-w-0 whitespace-normal rounded-lg border-0 bg-transparent px-2 text-center text-sm font-bold leading-none data-active:bg-transparent data-active:text-blue-700 data-active:shadow-none">ภาพรวม</TabsTrigger>
+                  <TabsTrigger value="classwork" className="relative z-10 h-12 min-w-0 whitespace-normal rounded-lg border-0 bg-transparent px-2 text-center text-sm font-bold leading-none data-active:bg-transparent data-active:text-blue-700 data-active:shadow-none">งานของชั้นเรียน</TabsTrigger>
+                  <TabsTrigger value="labs" className="relative z-10 h-12 min-w-0 whitespace-normal rounded-lg border-0 bg-transparent px-2 text-center text-sm font-bold leading-none data-active:bg-transparent data-active:text-blue-700 data-active:shadow-none">ห้องแล็บ</TabsTrigger>
+                  <TabsTrigger value="people" className="relative z-10 h-12 min-w-0 whitespace-normal rounded-lg border-0 bg-transparent px-2 text-center text-sm font-bold leading-none data-active:bg-transparent data-active:text-blue-700 data-active:shadow-none">สมาชิก</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="overview" className="pt-6">
@@ -546,7 +583,13 @@ export default function ClassroomWorkspacePage() {
                   />
                 </TabsContent>
                 <TabsContent value="labs" className="pt-6">
-                  <LabsPanel labs={roomLabs} />
+                  <LabsPanel
+                    labs={roomLabs}
+                    classroomId={room.id}
+                    assignments={assignments}
+                    submissions={submissions}
+                    isCreator={room.isCreator}
+                  />
                 </TabsContent>
                 <TabsContent value="people" className="pt-6">
                   <PeoplePanel
@@ -652,7 +695,19 @@ const CATEGORY_STYLES = {
   Foundation: { label: "ความรู้พื้นฐาน", accent: "bg-amber-400", icon: "bg-amber-50 text-amber-700", badge: "border-amber-100 bg-amber-50 text-amber-700" },
 } as const;
 
-function LabsPanel({ labs }: { labs: Array<(typeof labsById)[string]> }) {
+function LabsPanel({
+  labs,
+  classroomId,
+  assignments,
+  submissions,
+  isCreator,
+}: {
+  labs: Array<(typeof labsById)[string]>;
+  classroomId: string;
+  assignments: ClassroomAssignment[];
+  submissions: ClassroomAssignmentSubmission[];
+  isCreator: boolean;
+}) {
   if (labs.length === 0) {
     return (
       <section className="flex min-h-64 flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-slate-300 bg-white p-6 text-center" aria-labelledby="empty-labs-heading">
@@ -676,8 +731,17 @@ function LabsPanel({ labs }: { labs: Array<(typeof labsById)[string]> }) {
       </div>
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {labs.map((lab) => {
-          const readiness = getLabReadiness(lab.id);
           const theme = CATEGORY_STYLES[lab.category];
+          const matchingAssignments = assignments.filter((assignment) => assignment.labId === lab.id);
+          const labAssignment = isCreator
+            ? null
+            : matchingAssignments.find((assignment) => {
+                const submission = submissions.find((item) => item.assignmentId === assignment.id);
+                return !submission?.gradedAt;
+              }) ?? matchingAssignments[0] ?? null;
+          const labHref = labAssignment
+            ? `/labs/${lab.id}/simulation?classroom=${encodeURIComponent(classroomId)}&assignment=${encodeURIComponent(labAssignment.id)}`
+            : `/labs/${lab.id}/simulation`;
 
           return (
             <article key={lab.id} className="relative flex min-h-72 flex-col overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm transition-[border-color,box-shadow] duration-200 hover:border-slate-300 hover:shadow-md">
@@ -686,10 +750,6 @@ function LabsPanel({ labs }: { labs: Array<(typeof labsById)[string]> }) {
                 <div className="flex items-start justify-between gap-3">
                   <span className={`flex size-10 shrink-0 items-center justify-center rounded-lg ${theme.icon}`}>
                     <FlaskConical className="size-5" aria-hidden="true" />
-                  </span>
-                  <span className={`inline-flex min-h-7 items-center gap-1.5 rounded-full border px-2.5 text-[11px] font-extrabold ${readiness.isReady ? "border-emerald-100 bg-emerald-50 text-emerald-700" : "border-amber-100 bg-amber-50 text-amber-700"}`}>
-                    {readiness.isReady ? <CheckCircle2 className="size-3.5" aria-hidden="true" /> : <Clock3 className="size-3.5" aria-hidden="true" />}
-                    {readiness.label}
                   </span>
                 </div>
                 <div className="mt-4 flex flex-wrap gap-2 text-xs font-extrabold">
@@ -700,11 +760,11 @@ function LabsPanel({ labs }: { labs: Array<(typeof labsById)[string]> }) {
                 <p className="text-xs font-bold leading-relaxed text-slate-400">{lab.title}</p>
                 <p className="mt-2 line-clamp-2 text-sm font-semibold leading-relaxed text-slate-500">{lab.description}</p>
                 <Link
-                  href={`/labs/${lab.id}`}
+                  href={labHref}
                   className="mt-auto inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 text-sm font-extrabold text-white transition-colors hover:bg-blue-700 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
                 >
                   <DoorOpen className="size-4" aria-hidden="true" />
-                  เข้าห้อง
+                  {labAssignment ? "ทดลองและส่งงาน" : "เข้าห้อง"}
                   <ArrowRight className="size-4" aria-hidden="true" />
                 </Link>
               </div>
@@ -1014,8 +1074,8 @@ function ClassworkPanel({
               <DialogTitle className="text-lg font-extrabold leading-relaxed text-slate-950">เพิ่มงานของชั้นเรียน</DialogTitle>
               <DialogDescription className="font-semibold leading-relaxed">จัดรายละเอียดงาน แนบไฟล์ และกำหนดส่งให้สมาชิกในห้อง</DialogDescription>
             </DialogHeader>
-            <div className="grid gap-4 overflow-y-auto overflow-x-hidden px-5 py-5 md:grid-cols-[minmax(0,1fr)_minmax(0,320px)] sm:px-6">
-              <div className="grid min-w-0 gap-4">
+            <div className="grid items-start gap-4 overflow-y-auto overflow-x-hidden px-5 py-5 md:grid-cols-[minmax(0,1fr)_minmax(0,320px)] sm:px-6">
+              <div className="grid min-w-0 content-start gap-4">
                 <label className="grid gap-2 text-sm font-extrabold text-slate-800">
                   ชื่องาน <span className="text-rose-600">*</span>
                   <input
@@ -1024,7 +1084,7 @@ function ClassworkPanel({
                     maxLength={120}
                     required
                     autoFocus
-                    className="min-h-11 rounded-lg border border-slate-300 px-3 font-semibold outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-100"
+                    className="h-11 rounded-lg border border-slate-300 px-3 font-semibold outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-100"
                     placeholder="เช่น สรุปผลการทดลองเรื่องแรง"
                   />
                 </label>
@@ -1034,8 +1094,8 @@ function ClassworkPanel({
                     value={description}
                     onChange={(event) => setDescription(event.target.value)}
                     maxLength={1000}
-                    rows={7}
-                    className="min-h-40 resize-y rounded-lg border border-slate-300 px-3 py-2 font-semibold leading-relaxed outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-100"
+                    rows={4}
+                    className="min-h-28 resize-y rounded-lg border border-slate-300 px-3 py-2 font-semibold leading-relaxed outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-100"
                     placeholder="คำแนะนำ สิ่งที่ต้องส่ง หรือเกณฑ์สั้น ๆ"
                   />
                 </label>
@@ -1327,7 +1387,7 @@ function SubmissionList({
         </ul>
       )}
       <Dialog open={Boolean(reviewing)} onOpenChange={(nextOpen) => !nextOpen && setReviewing(null)}>
-        <DialogContent className="max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-2xl overflow-y-auto">
+        <DialogContent className="max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-6xl overflow-y-auto">
           <DialogHeader>
             <DialogTitle>ตรวจผลการทดลอง</DialogTitle>
             <DialogDescription>
@@ -1384,7 +1444,7 @@ function AssignmentSubmissionForm({
 }) {
   if (assignment.labId) {
     return (
-      <LabAssignmentSubmissionDialog
+      <ClassroomLabSubmissionDialog
         assignment={assignment}
         existingSubmission={existingSubmission}
         isSubmitting={isSubmitting}
@@ -1492,171 +1552,6 @@ function GeneralAssignmentSubmissionForm({
         {isSubmitting ? "กำลังส่ง..." : "ส่งงาน"}
       </button>
     </form>
-  );
-}
-
-function LabAssignmentSubmissionDialog({
-  assignment,
-  existingSubmission,
-  isSubmitting,
-  onSubmit,
-}: {
-  assignment: ClassroomAssignment;
-  existingSubmission: ClassroomAssignmentSubmission | null;
-  isSubmitting: boolean;
-  onSubmit: (input: SubmitClassroomAssignmentInput) => Promise<boolean>;
-}) {
-  const [open, setOpen] = useState(false);
-  const [runs, setRuns] = useState<ClassroomExperimentRun[]>([]);
-  const [selectedRunId, setSelectedRunId] = useState(existingSubmission?.experimentRunId ?? "");
-  const [conclusion, setConclusion] = useState(existingSubmission?.note ?? "");
-  const [isLoading, setIsLoading] = useState(false);
-  const selectedRun = runs.find((run) => run.id === selectedRunId) ?? null;
-  const isGraded = Boolean(existingSubmission?.gradedAt);
-
-  useEffect(() => {
-    if (!open || !assignment.labId) return;
-    let active = true;
-    void listMyExperimentRunsForLab(assignment.labId)
-      .then((nextRuns) => {
-        if (!active) return;
-        setRuns(nextRuns);
-        setSelectedRunId((current) => current || nextRuns[0]?.id || "");
-      })
-      .catch((error) => toast.error(error instanceof Error ? error.message : "โหลดผลการทดลองไม่สำเร็จ"))
-      .finally(() => active && setIsLoading(false));
-    return () => { active = false; };
-  }, [assignment.labId, open]);
-
-  async function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const saved = await onSubmit({
-      assignmentId: assignment.id,
-      classroomId: assignment.classroomId,
-      experimentRunId: selectedRunId,
-      note: conclusion,
-      linkUrls: "",
-      attachmentFiles: [],
-    });
-    if (saved) setOpen(false);
-  }
-
-  return (
-    <div className="mt-4 rounded-xl border border-blue-100 bg-blue-50/50 p-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <p className="text-sm font-extrabold text-blue-950">ผลการทดลองของคุณ</p>
-          <p className="mt-1 text-xs font-semibold text-blue-700">
-            {isGraded ? `ตรวจแล้ว ${existingSubmission?.score}/${assignment.maxScore} คะแนน` : existingSubmission ? "ส่งแล้ว และแก้ไขได้ก่อนคุณครูตรวจ" : "เลือกผลที่บันทึกไว้และเขียนสรุปก่อนส่ง"}
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={() => {
-            setIsLoading(true);
-            setOpen(true);
-          }}
-          disabled={isGraded}
-          className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-blue-600 px-4 text-sm font-extrabold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-300 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
-        >
-          <Upload className="size-4" aria-hidden="true" />
-          {isGraded ? "ตรวจแล้ว" : existingSubmission ? "แก้ไขงาน" : "ส่งงาน"}
-        </button>
-      </div>
-
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-h-[calc(100dvh-1rem)] w-[calc(100vw-1rem)] max-w-3xl overflow-y-auto p-0">
-          <DialogHeader className="border-b border-slate-100 px-5 py-4 pr-12 sm:px-6">
-            <DialogTitle>ส่งผลการทดลอง</DialogTitle>
-            <DialogDescription>{assignment.title} · คะแนนเต็ม {assignment.maxScore}</DialogDescription>
-          </DialogHeader>
-          <form onSubmit={submit} className="grid gap-5 px-5 pb-5 sm:px-6 sm:pb-6">
-            <fieldset className="grid gap-3">
-              <legend className="text-sm font-extrabold text-slate-900">ผลการทดลองที่บันทึกไว้</legend>
-              {isLoading ? <p role="status" className="rounded-xl bg-slate-50 p-4 text-sm font-semibold text-slate-600">กำลังโหลดผลการทดลอง...</p> : null}
-              {!isLoading && runs.length === 0 ? (
-                <div className="rounded-xl border border-dashed border-slate-300 p-5 text-center">
-                  <p className="text-sm font-bold text-slate-800">ยังไม่มีผลการทดลองที่บันทึกไว้</p>
-                  <Link href={`/labs/${assignment.labId}/simulation`} className="mt-3 inline-flex min-h-10 items-center rounded-lg bg-blue-600 px-4 text-sm font-extrabold text-white">ไปทดลองและบันทึกผล</Link>
-                </div>
-              ) : null}
-              {runs.map((experimentRun) => (
-                <label key={experimentRun.id} className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 ${selectedRunId === experimentRun.id ? "border-blue-500 bg-blue-50" : "border-slate-200 bg-white"}`}>
-                  <input type="radio" name={`run-${assignment.id}`} value={experimentRun.id} checked={selectedRunId === experimentRun.id} onChange={() => setSelectedRunId(experimentRun.id)} className="mt-1 size-4 accent-blue-600" />
-                  <span className="min-w-0">
-                    <span className="block text-sm font-extrabold text-slate-900">{experimentRun.title || labsById[experimentRun.lab_id]?.title || "ผลการทดลอง"}</span>
-                    <span className="mt-1 block text-xs font-semibold text-slate-500">บันทึกเมื่อ {formatClassroomDate(experimentRun.created_at)}</span>
-                  </span>
-                </label>
-              ))}
-            </fieldset>
-            {selectedRun ? <ExperimentRunPreview run={selectedRun} /> : null}
-            <label className="grid gap-2 text-sm font-extrabold text-slate-900">
-              สรุปผลการทดลอง <span className="text-xs font-semibold text-slate-500">20-1,000 ตัวอักษร</span>
-              <textarea
-                value={conclusion}
-                onChange={(event) => setConclusion(event.target.value)}
-                minLength={20}
-                maxLength={1000}
-                rows={5}
-                required
-                className="resize-y rounded-xl border border-slate-300 px-3 py-2 font-medium leading-relaxed outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-100"
-                placeholder="อธิบายสิ่งที่สังเกตได้ ผลที่เกิดขึ้น และข้อสรุปจากการทดลอง"
-              />
-            </label>
-            <DialogFooter>
-              <button type="button" onClick={() => setOpen(false)} className="min-h-11 rounded-lg border border-slate-300 px-4 font-extrabold text-slate-700">ยกเลิก</button>
-              <button type="submit" disabled={isSubmitting || !selectedRunId || conclusion.trim().length < 20} className="min-h-11 rounded-lg bg-blue-600 px-5 font-extrabold text-white hover:bg-blue-700 disabled:opacity-50">
-                {isSubmitting ? "กำลังส่ง..." : "ส่งงาน"}
-              </button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
-    </div>
-  );
-}
-
-function ExperimentRunPreview({ run }: { run: ClassroomExperimentRun }) {
-  const sections = [
-    ["ตัวแปรที่ตั้งค่า", run.variables],
-    ["ค่าที่วัดได้", run.live_values],
-    ["สรุปข้อมูล", run.summary],
-  ] as const;
-
-  return (
-    <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-      <div className="flex items-center gap-2">
-        <FlaskConical className="size-5 text-blue-600" aria-hidden="true" />
-        <h3 className="text-sm font-extrabold text-slate-950">{labsById[run.lab_id]?.title || run.title || "ผลการทดลอง"}</h3>
-      </div>
-      <div className="mt-3 grid gap-3 sm:grid-cols-3">
-        {sections.map(([label, value]) => (
-          <div key={label} className="min-w-0 rounded-lg bg-white p-3">
-            <p className="text-xs font-bold text-slate-500">{label}</p>
-            <ExperimentJsonValue value={value} />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function ExperimentJsonValue({ value }: { value: ClassroomExperimentRun["variables"] }) {
-  if (!value || typeof value !== "object" || Array.isArray(value)) {
-    return <p className="mt-1 break-words text-xs font-semibold text-slate-700">{String(value ?? "ไม่มีข้อมูล")}</p>;
-  }
-  const entries = Object.entries(value).slice(0, 12);
-  if (entries.length === 0) return <p className="mt-1 text-xs font-semibold text-slate-500">ไม่มีข้อมูล</p>;
-  return (
-    <dl className="mt-2 grid gap-1.5">
-      {entries.map(([key, item]) => (
-        <div key={key} className="flex min-w-0 justify-between gap-2 text-xs">
-          <dt className="min-w-0 break-words font-semibold text-slate-500">{key}</dt>
-          <dd className="min-w-0 break-words text-right font-bold text-slate-800">{typeof item === "object" ? JSON.stringify(item) : String(item)}</dd>
-        </div>
-      ))}
-    </dl>
   );
 }
 

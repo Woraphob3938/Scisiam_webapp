@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { AlertTriangle, ArrowLeft, Clock, Home } from "lucide-react";
 
+import SimulationClassroomSubmission from "@/components/classrooms/SimulationClassroomSubmission";
 import { labsById } from "@/data/labs";
 import { isLabReady } from "@/data/labReadiness";
 import {
@@ -383,6 +384,16 @@ function SimulationPlaceholder({ labId }: { labId: string }) {
 export default function SimulationRoomPage() {
   const params = useParams();
   const labId = (params?.id as string) || "newtons-cooling";
+
+  return (
+    <>
+      <SimulationForLab labId={labId} />
+      {isLabReady(labId) ? <SimulationClassroomSubmission labId={labId} /> : null}
+    </>
+  );
+}
+
+function SimulationForLab({ labId }: { labId: string }) {
 
   // Check if the lab ID is valid and ready
   if (!isLabReady(labId)) {

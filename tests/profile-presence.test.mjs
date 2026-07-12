@@ -31,6 +31,15 @@ test("navbar auth state persists across route navigation", () => {
   assert.match(authProvider, /auth\.onAuthStateChange\(/);
 });
 
+test("auth provider contains Supabase network failures without clearing responsive UI state", () => {
+  const authProvider = read("src", "context", "AuthContext.tsx");
+
+  assert.match(authProvider, /try\s*\{[\s\S]*?auth\.getUser\(\)[\s\S]*?\}\s*catch/);
+  assert.match(authProvider, /loadAuthStateFromCache\(false\)/);
+  assert.match(authProvider, /window\.addEventListener\("online", handleAuthUpdated\)/);
+  assert.match(authProvider, /window\.removeEventListener\("online", handleAuthUpdated\)/);
+});
+
 test("classroom members expose email and current profile avatar", () => {
   const client = read("src", "lib", "supabase", "classrooms.ts");
   const page = read("src", "app", "classrooms", "[id]", "page.tsx");

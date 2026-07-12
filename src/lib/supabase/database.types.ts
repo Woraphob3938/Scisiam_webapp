@@ -160,6 +160,7 @@ export type Database = {
           points_awarded: number;
           duration_seconds: number | null;
           submitted_at: string | null;
+          snapshot_path: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -179,6 +180,7 @@ export type Database = {
           points_awarded?: number;
           duration_seconds?: number | null;
           submitted_at?: string | null;
+          snapshot_path?: string | null;
         };
         Update: {
           status?: ScisiamSubmissionStatus;
@@ -192,6 +194,7 @@ export type Database = {
           summary?: Json;
           score?: number | null;
           duration_seconds?: number | null;
+          snapshot_path?: string | null;
           updated_at?: string;
         };
         Relationships: [];
@@ -522,6 +525,13 @@ export type Database = {
           p_duration_seconds?: number | null;
         };
         Returns: string;
+      };
+      attach_experiment_run_snapshot: {
+        Args: {
+          p_run_id: string;
+          p_snapshot_path: string;
+        };
+        Returns: boolean;
       };
       claim_mission_reward: {
         Args: {

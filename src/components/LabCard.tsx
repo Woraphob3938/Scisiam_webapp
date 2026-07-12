@@ -2,7 +2,6 @@
 
 import React from "react";
 import { ArrowRight } from "lucide-react";
-import { getLabReadiness } from "@/data/labReadiness";
 import {
   PushPullForcesSVG,
   LightShadowsSVG,
@@ -1632,8 +1631,6 @@ export default function LabCard({
     btnOutline: "border-slate-200 text-slate-600 hover:bg-slate-50",
     iconColor: "text-slate-500",
   };
-  const readiness = getLabReadiness(lab.id);
-
   // Render proper SVG
   const renderIllustration = () => {
     switch (lab.id) {
@@ -1891,7 +1888,7 @@ export default function LabCard({
     >
       <div>
         {/* SVG Illustration Container */}
-        <div className={`mb-4 flex h-28 w-full items-center justify-center overflow-hidden rounded-2xl border border-slate-100 ${themeColors.accentBg} ${readiness.isReady ? "" : "opacity-75"} [&>svg]:h-[88px] sm:h-32 sm:[&>svg]:h-24 xl:h-[136px] xl:[&>svg]:h-28`}>
+        <div className={`mb-4 flex h-28 w-full items-center justify-center overflow-hidden rounded-2xl border border-slate-100 ${themeColors.accentBg} [&>svg]:h-[88px] sm:h-32 sm:[&>svg]:h-24 xl:h-[136px] xl:[&>svg]:h-28`}>
           {renderIllustration()}
         </div>
 
@@ -1903,15 +1900,6 @@ export default function LabCard({
           </span>
           <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[10px] font-extrabold leading-[1.4] text-slate-600">
             {lab.gradeLevel}
-          </span>
-          <span
-            className={`ml-auto rounded-full border px-2.5 py-1 text-[10px] font-extrabold leading-[1.4] ${
-              readiness.isReady
-                ? "border-emerald-100 bg-emerald-50 text-emerald-700"
-                : "border-amber-100 bg-amber-50 text-amber-700"
-            }`}
-          >
-            {readiness.label}
           </span>
         </div>
 
@@ -1933,28 +1921,12 @@ export default function LabCard({
       <div className="mt-auto w-full">
         <button
           type="button"
-          disabled={!readiness.isReady}
           onClick={() => onEnterRoom?.(lab.id)}
-          title={readiness.description}
-          aria-label={
-            readiness.isReady
-              ? `เข้าห้องทดลอง ${lab.title}`
-              : `ห้องทดลอง ${lab.title} ยังไม่พร้อมใช้งาน`
-          }
-          className={`
-            flex min-h-11 w-full select-none items-center justify-center gap-1.5 rounded-xl px-3 py-2.5 text-xs font-bold
-            transition-all duration-200 active:scale-[0.98] focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100
-            ${
-              readiness.isReady
-                ? `${themeColors.btnPrimary} cursor-pointer`
-                : "cursor-not-allowed border border-slate-200 bg-slate-100 text-slate-400"
-            }
-          `}
+          aria-label={`เข้าห้องทดลอง ${lab.title}`}
+          className={`flex min-h-11 w-full select-none items-center justify-center gap-1.5 rounded-xl px-3 py-2.5 text-xs font-bold ${themeColors.btnPrimary} cursor-pointer transition-all duration-200 active:scale-[0.98] focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100`}
         >
-          <span>{readiness.isReady ? "เข้าห้อง" : "เร็ว ๆ นี้"}</span>
-          {readiness.isReady && (
-            <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
-          )}
+          <span>เข้าห้อง</span>
+          <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
         </button>
       </div>
     </div>

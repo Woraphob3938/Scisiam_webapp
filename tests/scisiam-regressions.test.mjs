@@ -295,7 +295,8 @@ test("elementary physics and chemistry labs are detail-only placeholders", () =>
 
   assert.equal(elementaryLabs.length, 0);
   assert.doesNotMatch(handleViewDetails, /isLabReady/);
-  assert.match(labCard, /disabled=\{!readiness\.isReady\}[\s\S]*onClick=\{\(\) => onEnterRoom\?\.\(lab\.id\)\}/);
+  assert.match(labCard, /onClick=\{\(\) => onEnterRoom\?\.\(lab\.id\)\}/);
+  assert.doesNotMatch(labCard, /readiness\.label/);
 
   for (const [labId, category] of elementaryLabs) {
     assert.match(labs, new RegExp(`id: "${labId}"[\\s\\S]*?category: "${category}"`), `${labId} should be listed as ${category}`);
@@ -344,15 +345,13 @@ test("university science labs use English titles and shared detail SVGs", () => 
   }
 });
 
-test("labs page summarizes filtered lab readiness", () => {
+test("labs page keeps the filtered lab count without redundant readiness status", () => {
   const labsPage = readProjectFile("src/app/labs/page.tsx");
 
-  assert.match(labsPage, /const unfinishedLabs = useMemo/);
-  assert.match(labsPage, /filteredLabs\.filter\(\(lab\) => !isLabReady\(lab\.id\)\)/);
-  assert.match(labsPage, /const readyFilteredLabCount = filteredLabs\.length - unfinishedLabs\.length/);
   assert.match(labsPage, /แล็บในมุมมองนี้ \{filteredLabs\.length\} แล็บ/);
-  assert.match(labsPage, /เหลือแล็บที่ยังไม่เสร็จ \{unfinishedLabs\.length\} แล็บ/);
-  assert.match(labsPage, /unfinishedLabs\.map\(\(lab\) =>/);
+  assert.match(labsPage, /if \(!isLabReady\(id\) \|\| isEnteringLab\) return;/);
+  assert.doesNotMatch(labsPage, /readyFilteredLabCount/);
+  assert.doesNotMatch(labsPage, /unfinishedLabs/);
 });
 
 test("lab detail layout avoids a duplicate bottom start CTA", () => {
@@ -928,6 +927,8 @@ test("local Supabase migrations mirror the deployed migration history", () => {
     "20260708194528",
     "20260709200551",
     "20260711182651",
+    "20260712072936",
+    "20260712074502",
   ];
 
   assert.deepEqual(

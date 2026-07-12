@@ -11,6 +11,22 @@ const classroomsIndexSource = fs.readFileSync(
   path.join(process.cwd(), "src", "app", "classrooms", "page.tsx"),
   "utf8",
 );
+const simulationRouteSource = fs.readFileSync(
+  path.join(process.cwd(), "src", "app", "labs", "[id]", "simulation", "page.tsx"),
+  "utf8",
+);
+const simulationSubmissionSource = fs.readFileSync(
+  path.join(process.cwd(), "src", "components", "classrooms", "SimulationClassroomSubmission.tsx"),
+  "utf8",
+);
+const labSubmissionDialogSource = fs.readFileSync(
+  path.join(process.cwd(), "src", "components", "classrooms", "ClassroomLabSubmissionDialog.tsx"),
+  "utf8",
+);
+const sharedSimulationShellSource = fs.readFileSync(
+  path.join(process.cwd(), "src", "components", "labs", "simulation", "SharedSimulationShell.tsx"),
+  "utf8",
+);
 
 test("classroom workspace presents a compact room overview with useful counts", () => {
   assert.match(source, /aria-labelledby="classroom-overview-heading"/);
@@ -72,11 +88,15 @@ test("classroom classwork supports assignment files, links, and student submissi
   assert.match(source, /aria-label=\{`เอาไฟล์ \$\{file\.name\} ออก`\}/);
   assert.match(source, /overflow-x-hidden/);
   assert.match(source, /md:grid-cols-\[minmax\(0,1fr\)_minmax\(0,320px\)\]/);
+  assert.match(source, /items-start/);
+  assert.match(source, /content-start/);
+  assert.match(source, /rows=\{4\}/);
+  assert.match(source, /min-h-28/);
   assert.doesNotMatch(source, /accept="image\/png,image\/jpeg/);
   assert.doesNotMatch(source, /file:mr-3/);
 });
 
-test("classroom tabs are prominent, count-free, and keep the active line inside", () => {
+test("classroom tabs are prominent, count-free, centered, and animate the active indicator", () => {
   assert.match(source, /ภาพรวม<\/TabsTrigger>/);
   assert.match(source, /ห้องแล็บ<\/TabsTrigger>/);
   assert.match(source, /งานของชั้นเรียน<\/TabsTrigger>/);
@@ -86,9 +106,11 @@ test("classroom tabs are prominent, count-free, and keep the active line inside"
   assert.match(source, /Tabs value=\{activeTab\}/);
   assert.doesNotMatch(source, /ห้องแล็บ \{roomLabs\.length\}/);
   assert.doesNotMatch(source, /บุคคล \{orderedMembers\.length\}/);
-  assert.match(source, /after:bottom-0/);
+  assert.match(source, /overflow-hidden/);
+  assert.match(source, /classroomTabIndicator/);
+  assert.match(source, /motion-reduce:transition-none/);
   assert.match(source, /data-active:text-blue-700/);
-  assert.doesNotMatch(source, /data-active:bg-blue-50/);
+  assert.doesNotMatch(source, /after:bottom-0/);
   assert.match(source, /grid-cols-2/);
   assert.match(source, /sm:grid-cols-4/);
   assert.doesNotMatch(source, /-mx-4 overflow-x-auto/);
@@ -96,6 +118,7 @@ test("classroom tabs are prominent, count-free, and keep the active line inside"
 });
 
 test("lab assignments require a selected lab, max score, saved run, and conclusion", () => {
+  const assignmentUiSource = `${source}\n${labSubmissionDialogSource}`;
   for (const label of [
     "มอบหมายห้องแล็บ",
     "ห้องแล็บที่มอบหมาย",
@@ -106,22 +129,48 @@ test("lab assignments require a selected lab, max score, saved run, and conclusi
     "ตรวจและให้คะแนน",
     "ตรวจแล้ว",
   ]) {
-    assert.match(source, new RegExp(label));
+    assert.match(assignmentUiSource, new RegExp(label));
   }
 
-  assert.match(source, /listMyExperimentRunsForLab/);
+  assert.match(labSubmissionDialogSource, /listMyExperimentRunsForLab/);
   assert.match(source, /gradeClassroomAssignmentSubmission/);
-  assert.match(source, /experimentRunId:/);
-  assert.match(source, /existingSubmission\?\.gradedAt/);
-  assert.match(source, /minLength=\{20\}/);
-  assert.match(source, /maxLength=\{1000\}/);
+  assert.match(labSubmissionDialogSource, /experimentRunId:/);
+  assert.match(labSubmissionDialogSource, /existingSubmission\?\.gradedAt/);
+  assert.match(labSubmissionDialogSource, /minLength=\{5\}/);
+  assert.match(labSubmissionDialogSource, /maxLength=\{1000\}/);
+  assert.match(labSubmissionDialogSource, /5-1,000 ตัวอักษร/);
+  assert.match(labSubmissionDialogSource, /max-w-6xl/);
+  assert.match(labSubmissionDialogSource, /snapshotUrl/);
+  assert.match(labSubmissionDialogSource, /ภาพหน้าการทดลอง/);
+  assert.match(labSubmissionDialogSource, /lg:grid-cols/);
+  assert.match(source, /max-w-6xl/);
 });
 
-test("classroom lab cards expose readiness and keep one clear entry action", () => {
-  assert.match(source, /getLabReadiness/);
-  assert.match(source, /readiness\.label/);
+test("classroom lab cards keep one clear entry action without redundant readiness badges", () => {
+  assert.doesNotMatch(source, /readiness\.label/);
   assert.match(source, /lab\.description/);
   assert.match(source, /เข้าห้อง/);
+  assert.match(source, /`\/labs\/\$\{lab\.id\}\/simulation/);
+  assert.match(source, /classroom=\$\{encodeURIComponent\(classroomId\)\}/);
+  assert.match(source, /assignment=\$\{encodeURIComponent\(labAssignment\.id\)\}/);
+});
+
+test("classroom lab simulation exposes the saved-run submission flow", () => {
+  assert.match(simulationRouteSource, /<SimulationClassroomSubmission labId=\{labId\}/);
+  assert.match(simulationSubmissionSource, /useSearchParams/);
+  assert.match(simulationSubmissionSource, /getClassroomAssignments/);
+  assert.match(simulationSubmissionSource, /getClassroomAssignmentSubmissions/);
+  assert.match(simulationSubmissionSource, /submitClassroomAssignment/);
+  assert.match(simulationSubmissionSource, /<ClassroomLabSubmissionDialog/);
+  assert.match(labSubmissionDialogSource, /ผลการทดลองที่บันทึกไว้/);
+  assert.match(labSubmissionDialogSource, /สรุปผลการทดลอง/);
+  assert.match(labSubmissionDialogSource, /ส่งงาน/);
+  assert.match(labSubmissionDialogSource, /minLength=\{5\}/);
+  assert.match(simulationSubmissionSource, /createPortal/);
+  assert.match(simulationSubmissionSource, /simulation-classroom-submission-slot/);
+  assert.match(sharedSimulationShellSource, /simulation-classroom-submission-slot/);
+  assert.match(labSubmissionDialogSource, /variant === "inline"/);
+  assert.match(labSubmissionDialogSource, /บันทึกผลใหม่เพื่อสร้างภาพ/);
 });
 
 test("classroom people view separates teachers and students", () => {

@@ -24,6 +24,7 @@ type VisibleClassroomLabRow = Pick<ClassroomLabRow, "classroom_id" | "lab_id" | 
 
 const CLASSROOM_ACCESS_ERROR = "ไม่พบห้องเรียนหรือคุณไม่มีสิทธิ์เข้าถึง";
 const CLASSROOM_FILES_BUCKET = "classroom-files";
+const EXPERIMENT_SNAPSHOTS_BUCKET = "experiment-snapshots";
 const CLASSROOM_FILE_SIZE_LIMIT = 10 * 1024 * 1024;
 const CLASSROOM_FILE_MIME_TYPES = new Set([
   "image/jpeg",
@@ -137,10 +138,14 @@ export type SubmitClassroomAssignmentInput = {
   attachmentFiles: File[];
 };
 
-export type ClassroomExperimentRun = Pick<
+type ClassroomExperimentRunRow = Pick<
   ExperimentRunRow,
-  "id" | "lab_id" | "title" | "variables" | "live_values" | "graph_points" | "table_rows" | "summary" | "created_at"
+  "id" | "lab_id" | "title" | "variables" | "live_values" | "graph_points" | "table_rows" | "summary" | "snapshot_path" | "created_at"
 >;
+
+export type ClassroomExperimentRun = ClassroomExperimentRunRow & {
+  snapshotUrl: string | null;
+};
 
 export type ClassroomNotification = {
   id: string;
@@ -500,14 +505,16 @@ export async function listMyExperimentRunsForLab(labIdValue: string): Promise<Cl
   const userId = await requireCurrentUserId(supabase);
   const { data, error } = await supabase
     .from("experiment_runs")
-    .select("id, lab_id, title, variables, live_values, graph_points, table_rows, summary, created_at")
+    .select("id, lab_id, title, variables, live_values, graph_points, table_rows, summary, snapshot_path, created_at")
     .eq("lab_id", labId)
     .eq("user_id", userId)
     .order("created_at", { ascending: false })
     .limit(20);
 
   if (error) throwClassroomActionError(error.code, error.message);
-  return (data ?? []) as ClassroomExperimentRun[];
+  return Promise.all(
+    ((data ?? []) as ClassroomExperimentRunRow[]).map((run) => withExperimentSnapshotUrl(supabase, run)),
+  );
 }
 
 export async function gradeClassroomAssignmentSubmission(
@@ -541,7 +548,21 @@ export async function getClassroomSubmissionExperimentRun(
   if (!isJsonObject(data) || typeof data.id !== "string" || typeof data.lab_id !== "string") {
     throw new Error("ไม่พบผลการทดลองที่ส่ง");
   }
-  return data as ClassroomExperimentRun;
+  const run = data as unknown as ClassroomExperimentRunRow;
+  return withExperimentSnapshotUrl(supabase, run);
+}
+
+async function withExperimentSnapshotUrl(
+  supabase: SupabaseClient,
+  run: ClassroomExperimentRunRow,
+): Promise<ClassroomExperimentRun> {
+  if (!run.snapshot_path) return { ...run, snapshotUrl: null };
+
+  const { data, error } = await supabase.storage
+    .from(EXPERIMENT_SNAPSHOTS_BUCKET)
+    .createSignedUrl(run.snapshot_path, 60 * 60);
+
+  return { ...run, snapshotUrl: error ? null : data.signedUrl };
 }
 
 export async function getClassroomNotifications(id: string): Promise<ClassroomNotification[]> {

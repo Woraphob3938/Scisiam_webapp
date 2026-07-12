@@ -54,6 +54,12 @@ function classroomExperimentGradingMigration() {
   return fs.readFileSync(path.join(migrations, files[0]), "utf8");
 }
 
+function experimentSnapshotMigration() {
+  const files = fs.readdirSync(migrations).filter((name) => name.endsWith("_experiment_run_snapshots.sql"));
+  assert.equal(files.length, 1, "expected exactly one experiment snapshot migration");
+  return fs.readFileSync(path.join(migrations, files[0]), "utf8");
+}
+
 function atmosphereLayersCatalogMigration() {
   const files = fs.readdirSync(migrations).filter((name) => name.endsWith("_add_atmosphere_layers_lab_catalog.sql"));
   assert.equal(files.length, 1, "expected exactly one atmosphere layers catalog migration");
@@ -223,6 +229,19 @@ test("classroom experiment grading is bound to owned runs and owner-defined scor
   assert.match(sql, /grant execute on function public\.get_classroom_submission_experiment_run[\s\S]*to authenticated/i);
 });
 
+test("experiment snapshots are private, owner-bound, and visible to the classroom owner", () => {
+  const sql = experimentSnapshotMigration();
+
+  assert.match(sql, /add column snapshot_path text/i);
+  assert.match(sql, /values\s*\(\s*'experiment-snapshots'\s*,\s*'experiment-snapshots'\s*,\s*false\s*,\s*3145728/i);
+  assert.match(sql, /allowed_mime_types[\s\S]*image\/webp/i);
+  assert.match(sql, /create or replace function public\.attach_experiment_run_snapshot/i);
+  assert.match(sql, /runs\.user_id = \(select auth\.uid\(\)\)/i);
+  assert.match(sql, /private\.is_class_creator/i);
+  assert.match(sql, /'snapshot_path'\s*,\s*runs\.snapshot_path/i);
+  assert.match(sql, /Lab conclusion must contain 5-1000 characters/i);
+});
+
 test("classroom database types expose experiment grading fields and RPCs", () => {
   const source = fs.readFileSync(
     path.join(root, "src", "lib", "supabase", "database.types.ts"),
@@ -234,6 +253,8 @@ test("classroom database types expose experiment grading fields and RPCs", () =>
   assert.match(source, /create_classroom_assignment:[\s\S]*p_lab_id\?: string \| null;[\s\S]*p_max_score\?: number \| null;/);
   assert.match(source, /submit_classroom_assignment:[\s\S]*p_experiment_run_id\?: string \| null;/);
   assert.match(source, /grade_classroom_assignment_submission:[\s\S]*p_submission_id: string;[\s\S]*p_score: number;/);
+  assert.match(source, /experiment_runs:[\s\S]*snapshot_path: string \| null;/);
+  assert.match(source, /attach_experiment_run_snapshot:[\s\S]*p_run_id: string;[\s\S]*p_snapshot_path: string;/);
 });
 
 test("classroom client wires experiment runs and grading through guarded RPCs", () => {
@@ -250,6 +271,10 @@ test("classroom client wires experiment runs and grading through guarded RPCs", 
   assert.match(source, /rpc\("grade_classroom_assignment_submission"/);
   assert.match(source, /export async function getClassroomSubmissionExperimentRun/);
   assert.match(source, /rpc\("get_classroom_submission_experiment_run"/);
+  assert.match(source, /experiment-snapshots/);
+  assert.match(source, /createSignedUrl/);
+  assert.match(source, /snapshot_path/);
+  assert.match(source, /snapshotUrl/);
 });
 
 test("classroom client exposes owner actions, assignments, and creator names", () => {
@@ -483,7 +508,7 @@ test("classroom workspace loads private room data and exposes four stable tabs",
   }
 
   assert.match(source, /ยังไม่มีงานของชั้นเรียน/);
-  assert.match(source, /href=\{`\/labs\/\$\{lab\.id\}`\}/);
+  assert.match(source, /`\/labs\/\$\{lab\.id\}\/simulation/);
   assert.match(source, /เข้าห้อง/);
   assert.match(source, /ไม่พบห้องหรือคุณไม่มีสิทธิ์เข้าถึง/);
 });

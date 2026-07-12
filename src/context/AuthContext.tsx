@@ -44,7 +44,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [authState, setAuthState] = useState(defaultAuthState);
 
   useEffect(() => {
-    const loadAuthStateFromCache = () => {
+    const loadAuthStateFromCache = (localNotificationMode = true) => {
       setAuthState({
         isAuthReady: true,
         isLoggedIn: localStorage.getItem("scisiam_logged_in") === "true",
@@ -52,7 +52,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         userName: localStorage.getItem("scisiam_user_name") || "นักเรียน",
         avatarPath: localStorage.getItem("scisiam_user_avatar"),
         avatarVersion: Date.now(),
-        localNotificationMode: true,
+        localNotificationMode,
       });
     };
 
@@ -63,42 +63,47 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      const supabase = createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      try {
+        const supabase = createClient();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
 
-      if (!user) {
-        clearScisiamAuthCache({ emit: false });
-        setAuthState({ ...defaultAuthState, isAuthReady: true });
-        return;
-      }
+        if (!user) {
+          clearScisiamAuthCache({ emit: false });
+          setAuthState({ ...defaultAuthState, isAuthReady: true });
+          return;
+        }
 
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("display_name, role, avatar_url")
-        .eq("id", user.id)
-        .maybeSingle();
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("display_name, role, avatar_url")
+          .eq("id", user.id)
+          .maybeSingle();
 
-      const userName = profile?.display_name || user.email?.split("@")[0] || "นักเรียน";
-      setAuthState({
-        isAuthReady: true,
-        isLoggedIn: true,
-        role: profile?.role || "student",
-        userName,
-        avatarPath: profile?.avatar_url ?? null,
-        avatarVersion: Date.now(),
-        localNotificationMode: false,
-      });
-      cacheScisiamAuth(
-        {
-          email: user.email,
+        const userName = profile?.display_name || user.email?.split("@")[0] || "นักเรียน";
+        setAuthState({
+          isAuthReady: true,
+          isLoggedIn: true,
           role: profile?.role || "student",
-          displayName: userName,
-          avatarUrl: profile?.avatar_url ?? null,
-        },
-        { emit: false },
-      );
+          userName,
+          avatarPath: profile?.avatar_url ?? null,
+          avatarVersion: Date.now(),
+          localNotificationMode: false,
+        });
+        cacheScisiamAuth(
+          {
+            email: user.email,
+            role: profile?.role || "student",
+            displayName: userName,
+            avatarUrl: profile?.avatar_url ?? null,
+          },
+          { emit: false },
+        );
+      } catch {
+        // The cache is display-only; middleware and Supabase still guard private data.
+        loadAuthStateFromCache(false);
+      }
     };
 
     void loadAuthState();
@@ -111,10 +116,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     window.addEventListener(SCISIAM_AUTH_EVENT, handleAuthUpdated);
     window.addEventListener("storage", handleAuthUpdated);
+    window.addEventListener("online", handleAuthUpdated);
 
     return () => {
       window.removeEventListener(SCISIAM_AUTH_EVENT, handleAuthUpdated);
       window.removeEventListener("storage", handleAuthUpdated);
+      window.removeEventListener("online", handleAuthUpdated);
       authSubscription?.unsubscribe();
     };
   }, []);
