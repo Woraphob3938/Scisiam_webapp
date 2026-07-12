@@ -540,20 +540,20 @@ export default function ClassroomWorkspacePage() {
 
             <section className="mx-auto max-w-7xl px-4 py-6 sm:px-8 lg:px-10">
               <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as ClassroomTab)} className="gap-0">
-                <TabsList data-testid="classroom-tabs-list" className="relative grid h-auto w-full grid-cols-2 gap-1 overflow-hidden rounded-xl border border-slate-200 bg-white p-1 shadow-sm sm:grid-cols-4" aria-label="เนื้อหาในชั้นเรียน">
+                <TabsList data-testid="classroom-tabs-list" className="relative !grid !h-auto !items-stretch w-full grid-cols-2 gap-1 overflow-hidden rounded-xl border border-slate-200 bg-white p-1 shadow-sm sm:grid-cols-4" aria-label="เนื้อหาในชั้นเรียน">
                   <span
                     aria-hidden="true"
-                    className="pointer-events-none absolute z-0 rounded-lg border border-blue-100 bg-blue-50 shadow-sm transition-[transform,width,height] duration-300 ease-out motion-reduce:transition-none"
+                    className="pointer-events-none absolute z-0 rounded-lg border border-blue-100 bg-blue-50 shadow-sm will-change-transform transition-[transform,width,height] duration-300 ease-out motion-reduce:transition-none"
                     style={classroomTabIndicator ? {
                       width: `${classroomTabIndicator.width}px`,
                       height: `${classroomTabIndicator.height}px`,
                       transform: `translate3d(${classroomTabIndicator.left}px, ${classroomTabIndicator.top}px, 0)`,
                     } : { opacity: 0 }}
                   />
-                  <TabsTrigger value="overview" className="relative z-10 h-12 min-w-0 whitespace-normal rounded-lg border-0 bg-transparent px-2 text-center text-sm font-bold leading-none data-active:bg-transparent data-active:text-blue-700 data-active:shadow-none">ภาพรวม</TabsTrigger>
-                  <TabsTrigger value="classwork" className="relative z-10 h-12 min-w-0 whitespace-normal rounded-lg border-0 bg-transparent px-2 text-center text-sm font-bold leading-none data-active:bg-transparent data-active:text-blue-700 data-active:shadow-none">งานของชั้นเรียน</TabsTrigger>
-                  <TabsTrigger value="labs" className="relative z-10 h-12 min-w-0 whitespace-normal rounded-lg border-0 bg-transparent px-2 text-center text-sm font-bold leading-none data-active:bg-transparent data-active:text-blue-700 data-active:shadow-none">ห้องแล็บ</TabsTrigger>
-                  <TabsTrigger value="people" className="relative z-10 h-12 min-w-0 whitespace-normal rounded-lg border-0 bg-transparent px-2 text-center text-sm font-bold leading-none data-active:bg-transparent data-active:text-blue-700 data-active:shadow-none">สมาชิก</TabsTrigger>
+                  <TabsTrigger value="overview" className="relative z-10 !grid !h-12 min-w-0 !place-items-center whitespace-normal rounded-lg border-0 bg-transparent px-2 !py-0 text-center text-sm font-bold leading-none data-active:bg-transparent data-active:text-blue-700 data-active:shadow-none">ภาพรวม</TabsTrigger>
+                  <TabsTrigger value="classwork" className="relative z-10 !grid !h-12 min-w-0 !place-items-center whitespace-normal rounded-lg border-0 bg-transparent px-2 !py-0 text-center text-sm font-bold leading-none data-active:bg-transparent data-active:text-blue-700 data-active:shadow-none">งานของชั้นเรียน</TabsTrigger>
+                  <TabsTrigger value="labs" className="relative z-10 !grid !h-12 min-w-0 !place-items-center whitespace-normal rounded-lg border-0 bg-transparent px-2 !py-0 text-center text-sm font-bold leading-none data-active:bg-transparent data-active:text-blue-700 data-active:shadow-none">ห้องแล็บ</TabsTrigger>
+                  <TabsTrigger value="people" className="relative z-10 !grid !h-12 min-w-0 !place-items-center whitespace-normal rounded-lg border-0 bg-transparent px-2 !py-0 text-center text-sm font-bold leading-none data-active:bg-transparent data-active:text-blue-700 data-active:shadow-none">สมาชิก</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="overview" className="pt-6">

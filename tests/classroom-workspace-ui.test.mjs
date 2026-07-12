@@ -108,6 +108,7 @@ test("classroom tabs are prominent, count-free, centered, and animate the active
   assert.doesNotMatch(source, /บุคคล \{orderedMembers\.length\}/);
   assert.match(source, /overflow-hidden/);
   assert.match(source, /classroomTabIndicator/);
+  assert.match(source, /!h-auto !items-stretch/);
   assert.match(source, /motion-reduce:transition-none/);
   assert.match(source, /data-active:text-blue-700/);
   assert.doesNotMatch(source, /after:bottom-0/);
