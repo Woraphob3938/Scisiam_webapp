@@ -1,8 +1,18 @@
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync, statSync } from "node:fs";
 import test from "node:test";
+import { fileURLToPath } from "node:url";
 
 const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
+const rootDirectory = fileURLToPath(new URL("../", import.meta.url));
+const desktopIconPaths = [
+  "icons/32x32.png",
+  "icons/128x128.png",
+  "icons/128x128@2x.png",
+  "icons/icon.ico",
+];
+const git = (...args) => spawnSync("git", args, { cwd: rootDirectory, encoding: "utf8" });
 
 test("Tauri Windows scaffold uses a local launcher and a fixed deep-link scheme", () => {
   assert.equal(existsSync(new URL("../src-tauri/Cargo.toml", import.meta.url)), true);
@@ -19,8 +29,9 @@ test("Tauri Windows scaffold uses a local launcher and a fixed deep-link scheme"
 test("desktop binary commits its configured icons and dependency lockfile", () => {
   const config = JSON.parse(read("src-tauri/tauri.conf.json"));
 
+  assert.deepEqual(config.bundle.icon, desktopIconPaths);
   assert.equal(existsSync(new URL("../src-tauri/Cargo.lock", import.meta.url)), true);
-  for (const icon of config.bundle.icon) {
+  for (const icon of desktopIconPaths) {
     assert.equal(
       existsSync(new URL(`../src-tauri/${icon}`, import.meta.url)),
       true,
@@ -31,10 +42,10 @@ test("desktop binary commits its configured icons and dependency lockfile", () =
 
 test("desktop branding uses valid committed assets and ignores only build output", () => {
   const config = JSON.parse(read("src-tauri/tauri.conf.json"));
-  const ignored = read(".gitignore");
 
+  assert.deepEqual(config.bundle.icon, desktopIconPaths);
   assert.equal(existsSync(new URL("../public/icon.png", import.meta.url)), true);
-  for (const icon of config.bundle.icon) {
+  for (const icon of desktopIconPaths) {
     const asset = new URL(`../src-tauri/${icon}`, import.meta.url);
     const contents = readFileSync(asset);
 
@@ -47,9 +58,17 @@ test("desktop branding uses valid committed assets and ignores only build output
     }
   }
 
-  assert.match(ignored, /^src-tauri\/target\/$/m);
-  assert.match(ignored, /^src-tauri\/gen\/$/m);
-  assert.doesNotMatch(ignored, /^src-tauri\/icons\/$/m);
+  const sourceAssets = [
+    "public/icon.png",
+    "src-tauri/Cargo.lock",
+    ...desktopIconPaths.map((icon) => `src-tauri/${icon}`),
+  ];
+  assert.equal(git("ls-files", "--error-unmatch", ...sourceAssets).status, 0);
+  assert.equal(git("check-ignore", "-q", "src-tauri/target/test-output").status, 0);
+  assert.equal(git("check-ignore", "-q", "src-tauri/gen/test-output").status, 0);
+  for (const sourceAsset of sourceAssets) {
+    assert.equal(git("check-ignore", "--no-index", "-q", sourceAsset).status, 1, sourceAsset);
+  }
 });
 
 test("remote content receives no broad Tauri permissions", () => {
