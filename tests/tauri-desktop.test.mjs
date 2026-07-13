@@ -128,3 +128,13 @@ test("launcher bounds connection attempts and restores recovery actions", () => 
   assert.match(launcher, /finally\s*\{[^]*clearTimeout\(/);
   assert.match(launcher, /catch\s*\{[^]*actions\.hidden\s*=\s*false/);
 });
+
+test("README documents the required desktop redirect and commands", () => {
+  const readme = read("README.md");
+
+  assert.match(readme, /scisiam:\/\/auth\/callback/);
+  assert.match(readme, /npm run desktop:dev/);
+  assert.match(readme, /npm run desktop:build/);
+  assert.match(readme, /Additional Redirect URLs/);
+  assert.match(readme, /Google OAuth/);
+});

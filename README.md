@@ -151,6 +151,44 @@ Email confirmation and recovery use `/auth/verify` → `POST /auth/confirm` → 
 
 ---
 
+## Windows Desktop (Tauri) / เดสก์ท็อป Windows (Tauri)
+
+### Prerequisites / สิ่งที่ต้องมี
+
+- Windows 10/11 x64 and Microsoft Edge WebView2 Runtime
+- Rust stable MSVC `1.77.2+`
+- Visual Studio Build Tools with the **Desktop development with C++** workload
+
+On the verified Windows development machine, `rustc` and `cargo` resolve from `C:\Users\HP\.cargo\bin`, which is on `PATH`. If a new terminal cannot find Rust after installing Rustup, reopen the terminal so the PATH update takes effect.
+
+### Supabase redirect / ตั้งค่า Supabase
+
+**Operator action required / ผู้ดูแลต้องดำเนินการเอง:** This repository cannot confirm or change Supabase Dashboard settings. In Supabase Dashboard → Authentication → URL Configuration, keep the existing **Site URL** as:
+
+`https://scisiam-app.vercel.app`
+
+Then add this exact value under **Additional Redirect URLs** and save the configuration:
+
+`scisiam://auth/callback`
+
+No wildcard custom scheme is required. Google OAuth opens in the system browser and returns to the installed app through the registered `scisiam://` protocol.
+
+### Desktop commands / คำสั่งเดสก์ท็อป
+
+```bash
+npm run desktop:dev    # Starts Next.js and the Tauri development window
+npm run desktop:check  # Checks the Rust desktop crate
+npm run desktop:build  # Creates the NSIS Windows installer
+```
+
+The build output is the NSIS installer at `src-tauri/target/release/bundle/nsis/Scisiam_<version>_x64-setup.exe`; the current build is `Scisiam_0.1.0_x64-setup.exe` in that directory.
+
+### Release security / ความปลอดภัยก่อนเผยแพร่
+
+Never place `GEMINI_API_KEY`, Supabase service-role credentials, database passwords, or signing credentials in Tauri source or configuration. The desktop wrapper uses the hosted SciSiam backend for server-side secrets and API access.
+
+---
+
 ## AI ไออุ่น Security
 
 The AI tutor is served through `src/app/api/ai-tutor/route.ts`.
