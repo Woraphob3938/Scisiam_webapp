@@ -106,12 +106,14 @@ test("remote content receives no broad Tauri permissions", () => {
 
 test("desktop runtime keeps OAuth and deep links in Rust", () => {
   const runtime = read("src-tauri/src/lib.rs");
+  const navigation = read("src-tauri/src/navigation.rs");
   const launcher = read("src-tauri/launcher/launcher.js");
 
   assert.match(runtime, /tauri_plugin_single_instance::init/);
   assert.match(runtime, /tauri_plugin_deep_link::init/);
   assert.match(runtime, /on_open_url/);
-  assert.match(runtime, /parse_oauth_callback/);
+  assert.match(navigation, /parse_oauth_callback/);
+  assert.match(runtime, /CallbackCoordinator/);
   assert.match(runtime, /classify_navigation/);
   assert.match(runtime, /__SCISIAM_DESKTOP__/);
   assert.ok(
@@ -135,7 +137,7 @@ test("desktop runtime denies secondary WebViews and handles native failures safe
     runtime,
     /\.on_navigation[\s\S]*open_external_url\([\s\S]*\.on_new_window[\s\S]*open_external_url\(/,
   );
-  assert.match(runtime, /NavigationDecision::AllowInApp\s*=>\s*navigate_main/);
+  assert.match(runtime, /NavigationDecision::AllowInApp\s*=>\s*navigate_new_window_in_main/);
   assert.match(navigation, /desktop-oauth-error=browser-open-failed/);
   assert.match(runtime, /failed to forward desktop OAuth callback/);
 });

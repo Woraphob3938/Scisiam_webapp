@@ -48,8 +48,10 @@ test("release desktop OAuth keeps PKCE on the remote SciSiam origin", () => {
   assert.match(launcher, /window\.location\.replace\(APP_ORIGIN\)/);
   assert.match(runtime, /const PRODUCTION_ORIGIN: &str = "https:\/\/scisiam-app\.vercel\.app"/);
   assert.match(runtime, /WebviewUrl::App\("index\.html"\.into\(\)\)/);
-  assert.match(runtime, /let callback = build_web_callback\(&app_origin\(\), &code\)/);
-  assert.match(runtime, /window\.navigate\(callback\)/);
+  assert.match(
+    runtime,
+    /fn forward_callback_code[\s\S]*build_web_callback\(&app_origin\(\), code\)[\s\S]*navigate_main\(app, &callback/,
+  );
   assert.match(navigation, /app_origin\s*\.join\("\/auth\/oauth-callback"\)/);
   assert.match(authForm, /getGoogleOAuthOptions\(window\.location\.origin, desktop\)/);
   assert.match(authForm, /window\.location\.assign\(data\.url\)/);
