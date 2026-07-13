@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
+    "lint": "eslint --ignore-pattern \"src-tauri/target/**\" --ignore-pattern \"src-tauri/gen/**\"",
     "test": "node --test tests/*.test.mjs",
     "desktop:dev": "tauri dev",
     "desktop:check": "cargo check --manifest-path src-tauri/Cargo.toml",

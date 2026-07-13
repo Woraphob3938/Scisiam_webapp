@@ -86,6 +86,13 @@ test("desktop branding uses valid committed assets and ignores only build output
   }
 });
 
+test("desktop lint excludes generated Tauri build output", () => {
+  const packageJson = JSON.parse(read("package.json"));
+
+  assert.match(packageJson.scripts.lint, /--ignore-pattern ["']src-tauri\/target\/\*\*["']/);
+  assert.match(packageJson.scripts.lint, /--ignore-pattern ["']src-tauri\/gen\/\*\*["']/);
+});
+
 test("remote content receives no broad Tauri permissions", () => {
   const capability = JSON.parse(read("src-tauri/capabilities/default.json"));
   assert.deepEqual(capability.windows, ["main"]);
