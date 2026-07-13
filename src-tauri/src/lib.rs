@@ -3,7 +3,7 @@ mod navigation;
 use navigation::{
     build_web_callback, classify_navigation, parse_oauth_callback, NavigationDecision,
 };
-use tauri::{AppHandle, Manager, WebviewUrl, WebviewWindowBuilder};
+use tauri::{webview::NewWindowResponse, AppHandle, Manager, WebviewUrl, WebviewWindowBuilder};
 use tauri_plugin_deep_link::DeepLinkExt;
 use tauri_plugin_opener::OpenerExt;
 use url::Url;
@@ -47,6 +47,12 @@ fn focus_main(app: &AppHandle) {
     }
 }
 
+fn open_external_url(app: &AppHandle, url: &Url) {
+    if app.opener().open_url(url.as_str(), None::<&str>).is_err() {
+        eprintln!("failed to open external URL in system browser");
+    }
+}
+
 fn forward_deep_link(app: &AppHandle, url: &Url) {
     let Ok(code) = parse_oauth_callback(url) else {
         focus_main(app);
@@ -54,7 +60,11 @@ fn forward_deep_link(app: &AppHandle, url: &Url) {
     };
     let callback = build_web_callback(&app_origin(), &code);
     if let Some(window) = app.get_webview_window("main") {
-        let _ = window.navigate(callback);
+        if window.navigate(callback).is_err() {
+            eprintln!("failed to forward desktop OAuth callback");
+        }
+    } else {
+        eprintln!("failed to forward desktop OAuth callback");
     }
     focus_main(app);
 }
@@ -66,8 +76,11 @@ fn create_main_window(app: &tauri::App) -> tauri::Result<()> {
         WebviewUrl::App("index.html".into())
     };
     let navigation_app = app.handle().clone();
-    let allowed_app_origin = app_origin();
-    let allowed_supabase_origin = supabase_origin();
+    let navigation_app_origin = app_origin();
+    let navigation_supabase_origin = supabase_origin();
+    let new_window_app = app.handle().clone();
+    let new_window_app_origin = app_origin();
+    let new_window_supabase_origin = supabase_origin();
 
     WebviewWindowBuilder::new(app, "main", start_url)
         .title("Scisiam")
@@ -81,16 +94,25 @@ fn create_main_window(app: &tauri::App) -> tauri::Result<()> {
             if is_local_launcher_url(url) {
                 return true;
             }
-            match classify_navigation(url, &allowed_app_origin, &allowed_supabase_origin) {
+            match classify_navigation(url, &navigation_app_origin, &navigation_supabase_origin) {
                 NavigationDecision::AllowInApp => true,
                 NavigationDecision::OpenExternal => {
-                    let _ = navigation_app
-                        .opener()
-                        .open_url(url.as_str(), None::<&str>);
+                    open_external_url(&navigation_app, url);
                     false
                 }
                 NavigationDecision::Block => false,
             }
+        })
+        .on_new_window(move |url, _features| {
+            if classify_navigation(
+                &url,
+                &new_window_app_origin,
+                &new_window_supabase_origin,
+            ) == NavigationDecision::OpenExternal
+            {
+                open_external_url(&new_window_app, &url);
+            }
+            NewWindowResponse::Deny
         })
         .build()?;
     Ok(())
