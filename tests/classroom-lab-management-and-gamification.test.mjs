@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import test from "node:test";
 
 const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
@@ -25,6 +25,20 @@ test("classroom owners can add an unused lab through a guarded RPC", () => {
   assert.match(workspace, /type="search"/);
   assert.match(workspace, /setLabSearch/);
   assert.match(workspace, /setSelectedLabId\(matchingLab\?\.id \?\? ""\)/);
+});
+
+test("classroom lab search shares normalized matching with the lab catalog", () => {
+  const helperPath = new URL("../src/lib/lab-search.ts", import.meta.url);
+  const helper = existsSync(helperPath) ? readFileSync(helperPath, "utf8") : "";
+  const workspace = read("src/app/classrooms/[id]/page.tsx");
+  const catalog = read("src/app/labs/page.tsx");
+
+  assert.match(helper, /normalize\("NFKC"\)/);
+  assert.match(helper, /thaiTitle/);
+  assert.match(helper, /gradeLevel/);
+  assert.match(helper, /CATEGORY_SEARCH_LABELS/);
+  assert.match(workspace, /matchesLabSearch/);
+  assert.match(catalog, /matchesLabSearch/);
 });
 
 test("classroom submission action has an immediate loading state", () => {

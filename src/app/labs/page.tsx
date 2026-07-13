@@ -11,6 +11,7 @@ import Sidebar from "@/components/Sidebar";
 import { useSidebar } from "@/context/SidebarContext";
 import { labsData } from "@/data/labs";
 import { isLabReady } from "@/data/labReadiness";
+import { matchesLabSearch } from "@/lib/lab-search";
 
 const INITIAL_VISIBLE_LABS = 12;
 const LABS_RETURN_STATE_KEY = "scisiam_labs_return_state";
@@ -23,15 +24,6 @@ const GRADE_FILTERS: Array<{ id: GradeFilter; label: string }> = [
   { id: "มัธยมปลาย", label: "มัธยมปลาย" },
   { id: "อุดมศึกษา", label: "อุดมศึกษา" },
 ];
-const CATEGORY_LABELS: Record<Category, string> = {
-  All: "ทั้งหมด",
-  Foundation: "ความรู้พื้นฐาน",
-  Physics: "ฟิสิกส์",
-  Chemistry: "เคมี",
-  Biology: "ชีววิทยา",
-  Mathematics: "คณิตศาสตร์",
-};
-
 type LabsReturnState = {
   scrollY: number;
   selectedCategory: Category;
@@ -104,25 +96,12 @@ function LabsContent() {
   );
 
   const filteredLabs = useMemo(() => {
-    const query = searchQuery.trim().toLocaleLowerCase("th");
-    const searchLabs = query ? labsData : categoryLabs;
+    const searchLabs = searchQuery.trim() ? labsData : categoryLabs;
 
     return searchLabs.filter((lab) => {
       const matchesGrade =
         selectedGradeLevel === "All" || lab.gradeLevel === selectedGradeLevel;
-      const searchableText = [
-        lab.thaiTitle,
-        lab.title,
-        lab.description,
-        lab.category,
-        lab.gradeLevel,
-        lab.id,
-        CATEGORY_LABELS[lab.category],
-      ]
-        .join(" ")
-        .toLocaleLowerCase("th");
-      const matchesSearch =
-        !query || searchableText.includes(query);
+      const matchesSearch = matchesLabSearch(lab, searchQuery);
 
       return matchesGrade && matchesSearch;
     });

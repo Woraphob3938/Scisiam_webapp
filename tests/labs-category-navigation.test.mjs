@@ -27,10 +27,12 @@ test("labs page can still open a requested category directly", () => {
 
 test("typing a Thai lab keyword searches every category and grade", () => {
   const labsPage = readProjectFile("src/app/labs/page.tsx");
+  const labSearch = readProjectFile("src/lib/lab-search.ts");
 
-  assert.match(labsPage, /const searchLabs = query \? labsData : categoryLabs/);
-  assert.match(labsPage, /lab\.thaiTitle/);
-  assert.match(labsPage, /lab\.id/);
+  assert.match(labsPage, /const searchLabs = searchQuery\.trim\(\) \? labsData : categoryLabs/);
+  assert.match(labsPage, /matchesLabSearch\(lab, searchQuery\)/);
+  assert.match(labSearch, /lab\.thaiTitle/);
+  assert.match(labSearch, /lab\.id/);
   assert.match(
     labsPage,
     /if \(query\.trim\(\)\) \{\s*setSelectedCategory\("All"\);\s*setSelectedGradeLevel\("All"\);/s,

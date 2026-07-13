@@ -50,6 +50,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSidebar } from "@/context/SidebarContext";
 import { labsById, labsData } from "@/data/labs";
 import { getClassroomPresentation } from "@/lib/classroom-presentation";
+import { matchesLabSearch, normalizeLabSearchText } from "@/lib/lab-search";
 import {
   addClassroomLab,
   createClassroomAssignment,
@@ -736,13 +737,7 @@ function LabsPanel({
   const [selectedLabId, setSelectedLabId] = useState("");
   const [labSearch, setLabSearch] = useState("");
   const availableLabs = labsData.filter((lab) => !labs.some((roomLab) => roomLab.id === lab.id));
-  const filteredAvailableLabs = availableLabs.filter((lab) => {
-    const query = labSearch.trim().toLocaleLowerCase("th");
-    return !query || [lab.thaiTitle, lab.title, lab.description, lab.category]
-      .join(" ")
-      .toLocaleLowerCase("th")
-      .includes(query);
-  });
+  const filteredAvailableLabs = availableLabs.filter((lab) => matchesLabSearch(lab, labSearch));
 
   return (
     <section aria-labelledby="labs-heading">
@@ -763,13 +758,12 @@ function LabsPanel({
                 onChange={(event) => {
                   const nextSearch = event.target.value;
                   setLabSearch(nextSearch);
-                  const query = nextSearch.trim().toLocaleLowerCase("th");
-                  const matchingLab = query
-                    ? availableLabs.find((lab) => [lab.thaiTitle, lab.title, lab.description, lab.category]
-                      .join(" ")
-                      .toLocaleLowerCase("th")
-                      .includes(query))
-                    : null;
+                  const query = normalizeLabSearchText(nextSearch);
+                  const matchingLabs = query
+                    ? availableLabs.filter((lab) => matchesLabSearch(lab, nextSearch))
+                    : [];
+                  const matchingLab = matchingLabs.find((lab) => [lab.thaiTitle, lab.title, lab.id]
+                    .some((value) => normalizeLabSearchText(value) === query)) ?? matchingLabs[0];
                   setSelectedLabId(matchingLab?.id ?? "");
                 }}
                 placeholder="ค้นหาแล็บที่จะเพิ่ม"
@@ -784,12 +778,15 @@ function LabsPanel({
                 className="min-h-10 max-w-56 rounded-lg border border-slate-300 bg-white px-3 text-sm font-bold text-slate-700 outline-none focus:border-blue-500 focus:ring-3 focus:ring-blue-100 disabled:cursor-not-allowed disabled:bg-slate-100"
               >
                 <option value="">เลือกแล็บเพิ่ม</option>
-                {filteredAvailableLabs.map((lab) => <option key={lab.id} value={lab.id}>{lab.thaiTitle}</option>)}
+                {filteredAvailableLabs.map((lab) => <option key={lab.id} value={lab.id}>{lab.thaiTitle} · {lab.title}</option>)}
               </select>
               <button
                 type="button"
                 onClick={async () => {
-                  if (selectedLabId && await onAddLab(selectedLabId)) setSelectedLabId("");
+                  if (selectedLabId && await onAddLab(selectedLabId)) {
+                    setSelectedLabId("");
+                    setLabSearch("");
+                  }
                 }}
                 disabled={!selectedLabId || isAddingLab || labs.length >= 24}
                 className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-blue-600 px-3 text-sm font-extrabold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-300 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
