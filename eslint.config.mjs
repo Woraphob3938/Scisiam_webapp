@@ -15,6 +15,10 @@ const eslintConfig = defineConfig([
     "main.js",
     "next-env.d.ts",
 
+    // Tauri build tooling generates non-source artifacts here.
+    "src-tauri/target/**",
+    "src-tauri/gen/**",
+
     // Local agent/tooling workspaces and generated QA artifacts are not app source.
     ".claude/**",
     ".agents/**",

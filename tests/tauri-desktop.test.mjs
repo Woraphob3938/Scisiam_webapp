@@ -3,6 +3,7 @@ import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync, statSync } from "node:fs";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
+import { ESLint } from "eslint";
 
 const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
 const rootDirectory = fileURLToPath(new URL("../", import.meta.url));
@@ -86,11 +87,12 @@ test("desktop branding uses valid committed assets and ignores only build output
   }
 });
 
-test("desktop lint excludes generated Tauri build output", () => {
-  const packageJson = JSON.parse(read("package.json"));
+test("desktop lint ignores only generated Tauri build output", async () => {
+  const eslint = new ESLint({ cwd: rootDirectory });
 
-  assert.match(packageJson.scripts.lint, /--ignore-pattern ["']src-tauri\/target\/\*\*["']/);
-  assert.match(packageJson.scripts.lint, /--ignore-pattern ["']src-tauri\/gen\/\*\*["']/);
+  assert.equal(await eslint.isPathIgnored("src-tauri/target/test-output.rs"), true);
+  assert.equal(await eslint.isPathIgnored("src-tauri/gen/test-output.js"), true);
+  assert.equal(await eslint.isPathIgnored("src/app/page.tsx"), false);
 });
 
 test("remote content receives no broad Tauri permissions", () => {
