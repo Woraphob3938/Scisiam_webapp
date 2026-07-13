@@ -17,14 +17,14 @@ test("Google OAuth returns authenticated users to the student profile", () => {
   );
 
   const authForm = readProjectFile("src/components/auth/AuthForm.tsx");
+  const desktopRuntime = readProjectFile("src/lib/desktop-runtime.ts");
   const callbackRoute = readProjectFile(callbackPath);
 
   assert.match(authForm, /signInWithOAuth\(\{/);
   assert.match(authForm, /provider:\s*["']google["']/);
-  assert.match(
-    authForm,
-    /redirectTo:\s*`\$\{window\.location\.origin\}\/auth\/oauth-callback\?next=\/profile`/,
-  );
+  assert.match(authForm, /getGoogleOAuthOptions\(window\.location\.origin, desktop\)/);
+  assert.match(desktopRuntime, /auth\/oauth-callback\?next=\/profile/);
+  assert.match(desktopRuntime, /scisiam:\/\/auth\/callback/);
   assert.match(authForm, /เข้าสู่ระบบด้วย Google/);
   assert.match(authForm, /สมัครด้วย Google/);
 
@@ -38,10 +38,10 @@ test("Google OAuth returns authenticated users to the student profile", () => {
 });
 
 test("Google OAuth always asks the user to select an account", () => {
-  const authForm = readProjectFile("src/components/auth/AuthForm.tsx");
+  const desktopRuntime = readProjectFile("src/lib/desktop-runtime.ts");
 
   assert.match(
-    authForm,
+    desktopRuntime,
     /queryParams:\s*\{\s*prompt:\s*["']select_account["']\s*\}/,
   );
 });

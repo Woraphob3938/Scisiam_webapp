@@ -18,6 +18,7 @@ import {
   cacheScisiamAuth,
   getRememberedLogin,
 } from "@/lib/supabase/auth-cache";
+import { getGoogleOAuthOptions, isScisiamDesktop } from "@/lib/desktop-runtime";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 
 interface AuthFormProps {
@@ -354,16 +355,24 @@ export default function AuthForm({
 
     try {
       const supabase = createClient();
-      const { error: oauthError } = await supabase.auth.signInWithOAuth({
+      const desktop = isScisiamDesktop();
+      const { data, error: oauthError } = await supabase.auth.signInWithOAuth({
         provider: "google",
-        options: {
-          redirectTo: `${window.location.origin}/auth/oauth-callback?next=/profile`,
-          queryParams: { prompt: "select_account" },
-        },
+        options: getGoogleOAuthOptions(window.location.origin, desktop),
       });
 
       if (oauthError) {
         setError("เชื่อมต่อบัญชี Google ไม่สำเร็จ กรุณาลองใหม่อีกครั้ง");
+        setOauthLoading(false);
+        return;
+      }
+
+      if (desktop) {
+        if (!data.url) {
+          setError("ไม่พบลิงก์เข้าสู่ระบบ Google กรุณาลองใหม่อีกครั้ง");
+        } else {
+          window.location.assign(data.url);
+        }
         setOauthLoading(false);
       }
     } catch {
