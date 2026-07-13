@@ -38,6 +38,8 @@ test("Tauri Windows scaffold uses a local launcher and a fixed deep-link scheme"
   assert.equal(config.identifier, "com.scisiam.desktop");
   assert.equal(config.build.frontendDist, "launcher");
   assert.deepEqual(config.bundle.targets, ["nsis"]);
+  assert.equal(config.bundle.publisher, "SciSiam");
+  assert.equal(config.bundle.shortDescription, "SciSiam Virtual Lab for Windows");
   assert.deepEqual(config.plugins["deep-link"].desktop.schemes, ["scisiam"]);
   assert.deepEqual(config.app.windows, []);
 });
@@ -112,19 +114,29 @@ test("desktop runtime keeps OAuth and deep links in Rust", () => {
   assert.match(runtime, /parse_oauth_callback/);
   assert.match(runtime, /classify_navigation/);
   assert.match(runtime, /__SCISIAM_DESKTOP__/);
+  assert.ok(
+    runtime.indexOf(".on_open_url") < runtime.indexOf(".get_current"),
+    "the open-url listener must be registered before startup URLs are drained",
+  );
   assert.match(launcher, /mode:\s*"no-cors"/);
   assert.match(launcher, /desktop-browser=1/);
 });
 
 test("desktop runtime denies secondary WebViews and handles native failures safely", () => {
   const runtime = read("src-tauri/src/lib.rs");
+  const navigation = read("src-tauri/src/navigation.rs");
 
   assert.match(runtime, /\.on_new_window/);
   assert.match(runtime, /NewWindowResponse::Deny/);
   assert.match(runtime, /classify_navigation/);
   assert.match(runtime, /open_external_url/);
   assert.doesNotMatch(runtime, /NewWindowResponse::(?:Allow|Create)/);
-  assert.match(runtime, /failed to open external URL in system browser/);
+  assert.match(
+    runtime,
+    /\.on_navigation[\s\S]*open_external_url\([\s\S]*\.on_new_window[\s\S]*open_external_url\(/,
+  );
+  assert.match(runtime, /NavigationDecision::AllowInApp\s*=>\s*navigate_main/);
+  assert.match(navigation, /desktop-oauth-error=browser-open-failed/);
   assert.match(runtime, /failed to forward desktop OAuth callback/);
 });
 
@@ -147,4 +159,13 @@ test("README documents the required desktop redirect and commands", () => {
   assert.match(readme, /npm run desktop:build/);
   assert.match(readme, /Additional Redirect URLs/);
   assert.match(readme, /Google OAuth/);
+  assert.match(readme, /SCISIAM_SUPABASE_ORIGIN/);
+  assert.match(readme, /NEXT_PUBLIC_SUPABASE_URL/);
+  assert.match(readme, /must be exactly equal/i);
+  assert.match(readme, /unsigned development installer/i);
+  assert.match(readme, /Authenticode/i);
+  assert.match(readme, /RFC 3161/i);
+  assert.match(readme, /signtool sign \/fd SHA256 \/tr https:\/\//i);
+  assert.match(readme, /Get-FileHash[^\n]+-Algorithm SHA256/i);
+  assert.match(readme, /publish[^\n]+SHA-256/i);
 });

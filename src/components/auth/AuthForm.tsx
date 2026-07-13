@@ -18,7 +18,11 @@ import {
   cacheScisiamAuth,
   getRememberedLogin,
 } from "@/lib/supabase/auth-cache";
-import { getGoogleOAuthOptions, isScisiamDesktop } from "@/lib/desktop-runtime";
+import {
+  getDesktopOAuthError,
+  getGoogleOAuthOptions,
+  isScisiamDesktop,
+} from "@/lib/desktop-runtime";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 
 interface AuthFormProps {
@@ -88,6 +92,18 @@ export default function AuthForm({
     window.addEventListener("pageshow", resetOAuthLoading);
 
     return () => window.removeEventListener("pageshow", resetOAuthLoading);
+  }, []);
+
+  useEffect(() => {
+    const desktopOAuthError = getDesktopOAuthError(window.location.search);
+    if (!desktopOAuthError) return;
+
+    const timer = window.setTimeout(() => {
+      setError(desktopOAuthError);
+      setOauthLoading(false);
+    }, 0);
+
+    return () => window.clearTimeout(timer);
   }, []);
 
   useEffect(() => {

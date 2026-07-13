@@ -1,8 +1,10 @@
 mod navigation;
 
 use navigation::{
-    build_web_callback, classify_navigation, parse_oauth_callback, NavigationDecision,
+    build_web_callback, classify_navigation, oauth_browser_error_target,
+    parse_matching_supabase_origin, CallbackCoordinator, NavigationDecision,
 };
+use std::sync::{Arc, Mutex};
 use tauri::{webview::NewWindowResponse, AppHandle, Manager, WebviewUrl, WebviewWindowBuilder};
 use tauri_plugin_deep_link::DeepLinkExt;
 use tauri_plugin_opener::OpenerExt;
@@ -23,7 +25,8 @@ fn app_origin() -> Url {
 
 fn supabase_origin() -> Url {
     let value = option_env!("SCISIAM_SUPABASE_ORIGIN").unwrap_or(DEFAULT_SUPABASE_ORIGIN);
-    Url::parse(value).expect("valid Supabase origin")
+    parse_matching_supabase_origin(value, option_env!("NEXT_PUBLIC_SUPABASE_URL"))
+        .expect("valid matching Supabase origin configuration")
 }
 
 fn is_local_launcher_url(url: &Url) -> bool {
@@ -47,25 +50,70 @@ fn focus_main(app: &AppHandle) {
     }
 }
 
-fn open_external_url(app: &AppHandle, url: &Url) {
-    if app.opener().open_url(url.as_str(), None::<&str>).is_err() {
+fn navigate_main(app: &AppHandle, url: &Url, failure_message: &str) {
+    if let Some(window) = app.get_webview_window("main") {
+        if window.navigate(url.clone()).is_err() {
+            eprintln!("{failure_message}");
+        }
+    } else {
+        eprintln!("{failure_message}");
+    }
+}
+
+fn open_external_url(app: &AppHandle, url: &Url, configured_supabase_origin: &Url) {
+    if app.opener().open_url(url.as_str(), None::<&str>).is_ok() {
+        return;
+    }
+
+    if let Some(error_url) =
+        oauth_browser_error_target(url, &app_origin(), configured_supabase_origin)
+    {
+        navigate_main(
+            app,
+            &error_url,
+            "failed to show desktop OAuth browser error",
+        );
+    } else {
         eprintln!("failed to open external URL in system browser");
     }
 }
 
-fn forward_deep_link(app: &AppHandle, url: &Url) {
-    let Ok(code) = parse_oauth_callback(url) else {
-        focus_main(app);
-        return;
-    };
-    let callback = build_web_callback(&app_origin(), &code);
-    if let Some(window) = app.get_webview_window("main") {
-        if window.navigate(callback).is_err() {
-            eprintln!("failed to forward desktop OAuth callback");
-        }
+fn lock_callbacks(
+    callbacks: &Mutex<CallbackCoordinator>,
+) -> std::sync::MutexGuard<'_, CallbackCoordinator> {
+    callbacks
+        .lock()
+        .unwrap_or_else(|poisoned| poisoned.into_inner())
+}
+
+fn forward_callback_code(app: &AppHandle, code: &str) {
+    let callback = build_web_callback(&app_origin(), code);
+    navigate_main(app, &callback, "failed to forward desktop OAuth callback");
+    focus_main(app);
+}
+
+fn receive_deep_link(app: &AppHandle, callbacks: &Mutex<CallbackCoordinator>, url: &Url) {
+    let received = lock_callbacks(callbacks).receive(url);
+    if let Ok(Some(code)) = received {
+        forward_callback_code(app, &code);
     } else {
-        eprintln!("failed to forward desktop OAuth callback");
+        focus_main(app);
     }
+}
+
+fn mark_main_ready(app: &AppHandle, callbacks: &Mutex<CallbackCoordinator>) {
+    let pending = lock_callbacks(callbacks).mark_ready();
+    if let Some(code) = pending {
+        forward_callback_code(app, &code);
+    }
+}
+
+fn navigate_new_window_in_main(app: &AppHandle, url: &Url) {
+    navigate_main(
+        app,
+        url,
+        "failed to navigate same-origin link in main window",
+    );
     focus_main(app);
 }
 
@@ -97,20 +145,23 @@ fn create_main_window(app: &tauri::App) -> tauri::Result<()> {
             match classify_navigation(url, &navigation_app_origin, &navigation_supabase_origin) {
                 NavigationDecision::AllowInApp => true,
                 NavigationDecision::OpenExternal => {
-                    open_external_url(&navigation_app, url);
+                    open_external_url(&navigation_app, url, &navigation_supabase_origin);
                     false
                 }
                 NavigationDecision::Block => false,
             }
         })
         .on_new_window(move |url, _features| {
-            if classify_navigation(
+            match classify_navigation(
                 &url,
                 &new_window_app_origin,
                 &new_window_supabase_origin,
-            ) == NavigationDecision::OpenExternal
-            {
-                open_external_url(&new_window_app, &url);
+            ) {
+                NavigationDecision::AllowInApp => navigate_new_window_in_main(&new_window_app, &url),
+                NavigationDecision::OpenExternal => {
+                    open_external_url(&new_window_app, &url, &new_window_supabase_origin);
+                }
+                NavigationDecision::Block => {}
             }
             NewWindowResponse::Deny
         })
@@ -133,23 +184,26 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_deep_link::init())
         .setup(|app| {
-            create_main_window(app)?;
-
             #[cfg(all(debug_assertions, windows))]
             app.deep_link().register_all()?;
 
+            let callbacks = Arc::new(Mutex::new(CallbackCoordinator::default()));
+            let listener_handle = app.handle().clone();
+            let listener_callbacks = Arc::clone(&callbacks);
+            app.deep_link().on_open_url(move |event| {
+                for url in event.urls() {
+                    receive_deep_link(&listener_handle, &listener_callbacks, &url);
+                }
+            });
+
             if let Some(urls) = app.deep_link().get_current()? {
                 for url in urls {
-                    forward_deep_link(app.handle(), &url);
+                    receive_deep_link(app.handle(), &callbacks, &url);
                 }
             }
 
-            let handle = app.handle().clone();
-            app.deep_link().on_open_url(move |event| {
-                for url in event.urls() {
-                    forward_deep_link(&handle, &url);
-                }
-            });
+            create_main_window(app)?;
+            mark_main_ready(app.handle(), &callbacks);
             Ok(())
         })
         .run(tauri::generate_context!())

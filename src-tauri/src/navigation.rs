@@ -1,3 +1,5 @@
+use std::collections::{hash_map::DefaultHasher, HashSet};
+use std::hash::{Hash, Hasher};
 use url::Url;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -11,6 +13,10 @@ fn same_origin(left: &Url, right: &Url) -> bool {
     left.scheme() == right.scheme()
         && left.host_str() == right.host_str()
         && left.port_or_known_default() == right.port_or_known_default()
+}
+
+fn is_supabase_oauth_authorize(url: &Url, supabase_origin: &Url) -> bool {
+    same_origin(url, supabase_origin) && url.path() == "/auth/v1/authorize"
 }
 
 pub fn classify_navigation(
@@ -29,7 +35,7 @@ pub fn classify_navigation(
     }
 
     if same_origin(url, supabase_origin) {
-        return if url.path() == "/auth/v1/authorize" {
+        return if is_supabase_oauth_authorize(url, supabase_origin) {
             NavigationDecision::OpenExternal
         } else {
             NavigationDecision::Block
@@ -57,15 +63,51 @@ pub fn parse_oauth_callback(url: &Url) -> Result<String, &'static str> {
         return Err("callback fragments are forbidden");
     }
 
-    let codes: Vec<String> = url
-        .query_pairs()
-        .filter(|(key, _)| key == "code")
-        .map(|(_, value)| value.into_owned())
-        .collect();
-    if codes.len() != 1 || codes[0].is_empty() || codes[0].len() > 2048 {
+    let mut pairs = url.query_pairs();
+    let Some((key, code)) = pairs.next() else {
+        return Err("callback must contain one bounded code");
+    };
+    if key != "code" || pairs.next().is_some() || code.is_empty() || code.len() > 2048 {
         return Err("callback must contain one bounded code");
     }
-    Ok(codes[0].clone())
+    Ok(code.into_owned())
+}
+
+pub fn parse_supabase_origin(value: &str) -> Result<Url, &'static str> {
+    let url = Url::parse(value).map_err(|_| "Supabase origin must be a valid URL")?;
+    if url.scheme() != "https"
+        || url.host_str().is_none()
+        || !url.username().is_empty()
+        || url.password().is_some()
+        || url.path() != "/"
+        || url.query().is_some()
+        || url.fragment().is_some()
+    {
+        return Err("Supabase origin must be a credential-free HTTPS root origin");
+    }
+    Ok(url)
+}
+
+pub fn parse_matching_supabase_origin(
+    desktop_value: &str,
+    web_value: Option<&str>,
+) -> Result<Url, &'static str> {
+    if web_value.is_some_and(|value| value != desktop_value) {
+        return Err("SCISIAM_SUPABASE_ORIGIN must exactly match NEXT_PUBLIC_SUPABASE_URL");
+    }
+    parse_supabase_origin(desktop_value)
+}
+
+pub fn oauth_browser_error_target(
+    requested_url: &Url,
+    app_origin: &Url,
+    supabase_origin: &Url,
+) -> Option<Url> {
+    is_supabase_oauth_authorize(requested_url, supabase_origin).then(|| {
+        app_origin
+            .join("/login?desktop-oauth-error=browser-open-failed")
+            .expect("valid app origin")
+    })
 }
 
 pub fn build_web_callback(app_origin: &Url, code: &str) -> Url {
@@ -77,6 +119,51 @@ pub fn build_web_callback(app_origin: &Url, code: &str) -> Url {
         .append_pair("code", code)
         .append_pair("next", "/profile");
     callback
+}
+
+#[derive(Debug, Default)]
+pub struct CallbackCoordinator {
+    ready: bool,
+    pending: Option<(u64, String)>,
+    delivered: HashSet<u64>,
+}
+
+impl CallbackCoordinator {
+    pub fn receive(&mut self, url: &Url) -> Result<Option<String>, &'static str> {
+        let code = parse_oauth_callback(url)?;
+        let id = callback_id(&code);
+        if self.delivered.contains(&id)
+            || self
+                .pending
+                .as_ref()
+                .is_some_and(|(pending_id, _)| *pending_id == id)
+        {
+            return Ok(None);
+        }
+
+        if self.ready {
+            self.delivered.insert(id);
+            return Ok(Some(code));
+        }
+
+        if self.pending.is_none() {
+            self.pending = Some((id, code));
+        }
+        Ok(None)
+    }
+
+    pub fn mark_ready(&mut self) -> Option<String> {
+        self.ready = true;
+        let (id, code) = self.pending.take()?;
+        self.delivered.insert(id);
+        Some(code)
+    }
+}
+
+fn callback_id(code: &str) -> u64 {
+    let mut hasher = DefaultHasher::new();
+    code.hash(&mut hasher);
+    hasher.finish()
 }
 
 #[cfg(test)]
@@ -160,6 +247,10 @@ mod tests {
             "scisiam://auth/wrong?code=abc",
             "scisiam://auth/callback",
             "scisiam://auth/callback?code=one&code=two",
+            "scisiam://auth/callback?code=abc&state=unexpected",
+            "scisiam://auth/callback?code=abc&error=denied",
+            "scisiam://auth/callback?code=abc&access_token=secret",
+            "scisiam://auth/callback?code=abc&refresh_token=secret",
             "scisiam://auth/callback?code=abc#access_token=secret",
         ] {
             assert!(
@@ -184,5 +275,100 @@ mod tests {
                 "{value}"
             );
         }
+    }
+
+    #[test]
+    fn validates_a_credential_free_https_supabase_root_origin() {
+        assert_eq!(
+            parse_supabase_origin("https://ekcsbxirzsbdlemtfanf.supabase.co")
+                .unwrap()
+                .as_str(),
+            "https://ekcsbxirzsbdlemtfanf.supabase.co/",
+        );
+
+        for value in [
+            "http://ekcsbxirzsbdlemtfanf.supabase.co",
+            "https://user@ekcsbxirzsbdlemtfanf.supabase.co",
+            "https://user:password@ekcsbxirzsbdlemtfanf.supabase.co",
+            "https://ekcsbxirzsbdlemtfanf.supabase.co/auth/v1",
+            "https://ekcsbxirzsbdlemtfanf.supabase.co?project=other",
+            "https://ekcsbxirzsbdlemtfanf.supabase.co#fragment",
+        ] {
+            assert!(parse_supabase_origin(value).is_err(), "{value}");
+        }
+
+        assert!(parse_matching_supabase_origin(
+            "https://ekcsbxirzsbdlemtfanf.supabase.co",
+            Some("https://ekcsbxirzsbdlemtfanf.supabase.co"),
+        )
+        .is_ok());
+        assert!(parse_matching_supabase_origin(
+            "https://ekcsbxirzsbdlemtfanf.supabase.co",
+            Some("https://other-project.supabase.co"),
+        )
+        .is_err());
+    }
+
+    #[test]
+    fn retains_one_pre_ready_callback_and_forwards_each_code_once() {
+        let cold = Url::parse("scisiam://auth/callback?code=cold-code").unwrap();
+        let warm = Url::parse("scisiam://auth/callback?code=warm-code").unwrap();
+        let mut callbacks = CallbackCoordinator::default();
+
+        assert_eq!(callbacks.receive(&cold), Ok(None));
+        assert_eq!(callbacks.receive(&cold), Ok(None));
+        assert_eq!(callbacks.mark_ready(), Some("cold-code".to_owned()));
+        assert_eq!(callbacks.mark_ready(), None);
+        assert_eq!(callbacks.receive(&cold), Ok(None));
+
+        assert_eq!(callbacks.receive(&warm), Ok(Some("warm-code".to_owned())));
+        assert_eq!(callbacks.receive(&warm), Ok(None));
+    }
+
+    #[test]
+    fn listener_delivery_wins_deterministically_before_startup_drain() {
+        let listener = Url::parse("scisiam://auth/callback?code=listener-code").unwrap();
+        let startup = Url::parse("scisiam://auth/callback?code=startup-code").unwrap();
+        let invalid = Url::parse("scisiam://auth/callback?access_token=secret").unwrap();
+        let mut callbacks = CallbackCoordinator::default();
+
+        assert!(callbacks.receive(&invalid).is_err());
+        assert_eq!(callbacks.receive(&listener), Ok(None));
+        assert_eq!(callbacks.receive(&startup), Ok(None));
+        assert_eq!(callbacks.mark_ready(), Some("listener-code".to_owned()));
+        assert_eq!(callbacks.receive(&listener), Ok(None));
+        assert_eq!(
+            callbacks.receive(&startup),
+            Ok(Some("startup-code".to_owned()))
+        );
+    }
+
+    #[test]
+    fn oauth_browser_failure_target_is_fixed_and_contains_no_request_payload() {
+        let app = app_origin();
+        let supabase = supabase_origin();
+        let authorize = Url::parse(
+            "https://ekcsbxirzsbdlemtfanf.supabase.co/auth/v1/authorize?provider=google&code=secret",
+        )
+        .unwrap();
+        let target = oauth_browser_error_target(&authorize, &app, &supabase).unwrap();
+
+        assert_eq!(
+            target.as_str(),
+            "https://scisiam-app.vercel.app/login?desktop-oauth-error=browser-open-failed",
+        );
+        assert!(!target.as_str().contains("secret"));
+        assert!(oauth_browser_error_target(
+            &Url::parse("https://example.com/help").unwrap(),
+            &app,
+            &supabase,
+        )
+        .is_none());
+        assert!(oauth_browser_error_target(
+            &Url::parse("https://ekcsbxirzsbdlemtfanf.supabase.co/storage/v1/object").unwrap(),
+            &app,
+            &supabase,
+        )
+        .is_none());
     }
 }

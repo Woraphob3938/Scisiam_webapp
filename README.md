@@ -173,19 +173,41 @@ Then add this exact value under **Additional Redirect URLs** and save the config
 
 No wildcard custom scheme is required. Google OAuth opens in the system browser and returns to the installed app through the registered `scisiam://` protocol.
 
+The public compile-time desktop value `SCISIAM_SUPABASE_ORIGIN` must be a credential-free HTTPS root origin and **must be exactly equal** to `NEXT_PUBLIC_SUPABASE_URL`, including whether a trailing slash is present. Export both values before a desktop build; never include a path, query, fragment, username, or password:
+
+```powershell
+$env:NEXT_PUBLIC_SUPABASE_URL="https://ekcsbxirzsbdlemtfanf.supabase.co"
+$env:SCISIAM_SUPABASE_ORIGIN=$env:NEXT_PUBLIC_SUPABASE_URL
+```
+
 ### Desktop commands / คำสั่งเดสก์ท็อป
 
 ```bash
 npm run desktop:dev    # Starts Next.js and the Tauri development window
 npm run desktop:check  # Checks the Rust desktop crate
-npm run desktop:build  # Creates the NSIS Windows installer
+npm run desktop:build  # Creates an unsigned development NSIS installer
 ```
 
-The build output is the NSIS installer at `src-tauri/target/release/bundle/nsis/Scisiam_<version>_x64-setup.exe`; the current build is `Scisiam_0.1.0_x64-setup.exe` in that directory.
+The local build output at `src-tauri/target/release/bundle/nsis/Scisiam_<version>_x64-setup.exe` is an **unsigned development installer**. It is not production-signed and must not be published or described as a production installer.
 
 ### Release security / ความปลอดภัยก่อนเผยแพร่
 
 Never place `GEMINI_API_KEY`, Supabase service-role credentials, database passwords, or signing credentials in Tauri source or configuration. The desktop wrapper uses the hosted SciSiam backend for server-side secrets and API access.
+
+Production distribution has a manual release gate: obtain the SciSiam Authenticode certificate from protected release storage, sign with SHA-256 and an RFC 3161 timestamp, and verify the signature. The certificate and its password must remain outside Git and outside the application bundle. From a release shell with the certificate available to SignTool, run:
+
+```powershell
+signtool sign /fd SHA256 /tr https://timestamp.digicert.com /td SHA256 /a "src-tauri/target/release/bundle/nsis/Scisiam_<version>_x64-setup.exe"
+signtool verify /pa /v "src-tauri/target/release/bundle/nsis/Scisiam_<version>_x64-setup.exe"
+```
+
+Only a successful `signtool verify` result satisfies the signing gate. After verification, generate the publication digest from that exact signed file:
+
+```powershell
+Get-FileHash -LiteralPath "src-tauri/target/release/bundle/nsis/Scisiam_<version>_x64-setup.exe" -Algorithm SHA256
+```
+
+Publish the versioned installer filename and its exact SHA-256 value beside the release download. Recompute the hash after every signing or rebuild operation; never reuse the checksum of an unsigned or earlier artifact.
 
 ---
 

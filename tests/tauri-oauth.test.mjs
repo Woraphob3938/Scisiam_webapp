@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
-import { getGoogleOAuthOptions } from "../src/lib/desktop-runtime.ts";
+import {
+  getDesktopOAuthError,
+  getGoogleOAuthOptions,
+} from "../src/lib/desktop-runtime.ts";
 
 const readProjectFile = (path) => readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
 
@@ -19,6 +22,19 @@ test("browser Google OAuth keeps the existing HTTPS callback", () => {
     skipBrowserRedirect: false,
     queryParams: { prompt: "select_account" },
   });
+});
+
+test("desktop browser-open failure exposes only a fixed retryable Thai error", () => {
+  assert.equal(
+    getDesktopOAuthError("?desktop-oauth-error=browser-open-failed"),
+    "เปิดเบราว์เซอร์เพื่อเข้าสู่ระบบ Google ไม่สำเร็จ กรุณาตรวจสอบเบราว์เซอร์เริ่มต้นแล้วลองใหม่อีกครั้ง",
+  );
+  assert.equal(getDesktopOAuthError("?desktop-oauth-error=unknown"), "");
+  assert.equal(getDesktopOAuthError("?code=secret"), "");
+
+  const authForm = readProjectFile("src/components/auth/AuthForm.tsx");
+  assert.match(authForm, /getDesktopOAuthError\(window\.location\.search\)/);
+  assert.match(authForm, /setOauthLoading\(false\)/);
 });
 
 test("release desktop OAuth keeps PKCE on the remote SciSiam origin", () => {
