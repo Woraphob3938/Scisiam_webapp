@@ -13,6 +13,21 @@ const desktopIconPaths = [
   "icons/icon.ico",
 ];
 const git = (...args) => spawnSync("git", args, { cwd: rootDirectory, encoding: "utf8" });
+const assertIgnoredByRepo = (path, expectedPattern) => {
+  const result = spawnSync("git", ["check-ignore", "--stdin", "-z", "-v"], {
+    cwd: rootDirectory,
+    encoding: "utf8",
+    input: `${path}\0`,
+  });
+  assert.equal(result.status, 0, result.stderr);
+  const [source, line, pattern, matchedPath, trailing] = result.stdout.split("\0");
+
+  assert.equal(source, ".gitignore");
+  assert.match(line, /^[1-9]\d*$/);
+  assert.equal(pattern, expectedPattern);
+  assert.equal(matchedPath, path);
+  assert.equal(trailing, "");
+};
 
 test("Tauri Windows scaffold uses a local launcher and a fixed deep-link scheme", () => {
   assert.equal(existsSync(new URL("../src-tauri/Cargo.toml", import.meta.url)), true);
@@ -64,8 +79,8 @@ test("desktop branding uses valid committed assets and ignores only build output
     ...desktopIconPaths.map((icon) => `src-tauri/${icon}`),
   ];
   assert.equal(git("ls-files", "--error-unmatch", ...sourceAssets).status, 0);
-  assert.equal(git("check-ignore", "-q", "src-tauri/target/test-output").status, 0);
-  assert.equal(git("check-ignore", "-q", "src-tauri/gen/test-output").status, 0);
+  assertIgnoredByRepo("src-tauri/target/test-output", "src-tauri/target/");
+  assertIgnoredByRepo("src-tauri/gen/test-output", "src-tauri/gen/");
   for (const sourceAsset of sourceAssets) {
     assert.equal(git("check-ignore", "--no-index", "-q", sourceAsset).status, 1, sourceAsset);
   }
