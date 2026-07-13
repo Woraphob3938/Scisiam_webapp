@@ -90,7 +90,7 @@ test("desktop branding uses valid committed assets and ignores only build output
 test("desktop lint ignores only generated Tauri build output", async () => {
   const eslint = new ESLint({ cwd: rootDirectory });
 
-  assert.equal(await eslint.isPathIgnored("src-tauri/target/test-output.rs"), true);
+  assert.equal(await eslint.isPathIgnored("src-tauri/target/test-output.js"), true);
   assert.equal(await eslint.isPathIgnored("src-tauri/gen/test-output.js"), true);
   assert.equal(await eslint.isPathIgnored("src/app/page.tsx"), false);
 });
