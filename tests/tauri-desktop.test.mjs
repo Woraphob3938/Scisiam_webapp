@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, statSync } from "node:fs";
 import test from "node:test";
 
 const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
@@ -27,6 +27,29 @@ test("desktop binary commits its configured icons and dependency lockfile", () =
       `${icon} must be committed`,
     );
   }
+});
+
+test("desktop branding uses valid committed assets and ignores only build output", () => {
+  const config = JSON.parse(read("src-tauri/tauri.conf.json"));
+  const ignored = read(".gitignore");
+
+  assert.equal(existsSync(new URL("../public/icon.png", import.meta.url)), true);
+  for (const icon of config.bundle.icon) {
+    const asset = new URL(`../src-tauri/${icon}`, import.meta.url);
+    const contents = readFileSync(asset);
+
+    assert.equal(existsSync(asset), true, `${icon} must be committed`);
+    assert.ok(statSync(asset).size > 0, `${icon} must not be empty`);
+    if (icon.endsWith(".png")) {
+      assert.deepEqual([...contents.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10]);
+    } else {
+      assert.deepEqual([...contents.subarray(0, 4)], [0, 0, 1, 0]);
+    }
+  }
+
+  assert.match(ignored, /^src-tauri\/target\/$/m);
+  assert.match(ignored, /^src-tauri\/gen\/$/m);
+  assert.doesNotMatch(ignored, /^src-tauri\/icons\/$/m);
 });
 
 test("remote content receives no broad Tauri permissions", () => {
