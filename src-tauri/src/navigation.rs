@@ -44,7 +44,13 @@ pub fn classify_navigation(
 }
 
 pub fn parse_oauth_callback(url: &Url) -> Result<String, &'static str> {
-    if url.scheme() != "scisiam" || url.host_str() != Some("auth") || url.path() != "/callback" {
+    if url.scheme() != "scisiam"
+        || url.host_str() != Some("auth")
+        || url.port().is_some()
+        || !url.username().is_empty()
+        || url.password().is_some()
+        || url.path() != "/callback"
+    {
         return Err("invalid callback destination");
     }
     if url.fragment().is_some() {
@@ -164,5 +170,19 @@ mod tests {
 
         let oversized = format!("scisiam://auth/callback?code={}", "a".repeat(2049));
         assert!(parse_oauth_callback(&Url::parse(&oversized).unwrap()).is_err());
+    }
+
+    #[test]
+    fn rejects_callback_authority_spoofing() {
+        for value in [
+            "scisiam://auth:123/callback?code=abc",
+            "scisiam://user@auth/callback?code=abc",
+            "scisiam://user:password@auth/callback?code=abc",
+        ] {
+            assert!(
+                parse_oauth_callback(&Url::parse(value).unwrap()).is_err(),
+                "{value}"
+            );
+        }
     }
 }
