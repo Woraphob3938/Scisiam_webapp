@@ -22,3 +22,10 @@ test("remote content receives no broad Tauri permissions", () => {
   assert.deepEqual(capability.permissions, []);
   assert.doesNotMatch(JSON.stringify(capability), /fs:|shell:|process:|opener:|deep-link:/);
 });
+
+test("Tauri library exports the minimal Task 1 run entrypoint", () => {
+  assert.equal(existsSync(new URL("../src-tauri/src/lib.rs", import.meta.url)), true);
+  const library = read("src-tauri/src/lib.rs");
+
+  assert.match(library, /pub\s+fn\s+run\s*\(\s*\)\s*\{\s*\}/);
+});
