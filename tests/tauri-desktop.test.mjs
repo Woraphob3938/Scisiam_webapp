@@ -23,9 +23,16 @@ test("remote content receives no broad Tauri permissions", () => {
   assert.doesNotMatch(JSON.stringify(capability), /fs:|shell:|process:|opener:|deep-link:/);
 });
 
-test("Tauri library exports the minimal Task 1 run entrypoint", () => {
-  assert.equal(existsSync(new URL("../src-tauri/src/lib.rs", import.meta.url)), true);
-  const library = read("src-tauri/src/lib.rs");
+test("desktop runtime keeps OAuth and deep links in Rust", () => {
+  const runtime = read("src-tauri/src/lib.rs");
+  const launcher = read("src-tauri/launcher/launcher.js");
 
-  assert.match(library, /pub\s+fn\s+run\s*\(\s*\)\s*\{\s*\}/);
+  assert.match(runtime, /tauri_plugin_single_instance::init/);
+  assert.match(runtime, /tauri_plugin_deep_link::init/);
+  assert.match(runtime, /on_open_url/);
+  assert.match(runtime, /parse_oauth_callback/);
+  assert.match(runtime, /classify_navigation/);
+  assert.match(runtime, /__SCISIAM_DESKTOP__/);
+  assert.match(launcher, /mode:\s*"no-cors"/);
+  assert.match(launcher, /desktop-browser=1/);
 });
