@@ -133,6 +133,7 @@ test("README documents the required desktop redirect and commands", () => {
   const readme = read("README.md");
 
   assert.match(readme, /scisiam:\/\/auth\/callback/);
+  assert.match(readme, /https:\/\/scisiam-app\.vercel\.app/);
   assert.match(readme, /npm run desktop:dev/);
   assert.match(readme, /npm run desktop:build/);
   assert.match(readme, /Additional Redirect URLs/);
