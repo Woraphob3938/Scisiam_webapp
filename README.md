@@ -188,7 +188,21 @@ npm run desktop:check  # Checks the Rust desktop crate
 npm run desktop:build  # Creates an unsigned development NSIS installer
 ```
 
-The local build output at `src-tauri/target/release/bundle/nsis/Scisiam_<version>_x64-setup.exe` is an **unsigned development installer**. It is not production-signed and must not be published or described as a production installer.
+The local build output at `src-tauri/target/release/bundle/nsis/Scisiam_<version>_x64-setup.exe` is an **unsigned development installer**. The installer UI uses Thai and the Windows app icon uses the AI I-Oon mascot. It is not production-signed and must not be described as a production installer.
+
+### Distribution / การแจกให้ผู้ใช้อื่น
+
+For a small trusted test group, send the generated `.exe` file directly or attach it to a private GitHub pre-release. Windows SmartScreen may show an unknown-publisher warning because the test installer is unsigned.
+
+For a public release:
+
+1. Build the NSIS installer with `npm run desktop:build`.
+2. Sign and verify the exact `.exe` using the Authenticode steps below.
+3. Generate and record its SHA-256 checksum.
+4. Create a versioned GitHub Release and upload the signed installer.
+5. Publish the checksum beside the download link so users can verify the file before installation.
+
+Users only need Windows 10/11, an internet connection, and the installer. After installation, SciSiam opens the hosted web application inside the desktop window, so application updates normally deploy through Vercel without requiring a new installer. A new installer is required only when the Tauri wrapper, permissions, icon, protocol registration, or other native desktop behavior changes.
 
 ### Release security / ความปลอดภัยก่อนเผยแพร่
 

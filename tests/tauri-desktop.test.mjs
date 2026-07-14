@@ -63,6 +63,11 @@ test("desktop branding uses valid committed assets and ignores only build output
 
   assert.deepEqual(config.bundle.icon, desktopIconPaths);
   assert.equal(existsSync(new URL("../public/icon.png", import.meta.url)), true);
+  assert.deepEqual(
+    readFileSync(new URL("../public/icon.png", import.meta.url)),
+    readFileSync(new URL("../public/ai-oon-logo.png", import.meta.url)),
+    "the desktop icon source must use the AI I-Oon mascot",
+  );
   for (const icon of desktopIconPaths) {
     const asset = new URL(`../src-tauri/${icon}`, import.meta.url);
     const contents = readFileSync(asset);
@@ -87,6 +92,19 @@ test("desktop branding uses valid committed assets and ignores only build output
   for (const sourceAsset of sourceAssets) {
     assert.equal(git("check-ignore", "--no-index", "-q", sourceAsset).status, 1, sourceAsset);
   }
+});
+
+test("NSIS installer uses Thai without an extra language chooser", () => {
+  const config = JSON.parse(read("src-tauri/tauri.conf.json"));
+
+  assert.deepEqual(config.bundle.windows.nsis.languages, ["Thai"]);
+  assert.equal(config.bundle.windows.nsis.displayLanguageSelector, false);
+  assert.equal(config.bundle.windows.nsis.customLanguageFiles.Thai, "languages/Thai.nsh");
+
+  const thaiMessages = read("src-tauri/languages/Thai.nsh");
+  assert.match(thaiMessages, /LangString addOrReinstall \$\{LANG_THAI\}/);
+  assert.match(thaiMessages, /LangString installingWebview2 \$\{LANG_THAI\}/);
+  assert.match(thaiMessages, /LangString deleteAppData \$\{LANG_THAI\}/);
 });
 
 test("desktop lint ignores only generated Tauri build output", async () => {

@@ -24,7 +24,16 @@
       "icons/128x128.png",
       "icons/128x128@2x.png",
       "icons/icon.ico"
-    ]
+    ],
+    "windows": {
+      "nsis": {
+        "languages": ["Thai"],
+        "displayLanguageSelector": false,
+        "customLanguageFiles": {
+          "Thai": "languages/Thai.nsh"
+        }
+      }
+    }
   },
   "plugins": {
     "deep-link": {
