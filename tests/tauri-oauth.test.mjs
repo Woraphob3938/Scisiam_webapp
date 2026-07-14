@@ -10,7 +10,7 @@ const readProjectFile = (path) => readFileSync(new URL(`../${path}`, import.meta
 
 test("desktop Google OAuth uses system-browser PKCE callback", () => {
   assert.deepEqual(getGoogleOAuthOptions("https://scisiam-app.vercel.app", true), {
-    redirectTo: "scisiam://auth/callback",
+    redirectTo: "https://scisiam-app.vercel.app/auth/oauth-callback?desktop=1",
     skipBrowserRedirect: true,
     queryParams: { prompt: "select_account" },
   });
@@ -57,7 +57,7 @@ test("release desktop OAuth keeps PKCE on the remote SciSiam origin", () => {
   assert.match(authForm, /window\.location\.assign\(data\.url\)/);
   assert.equal(
     getGoogleOAuthOptions(releaseOrigin, true).redirectTo,
-    "scisiam://auth/callback",
+    "https://scisiam-app.vercel.app/auth/oauth-callback?desktop=1",
   );
   assert.doesNotMatch(launcher, /tauri:\/\/localhost/);
   assert.doesNotMatch(authForm, /tauri:\/\/localhost/);

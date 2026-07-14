@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowRight,
   Check,
+  Download,
   Eye,
   EyeOff,
   Lock,
@@ -43,6 +44,11 @@ type SchoolOption = {
 
 const isDemoModeEnabled =
   process.env.NEXT_PUBLIC_ENABLE_DEMO_MODE === "true";
+const windowsDownloadUrl =
+  process.env.NEXT_PUBLIC_WINDOWS_DOWNLOAD_URL?.trim() ||
+  "https://github.com/Woraphob3938/Scisiam_webapp/releases";
+const subscribeToDesktopRuntime = () => () => {};
+const getServerDesktopRuntime = () => false;
 
 const roleOptions: Array<{
   id: AuthRole;
@@ -81,6 +87,11 @@ export default function AuthForm({
   const [recoverySent, setRecoverySent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [oauthLoading, setOauthLoading] = useState(false);
+  const desktopRuntime = useSyncExternalStore(
+    subscribeToDesktopRuntime,
+    isScisiamDesktop,
+    getServerDesktopRuntime,
+  );
 
   const isRegister = mode === "register";
   const isForgotPassword = mode === "forgot-password";
@@ -421,6 +432,19 @@ export default function AuthForm({
             : "หน้าเข้าสู่ระบบ Scisiam"
       }
     >
+      {!desktopRuntime && (
+        <a
+          href={windowsDownloadUrl}
+          target="_blank"
+          rel="noreferrer"
+          aria-label="ดาวน์โหลดและติดตั้งแอป Scisiam สำหรับ Windows"
+          className="fixed right-3 top-3 z-30 inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-blue-200 bg-white/95 px-3.5 py-2.5 text-sm font-extrabold leading-[1.45] text-blue-700 shadow-lg shadow-blue-900/10 backdrop-blur transition-all hover:-translate-y-0.5 hover:border-blue-300 hover:bg-blue-50 focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-200 sm:right-5 sm:top-5 sm:px-4"
+        >
+          <Download aria-hidden="true" className="h-4 w-4" />
+          <span className="hidden sm:inline">ติดตั้งแอป Windows</span>
+          <span className="sm:hidden">ติดตั้งแอป</span>
+        </a>
+      )}
       <div className="flex w-full min-w-0 items-center justify-center">
         <div className="grid w-full max-w-[560px] gap-4">
           <form

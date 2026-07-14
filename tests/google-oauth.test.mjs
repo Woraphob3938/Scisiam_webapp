@@ -24,11 +24,14 @@ test("Google OAuth returns authenticated users to the student profile", () => {
   assert.match(authForm, /provider:\s*["']google["']/);
   assert.match(authForm, /getGoogleOAuthOptions\(window\.location\.origin, desktop\)/);
   assert.match(desktopRuntime, /auth\/oauth-callback\?next=\/profile/);
-  assert.match(desktopRuntime, /scisiam:\/\/auth\/callback/);
+  assert.match(desktopRuntime, /auth\/oauth-callback\?desktop=1/);
   assert.match(authForm, /เข้าสู่ระบบด้วย Google/);
   assert.match(authForm, /สมัครด้วย Google/);
 
   assert.match(callbackRoute, /exchangeCodeForSession\(code\)/);
+  assert.match(callbackRoute, /searchParams\.get\("desktop"\)\s*===\s*"1"/);
+  assert.match(callbackRoute, /new URL\("scisiam:\/\/auth\/callback"\)/);
+  assert.match(callbackRoute, /headers:\s*\{\s*Location:\s*desktopCallback\.toString\(\)\s*\}/);
   assert.match(callbackRoute, /searchParams\.get\("next"\)\s*\?\?\s*"\/profile"/);
   assert.match(callbackRoute, /function getSafeRedirectPath/);
   assert.match(callbackRoute, /requestedNext\.includes\("\\\\"\)/);
@@ -44,6 +47,20 @@ test("Google OAuth always asks the user to select an account", () => {
     desktopRuntime,
     /queryParams:\s*\{\s*prompt:\s*["']select_account["']\s*\}/,
   );
+});
+
+test("login and register expose an accessible Windows app installer link", () => {
+  const authForm = readProjectFile("src/components/auth/AuthForm.tsx");
+  const envExample = readProjectFile(".env.example");
+
+  assert.match(authForm, /NEXT_PUBLIC_WINDOWS_DOWNLOAD_URL/);
+  assert.match(authForm, /github\.com\/Woraphob3938\/Scisiam_webapp\/releases/);
+  assert.match(authForm, /ติดตั้งแอป Windows/);
+  assert.match(authForm, /aria-label="ดาวน์โหลดและติดตั้งแอป Scisiam สำหรับ Windows"/);
+  assert.match(authForm, /target="_blank"/);
+  assert.match(authForm, /rel="noreferrer"/);
+  assert.match(authForm, /!desktopRuntime/);
+  assert.match(envExample, /NEXT_PUBLIC_WINDOWS_DOWNLOAD_URL=/);
 });
 
 test("Google OAuth loading state resets when returning from browser history", () => {

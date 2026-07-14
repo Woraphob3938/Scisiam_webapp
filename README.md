@@ -167,11 +167,11 @@ On the verified Windows development machine, `rustc` and `cargo` resolve from `C
 
 `https://scisiam-app.vercel.app`
 
-Then add this exact value under **Additional Redirect URLs** and save the configuration:
+Then add this exact HTTPS bridge under **Additional Redirect URLs** and save the configuration:
 
-`scisiam://auth/callback`
+`https://scisiam-app.vercel.app/auth/oauth-callback?desktop=1`
 
-No wildcard custom scheme is required. Google OAuth opens in the system browser and returns to the installed app through the registered `scisiam://` protocol.
+Google OAuth opens in the system browser, returns through the HTTPS bridge, and then opens the installed app through the registered `scisiam://auth/callback` protocol. This keeps the PKCE verifier and session exchange inside the desktop app.
 
 The public compile-time desktop value `SCISIAM_SUPABASE_ORIGIN` must be a credential-free HTTPS root origin and **must be exactly equal** to `NEXT_PUBLIC_SUPABASE_URL`, including whether a trailing slash is present. Export both values before a desktop build; never include a path, query, fragment, username, or password:
 
@@ -201,6 +201,8 @@ For a public release:
 3. Generate and record its SHA-256 checksum.
 4. Create a versioned GitHub Release and upload the signed installer.
 5. Publish the checksum beside the download link so users can verify the file before installation.
+
+Set `NEXT_PUBLIC_WINDOWS_DOWNLOAD_URL` in Vercel to the signed installer asset or release page URL. The login and register pages use this value for the top-right Windows install button.
 
 Users only need Windows 10/11, an internet connection, and the installer. After installation, SciSiam opens the hosted web application inside the desktop window, so application updates normally deploy through Vercel without requiring a new installer. A new installer is required only when the Tauri wrapper, permissions, icon, protocol registration, or other native desktop behavior changes.
 
