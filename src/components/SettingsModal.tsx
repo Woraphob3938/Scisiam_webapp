@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import {
   Bot,
   Check,
+  FileText,
   KeyRound,
   Monitor,
   Palette,
@@ -109,9 +110,11 @@ function persistSettings(input: {
 export default function SettingsModal({
   isOpen,
   onClose,
+  onOpenSoftwareDisclaimer,
 }: {
   isOpen: boolean;
   onClose: () => void;
+  onOpenSoftwareDisclaimer: () => void;
 }) {
   const [aiStyle, setAiStyle] = useState<AiStyle>(() =>
     getStoredValue<AiStyle>(AI_STYLE_KEY, "simple", ["simple", "hint", "guided"])
@@ -440,6 +443,32 @@ export default function SettingsModal({
                 {passwordResetMessage}
               </p>
             ) : null}
+          </section>
+
+          <section className="rounded-2xl border border-slate-200 bg-white p-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex min-w-0 items-start gap-3">
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-blue-50 text-blue-700 ring-1 ring-blue-100">
+                  <FileText className="h-5 w-5" aria-hidden="true" />
+                </span>
+                <div className="min-w-0">
+                  <h3 className="text-base font-extrabold leading-[1.45] text-slate-950">
+                    ข้อตกลงการใช้ซอฟต์แวร์ NSC 2026
+                  </h3>
+                  <p className="text-sm font-semibold leading-relaxed text-slate-600">
+                    เปิดอ่านข้อความประกาศของโครงการและข้อมูลคณะผู้พัฒนา
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                aria-haspopup="dialog"
+                onClick={onOpenSoftwareDisclaimer}
+                className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-xl border border-blue-600 bg-white px-4 text-sm font-extrabold text-blue-800 transition-colors hover:bg-blue-50 focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
+              >
+                เปิดอ่าน
+              </button>
+            </div>
           </section>
         </div>
 

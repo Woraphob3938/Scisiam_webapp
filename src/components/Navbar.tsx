@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Bell, ChevronDown, Award, Menu, User, X } from "lucide-react";
 import { useSidebar } from "@/context/SidebarContext";
 import SettingsModal from "@/components/SettingsModal";
+import SoftwareDisclaimerDialog from "@/components/SoftwareDisclaimerDialog";
 import { ClassroomActionLauncher } from "@/components/classrooms/ClassroomActionLauncher";
 import { clearScisiamAuthCache } from "@/lib/supabase/auth-cache";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
@@ -24,9 +25,11 @@ type NavbarNotification = {
 
 export default function Navbar() {
   const { toggleSidebar } = useSidebar();
+  const profileMenuTriggerRef = useRef<HTMLButtonElement>(null);
   const [showNotification, setShowNotification] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const [showSoftwareDisclaimer, setShowSoftwareDisclaimer] = useState(false);
   const {
     isAuthReady,
     isLoggedIn,
@@ -37,6 +40,11 @@ export default function Navbar() {
     localNotificationMode,
   } = useAuth();
   const [notifications, setNotifications] = useState<NavbarNotification[]>([]);
+
+  const openSoftwareDisclaimerFromSettings = () => {
+    setShowSettingsModal(false);
+    window.setTimeout(() => setShowSoftwareDisclaimer(true), 0);
+  };
 
   const loadClassroomNotificationsSafely = useCallback(async () => {
     if (!isAuthReady || !isLoggedIn || localNotificationMode || !isSupabaseConfigured()) {
@@ -294,6 +302,10 @@ export default function Navbar() {
           ) : isLoggedIn ? (
             <>
               <button
+                ref={profileMenuTriggerRef}
+                type="button"
+                aria-haspopup="menu"
+                aria-expanded={showProfileMenu}
                 onClick={() => setShowProfileMenu(!showProfileMenu)}
                 className="flex items-center gap-2 hover:bg-slate-50 p-1.5 pr-2.5 rounded-xl transition-all duration-200 select-none cursor-pointer"
               >
@@ -364,6 +376,12 @@ export default function Navbar() {
     <SettingsModal
       isOpen={showSettingsModal}
       onClose={() => setShowSettingsModal(false)}
+      onOpenSoftwareDisclaimer={openSoftwareDisclaimerFromSettings}
+    />
+    <SoftwareDisclaimerDialog
+      open={showSoftwareDisclaimer}
+      onOpenChange={setShowSoftwareDisclaimer}
+      returnFocusRef={profileMenuTriggerRef}
     />
     </>
   );

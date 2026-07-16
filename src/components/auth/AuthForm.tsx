@@ -1,6 +1,11 @@
 "use client";
 
-import React, { useEffect, useState, useSyncExternalStore } from "react";
+import React, {
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowRight,
@@ -25,6 +30,8 @@ import {
   isScisiamDesktop,
 } from "@/lib/desktop-runtime";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
+import SoftwareDisclaimerDialog from "@/components/SoftwareDisclaimerDialog";
+import { SOFTWARE_DISCLAIMER_SEEN_KEY } from "@/data/softwareDisclaimer";
 
 interface AuthFormProps {
   initialMode: "login" | "register";
@@ -65,6 +72,8 @@ export default function AuthForm({
   initialError = "",
 }: AuthFormProps) {
   const router = useRouter();
+  const emailInputRef = useRef<HTMLInputElement>(null);
+  const [showSoftwareDisclaimer, setShowSoftwareDisclaimer] = useState(false);
   const [mode, setMode] = useState<AuthMode>(initialMode);
 
   const [fullName, setFullName] = useState("");
@@ -116,6 +125,28 @@ export default function AuthForm({
 
     return () => window.clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      try {
+        if (localStorage.getItem(SOFTWARE_DISCLAIMER_SEEN_KEY) !== "true") {
+          setShowSoftwareDisclaimer(true);
+        }
+      } catch {
+        setShowSoftwareDisclaimer(true);
+      }
+    }, 0);
+
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  const markSoftwareDisclaimerSeen = () => {
+    try {
+      localStorage.setItem(SOFTWARE_DISCLAIMER_SEEN_KEY, "true");
+    } catch {
+      // The disclaimer remains available through the permanent trigger.
+    }
+  };
 
   useEffect(() => {
     if (initialMode !== "login") return;
@@ -541,6 +572,7 @@ export default function AuthForm({
                 icon={Mail}
               >
                 <input
+                  ref={emailInputRef}
                   id="auth-email"
                   type="email"
                   required
@@ -817,6 +849,15 @@ export default function AuthForm({
                 </p>
               )}
 
+              <button
+                type="button"
+                aria-haspopup="dialog"
+                onClick={() => setShowSoftwareDisclaimer(true)}
+                className="mx-auto min-h-11 rounded-lg px-3 text-sm font-extrabold leading-[1.45] text-blue-700 underline underline-offset-4 hover:text-blue-900 focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
+              >
+                ข้อตกลงการใช้ซอฟต์แวร์ NSC 2026
+              </button>
+
               {isDemoModeEnabled && !isForgotPassword ? (
                 isRegister ? (
                   <button
@@ -853,6 +894,12 @@ export default function AuthForm({
           </form>
         </div>
       </div>
+      <SoftwareDisclaimerDialog
+        open={showSoftwareDisclaimer}
+        onOpenChange={setShowSoftwareDisclaimer}
+        onDismiss={markSoftwareDisclaimerSeen}
+        returnFocusRef={emailInputRef}
+      />
     </section>
   );
 }
