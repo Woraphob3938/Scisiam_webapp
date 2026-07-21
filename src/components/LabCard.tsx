@@ -64,6 +64,16 @@ import {
   WesternBlottingSVG,
   MetabolicPathwayFluxSVG
 } from "@/components/labs/UnfinishedLabSVGs";
+import {
+  AnimalCellCardSVG,
+  ExperimentChemicalsCardSVG,
+  ExternalMuscleCardSVG,
+  GoodBadMineralsCardSVG,
+  HumanBloodCellsCardSVG,
+  InternalMuscleCardSVG,
+  LabEquipmentCardSVG,
+  LeafCellCardSVG,
+} from "@/components/labs/FoundationLabCardSVGs";
 
 export type GradeLevel = "ประถม" | "มัธยมต้น" | "มัธยมปลาย" | "อุดมศึกษา";
 
@@ -271,24 +281,6 @@ const AtmosphereLayersSVG = () => (
       <text x="36" y="51" fill="#0f766e" fontSize="8" fontWeight="800" textAnchor="middle">0-2 km</text>
     </g>
     <text x="16" y="18" fill="#ffffff" fontSize="9" fontWeight="900">ชั้นบรรยากาศ</text>
-  </svg>
-);
-
-const FoundationKnowledgeSVG = ({ label, tone = "#0891b2" }: { label: string; tone?: string }) => (
-  <svg className="h-32 w-full" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <rect width="200" height="120" rx="18" fill="#f8fafc" />
-    <circle cx="52" cy="58" r="30" fill={tone} opacity="0.14" />
-    <circle cx="148" cy="54" r="36" fill="#34d399" opacity="0.12" />
-    <rect x="36" y="28" width="128" height="64" rx="18" fill="#ffffff" stroke="#cbd5e1" strokeWidth="1.5" />
-    <g transform="translate(52 43)">
-      <circle cx="18" cy="18" r="18" fill={tone} opacity="0.16" />
-      <path d="M9 20 C13 10 23 10 27 20 C24 27 12 27 9 20Z" fill={tone} opacity="0.86" />
-      <circle cx="18" cy="18" r="5" fill="#ffffff" opacity="0.9" />
-    </g>
-    <rect x="94" y="42" width="52" height="8" rx="4" fill="#e2e8f0" />
-    <rect x="94" y="57" width="42" height="7" rx="3.5" fill={tone} opacity="0.62" />
-    <rect x="94" y="70" width="58" height="7" rx="3.5" fill="#cbd5e1" />
-    <text x="100" y="105" textAnchor="middle" fill="#0f172a" fontSize="10" fontWeight="900">{label}</text>
   </svg>
 );
 
@@ -1665,21 +1657,21 @@ export default function LabCard({
       case "atmosphere-layers":
         return <AtmosphereLayersSVG />;
       case "lab-equipment-overview":
-        return <FoundationKnowledgeSVG label="อุปกรณ์" tone="#2563eb" />;
+        return <LabEquipmentCardSVG />;
       case "animal-cell":
-        return <FoundationKnowledgeSVG label="เซลล์สัตว์" tone="#7c3aed" />;
+        return <AnimalCellCardSVG />;
       case "leaf-cell":
-        return <FoundationKnowledgeSVG label="เซลล์ใบไม้" tone="#059669" />;
+        return <LeafCellCardSVG />;
       case "human-blood-cells":
-        return <FoundationKnowledgeSVG label="เม็ดเลือด" tone="#e11d48" />;
+        return <HumanBloodCellsCardSVG />;
       case "experiment-chemicals":
-        return <FoundationKnowledgeSVG label="สารเคมี" tone="#f97316" />;
+        return <ExperimentChemicalsCardSVG />;
       case "external-muscle-anatomy":
-        return <FoundationKnowledgeSVG label="กล้ามเนื้อภายนอก" tone="#e11d48" />;
+        return <ExternalMuscleCardSVG />;
       case "internal-muscle-anatomy":
-        return <FoundationKnowledgeSVG label="กล้ามเนื้อภายใน" tone="#7c3aed" />;
+        return <InternalMuscleCardSVG />;
       case "good-bad-minerals":
-        return <FoundationKnowledgeSVG label="แร่ธาตุ" tone="#0891b2" />;
+        return <GoodBadMineralsCardSVG />;
       case "boyles-law":
         return <BoylesLawSVG />;
       case "charles-law":
@@ -1898,7 +1890,7 @@ export default function LabCard({
           <span className={`rounded-full border px-3 py-1 text-xs font-bold leading-[1.45] ${themeColors.badgeColor}`}>
             {lab.category}
           </span>
-          <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[10px] font-extrabold leading-[1.4] text-slate-600">
+          <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs font-extrabold leading-[1.4] text-slate-600">
             {lab.gradeLevel}
           </span>
         </div>

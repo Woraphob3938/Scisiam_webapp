@@ -161,107 +161,47 @@ export default function TransitionMetalComplexesSimulation() {
       icon={Sparkles}
       sceneTitle="โครงสร้างสารเชิงซ้อนแปดหน้า (Octahedral Structure)"
       scene={
-        <div className="flex flex-col items-center justify-center p-4 border border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-50 dark:bg-slate-900/50 min-h-[340px] relative w-full h-full">
-          <div className="grid grid-cols-2 gap-4 w-full h-full max-w-md items-center">
-            {/* Molecular octahedron SVG */}
-            <div className="flex flex-col items-center justify-center">
-              <svg viewBox="0 0 160 160" className="w-full max-w-[150px] h-auto drop-shadow-md">
-                {/* Coordination bonds */}
-                <line x1="80" y1="80" x2="80" y2="20" stroke="#cbd5e1" strokeWidth="2" />
-                <line x1="80" y1="80" x2="80" y2="140" stroke="#cbd5e1" strokeWidth="2" />
-                <line x1="80" y1="80" x2="30" y2="50" stroke="#cbd5e1" strokeWidth="2" />
-                <line x1="80" y1="80" x2="130" y2="110" stroke="#cbd5e1" strokeWidth="2" />
-                <line x1="80" y1="80" x2="35" y2="105" stroke="#cbd5e1" strokeWidth="2" />
-                <line x1="80" y1="80" x2="125" y2="55" stroke="#cbd5e1" strokeWidth="2" />
+        <div className="relative flex min-h-[340px] h-full w-full flex-col items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_30%_35%,#f5f3ff_0%,#eef2ff_34%,#f8fafc_72%)] p-4">
+          <svg viewBox="0 0 600 310" className="h-auto w-full max-w-[680px]" role="img" aria-label="โครงสร้างสารเชิงซ้อนทรงแปดหน้าและแผนภาพระดับพลังงานออร์บิทัล">
+            <title>สารเชิงซ้อนโลหะแทรนซิชันและการแยกระดับพลังงาน</title>
+            <desc>โลหะอยู่กลางลิแกนด์หกตำแหน่ง ด้านขวาแสดงระดับพลังงาน t2g และ eg กับค่าช่องว่างพลังงาน</desc>
+            <g transform="translate(36 36)">
+              {[[142, 16], [142, 218], [42, 66], [242, 168], [52, 178], [232, 56]].map(([x, y], index) => (
+                <g key={index}>
+                  <line x1="142" y1="118" x2={x} y2={y} stroke="#a5b4fc" strokeWidth="5" strokeLinecap="round" />
+                  <circle cx={x} cy={y} r="23" fill="#ffffff" stroke="#8b5cf6" strokeWidth="4" />
+                  <text x={x} y={y + 5} textAnchor="middle" fill="#6d28d9" fontSize="12" fontWeight="900">{selectedLigand.id.toUpperCase()}</text>
+                </g>
+              ))}
+              <circle cx="142" cy="118" r="39" fill={complexColor.hex} stroke="#4f46e5" strokeWidth="6" />
+              <text x="142" y="125" textAnchor="middle" fill="#ffffff" fontSize="20" fontWeight="900">{selectedMetal.id === "cu2" ? "Cu²⁺" : selectedMetal.id === "co2" ? "Co²⁺" : "Ni²⁺"}</text>
+              <text x="142" y="276" textAnchor="middle" fill="#475569" fontSize="14" fontWeight="800">โครงสร้างทรงแปดหน้า (Oₕ)</text>
+            </g>
 
-                {/* Central Metal Ion */}
-                <circle cx="80" cy="80" r="16" fill="#6366f1" stroke="#4f46e5" strokeWidth="2" />
-                <text x="80" y="84" className="text-[7px] fill-white font-bold" textAnchor="middle">
-                  {selectedMetal.id === "cu2" ? "Cu²⁺" : selectedMetal.id === "co2" ? "Co²⁺" : "Ni²⁺"}
-                </text>
-
-                {/* 6 octahedral ligands surrounding */}
-                <circle cx="80" cy="20" r="10" fill="#f8fafc" stroke="#cbd5e1" strokeWidth="1" />
-                <text x="80" y="23" className="text-[6px] fill-slate-500 font-bold" textAnchor="middle">{selectedLigand.id.toUpperCase()}</text>
-
-                <circle cx="80" cy="140" r="10" fill="#f8fafc" stroke="#cbd5e1" strokeWidth="1" />
-                <text x="80" y="143" className="text-[6px] fill-slate-500 font-bold" textAnchor="middle">{selectedLigand.id.toUpperCase()}</text>
-
-                <circle cx="30" cy="50" r="10" fill="#f8fafc" stroke="#cbd5e1" strokeWidth="1" />
-                <text x="30" y="53" className="text-[6px] fill-slate-500 font-bold" textAnchor="middle">{selectedLigand.id.toUpperCase()}</text>
-
-                <circle cx="130" cy="110" r="10" fill="#f8fafc" stroke="#cbd5e1" strokeWidth="1" />
-                <text x="130" y="113" className="text-[6px] fill-slate-500 font-bold" textAnchor="middle">{selectedLigand.id.toUpperCase()}</text>
-
-                <circle cx="35" cy="105" r="10" fill="#f8fafc" stroke="#cbd5e1" strokeWidth="1" />
-                <text x="35" y="108" className="text-[6px] fill-slate-500 font-bold" textAnchor="middle">{selectedLigand.id.toUpperCase()}</text>
-
-                <circle cx="125" cy="55" r="10" fill="#f8fafc" stroke="#cbd5e1" strokeWidth="1" />
-                <text x="125" y="58" className="text-[6px] fill-slate-500 font-bold" textAnchor="middle">{selectedLigand.id.toUpperCase()}</text>
-              </svg>
-              <div className="text-[10px] font-bold text-slate-400 mt-1.5">ทรงแปดหน้า (Oh)</div>
-            </div>
-
-            {/* Crystal field d-orbital splitting Diagram */}
-            <div className="flex flex-col justify-between h-full py-4 relative border-l border-slate-200 dark:border-slate-800 pl-4">
-              <span className="text-[9px] font-bold text-slate-400 block mb-2">Crystal Field Splitting (d-Orbitals)</span>
-
-              {/* Energy gap diagram */}
-              <div className="h-44 relative w-full flex flex-col justify-between p-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
-                {/* eg orbitals */}
-                <div className="flex gap-2 justify-center mt-2">
-                  <span className="text-[9px] font-bold text-slate-400 absolute left-2 top-4">eg</span>
-                  <div className="w-6 h-1 bg-red-400 rounded relative">
-                    {/* Electron arrows */}
-                    {selectedMetal.dElectrons > 5 && <span className="absolute -top-3 left-1 text-[8px] text-red-500">↑</span>}
-                  </div>
-                  <div className="w-6 h-1 bg-red-400 rounded" />
-                </div>
-
-                {/* Vertical Energy arrow showing delta */}
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col items-center">
-                  <span className="text-[7px] text-slate-400 font-bold">Δ₀ = {energyGap.toFixed(2)} eV</span>
-                  <div className="w-1 bg-slate-300 relative h-12">
-                    <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[3px] border-l-transparent border-r-[3px] border-r-transparent border-b-[4px] border-b-slate-400" />
-                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[3px] border-l-transparent border-r-[3px] border-r-transparent border-t-[4px] border-t-slate-400" />
-                  </div>
-                </div>
-
-                {/* photon excitation animation */}
-                {showExcitation && (
-                  <g className="absolute left-1/2 top-1/2 -translate-x-1/2">
-                    <circle cx="0" cy={35 - excitationProgress * 0.7} r="4" fill="#a855f7" className="animate-ping" />
-                  </g>
-                )}
-
-                {/* t2g orbitals */}
-                <div className="flex gap-2 justify-center mb-2">
-                  <span className="text-[9px] font-bold text-slate-400 absolute left-2 bottom-4">t2g</span>
-                  <div className="w-5 h-1 bg-blue-400 rounded" />
-                  <div className="w-5 h-1 bg-blue-400 rounded" />
-                  <div className="w-5 h-1 bg-blue-400 rounded" />
-                </div>
-              </div>
-
-              <button
-                onClick={handleExcite}
-                disabled={showExcitation}
-                className="mt-2 text-[9px] font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded py-1 px-2 flex justify-center items-center gap-1 transition-all"
-              >
-                <Sparkles className="w-3 h-3" /> Excitation
-              </button>
-            </div>
+            <g transform="translate(350 34)">
+              <text x="105" y="10" textAnchor="middle" fill="#475569" fontSize="14" fontWeight="900">การแยกระดับพลังงาน d-orbital</text>
+              <text x="0" y="64" fill="#be123c" fontSize="15" fontWeight="900">e<tspan baselineShift="sub" fontSize="10">g</tspan></text>
+              <line x1="44" y1="58" x2="106" y2="58" stroke="#fb7185" strokeWidth="6" strokeLinecap="round" />
+              <line x1="126" y1="58" x2="188" y2="58" stroke="#fb7185" strokeWidth="6" strokeLinecap="round" />
+              <text x="0" y="204" fill="#1d4ed8" fontSize="15" fontWeight="900">t<tspan baselineShift="sub" fontSize="10">2g</tspan></text>
+              {[44, 98, 152].map((x) => <line key={x} x1={x} y1="198" x2={x + 42} y2="198" stroke="#60a5fa" strokeWidth="6" strokeLinecap="round" />)}
+              <rect x="44" y="94" width="144" height="68" rx="18" fill="#ede9fe" />
+              <text x="116" y="121" textAnchor="middle" fill="#6d28d9" fontSize="13" fontWeight="900">ช่องว่างพลังงาน Δ₀</text>
+              <text x="116" y="148" textAnchor="middle" fill="#4c1d95" fontSize="24" fontWeight="900">{energyGap.toFixed(2)} eV</text>
+              {Array.from({ length: selectedMetal.dElectrons }, (_, index) => (
+                <circle key={index} cx={58 + (index % 5) * 27} cy={index < 5 ? 186 : 46} r="6" fill={index < 5 ? "#2563eb" : "#e11d48"} />
+              ))}
+              {showExcitation && <circle cx="116" cy={178 - excitationProgress * 1.05} r="9" fill="#a855f7" opacity="0.86" />}
+              <text x="105" y="246" textAnchor="middle" fill="#64748b" fontSize="13" fontWeight="800">d-electron {selectedMetal.dElectrons} ตัว</text>
+            </g>
+          </svg>
+          <div className="absolute bottom-4 left-5 flex items-center gap-2 text-sm font-bold text-slate-700">
+            <span className="h-8 w-5 rounded border border-slate-300" style={{ backgroundColor: complexColor.hex }} />
+            สีสารละลาย: {complexColor.name}
           </div>
-
-          {/* Test tube fluid color indicator */}
-          <div className="absolute bottom-4 left-4 bg-white/90 dark:bg-slate-900/90 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center gap-2">
-            <span className="text-xs font-semibold text-slate-500">สีที่มองเห็น:</span>
-            <div
-              className="w-5 h-10 border border-slate-300 rounded shadow-inner"
-              style={{ backgroundColor: complexColor.hex, transition: "background-color 0.4s ease" }}
-            />
-            <span className="text-xs font-bold text-slate-700 dark:text-slate-200">{complexColor.name}</span>
-          </div>
+          <button onClick={handleExcite} disabled={showExcitation} className="absolute bottom-4 right-5 inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-black text-white shadow-sm hover:bg-indigo-700 disabled:opacity-60">
+            <Sparkles className="h-4 w-4" /> กระตุ้นอิเล็กตรอน
+          </button>
         </div>
       }
       controlsTitle="เลือกโลหะและลิแกนด์เชิงซ้อน"

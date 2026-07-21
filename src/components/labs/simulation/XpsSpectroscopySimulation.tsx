@@ -184,25 +184,30 @@ export default function XpsSpectroscopySimulation() {
       icon={Zap}
       sceneTitle="ห้องสูญญากาศวิเคราะห์พื้นผิว (UHV Chamber)"
       scene={
-        <div className="flex flex-col items-center justify-center p-4 border border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-50 dark:bg-slate-900/50 min-h-[340px] relative w-full h-full">
-          <svg viewBox="0 0 300 300" className="w-full max-w-sm h-auto drop-shadow-md">
+        <div className="relative flex min-h-[340px] h-full w-full flex-col items-center justify-center bg-[radial-gradient(circle_at_center,#1e293b_0%,#0f172a_56%,#020617_100%)] p-4">
+          <svg viewBox="0 0 340 270" className="h-auto w-full max-w-md" role="img" aria-label="ห้องสูญญากาศ XPS ที่ยิงรังสีเอกซ์ไปยังผิวตัวอย่างและตรวจอิเล็กตรอนที่หลุดออกมา">
+            <title>ระบบวิเคราะห์พื้นผิว XPS</title>
+            <desc>แหล่งกำเนิดรังสีเอกซ์ฉายลงบนตัวอย่างในห้องสูญญากาศ อิเล็กตรอนที่หลุดออกถูกส่งไปยังเครื่องวิเคราะห์พลังงาน</desc>
             {/* Outer Chamber (UHV) */}
-            <circle cx="150" cy="130" r="90" fill="none" stroke="#64748b" strokeWidth="6" />
-            <circle cx="150" cy="130" r="86" fill="#1e293b" />
+            <circle cx="170" cy="130" r="90" fill="none" stroke="#94a3b8" strokeWidth="6" />
+            <circle cx="170" cy="130" r="86" fill="#1e293b" />
 
             {/* X-ray Source Gun */}
-            <rect x="40" y="40" width="20" height="60" fill="#475569" stroke="#334155" transform="rotate(-45 40 40)" />
+            <rect x="60" y="40" width="20" height="60" fill="#475569" stroke="#334155" transform="rotate(-45 60 40)" />
+            <text x="24" y="34" fill="#c4b5fd" fontSize="11" fontWeight="900">X-ray source</text>
+            <text x="24" y="50" fill="#94a3b8" fontSize="9" fontWeight="700">{xrayPower} W</text>
 
             {/* Electron Analyzer Inlet */}
-            <rect x="230" y="40" width="25" height="70" fill="#475569" stroke="#334155" transform="rotate(45 230 40)" />
-            <path d="M 180 80 Q 210 50 230 40" stroke="#cbd5e1" strokeWidth="2" strokeDasharray="3 3" fill="none" />
+            <rect x="250" y="40" width="25" height="70" fill="#475569" stroke="#334155" transform="rotate(45 250 40)" />
+            <path d="M 200 80 Q 230 50 250 40" stroke="#38bdf8" strokeWidth="2" strokeDasharray="3 3" fill="none" />
+            <text x="274" y="34" fill="#7dd3fc" fontSize="11" fontWeight="900">Analyzer</text>
 
             {/* Sample holder & stage */}
-            <rect x="120" y="160" width="60" height="15" fill="#475569" />
-            <rect x="145" y="175" width="10" height="40" fill="#64748b" />
+            <rect x="140" y="160" width="60" height="15" fill="#475569" />
+            <rect x="165" y="175" width="10" height="40" fill="#64748b" />
 
             {/* Active Sample substrate */}
-            <rect x="130" y="152" width="40" height="8" fill={
+            <rect x="150" y="152" width="40" height="8" fill={
               selectedSample.id === "gold" ? "#fbbf24" :
               selectedSample.id === "silicon" ? "#94a3b8" : "#475569"
             } rx="1" />
@@ -210,9 +215,9 @@ export default function XpsSpectroscopySimulation() {
             {/* X-ray beam beam path */}
             {isEmitting && (
               <line
-                x1="80"
+                x1="100"
                 y1="80"
-                x2={130 + (beamProgress / 100) * 20}
+                x2={150 + (beamProgress / 100) * 20}
                 y2={120 + (beamProgress / 100) * 35}
                 stroke="#a855f7"
                 strokeWidth="4"
@@ -224,18 +229,20 @@ export default function XpsSpectroscopySimulation() {
             {/* Photoelectron emission balls flying to analyzer */}
             {isEmitting && beamProgress > 60 && (
               <g>
-                <circle cx="160" cy="140" r="3" fill="#fbbf24" className="animate-ping" />
-                <circle cx="175" cy="110" r="3.5" fill="#38bdf8" />
-                <circle cx="190" cy="85" r="4" fill="#38bdf8" />
+                <circle cx="180" cy="140" r="3" fill="#fbbf24" className="animate-ping" />
+                <circle cx="195" cy="110" r="3.5" fill="#38bdf8" />
+                <circle cx="210" cy="85" r="4" fill="#38bdf8" />
               </g>
             )}
+            <text x="170" y="238" textAnchor="middle" fill="#cbd5e1" fontSize="11" fontWeight="800">UHV chamber · วิเคราะห์ชั้นผิวของ {selectedSample.name}</text>
           </svg>
 
           {/* XPS Spectrum curve readout graph */}
           <div className="w-full mt-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 h-28 relative">
             <span className="absolute left-2 top-1 text-[9px] font-bold text-slate-400">XPS Core Spectrum (Intensity vs BE)</span>
             {hasSpectrum ? (
-              <svg className="w-full h-full" viewBox="0 0 300 100">
+              <svg className="w-full h-full" viewBox="0 0 300 100" role="img" aria-label="กราฟสเปกตรัม XPS แสดงความเข้มเทียบกับพลังงานยึดเหนี่ยว">
+                <title>สเปกตรัม XPS</title>
                 {/* Baseline */}
                 <line x1="30" y1="80" x2="270" y2="80" stroke="#94a3b8" strokeWidth="1.5" />
 

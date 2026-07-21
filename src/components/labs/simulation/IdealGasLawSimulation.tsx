@@ -151,7 +151,7 @@ export function GasChamber3DScene({
   const mountRef = useRef<HTMLDivElement | null>(null);
   const propsRef = useRef({ volume, temperature, pressure, isRunning });
   const rotationRef = useRef({ x: -0.08, y: -0.45 });
-  const distanceRef = useRef(9.4);
+  const distanceRef = useRef(11.2);
   const dragRef = useRef<{ active: boolean; x: number; y: number }>({ active: false, x: 0, y: 0 });
   const [webglFailed, setWebglFailed] = useState(false);
 
@@ -191,8 +191,8 @@ export function GasChamber3DScene({
     keyLight.position.set(5, 6, 4);
     scene.add(keyLight);
 
-    camera.position.set(5.4, 3.6, distanceRef.current);
-    camera.lookAt(0, 0.35, 0);
+    camera.position.set(0, 2.4, distanceRef.current);
+    camera.lookAt(0, 0.45, 0);
 
     const chamberMaterial = new THREE.MeshStandardMaterial({
       color: 0xdff7ff,
@@ -287,7 +287,7 @@ export function GasChamber3DScene({
     };
     const onWheel = (event: WheelEvent) => {
       event.preventDefault();
-      distanceRef.current = THREE.MathUtils.clamp(distanceRef.current + event.deltaY * 0.006, 6.4, 13);
+      distanceRef.current = THREE.MathUtils.clamp(distanceRef.current + event.deltaY * 0.006, 8, 14.5);
     };
 
     host.addEventListener("pointerdown", onPointerDown);
@@ -315,8 +315,8 @@ export function GasChamber3DScene({
       if (!dragRef.current.active) rotationRef.current.y += delta * (current.isRunning ? 0.16 : 0.025);
       root.rotation.x = rotationRef.current.x;
       root.rotation.y = rotationRef.current.y;
-      camera.position.set(5.4, 3.6, distanceRef.current);
-      camera.lookAt(0, 0.35, 0);
+      camera.position.set(0, 2.4, distanceRef.current);
+      camera.lookAt(0, 0.45, 0);
 
       particleColor.set(current.temperature > 360 ? 0xef4444 : current.temperature < 220 ? 0x3b82f6 : 0x10b981);
       particleMaterial.color.copy(particleColor);

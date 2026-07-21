@@ -219,14 +219,16 @@ export default function HplcChromatographySimulation() {
       icon={Layers}
       sceneTitle="แผนภาพเส้นทางระบบ HPLC"
       scene={
-        <div className="flex flex-col items-center justify-center p-4 border border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-50 dark:bg-slate-900/50 min-h-[340px] relative w-full h-full">
-          <svg viewBox="0 0 300 300" className="w-full max-w-sm h-auto drop-shadow-md">
+        <div className="relative flex min-h-[340px] h-full w-full flex-col items-center justify-center bg-[linear-gradient(145deg,#ecfdf5,#f8fafc_55%,#eff6ff)] p-4">
+          <svg viewBox="0 0 300 250" className="h-auto w-full max-w-md" role="img" aria-label="เส้นทางการไหลของสารในระบบ HPLC จากตัวทำละลายผ่านปั๊ม หัวฉีด คอลัมน์ และตัวตรวจวัด">
+            <title>แผนภาพระบบ HPLC</title>
+            <desc>ตัวทำละลายผสมกันแล้วถูกปั๊มผ่านหัวฉีดและคอลัมน์ C18 ก่อนเข้าสู่ตัวตรวจวัดยูวีและภาชนะของเสีย</desc>
             {/* Solvent Bottles */}
             <rect x="25" y="30" width="30" height="45" fill="#e2e8f0" rx="3" stroke="#94a3b8" />
-            <text x="40" y="55" className="text-[7px] fill-slate-500 font-bold" textAnchor="middle">H2O</text>
+            <text x="40" y="56" fill="#475569" fontSize="9" fontWeight="900" textAnchor="middle">H₂O</text>
 
             <rect x="65" y="30" width="30" height="45" fill="#bae6fd" rx="3" stroke="#38bdf8" />
-            <text x="80" y="55" className="text-[7px] fill-slate-500 font-bold" textAnchor="middle">ACN</text>
+            <text x="80" y="56" fill="#0369a1" fontSize="9" fontWeight="900" textAnchor="middle">ACN</text>
 
             {/* Tube paths */}
             <path d="M 40 75 L 40 90 L 80 90 L 80 110" stroke="#cbd5e1" strokeWidth="2" fill="none" />
@@ -256,16 +258,19 @@ export default function HplcChromatographySimulation() {
             <rect x="240" y="180" width="20" height="30" fill="#64748b" rx="2" />
 
             {/* Labels */}
-            <text x="80" y="105" className="text-[6px] fill-slate-400 font-bold" textAnchor="middle">PUMP</text>
-            <text x="150" y="137" className="text-[6px] fill-slate-400 font-bold" textAnchor="middle">COLUMN (C18)</text>
-            <text x="220" y="135" className="text-[6px] fill-slate-400 font-bold" textAnchor="middle">DETECTOR</text>
+            <text x="80" y="103" fill="#475569" fontSize="9" fontWeight="900" textAnchor="middle">ปั๊มแรงดันสูง</text>
+            <text x="150" y="134" fill="#475569" fontSize="9" fontWeight="900" textAnchor="middle">คอลัมน์ C18</text>
+            <text x="220" y="132" fill="#6d28d9" fontSize="9" fontWeight="900" textAnchor="middle">UV detector</text>
+            <text x="250" y="224" fill="#64748b" fontSize="9" fontWeight="800" textAnchor="middle">ของเสีย</text>
+            <text x="150" y="242" fill="#047857" fontSize="11" fontWeight="900" textAnchor="middle">อัตราการไหล {flowRate.toFixed(1)} mL/min · ตัวทำละลายอินทรีย์ {solventPercent}%</text>
           </svg>
 
           {/* Chromatogram graph display at bottom */}
           <div className="w-full mt-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 h-28 relative">
             <span className="absolute left-2 top-1 text-[9px] font-bold text-slate-400">UV Absorbance (Chromatogram)</span>
             <div className="w-full h-full">
-              <svg className="w-full h-full" viewBox="0 0 300 100">
+              <svg className="w-full h-full" viewBox="0 0 300 100" role="img" aria-label="โครมาโทแกรมค่าการดูดกลืนยูวีตามเวลา">
+                <title>โครมาโทแกรม HPLC</title>
                 {/* Baseline */}
                 <line x1="30" y1="80" x2="270" y2="80" stroke="#94a3b8" strokeWidth="1.5" />
 

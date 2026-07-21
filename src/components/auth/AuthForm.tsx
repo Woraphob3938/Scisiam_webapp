@@ -594,7 +594,7 @@ export default function AuthForm({
                     <button
                       type="button"
                       onClick={() => setAuthMode("forgot-password")}
-                      className="min-h-8 text-xs font-extrabold leading-[1.45] text-slate-500 transition-colors hover:text-blue-600 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
+                      className="min-h-11 text-xs font-extrabold leading-[1.45] text-slate-500 transition-colors hover:text-blue-600 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
                     >
                       ลืมรหัสผ่าน?
                     </button>
@@ -842,7 +842,7 @@ export default function AuthForm({
                   <button
                     type="button"
                     onClick={() => setAuthMode(isRegister ? "login" : "register")}
-                    className="font-extrabold text-blue-600 underline-offset-4 hover:underline focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
+                    className="inline-flex min-h-11 items-center px-1 font-extrabold text-blue-600 underline-offset-4 hover:underline focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
                   >
                     {isRegister ? "เข้าสู่ระบบ" : "สมัครสมาชิก"}
                   </button>
@@ -863,7 +863,7 @@ export default function AuthForm({
                   <button
                     type="button"
                     onClick={handleDemoTeacherLogin}
-                    className="mx-auto inline-flex min-h-8 items-center justify-center gap-1.5 rounded-lg px-2 text-xs font-extrabold leading-[1.45] text-slate-500 transition-colors hover:text-blue-600 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
+                    className="mx-auto inline-flex min-h-11 items-center justify-center gap-1.5 rounded-lg px-2 text-xs font-extrabold leading-[1.45] text-slate-500 transition-colors hover:text-blue-600 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
                   >
                     <span>ทดลองในบทบาทคุณครู</span>
                     <ArrowRight className="h-3.5 w-3.5" />
@@ -954,7 +954,7 @@ function PasswordToggle({
     <button
       type="button"
       onClick={onToggle}
-      className="absolute right-2 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-lg text-slate-400 transition-colors hover:bg-slate-50 hover:text-slate-700 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
+      className="absolute right-2 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-lg text-slate-400 transition-colors hover:bg-slate-50 hover:text-slate-700 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
       aria-label={`${isVisible ? "ซ่อน" : "แสดง"}${label}`}
       aria-pressed={isVisible}
     >

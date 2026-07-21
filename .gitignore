@@ -46,6 +46,9 @@ yarn-error.log*
 /graphify-out/
 /output/
 /scratch/
+/tmp/
+__pycache__/
+*.pyc
 recovery_step_*.json
 test*.log
 test_output*.txt

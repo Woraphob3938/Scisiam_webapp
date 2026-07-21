@@ -181,18 +181,13 @@ export default function SharedSimulationShell({
   const usesRegularControlDock = usesPersistentControlDock && !hasCompactControls;
   const stageBottomClass = !usesPersistentControlDock
     ? controlsOpen
-      ? "bottom-[calc(32vh+48px)]"
+      ? "sm:bottom-[calc(32vh+48px)]"
       : hasCollapsedControls
-        ? "bottom-[210px] sm:bottom-[220px]"
-        : "bottom-[96px] sm:bottom-[104px]"
+        ? "sm:bottom-[220px]"
+        : "sm:bottom-[104px]"
     : usesRegularControlDock
-      ? "bottom-[272px] sm:bottom-[272px]"
-      : "bottom-[228px] sm:bottom-[220px]";
-  const fullscreenButtonBottomClass = usesRegularControlDock
-    ? "bottom-[272px] sm:bottom-[272px]"
-    : usesPersistentControlDock
-      ? "bottom-[188px] sm:bottom-[180px]"
-      : stageBottomClass;
+      ? "sm:bottom-[272px]"
+      : "sm:bottom-[220px]";
 
   useEffect(() => {
     const syncFullscreen = () => setIsExpanded(document.fullscreenElement === stageShellRef.current);
@@ -242,8 +237,8 @@ export default function SharedSimulationShell({
       </div>
       <div className="grid grid-cols-2 gap-2">
         {metrics.slice(0, 4).map((metric) => (
-          <div key={metric.label} className={`rounded-xl px-2.5 py-2 text-[11px] font-black ${metricToneClasses[metric.tone ?? resolvedAccent]}`}>
-            <p className="truncate text-[10px] opacity-75">{metric.label}</p>
+          <div key={metric.label} className={`rounded-xl px-2.5 py-2 text-xs font-black ${metricToneClasses[metric.tone ?? resolvedAccent]}`}>
+            <p className="truncate text-xs opacity-75">{metric.label}</p>
             <p className="truncate text-sm">{metric.value}</p>
           </div>
         ))}
@@ -263,7 +258,7 @@ export default function SharedSimulationShell({
           <button
             type="button"
             onClick={() => setControlsOpen((value) => !value)}
-            className={`inline-flex min-h-10 items-center gap-1.5 rounded-full border px-3.5 py-2 text-xs font-black sm:text-sm ${tone.soft}`}
+            className={`inline-flex min-h-11 items-center gap-1.5 rounded-full border px-3.5 py-2 text-xs font-black sm:text-sm ${tone.soft}`}
             aria-expanded={controlsOpen}
           >
             {controlsOpen ? "ย่อแผง" : "เปิดแผง"}
@@ -317,7 +312,7 @@ export default function SharedSimulationShell({
           <button
             type="button"
             onClick={() => setControlsOpen((value) => !value)}
-            className={`inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-black transition hover:brightness-95 ${tone.soft}`}
+            className={`inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-black transition hover:brightness-95 ${tone.soft}`}
             aria-expanded={controlsOpen}
             aria-controls="simulation-advanced-controls"
           >
@@ -336,7 +331,7 @@ export default function SharedSimulationShell({
     <section
       id="simulation-advanced-controls"
       data-testid="simulation-advanced-controls"
-      className={`absolute inset-x-4 bottom-[210px] top-[122px] z-40 overflow-y-auto rounded-2xl border bg-white p-4 shadow-xl shadow-slate-900/15 sm:inset-x-5 md:left-auto md:w-[min(720px,calc(100%-2.5rem))] ${tone.border}`}
+      className={`absolute inset-4 z-40 overflow-y-auto rounded-2xl border bg-white p-4 shadow-xl shadow-slate-900/15 sm:inset-x-5 sm:bottom-[210px] sm:top-[122px] md:left-auto md:w-[min(720px,calc(100%-2.5rem))] ${tone.border}`}
     >
       <div className="mb-3 flex items-center justify-between gap-3 border-b border-slate-100 pb-3">
         <h2 className="text-sm font-black text-slate-900">การตั้งค่าขั้นสูง</h2>
@@ -368,23 +363,23 @@ export default function SharedSimulationShell({
       className={`relative overflow-hidden border border-slate-200 bg-slate-900 shadow-2xl shadow-slate-300/60 ${
         isExpanded
           ? "fixed inset-0 z-[100] h-screen min-h-screen w-screen rounded-none border-0 shadow-none"
-          : "h-[72vh] min-h-[620px] max-h-[840px] rounded-[24px]"
+          : "min-h-[760px] rounded-[24px] sm:h-[72vh] sm:min-h-[620px] sm:max-h-[840px]"
       }`}
     >
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(59,130,246,0.18),transparent_30%),radial-gradient(circle_at_80%_20%,rgba(16,185,129,0.14),transparent_28%)]" />
       <div className={`absolute inset-px bg-slate-100 ${isExpanded ? "" : "rounded-[22px]"}`} />
 
-      <div className="pointer-events-none absolute left-5 right-5 top-5 z-20">
-          <div className="pointer-events-auto inline-block min-w-0 max-w-[calc(100%-64px)] rounded-2xl border border-white/70 bg-white/92 px-4 py-3 shadow-lg shadow-slate-900/10 backdrop-blur-md xl:max-w-[calc(100%-340px)]">
+      <div className="relative z-20 px-4 pt-4 sm:pointer-events-none sm:absolute sm:left-5 sm:right-5 sm:top-5 sm:p-0">
+          <div className="pointer-events-auto block min-w-0 rounded-2xl border border-white/70 bg-white/92 px-4 py-3 shadow-lg shadow-slate-900/10 backdrop-blur-md sm:inline-block sm:max-w-[calc(100%-64px)] xl:max-w-[calc(100%-340px)]">
           <div className="mb-1 flex flex-wrap items-center gap-2">
             <Link
               href="/labs"
-              className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-black text-slate-700 shadow-sm transition-colors hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-1"
+              className="inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-black text-slate-700 shadow-sm transition-colors hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-1"
             >
               <ArrowLeft className="h-3.5 w-3.5" />
               ย้อนกลับ
             </Link>
-            <span className={`rounded-full border px-2.5 py-1 text-[10px] font-black ${tone.soft}`}>{category}</span>
+            <span className={`rounded-full border px-2.5 py-1 text-xs font-black ${tone.soft}`}>{category}</span>
           </div>
           <h1 className="max-w-[720px] text-lg font-black leading-relaxed text-slate-950 sm:text-2xl">{title}</h1>
         </div>
@@ -397,37 +392,36 @@ export default function SharedSimulationShell({
         </div>
       )}
 
-      {showLiveMetrics && <div className="absolute right-5 top-[148px] z-20 sm:hidden pointer-events-none">
-        <div className="inline-flex max-w-[180px] items-center gap-2 rounded-2xl border border-white/70 bg-white/92 px-3 py-2 text-[11px] font-black text-slate-900 shadow-lg shadow-slate-900/10 backdrop-blur-md pointer-events-auto">
+      {showLiveMetrics && <div data-testid="simulation-mobile-metric" className="relative z-20 mx-4 mt-3 sm:hidden">
+        <div className="flex min-h-11 w-full items-center gap-2 rounded-2xl border border-white/70 bg-white/92 px-3 py-2 text-xs font-black text-slate-900 shadow-lg shadow-slate-900/10 backdrop-blur-md">
           <BarChart3 className={`h-3.5 w-3.5 ${tone.text}`} />
           <span className="truncate">{metrics[0]?.label}: {metrics[0]?.value}</span>
         </div>
       </div>}
 
-      <div className={`absolute inset-x-4 top-[122px] z-10 transition-all duration-300 sm:inset-x-5 ${stageBottomClass}`}>
+      <div className={`relative z-10 mx-4 mt-3 min-h-[320px] transition-all duration-300 sm:absolute sm:inset-x-5 sm:top-[122px] sm:mx-0 sm:mt-0 sm:min-h-0 ${stageBottomClass}`}>
         <div
           data-testid="simulation-stage-content"
-          className="relative h-full min-h-0 overflow-hidden rounded-[22px]"
+          className="relative min-h-[320px] overflow-hidden rounded-[22px] sm:h-full sm:min-h-0"
         >
-          <div data-testid="simulation-stage-scene" className="h-full min-h-0 overflow-hidden">
+          <div data-testid="simulation-stage-scene" className="min-h-[320px] overflow-hidden sm:h-full sm:min-h-0">
             {scene}
           </div>
+          <button
+            type="button"
+            data-testid="simulation-fullscreen-toggle"
+            onClick={toggleFullscreen}
+            className="absolute bottom-3 right-3 z-30 grid h-11 w-11 place-items-center rounded-2xl border border-white/70 bg-white/92 text-slate-700 shadow-lg shadow-slate-900/10 backdrop-blur-md transition hover:text-slate-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+            aria-label={isExpanded ? "ออกจากโหมดเต็มจอ" : "ขยายห้องทดลอง"}
+          >
+            {isExpanded ? <Minimize2 className="h-5 w-5" /> : <Maximize2 className="h-5 w-5" />}
+          </button>
         </div>
       </div>
 
       {persistentAdvancedPanel}
 
-      <button
-        type="button"
-        data-testid="simulation-fullscreen-toggle"
-        onClick={toggleFullscreen}
-        className={`absolute right-5 z-30 grid h-11 w-11 place-items-center rounded-2xl border border-white/70 bg-white/92 text-slate-700 shadow-lg shadow-slate-900/10 backdrop-blur-md transition hover:text-slate-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${fullscreenButtonBottomClass}`}
-        aria-label={isExpanded ? "ออกจากโหมดเต็มจอ" : "ขยายห้องทดลอง"}
-      >
-        {isExpanded ? <Minimize2 className="h-5 w-5" /> : <Maximize2 className="h-5 w-5" />}
-      </button>
-
-      <div className="absolute bottom-4 left-4 right-4 z-30 sm:bottom-5 sm:left-5 sm:right-5">
+      <div className="relative z-30 mx-4 mb-4 mt-3 sm:absolute sm:bottom-5 sm:left-5 sm:right-5 sm:m-0">
         {usesPersistentControlDock ? persistentControlDock : controlsDrawer}
       </div>
     </section>
@@ -519,7 +513,7 @@ export default function SharedSimulationShell({
               {simulationStage}
 
               {showInfoTabs && <section className="space-y-4">
-            <div className="flex gap-2 overflow-x-auto rounded-2xl border border-slate-200 bg-white p-2 shadow-sm shadow-slate-200/40">
+            <div className="grid grid-cols-3 gap-2 rounded-2xl border border-slate-200 bg-white p-2 shadow-sm shadow-slate-200/40 sm:flex sm:overflow-x-auto">
               {tabs.map((tab) => {
                 const TabIcon = tab.icon;
                 const selected = activeTab === tab.key;
@@ -529,7 +523,7 @@ export default function SharedSimulationShell({
                     key={tab.key}
                     type="button"
                     onClick={() => setActiveTab(tab.key)}
-                    className={`inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl px-4 text-sm font-black transition ${
+                    className={`inline-flex min-h-11 w-full items-center justify-center gap-1.5 rounded-xl px-2 text-xs font-black transition sm:w-auto sm:shrink-0 sm:gap-2 sm:px-4 sm:text-sm ${
                       selected ? `${tone.soft} ring-1 ring-inset ${tone.border}` : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
                     }`}
                   >

@@ -441,7 +441,7 @@ export default function LabDetailLayout({ labId, lab, details, hero }: LabDetail
 
       <main className="relative z-10 mx-auto w-full max-w-[1440px] px-4 py-5 sm:px-12 md:px-20">
         <section className="space-y-4">
-          <div className="flex gap-2 overflow-x-auto rounded-2xl border border-slate-200 bg-white p-2 shadow-sm shadow-slate-200/40">
+          <div className="grid grid-cols-3 gap-2 rounded-2xl border border-slate-200 bg-white p-2 shadow-sm shadow-slate-200/40 sm:flex sm:overflow-x-auto">
             {tabs.map((tab) => {
               const TabIcon = tab.icon;
               const selected = activeTab === tab.key;
@@ -451,7 +451,7 @@ export default function LabDetailLayout({ labId, lab, details, hero }: LabDetail
                   key={tab.key}
                   type="button"
                   onClick={() => setActiveTab(tab.key)}
-                  className={`inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl px-4 text-sm font-black transition ${
+                  className={`inline-flex min-h-11 w-full items-center justify-center gap-1.5 rounded-xl px-2 text-xs font-black transition sm:w-auto sm:shrink-0 sm:gap-2 sm:px-4 sm:text-sm ${
                     selected
                       ? `${theme.accentBg} ${theme.accentText} ring-1 ring-inset ${theme.accentBorder}`
                       : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"

@@ -1,17 +1,23 @@
 {
   "version": 1,
   "skills": {
+    "hallmark": {
+      "source": "nutlope/hallmark",
+      "sourceType": "github",
+      "skillPath": "skills/hallmark/SKILL.md",
+      "computedHash": "c25595fa30b123e0cf6f8bb4e2c584bd592c9ada9a4b5b4a1d161d97ff8105e3"
+    },
     "supabase": {
       "source": "supabase/agent-skills",
       "sourceType": "github",
       "skillPath": "skills/supabase/SKILL.md",
-      "computedHash": "1171386737b231610fa42485707272765c3516a9bbc0bd2c6c161a8cee3d7d33"
+      "computedHash": "19fca56d93a6d212c6373ad921dcaeddf2ff13e3558e6bfd6e63acb063255f86"
     },
     "supabase-postgres-best-practices": {
       "source": "supabase/agent-skills",
       "sourceType": "github",
       "skillPath": "skills/supabase-postgres-best-practices/SKILL.md",
-      "computedHash": "ccd6e4596bd51cf344fe76c464867c541ccc16b6d90ae7a9db449fb17588613b"
+      "computedHash": "b7a3d8aeef07a25790856cb3c7c13ef777ebf5ca78954e71dacd112869585f3f"
     }
   }
 }

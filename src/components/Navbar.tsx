@@ -233,7 +233,7 @@ export default function Navbar() {
                   );
               }
             }}
-            className="relative flex size-10 items-center justify-center rounded-xl text-slate-500 transition-all duration-200 hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
+            className="relative flex size-11 items-center justify-center rounded-xl text-slate-500 transition-all duration-200 hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
             aria-label="การแจ้งเตือน"
           >
             <Bell className="w-5 h-5" />
@@ -250,7 +250,7 @@ export default function Navbar() {
             <div className="absolute right-0 mt-2.5 w-72 bg-white rounded-2xl shadow-xl border border-slate-100 py-2.5 text-left z-50 animate-in fade-in slide-in-from-top-2 duration-200">
               <div className="px-4 py-1.5 border-b border-slate-50 flex justify-between items-center">
                 <span className="font-semibold text-slate-800 text-sm">การแจ้งเตือน</span>
-                <span className="text-[10px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded-md font-semibold">ใหม่ {unreadNotificationCount}</span>
+                <span className="rounded-md bg-blue-50 px-1.5 py-0.5 text-xs font-semibold text-blue-600">ใหม่ {unreadNotificationCount}</span>
               </div>
               <div className="max-h-60 overflow-y-auto px-2 py-1.5 space-y-1">
                 {unreadNotifications.length === 0 ? (
@@ -273,14 +273,14 @@ export default function Navbar() {
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="text-xs font-semibold text-slate-800 truncate">{n.title}</p>
-                          <p className="text-[10px] text-slate-500 mt-0.5 break-words">{n.message}</p>
+                          <p className="mt-0.5 break-words text-xs text-slate-500">{n.message}</p>
                         </div>
                       </button>
                       <button
                         type="button"
                         aria-label={`ลบแจ้งเตือน ${n.title}`}
                         onClick={() => dismissNotification(n)}
-                        className="grid size-7 shrink-0 place-items-center rounded-lg text-slate-400 hover:bg-rose-50 hover:text-rose-600 focus:outline-none focus-visible:ring-3 focus-visible:ring-rose-100"
+                        className="grid size-11 shrink-0 place-items-center rounded-lg text-slate-400 hover:bg-rose-50 hover:text-rose-600 focus:outline-none focus-visible:ring-3 focus-visible:ring-rose-100"
                       >
                         <X className="size-3.5" aria-hidden="true" />
                       </button>

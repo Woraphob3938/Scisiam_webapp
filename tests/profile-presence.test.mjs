@@ -104,6 +104,22 @@ test("mobile category filter stays inside the viewport", () => {
   assert.match(source, /max-w-\[calc\(100vw-1rem\)\]/);
   assert.match(source, /overflow-hidden/);
   assert.match(source, /min-w-0/);
+  assert.match(source, /text-xs/);
+  assert.doesNotMatch(source, /text-\[11px\]/);
+});
+
+test("mobile navigation and common icon buttons meet the touch target baseline", () => {
+  const mobileTabBar = read("src", "components", "MobileTabBar.tsx");
+  const navbar = read("src", "components", "Navbar.tsx");
+  const authForm = read("src", "components", "auth", "AuthForm.tsx");
+  const labsPage = read("src", "app", "labs", "page.tsx");
+
+  assert.match(mobileTabBar, /text-xs/);
+  assert.match(navbar, /size-11/);
+  assert.match(authForm, /className="min-h-11 text-xs/);
+  assert.match(authForm, /className="absolute right-2 top-1\/2 grid h-11 w-11/);
+  assert.match(authForm, /mx-auto inline-flex min-h-11 items-center justify-center/);
+  assert.match(labsPage, /className={`min-h-11 rounded-xl border/);
 });
 
 test("navbar notifications do not reuse local lab keys for Supabase accounts", () => {

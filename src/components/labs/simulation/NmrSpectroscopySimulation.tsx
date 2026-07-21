@@ -213,36 +213,45 @@ export default function NmrSpectroscopySimulation() {
       icon={Radio}
       sceneTitle="เครื่องตรวจวัดสเปกตรัม NMR"
       scene={
-        <div className="flex flex-col items-center justify-center p-4 border border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-50 dark:bg-slate-900/50 min-h-[340px] relative w-full h-full">
-          <svg viewBox="0 0 300 300" className="w-full max-w-sm h-auto drop-shadow-md">
+        <div className="relative flex min-h-[340px] h-full w-full flex-col items-center justify-center bg-[linear-gradient(145deg,#ecfeff,#f8fafc_55%,#eff6ff)] p-4">
+          <svg viewBox="0 0 360 300" className="h-auto w-full max-w-md" role="img" aria-label="เครื่อง NMR แสดงแม่เหล็ก ตัวอย่าง ขดลวด RF และแนวสปินของโปรตอน">
+            <title>เครื่องตรวจวัดสเปกตรัม NMR</title>
+            <desc>หลอดตัวอย่างอยู่กึ่งกลางแม่เหล็กสนามสูง ขดลวดส่งพัลส์วิทยุทำให้สปินโปรตอนตอบสนองและเกิดสเปกตรัม</desc>
             {/* NMR Magnet body */}
-            <rect x="70" y="60" width="160" height="180" fill="#475569" rx="10" />
-            <rect x="85" y="75" width="130" height="150" fill="#94a3b8" rx="6" />
+            <rect x="100" y="60" width="160" height="180" fill="#475569" rx="18" />
+            <rect x="115" y="75" width="130" height="150" fill="#94a3b8" rx="10" />
 
             {/* Superconducting coils */}
-            <line x1="85" y1="100" x2="215" y2="100" stroke="#f1f5f9" strokeWidth="4" strokeDasharray="3 3" />
-            <line x1="85" y1="120" x2="215" y2="120" stroke="#f1f5f9" strokeWidth="4" strokeDasharray="3 3" />
-            <line x1="85" y1="180" x2="215" y2="180" stroke="#f1f5f9" strokeWidth="4" strokeDasharray="3 3" />
-            <line x1="85" y1="200" x2="215" y2="200" stroke="#f1f5f9" strokeWidth="4" strokeDasharray="3 3" />
+            {[100, 120, 180, 200].map((y) => <line key={y} x1="115" y1={y} x2="245" y2={y} stroke="#f1f5f9" strokeWidth="4" strokeDasharray="3 3" />)}
 
             {/* Liquid Nitrogen Cooling level */}
-            <rect x="90" y="80" width="25" height="140" fill="#bae6fd" opacity="0.4" />
-            <rect x="185" y="80" width="25" height="140" fill="#bae6fd" opacity="0.4" />
+            <rect x="120" y="80" width="25" height="140" fill="#bae6fd" opacity="0.45" />
+            <rect x="215" y="80" width="25" height="140" fill="#bae6fd" opacity="0.45" />
 
             {/* NMR Tube insertion sleeve */}
-            <rect x="140" y="20" width="20" height="220" fill="#1e293b" opacity="0.9" />
+            <rect x="170" y="20" width="20" height="220" fill="#1e293b" opacity="0.9" />
 
             {/* Glass NMR Tube */}
-            <rect x="146" y="30" width="8" height="190" fill="#ffffff" stroke="#cbd5e1" strokeWidth="1" opacity="0.8" />
+            <rect x="176" y="30" width="8" height="190" fill="#ffffff" stroke="#cbd5e1" strokeWidth="1" opacity="0.8" />
             {/* Sample liquid inside tube */}
-            <rect x="147" y="110" width="6" height="70" fill="#a5f3fc" opacity="0.75" />
+            <rect x="177" y="110" width="6" height="70" fill="#22d3ee" opacity="0.8" />
 
             {/* RF coils at the center */}
-            <circle cx="150" cy="145" r="18" fill="none" stroke="#eab308" strokeWidth="3" strokeDasharray="4 2" />
+            <circle cx="180" cy="145" r="18" fill="none" stroke="#eab308" strokeWidth="3" strokeDasharray="4 2" />
+            {[[162, 128], [180, 130], [198, 128], [170, 158], [190, 158]].map(([x, y], index) => (
+              <g key={index} transform={`translate(${x} ${y}) rotate(${isPulsing ? 90 : index % 2 === 0 ? -20 : 20})`}>
+                <circle r="5" fill="#ffffff" stroke="#0891b2" strokeWidth="2" />
+                <line y1="-5" y2="-16" stroke="#0e7490" strokeWidth="2" strokeLinecap="round" />
+              </g>
+            ))}
+            <text x="38" y="93" fill="#0e7490" fontSize="13" fontWeight="900">B₀ {magneticField.toFixed(1)} T</text>
+            <text x="38" y="112" fill="#64748b" fontSize="11" fontWeight="700">สนามแม่เหล็กหลัก</text>
+            <text x="274" y="142" fill="#a16207" fontSize="13" fontWeight="900">RF pulse</text>
+            <text x="274" y="160" fill="#64748b" fontSize="11" fontWeight="700">กระตุ้นสปิน ¹H</text>
 
             {/* RF Pulsing wave circles */}
             {isPulsing && (
-              <g transform="translate(150, 145)">
+              <g transform="translate(180, 145)">
                 <circle cx="0" cy="0" r={pulseProgress * 0.4} fill="none" stroke="#ef4444" strokeWidth="2" opacity={1 - pulseProgress / 100} />
                 <circle cx="0" cy="0" r={Math.max(0, pulseProgress * 0.4 - 20)} fill="none" stroke="#f97316" strokeWidth="1.5" opacity={1 - pulseProgress / 100} />
               </g>

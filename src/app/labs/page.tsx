@@ -196,7 +196,7 @@ function LabsContent() {
                   key={grade.id}
                   type="button"
                   onClick={() => handleGradeLevelChange(grade.id)}
-                  className={`min-h-9 rounded-xl border px-3 py-1.5 text-xs font-extrabold leading-[1.45] transition-colors focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100 ${
+                  className={`min-h-11 rounded-xl border px-3 py-2 text-xs font-extrabold leading-[1.45] transition-colors focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100 ${
                     isActive
                       ? "border-blue-600 bg-blue-600 text-white shadow-sm shadow-blue-500/20"
                       : "border-slate-200 bg-white text-slate-600 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
@@ -231,7 +231,7 @@ function LabsContent() {
                   setSelectedCategory("All");
                   setShowAllLabs(false);
                 }}
-                className="mt-2 rounded-xl bg-blue-600 px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-blue-700 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
+                className="mt-2 inline-flex min-h-11 items-center justify-center rounded-xl bg-blue-600 px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-blue-700 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
               >
                 ดูห้องแล็บทั้งหมด
               </button>

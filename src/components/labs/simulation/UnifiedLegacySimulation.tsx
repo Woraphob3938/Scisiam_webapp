@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useId, useMemo, useState } from "react";
 import {
   Atom,
   Beaker,
@@ -210,6 +210,8 @@ function LabScene({
   values: Partial<Record<ControlKey, number>>;
   isRunning: boolean;
 }) {
+  const sceneId = useId().replace(/:/g, "");
+
   if (labId === "ideal-gas-law") {
     return (
       <GasChamber3DScene
@@ -222,9 +224,13 @@ function LabScene({
     );
   }
 
-  const isChem = configs[labId].category === "Chemistry";
-  const fill = labId === "acid-base-titration" ? (result.primary < 6 ? "#fca5a5" : result.primary < 8 ? "#bbf7d0" : "#a5f3fc") : isChem ? "#c084fc" : "#60a5fa";
-  const level = labId === "newtons-second-law" ? 58 : Math.max(34, Math.min(94, result.primary * 3.5));
+  const indicatorColor = result.primary < 6 ? "#fb7185" : result.primary < 8 ? "#86efac" : "#67e8f9";
+  const volume = getValue(values, "volume");
+  const pistonY = 292 - ((volume - 1) / 7) * 150;
+  const charlesVolume = Math.max(1, Math.min(6, result.primary));
+  const charlesPistonY = 286 - ((charlesVolume - 1) / 5) * 142;
+  const baseVolume = getValue(values, "baseVolume");
+  const buretteLevel = Math.max(48, 204 - baseVolume * 2.35);
 
   return (
     <div className="relative flex h-full min-h-0 items-center justify-center overflow-hidden rounded-2xl bg-[linear-gradient(135deg,#f8fbff_0%,#eef6ff_48%,#ffffff_100%)]">
@@ -233,7 +239,15 @@ function LabScene({
         <p className="text-[10px] font-black uppercase text-blue-600">live apparatus</p>
         <p>{configs[labId].sceneTitle}</p>
       </div>
-      <svg className="relative z-10 h-full max-h-[430px] w-full max-w-[720px]" viewBox="0 0 720 430" fill="none" aria-hidden="true">
+      <svg
+        className="relative z-10 h-full max-h-[430px] w-full max-w-[720px]"
+        viewBox="0 0 720 430"
+        fill="none"
+        role="img"
+        aria-labelledby={`${sceneId}-title ${sceneId}-description`}
+      >
+        <title id={`${sceneId}-title`}>{configs[labId].sceneTitle}</title>
+        <desc id={`${sceneId}-description`}>อุปกรณ์ทดลองตอบสนองตามค่าที่ผู้เรียนกำหนดและแสดงผลลัพธ์ปัจจุบัน</desc>
         <ellipse cx="360" cy="355" rx="230" ry="28" fill="#dbeafe" opacity="0.7" />
         {labId === "newtons-second-law" ? (
           <>
@@ -254,20 +268,69 @@ function LabScene({
             <circle cx="360" cy="215" r="9" fill="#ffffff" stroke="#0f172a" strokeWidth="3" />
             <text x="470" y="170" fill="#0f172a" fontSize="18" fontWeight="900">θ₂ {result.primary.toFixed(1)}°</text>
           </>
-        ) : (
+        ) : labId === "acid-base-titration" ? (
           <>
-            <rect x="205" y="100" width="56" height="220" rx="24" fill="#f8fafc" stroke="#94a3b8" strokeWidth="5" />
-            <rect x="217" y={300 - level} width="32" height={level + 5} rx="16" fill={fill} opacity="0.72" />
-            <path d="M245 110H425" stroke="#64748b" strokeWidth="7" strokeLinecap="round" />
-            <path d="M420 110V280" stroke="#64748b" strokeWidth="7" strokeLinecap="round" />
-            <path d="M350 185C382 176 422 176 456 185V286C456 306 440 322 420 322H286C266 322 250 306 250 286V185C282 176 318 176 350 185Z" fill="#ffffff" stroke="#94a3b8" strokeWidth="5" />
-            <path d={`M260 ${292 - Math.min(84, level)}C292 ${282 - Math.min(84, level)} 414 ${282 - Math.min(84, level)} 446 ${292 - Math.min(84, level)}V286C446 300 434 312 420 312H286C272 312 260 300 260 286Z`} fill={fill} opacity="0.78" />
-            <rect x="480" y="145" width="120" height="78" rx="18" fill="#0f172a" />
-            <rect x="493" y="158" width="94" height="50" rx="12" fill="#dcfce7" />
-            <text x="540" y="188" textAnchor="middle" fill="#065f46" fontSize="22" fontWeight="900">{result.primary.toFixed(2)} {result.unit}</text>
-            <text x="540" y="205" textAnchor="middle" fill="#047857" fontSize="10" fontWeight="900">{configs[labId].equation}</text>
+            <path d="M198 80H282M240 80V318" stroke="#475569" strokeWidth="7" strokeLinecap="round" />
+            <rect x="222" y="48" width="36" height="206" rx="16" fill="#ffffff" stroke="#64748b" strokeWidth="4" />
+            <rect x="230" y={buretteLevel} width="20" height={244 - buretteLevel} rx="8" fill="#67e8f9" opacity="0.82" />
+            {Array.from({ length: 8 }, (_, index) => (
+              <line key={index} x1="222" x2={index % 2 === 0 ? 238 : 232} y1={72 + index * 22} y2={72 + index * 22} stroke="#94a3b8" strokeWidth="2" />
+            ))}
+            <path d="M240 254V278H270" stroke="#475569" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
+            <circle cx="270" cy="278" r="7" fill="#0891b2" />
+            {baseVolume > 0 && <circle cx="270" cy="296" r="5" fill="#22d3ee" opacity={isRunning ? 1 : 0.55} />}
+            <path d="M318 198H456L438 330H336L318 198Z" fill="#ffffff" stroke="#64748b" strokeWidth="5" strokeLinejoin="round" />
+            <path d="M330 262C360 250 414 250 444 262L436 324H338L330 262Z" fill={indicatorColor} opacity="0.72" />
+            <path d="M360 188V286" stroke="#f8fafc" strokeWidth="5" strokeLinecap="round" opacity="0.85" />
+            <ellipse cx="388" cy="337" rx="82" ry="12" fill="#cbd5e1" opacity="0.65" />
+            <g transform="translate(482 132)">
+              <rect width="126" height="92" rx="18" fill="#0f172a" />
+              <text x="63" y="24" textAnchor="middle" fill="#94a3b8" fontSize="11" fontWeight="800">pH SENSOR</text>
+              <text x="63" y="57" textAnchor="middle" fill="#dcfce7" fontSize="28" fontWeight="900">{result.primary.toFixed(2)}</text>
+              <text x="63" y="76" textAnchor="middle" fill="#67e8f9" fontSize="10" fontWeight="800">เติมเบส {baseVolume.toFixed(1)} ml</text>
+            </g>
           </>
-        )}
+        ) : labId === "boyles-law" ? (
+          <>
+            <g transform="translate(222 52)">
+              <rect x="0" y="32" width="224" height="252" rx="28" fill="#eef2ff" stroke="#64748b" strokeWidth="6" />
+              <rect x="12" y={pistonY} width="200" height={276 - pistonY} rx="18" fill="#c4b5fd" opacity="0.7" />
+              <rect x="-12" y={pistonY - 12} width="248" height="24" rx="12" fill="#475569" />
+              <path d={`M112 ${pistonY - 12}V8`} stroke="#475569" strokeWidth="12" strokeLinecap="round" />
+              <rect x="58" y="0" width="108" height="22" rx="11" fill="#94a3b8" />
+              {Array.from({ length: 12 }, (_, index) => (
+                <circle key={index} cx={32 + (index * 41) % 160} cy={pistonY + 30 + ((index * 29) % Math.max(36, 234 - pistonY))} r="6" fill="#7c3aed" opacity="0.78" />
+              ))}
+            </g>
+            <g transform="translate(490 132)">
+              <circle cx="60" cy="60" r="58" fill="#ffffff" stroke="#94a3b8" strokeWidth="6" />
+              <path d="M60 60L91 35" stroke="#7c3aed" strokeWidth="7" strokeLinecap="round" />
+              <circle cx="60" cy="60" r="7" fill="#0f172a" />
+              <text x="60" y="94" textAnchor="middle" fill="#475569" fontSize="13" fontWeight="900">{result.primary.toFixed(1)} kPa</text>
+              <text x="60" y="116" textAnchor="middle" fill="#7c3aed" fontSize="11" fontWeight="800">V = {volume.toFixed(1)} L</text>
+            </g>
+          </>
+        ) : labId === "charles-law" ? (
+          <>
+            <rect x="188" y="238" width="348" height="104" rx="32" fill="#bfdbfe" stroke="#60a5fa" strokeWidth="5" opacity="0.88" />
+            <path d="M206 272C248 246 294 298 338 272C382 246 430 298 516 266" stroke="#38bdf8" strokeWidth="8" strokeLinecap="round" opacity="0.75" />
+            <g transform="translate(278 54)">
+              <rect x="0" y="24" width="168" height="244" rx="24" fill="#ffffff" stroke="#64748b" strokeWidth="6" />
+              <rect x="10" y={charlesPistonY} width="148" height={258 - charlesPistonY} rx="16" fill="#fdba74" opacity="0.62" />
+              <rect x="-10" y={charlesPistonY - 10} width="188" height="22" rx="11" fill="#475569" />
+              <path d={`M84 ${charlesPistonY - 10}V4`} stroke="#475569" strokeWidth="10" strokeLinecap="round" />
+              {Array.from({ length: 10 }, (_, index) => (
+                <circle key={index} cx={24 + (index * 37) % 120} cy={charlesPistonY + 28 + ((index * 31) % Math.max(34, 218 - charlesPistonY))} r="6" fill="#f97316" opacity="0.78" />
+              ))}
+            </g>
+            <g transform="translate(492 94)">
+              <rect width="122" height="98" rx="18" fill="#fff7ed" stroke="#fdba74" strokeWidth="4" />
+              <text x="61" y="28" textAnchor="middle" fill="#9a3412" fontSize="11" fontWeight="900">WATER BATH</text>
+              <text x="61" y="59" textAnchor="middle" fill="#ea580c" fontSize="25" fontWeight="900">{getValue(values, "temperature").toFixed(0)} K</text>
+              <text x="61" y="80" textAnchor="middle" fill="#475569" fontSize="11" fontWeight="800">V = {result.primary.toFixed(2)} L</text>
+            </g>
+          </>
+        ) : null}
       </svg>
     </div>
   );

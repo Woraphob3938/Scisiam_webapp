@@ -39,7 +39,7 @@ function MobileNavLink({ item, activeItem }: { item: MobileNavItem; activeItem: 
     <Link
       href={item.href}
       aria-current={isActive ? "page" : undefined}
-      className={`flex min-h-[52px] min-w-0 flex-col items-center justify-center gap-0.5 rounded-lg px-1 text-[10px] font-extrabold leading-[1.35] transition-colors focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100 ${
+      className={`flex min-h-[52px] min-w-0 flex-col items-center justify-center gap-0.5 rounded-lg px-1 text-xs font-extrabold leading-[1.35] transition-colors focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100 ${
         isActive
           ? "bg-blue-600 text-white shadow-md shadow-blue-500/20"
           : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"

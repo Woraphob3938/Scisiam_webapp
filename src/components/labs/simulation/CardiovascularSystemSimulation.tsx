@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useId, useMemo, useState } from "react";
 import {
   Activity,
   BarChart3,
@@ -37,6 +37,7 @@ function classifyVitals(heartRate: number, systolic: number) {
 }
 
 export default function CardiovascularSystemSimulation() {
+  const sceneId = useId().replace(/:/g, "");
   const [activityLevel, setActivityLevel] = useState(2);
   const [stimulantDose, setStimulantDose] = useState(0);
   const [recoveryMinutes, setRecoveryMinutes] = useState(0);
@@ -159,41 +160,49 @@ export default function CardiovascularSystemSimulation() {
       icon={Activity}
       sceneTitle="จอมอนิเตอร์ ECG และความดันเลือด"
       scene={
-        <div className="relative flex h-[360px] items-center justify-center overflow-hidden rounded-2xl border border-blue-100 bg-[#0f172a] shadow-inner">
+        <div className="relative flex h-[360px] items-center justify-center overflow-hidden bg-[#0f172a]">
           <div className="absolute inset-0 bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:24px_24px] opacity-45 pointer-events-none" />
+          <svg
+            className="relative z-10 h-full w-full max-w-[720px] p-4"
+            viewBox="0 0 640 340"
+            fill="none"
+            role="img"
+            aria-labelledby={`${sceneId}-title ${sceneId}-description`}
+          >
+            <title id={`${sceneId}-title`}>ระบบไหลเวียนเลือดและจอมอนิเตอร์สัญญาณชีพ</title>
+            <desc id={`${sceneId}-description`}>หัวใจส่งเลือดไปปอดและร่างกาย พร้อมแสดงคลื่นไฟฟ้าหัวใจ อัตราการเต้น ความดัน และปริมาตรเลือดที่สูบฉีด</desc>
 
-          <svg className="relative z-10 h-full w-full max-w-[520px] p-4" viewBox="0 0 400 300" fill="none">
-            <rect x="34" y="44" width="332" height="190" rx="22" fill="#020617" stroke="#1e40af" strokeWidth="4" />
-            <rect x="54" y="70" width="292" height="120" rx="14" fill="#0f172a" stroke="#334155" strokeWidth="2" />
-
-            <g opacity="0.3" stroke="#1d4ed8" strokeWidth="1">
-              {Array.from({ length: 8 }).map((_, index) => (
-                <line key={`v-${index}`} x1={72 + index * 36} y1="76" x2={72 + index * 36} y2="184" />
-              ))}
-              {Array.from({ length: 5 }).map((_, index) => (
-                <line key={`h-${index}`} x1="58" y1={88 + index * 22} x2="342" y2={88 + index * 22} />
-              ))}
+            <g transform="translate(22 44)">
+              <path d="M128 50C77 18 31 65 48 119C61 159 112 190 128 205C144 190 195 159 208 119C225 65 179 18 128 50Z" fill="#ef4444" stroke="#fecaca" strokeWidth="5" />
+              <path d="M128 51V199M52 112H204" stroke="#991b1b" strokeWidth="5" opacity="0.72" />
+              <path d="M87 42C70 16 79 0 96 -15M168 43C187 14 177 -3 161 -18" stroke="#f8fafc" strokeWidth="12" strokeLinecap="round" />
+              <path d="M84 42C70 15 77 2 94 -15M171 43C188 15 180 1 164 -18" stroke="#38bdf8" strokeWidth="6" strokeLinecap="round" />
+              <circle cx="92" cy="91" r="23" fill="#60a5fa" opacity="0.72" />
+              <circle cx="164" cy="91" r="23" fill="#fb7185" opacity="0.76" />
+              <circle cx="91" cy="148" r="28" fill="#2563eb" opacity="0.74" />
+              <circle cx="165" cy="148" r="28" fill="#dc2626" opacity="0.78" />
+              <path d="M43 90C5 77 -2 42 15 20M211 90C249 78 260 42 242 19" stroke="#60a5fa" strokeWidth="7" strokeLinecap="round" />
+              <path d="M43 146C4 160 -2 196 18 220M211 146C249 162 258 197 238 222" stroke="#fb7185" strokeWidth="7" strokeLinecap="round" />
+              <text x="128" y="244" textAnchor="middle" fill="#cbd5e1" fontSize="13" fontWeight="800">การไหลเวียนเลือด ปอด ↔ หัวใจ ↔ ร่างกาย</text>
             </g>
 
-            <path d={ecgPath} stroke={vitalSigns.heartRate > 150 ? "#fb7185" : "#22c55e"} strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-
-            <text x="68" y="218" fill="#93c5fd" fontSize="13" fontWeight="900">HR</text>
-            <text x="102" y="221" fill="#f8fafc" fontSize="28" fontWeight="900">{isMeasured ? vitalSigns.heartRate : "--"}</text>
-            <text x="158" y="218" fill="#64748b" fontSize="11" fontWeight="900">bpm</text>
-
-            <text x="206" y="218" fill="#93c5fd" fontSize="13" fontWeight="900">BP</text>
-            <text x="238" y="221" fill="#f8fafc" fontSize="25" fontWeight="900">
-              {isMeasured ? `${vitalSigns.systolic}/${vitalSigns.diastolic}` : "--/--"}
-            </text>
-
-            <path d="M182 252 C184 232 218 232 220 252 C222 232 256 232 258 252 C260 274 220 286 220 286 C220 286 180 274 182 252 Z" fill="#ef4444" opacity={isMeasured ? "0.95" : "0.45"} />
-            <text x="220" y="272" textAnchor="middle" fill="#fff" fontSize="12" fontWeight="900">CO {isMeasured ? vitalSigns.cardiacOutput : "--"}</text>
+            <g transform="translate(285 37)">
+              <rect width="330" height="238" rx="24" fill="#020617" stroke="#1e40af" strokeWidth="4" />
+              <rect x="20" y="28" width="290" height="126" rx="14" fill="#0f172a" stroke="#334155" strokeWidth="2" />
+              <g opacity="0.28" stroke="#1d4ed8">
+                {Array.from({ length: 8 }).map((_, index) => <line key={`v-${index}`} x1={38 + index * 36} y1="34" x2={38 + index * 36} y2="148" />)}
+                {Array.from({ length: 5 }).map((_, index) => <line key={`h-${index}`} x1="26" y1={46 + index * 22} x2="304" y2={46 + index * 22} />)}
+              </g>
+              <path d={ecgPath} transform="translate(15 -42) scale(.73 .82)" stroke={vitalSigns.heartRate > 150 ? "#fb7185" : "#22c55e"} strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
+              <text x="24" y="185" fill="#93c5fd" fontSize="12" fontWeight="900">HR</text>
+              <text x="54" y="190" fill="#f8fafc" fontSize="26" fontWeight="900">{isMeasured ? vitalSigns.heartRate : "--"}</text>
+              <text x="108" y="187" fill="#64748b" fontSize="10" fontWeight="900">bpm</text>
+              <text x="162" y="185" fill="#93c5fd" fontSize="12" fontWeight="900">BP</text>
+              <text x="190" y="190" fill="#f8fafc" fontSize="22" fontWeight="900">{isMeasured ? `${vitalSigns.systolic}/${vitalSigns.diastolic}` : "--/--"}</text>
+              <text x="24" y="218" fill="#94a3b8" fontSize="11" fontWeight="800">CO {isMeasured ? `${vitalSigns.cardiacOutput} L/min` : "--"}</text>
+              <text x="306" y="218" textAnchor="end" fill="#cbd5e1" fontSize="11" fontWeight="800">{isMeasured ? vitalSigns.condition : "ยังไม่วัด"}</text>
+            </g>
           </svg>
-
-          <div className="absolute right-5 bottom-5 rounded-xl border border-slate-700/60 bg-slate-900/90 px-3.5 py-1.5 text-right text-xs font-bold text-white">
-            <span className="block text-[10px] font-black text-slate-400">สถานะหัวใจ</span>
-            {isMeasured ? vitalSigns.condition : "ยังไม่วัด"}
-          </div>
         </div>
       }
       controlsTitle="ควบคุมกิจกรรมและภาระต่อหัวใจ"

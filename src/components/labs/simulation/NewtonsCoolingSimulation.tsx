@@ -930,7 +930,7 @@ export default function NewtonsCoolingSimulation() {
 
   const compactControls = (
     <div className="grid gap-2 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
-      <div className="grid auto-cols-[minmax(210px,1fr)] grid-flow-col gap-2 overflow-x-auto pb-1 lg:grid-flow-row lg:grid-cols-3 lg:overflow-visible lg:pb-0">
+      <div className="grid grid-cols-2 gap-2 lg:grid-cols-3">
         {coolingControls.map((control) => {
           const ControlIcon = control.icon;
           const disabled = isRunning && control.shortLabel === "T₀";
@@ -950,7 +950,7 @@ export default function NewtonsCoolingSimulation() {
                   value={control.value}
                   disabled={disabled}
                   onChange={control.set}
-                  className="h-8 w-24 rounded-lg border border-slate-200 bg-white px-2 text-right text-xs font-black text-slate-800 outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100 disabled:bg-slate-50 disabled:text-slate-400"
+                  className="h-8 w-[72px] rounded-lg border border-slate-200 bg-white px-2 text-right text-xs font-black text-slate-800 outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100 disabled:bg-slate-50 disabled:text-slate-400 sm:w-24"
                   ariaLabel={`กรอก${control.label}`}
                 />
               </div>

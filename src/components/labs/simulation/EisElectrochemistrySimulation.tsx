@@ -214,11 +214,13 @@ export default function EisElectrochemistrySimulation() {
       icon={Disc}
       sceneTitle="ระบบเซลล์สามขั้วไฟฟ้า (Three-Electrode Cell)"
       scene={
-        <div className="flex flex-col items-center justify-center p-4 border border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-50 dark:bg-slate-900/50 min-h-[340px] relative w-full h-full">
-          <div className="grid grid-cols-2 gap-4 w-full h-full max-w-md items-center">
+        <div className="relative flex min-h-[340px] h-full w-full items-center justify-center bg-[linear-gradient(145deg,#fff7ed,#f8fafc_52%,#eff6ff)] p-4">
+          <div className="grid w-full max-w-2xl grid-cols-2 gap-6 items-center">
             {/* 3-electrode cell SVG */}
             <div className="flex flex-col items-center">
-              <svg viewBox="0 0 160 160" className="w-full max-w-[140px] h-auto drop-shadow-md">
+              <svg viewBox="0 0 190 180" className="h-auto w-full max-w-[210px]" role="img" aria-label="เซลล์อิเล็กโทรเคมีสามขั้วไฟฟ้าเชื่อมต่อกับโพเทนชิโอสแตต">
+                <title>เซลล์สามขั้วไฟฟ้าสำหรับวัด EIS</title>
+                <desc>ขั้วทำงาน ขั้วอ้างอิง และขั้วช่วยจุ่มในอิเล็กโทรไลต์และเชื่อมต่อเครื่องวิเคราะห์อิมพีแดนซ์</desc>
                 {/* Electrolyte liquid in Beaker */}
                 <rect x="20" y="40" width="120" height="100" fill="none" stroke="#64748b" strokeWidth="3" />
                 <rect x="22" y="60" width="116" height="78" fill="#bae6fd" opacity="0.4" />
@@ -245,20 +247,34 @@ export default function EisElectrochemistrySimulation() {
                 <path d="M 79 30 L 79 15" stroke="#10b981" strokeWidth="1.5" fill="none" />
                 <path d="M 115 30 L 115 15 L 80 15" stroke="#3b82f6" strokeWidth="1.5" fill="none" />
                 <circle cx="80" cy="15" r="3" fill="#1e293b" />
+                <rect x="66" y="2" width="28" height="18" rx="5" fill="#0f172a" />
+                <text x="80" y="14" textAnchor="middle" fill="#f8fafc" fontSize="7" fontWeight="900">EIS</text>
+                <text x="45" y="118" textAnchor="middle" fill="#b91c1c" fontSize="10" fontWeight="900">WE</text>
+                <text x="79" y="118" textAnchor="middle" fill="#047857" fontSize="10" fontWeight="900">RE</text>
+                <text x="115" y="118" textAnchor="middle" fill="#1d4ed8" fontSize="10" fontWeight="900">CE</text>
 
                 {/* AC wave ripple inside electrolyte */}
                 {isSweeping && (
                   <path d="M 45 80 Q 60 70 75 80 T 105 80" stroke="#f97316" strokeWidth="1.5" fill="none" className="animate-pulse" />
                 )}
               </svg>
-              <div className="text-[9px] font-bold text-slate-400 mt-2">ขั้วไฟฟ้า: {selectedElectrode.name.split(" (")[0]}</div>
+              <div className="mt-2 text-xs font-bold text-slate-600">ขั้วทำงาน: {selectedElectrode.name.split(" (")[0]}</div>
             </div>
 
             {/* Nyquist Plot SVG */}
-            <div className="flex flex-col justify-between h-full py-4 relative border-l border-slate-200 dark:border-slate-800 pl-4">
-              <span className="text-[9px] font-bold text-slate-400 block mb-1">Nyquist Plot (-Z&apos;&apos; vs Z&apos;)</span>
-              <div className="h-44 w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-2 relative">
-                <svg className="w-full h-full" viewBox="0 0 160 120">
+            <div className="relative flex h-full flex-col justify-between border-l border-slate-200 pl-5 py-2">
+              <span className="mb-1 block text-xs font-black text-slate-600">Nyquist plot (-Z&apos;&apos; เทียบ Z&apos;)</span>
+              <svg viewBox="0 0 220 38" className="mb-1 h-10 w-full" role="img" aria-label="วงจรสมมูลแบบแรนเดิลส์">
+                <title>วงจรสมมูล Randles</title>
+                <path d="M8 19H34M64 19H90M90 19V7H132V19M90 19V31H132V19M132 19H158M190 19H212" stroke="#64748b" strokeWidth="2" fill="none" />
+                <path d="M34 11L39 27L45 11L51 27L57 11L64 19M158 11L164 27L170 11L176 27L182 11L190 19" stroke="#f97316" strokeWidth="2" fill="none" />
+                <text x="49" y="9" textAnchor="middle" fill="#9a3412" fontSize="8" fontWeight="900">Rₛ</text>
+                <text x="111" y="6" textAnchor="middle" fill="#1d4ed8" fontSize="8" fontWeight="900">Cdl</text>
+                <text x="174" y="9" textAnchor="middle" fill="#9a3412" fontSize="8" fontWeight="900">Rct</text>
+              </svg>
+              <div className="relative h-44 w-full p-1">
+                <svg className="w-full h-full" viewBox="0 0 160 120" role="img" aria-label="กราฟ Nyquist ของอิมพีแดนซ์เชิงซ้อน">
+                  <title>กราฟ Nyquist</title>
                   {/* Axis */}
                   <line x1="20" y1="100" x2="150" y2="100" stroke="#94a3b8" strokeWidth="1" />
                   <line x1="20" y1="10" x2="20" y2="100" stroke="#94a3b8" strokeWidth="1" />

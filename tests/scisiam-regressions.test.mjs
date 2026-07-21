@@ -541,8 +541,8 @@ test("shared simulation shell overlays live metrics without shrinking the stage"
   assert.doesNotMatch(source, /xl:grid-cols-\[minmax\(0,1fr\)_320px\]/);
   assert.doesNotMatch(source, /xl:mr-\[336px\]/);
   assert.match(source, /\? "fixed inset-0 z-\[100\] h-screen min-h-screen w-screen rounded-none border-0 shadow-none"/);
-  assert.match(source, /data-testid="simulation-stage-content"[\s\S]*className="relative h-full/);
-  assert.match(source, /data-testid="simulation-stage-scene"[\s\S]*className="h-full min-h-0 overflow-hidden"/);
+  assert.match(source, /data-testid="simulation-stage-content"[\s\S]*className="relative min-h-\[320px\][^"]*sm:h-full/);
+  assert.match(source, /data-testid="simulation-stage-scene"[\s\S]*className="min-h-\[320px\][^"]*sm:h-full/);
   assert.match(source, /data-testid="simulation-stage-metrics" className="absolute right-5 top-5 z-20 hidden w-\[320px\] xl:block"/);
   assert.match(source, /drawerSummary \?\? \(showLiveMetrics && liveMetricsCard\)/);
   assert.match(source, /\{persistentAdvancedPanel\}[\s\S]*usesPersistentControlDock \? persistentControlDock : controlsDrawer/);
@@ -1023,6 +1023,7 @@ test("foundation explorer labs are ready and content-mapped", () => {
   const savedRegistry = readProjectFile("src/data/labSavedExperiments.ts");
   const data = readProjectFile("src/data/foundationExplorerLabs.ts");
   const simulation = readProjectFile("src/components/labs/simulation/FoundationExplorerSimulation.tsx");
+  const cardIllustrations = readProjectFile("src/components/labs/FoundationLabCardSVGs.tsx");
 
   for (const labId of labIds) {
     assert.match(labs, new RegExp(`id:\\s*"${labId}"[\\s\\S]*?category:\\s*"Foundation"`), `${labId} should be a Foundation lab`);
@@ -1034,6 +1035,20 @@ test("foundation explorer labs are ready and content-mapped", () => {
   }
 
   assert.match(details, /\.\.\.foundationExplorerDetails/);
+  for (const component of [
+    "LabEquipmentCardSVG",
+    "AnimalCellCardSVG",
+    "LeafCellCardSVG",
+    "HumanBloodCellsCardSVG",
+    "ExperimentChemicalsCardSVG",
+    "ExternalMuscleCardSVG",
+    "InternalMuscleCardSVG",
+    "GoodBadMineralsCardSVG",
+  ]) {
+    assert.match(card, new RegExp(`<${component} \\/>`), `${component} should be selected by LabCard`);
+    assert.match(cardIllustrations, new RegExp(`export const ${component}`), `${component} should have a dedicated SVG`);
+  }
+  assert.doesNotMatch(card, /FoundationKnowledgeSVG/, "foundation labs should not share the generic card illustration");
   assert.match(simulation, /ChemicalListModal/);
   assert.match(simulation, /side === "good"/);
   assert.match(simulation, /showLiveMetrics=\{false\}/);
@@ -1090,6 +1105,15 @@ test("Newton cooling keeps a bounded experiment history", () => {
 
   assert.match(source, /MAX_COOLING_DATA_POINTS\s*=\s*\d+/);
   assert.match(source, /\.slice\(-MAX_COOLING_DATA_POINTS\)/);
+});
+
+test("ideal gas 3D chamber uses a centered camera composition", () => {
+  const source = readProjectFile(
+    "src/components/labs/simulation/IdealGasLawSimulation.tsx",
+  );
+
+  assert.match(source, /camera\.position\.set\(0,\s*2\.4,\s*distanceRef\.current\)/);
+  assert.match(source, /camera\.lookAt\(0,\s*0\.45,\s*0\)/);
 });
 
 test("local Supabase CLI state is ignored by Git", () => {

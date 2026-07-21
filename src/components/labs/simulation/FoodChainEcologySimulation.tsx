@@ -46,6 +46,46 @@ function classifyHealth(energyRatio: number, toxin: number) {
   return "ระบบนิเวศค่อนข้างสมดุล";
 }
 
+function TrophicIcon({ index }: { index: number }) {
+  if (index === 0) {
+    return (
+      <g stroke="#064e3b" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8">
+        <path d="M12 25 V10" />
+        <path d="M12 16 C4 16 3 8 11 7 C15 9 15 13 12 16 Z" fill="#dcfce7" />
+        <path d="M12 12 C18 11 21 5 15 3 C11 5 10 8 12 12 Z" fill="#bbf7d0" />
+      </g>
+    );
+  }
+
+  if (index === 1) {
+    return (
+      <g fill="#ecfccb" stroke="#365314" strokeLinecap="round" strokeWidth="1.6">
+        <circle cx="7" cy="14" r="4" />
+        <circle cx="14" cy="14" r="4.5" />
+        <circle cx="22" cy="14" r="5" />
+        <path d="M5 19 L2 23 M12 19 L10 24 M20 19 L22 24 M24 9 L27 5" fill="none" />
+      </g>
+    );
+  }
+
+  if (index === 2) {
+    return (
+      <g fill="#fef3c7" stroke="#78350f" strokeLinejoin="round" strokeWidth="1.6">
+        <ellipse cx="13" cy="14" rx="10" ry="6" />
+        <path d="M22 14 L29 8 V20 Z" />
+        <circle cx="8" cy="12" r="1.3" fill="#78350f" stroke="none" />
+      </g>
+    );
+  }
+
+  return (
+    <g fill="#fee2e2" stroke="#7f1d1d" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.7">
+      <path d="M2 17 C7 6 13 8 16 13 C19 8 25 6 30 17 C24 14 20 17 16 21 C12 17 8 14 2 17 Z" />
+      <path d="M16 13 V24" fill="none" />
+    </g>
+  );
+}
+
 export default function FoodChainEcologySimulation() {
   const [producerEnergy, setProducerEnergy] = useState(10000);
   const [transferEfficiency, setTransferEfficiency] = useState(10);
@@ -156,26 +196,36 @@ export default function FoodChainEcologySimulation() {
       icon={Activity}
       sceneTitle="พีระมิดพลังงานและสารพิษสะสม"
       scene={
-        <div className="relative flex h-[360px] items-center justify-center overflow-hidden rounded-2xl border border-emerald-100 bg-[#0f172a] shadow-inner">
+        <div className="relative flex h-[360px] items-center justify-center overflow-hidden bg-[#0f172a]">
           <div className="absolute inset-0 bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:24px_24px] opacity-45 pointer-events-none" />
 
-          <svg className="relative z-10 h-full w-full max-w-[520px] p-4" viewBox="0 0 400 300" fill="none">
+          <svg className="relative z-10 h-full w-full max-w-[680px] p-4" viewBox="0 0 560 300" fill="none" role="img" aria-label="พีระมิดพลังงานและการสะสมสารพิษในห่วงโซ่อาหาร">
+            <title>พีระมิดพลังงานและการสะสมสารพิษ</title>
+            <desc>พลังงานลดลงเมื่อสูงขึ้นตามลำดับผู้บริโภค ขณะที่สารพิษสะสมเพิ่มขึ้นจนถึงผู้ล่าสูงสุด</desc>
             <defs>
               <linearGradient id="energyGlow" x1="0" y1="0" x2="1" y2="0">
                 <stop offset="0%" stopColor="#bbf7d0" />
                 <stop offset="100%" stopColor="#22c55e" />
               </linearGradient>
+              <linearGradient id="toxinGlow" x1="0" y1="1" x2="0" y2="0">
+                <stop offset="0%" stopColor="#fecdd3" />
+                <stop offset="100%" stopColor="#fb7185" />
+              </linearGradient>
             </defs>
+
+            <text x="32" y="28" fill="#86efac" fontSize="12" fontWeight="900">พลังงานลดลงเมื่อสูงขึ้น</text>
+            <text x="407" y="28" fill="#fda4af" fontSize="12" fontWeight="900">สารพิษสะสมเพิ่มขึ้น</text>
 
             {trophicData.map((point, index) => {
               const y = 214 - index * 48;
-              const width = 270 - index * 54;
-              const left = 200 - width / 2;
-              const right = 200 + width / 2;
+              const width = 300 - index * 56;
+              const left = 230 - width / 2;
+              const right = 230 + width / 2;
               const topWidth = Math.max(56, width - 42);
-              const topLeft = 200 - topWidth / 2;
-              const topRight = 200 + topWidth / 2;
+              const topLeft = 230 - topWidth / 2;
+              const topRight = 230 + topWidth / 2;
               const color = trophicTemplate[index].color;
+              const toxinDots = toxinInput === 0 ? 0 : Math.max(1, Math.round((point.toxin / topPredator.toxin) * 5));
 
               return (
                 <g key={point.level}>
@@ -186,26 +236,40 @@ export default function FoodChainEcologySimulation() {
                     stroke="#f8fafc"
                     strokeWidth="2"
                   />
-                  <text x="200" y={y + 16} textAnchor="middle" fill="#0f172a" fontSize="12" fontWeight="900">
+                  <g transform={`translate(${left + 16} ${y + 6})`}>
+                    <circle cx="14" cy="14" r="14" fill="#ffffff" opacity="0.9" />
+                    <g transform="translate(1 1) scale(.88)"><TrophicIcon index={index} /></g>
+                  </g>
+                  <text x="230" y={y + 16} textAnchor="middle" fill="#0f172a" fontSize="12" fontWeight="900">
                     {point.level}
                   </text>
-                  <text x="200" y={y + 31} textAnchor="middle" fill="#0f172a" fontSize="10" fontWeight="800">
-                    {isSimulated ? `${point.energy.toLocaleString()} kcal | toxin ${point.toxin}x` : point.organism}
+                  <text x="230" y={y + 31} textAnchor="middle" fill="#0f172a" fontSize="10" fontWeight="800">
+                    {isSimulated ? `${point.energy.toLocaleString()} kcal` : point.organism}
+                  </text>
+                  {Array.from({ length: toxinDots }, (_, dotIndex) => (
+                    <circle
+                      key={`${point.level}-toxin-${dotIndex}`}
+                      cx={420 + dotIndex * 17}
+                      cy={y + 18}
+                      r={4 + index * 0.7}
+                      fill="#fb7185"
+                      opacity={isSimulated ? 0.95 : 0.35}
+                    />
+                  ))}
+                  <text x="407" y={y + 38} fill="#fecdd3" fontSize="9" fontWeight="800">
+                    {isSimulated ? `${point.toxin}x` : index === 0 ? "ต่ำ" : index === 3 ? "สูง" : ""}
                   </text>
                 </g>
               );
             })}
 
-            <path d="M54 260 H346" stroke="url(#energyGlow)" strokeWidth="5" strokeLinecap="round" strokeDasharray="10 10" opacity="0.75" />
-            <text x="200" y="283" textAnchor="middle" fill="#cbd5e1" fontSize="12" fontWeight="900">
-              Energy transfer efficiency: {transferEfficiency}% per trophic level
+            <rect x="406" y="48" width="8" height="184" rx="4" fill="url(#toxinGlow)" opacity="0.28" />
+            <path d="M72 258 H388" stroke="url(#energyGlow)" strokeWidth="5" strokeLinecap="round" opacity="0.78" />
+            <text x="230" y="282" textAnchor="middle" fill="#cbd5e1" fontSize="12" fontWeight="900">
+              ส่งผ่านพลังงาน {transferEfficiency}% ต่อระดับ
             </text>
+            <text x="407" y="260" fill="#fda4af" fontSize="10" fontWeight="900">จุดสีชมพู = ความเข้มข้นสารพิษ</text>
           </svg>
-
-          <div className="absolute right-5 bottom-5 rounded-xl border border-slate-700/60 bg-slate-900/90 px-3.5 py-1.5 text-right text-xs font-bold text-white">
-            <span className="block text-[10px] font-black text-slate-400">Top predator</span>
-            {isSimulated ? `${topPredator.energy} kcal / toxin ${topPredator.toxin}x` : "รอจำลอง"}
-          </div>
         </div>
       }
       controlsTitle="ควบคุมพลังงานฐานและการส่งต่อ"

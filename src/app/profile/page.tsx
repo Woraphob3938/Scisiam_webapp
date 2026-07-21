@@ -349,7 +349,7 @@ export default function ProfilePage() {
                     ) : (
                       <div className="mt-1 flex flex-wrap items-center gap-2">
                         <h1 className="truncate text-2xl font-extrabold leading-[1.35] text-slate-950 sm:text-3xl">{username}</h1>
-                        <button type="button" onClick={handleStartEditProfile} className="inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-xl border border-blue-100 bg-blue-50 px-3 text-xs font-extrabold text-blue-700 transition-colors hover:bg-blue-100" title="แก้ไขโปรไฟล์">
+                        <button type="button" onClick={handleStartEditProfile} className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-xl border border-blue-100 bg-blue-50 px-3 text-xs font-extrabold text-blue-700 transition-colors hover:bg-blue-100" title="แก้ไขโปรไฟล์">
                           <Pencil className="h-4 w-4" />
                           แก้ไขโปรไฟล์
                         </button>

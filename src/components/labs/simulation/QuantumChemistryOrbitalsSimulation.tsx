@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useId, useState } from "react";
 import SharedSimulationShell from "./SharedSimulationShell";
 import { Info, Activity, Disc } from "lucide-react";
 import { labsById } from "@/data/labs";
@@ -54,6 +54,13 @@ export default function QuantumChemistryOrbitalsSimulation() {
   const [bondDistance, setBondDistance] = useState(0.74); // Angstroms (0.4 to 2.5)
   const [logs, setLogs] = useState<OrbitalLog[]>([]);
   const [, setIsSaving] = useState(false);
+  const orbitalPositiveId = useId().replace(/:/g, "");
+  const orbitalNegativeId = useId().replace(/:/g, "");
+  const orbitalGlowId = useId().replace(/:/g, "");
+  const sceneCenterX = 230;
+  const sceneCenterY = 112;
+  const nucleusAX = sceneCenterX - bondDistance * 38;
+  const nucleusBX = sceneCenterX + bondDistance * 38;
 
   // Calculate potential energy based on Morse Potential: V(r) = De * (1 - e^-a(r-re))^2 - De
   const getMorsePotential = (r: number) => {
@@ -151,55 +158,49 @@ export default function QuantumChemistryOrbitalsSimulation() {
   // Render SVG contour lobes representing the Molecular Orbitals wavefunction
   const renderOrbitalLobes = () => {
     const scale = bondDistance / selectedMolecule.idealDistance;
-    // Nucleus A: (150 - bondDistance * 40), Nucleus B: (150 + bondDistance * 40)
-    const nA = 150 - bondDistance * 30;
-    const nB = 150 + bondDistance * 30;
-
     const isH2 = selectedMolecule.id === "h2";
-    const isSigma = selectedOrbital.id.includes("sigma");
+    const isAntibonding = selectedOrbital.character === "Antibonding";
 
     if (isH2) {
-      if (isSigma) {
-        // Bonding Sigma orbital (HOMO) -> single continuous oval density wave
+      if (!isAntibonding) {
         return (
-          <g>
-            <ellipse cx="150" cy="150" rx={Math.max(10, 50 / scale)} ry="30" fill="#3b82f6" opacity="0.6" />
-          </g>
-        );
-      } else {
-        // Antibonding Sigma* orbital (LUMO) -> 2 separate lobes of opposite phases (red/blue)
-        return (
-          <g>
-            <circle cx={nA - 10} cy="150" r="22" fill="#ef4444" opacity="0.6" />
-            <circle cx={nB + 10} cy="150" r="22" fill="#3b82f6" opacity="0.6" />
-            {/* Nodal plane line */}
-            <line x1="150" y1="100" x2="150" y2="200" stroke="#94a3b8" strokeWidth="2" strokeDasharray="3 3" />
+          <g filter={`url(#${orbitalGlowId})`}>
+            <ellipse cx={sceneCenterX} cy={sceneCenterY} rx={Math.max(48, 78 / scale)} ry="48" fill={`url(#${orbitalPositiveId})`} opacity="0.3" />
+            <ellipse cx={sceneCenterX} cy={sceneCenterY} rx={Math.max(38, 60 / scale)} ry="33" fill={`url(#${orbitalPositiveId})`} opacity="0.58" />
+            <ellipse cx={sceneCenterX} cy={sceneCenterY} rx={Math.max(25, 42 / scale)} ry="20" fill="#2563eb" opacity="0.34" />
           </g>
         );
       }
-    } else {
-      // CO molecule (asymmetric polar molecular orbital)
-      if (selectedOrbital.id === "sigma5") {
-        // Asymmetric polar bonding lobe skewed towards oxygen (high electronegativity)
-        return (
-          <g>
-            <ellipse cx={nA + 10} cy="150" rx="30" ry="25" fill="#3b82f6" opacity="0.6" />
-            <ellipse cx={nB - 5} cy="150" rx="42" ry="32" fill="#3b82f6" opacity="0.5" />
-          </g>
-        );
-      } else {
-        // Antibonding LUMO with nodes
-        return (
-          <g>
-            <circle cx={nA - 15} cy="150" r="16" fill="#ef4444" opacity="0.6" />
-            <circle cx={nA + 15} cy="150" r="16" fill="#3b82f6" opacity="0.6" />
-            <circle cx={nB - 15} cy="150" r="22" fill="#3b82f6" opacity="0.6" />
-            <circle cx={nB + 15} cy="150" r="22" fill="#ef4444" opacity="0.6" />
-            <line x1="150" y1="100" x2="150" y2="200" stroke="#94a3b8" strokeWidth="2" strokeDasharray="3 3" />
-          </g>
-        );
-      }
+
+      return (
+        <g filter={`url(#${orbitalGlowId})`}>
+          <ellipse cx={nucleusAX - 17} cy={sceneCenterY} rx="39" ry="36" fill={`url(#${orbitalPositiveId})`} opacity="0.68" />
+          <ellipse cx={nucleusBX + 17} cy={sceneCenterY} rx="39" ry="36" fill={`url(#${orbitalNegativeId})`} opacity="0.68" />
+          <rect x={sceneCenterX - 5} y="62" width="10" height="100" rx="5" fill="#ffffff" opacity="0.88" />
+        </g>
+      );
     }
+
+    if (selectedOrbital.id === "sigma5") {
+      return (
+        <g filter={`url(#${orbitalGlowId})`}>
+          <ellipse cx={nucleusAX - 16} cy={sceneCenterY} rx="53" ry="41" fill={`url(#${orbitalPositiveId})`} opacity="0.62" />
+          <ellipse cx={nucleusBX - 8} cy={sceneCenterY} rx="39" ry="33" fill={`url(#${orbitalPositiveId})`} opacity="0.48" />
+          <ellipse cx={nucleusAX - 48} cy={sceneCenterY} rx="18" ry="22" fill={`url(#${orbitalNegativeId})`} opacity="0.5" />
+        </g>
+      );
+    }
+
+    return (
+      <g filter={`url(#${orbitalGlowId})`}>
+        <ellipse cx={nucleusAX} cy={sceneCenterY - 31} rx="34" ry="23" fill={`url(#${orbitalPositiveId})`} opacity="0.7" />
+        <ellipse cx={nucleusAX} cy={sceneCenterY + 31} rx="34" ry="23" fill={`url(#${orbitalNegativeId})`} opacity="0.7" />
+        <ellipse cx={nucleusBX} cy={sceneCenterY - 31} rx="39" ry="26" fill={`url(#${orbitalNegativeId})`} opacity="0.7" />
+        <ellipse cx={nucleusBX} cy={sceneCenterY + 31} rx="39" ry="26" fill={`url(#${orbitalPositiveId})`} opacity="0.7" />
+        <rect x={sceneCenterX - 5} y="54" width="10" height="116" rx="5" fill="#ffffff" opacity="0.88" />
+        <rect x="128" y={sceneCenterY - 4} width="204" height="8" rx="4" fill="#ffffff" opacity="0.78" />
+      </g>
+    );
   };
 
   return (
@@ -213,33 +214,70 @@ export default function QuantumChemistryOrbitalsSimulation() {
       icon={Disc}
       sceneTitle="แผนภาพความหนาแน่นอิเล็กตรอน (Orbital Probability Density)"
       scene={
-        <div className="flex flex-col items-center justify-center p-4 border border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-50 dark:bg-slate-900/50 min-h-[340px] relative w-full h-full">
-          <svg viewBox="0 0 300 300" className="w-full max-w-sm h-auto drop-shadow-md">
-            {/* Background space grid */}
-            <circle cx="150" cy="150" r="120" fill="none" stroke="#e2e8f0" strokeWidth="1" strokeDasharray="3 3" opacity="0.4" />
+        <div className="relative flex min-h-[340px] h-full w-full flex-col items-center justify-center bg-[radial-gradient(circle_at_center,#eef2ff_0%,#f8fafc_58%,#fdf2f8_100%)] p-4">
+          <svg viewBox="0 0 460 260" className="h-auto w-full max-w-xl" role="img" aria-label={`ความหนาแน่นอิเล็กตรอนของออร์บิทัล ${selectedOrbital.name}`}>
+            <title>ความหนาแน่นอิเล็กตรอนของโมเลกุล</title>
+            <desc>สีฟ้าและสีชมพูแสดงเฟสตรงข้ามของฟังก์ชันคลื่น นิวเคลียสสองอะตอมห่างกันตามระยะพันธะที่ตั้งไว้</desc>
+            <defs>
+              <radialGradient id={orbitalPositiveId}>
+                <stop offset="0%" stopColor="#1d4ed8" stopOpacity="0.95" />
+                <stop offset="62%" stopColor="#60a5fa" stopOpacity="0.68" />
+                <stop offset="100%" stopColor="#dbeafe" stopOpacity="0.08" />
+              </radialGradient>
+              <radialGradient id={orbitalNegativeId}>
+                <stop offset="0%" stopColor="#be123c" stopOpacity="0.92" />
+                <stop offset="62%" stopColor="#fb7185" stopOpacity="0.66" />
+                <stop offset="100%" stopColor="#ffe4e6" stopOpacity="0.08" />
+              </radialGradient>
+              <filter id={orbitalGlowId} x="-30%" y="-30%" width="160%" height="160%">
+                <feGaussianBlur stdDeviation="1.2" result="blur" />
+                <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+              </filter>
+            </defs>
 
-            {/* Electron Wave Contour Lobes */}
+            <text x="24" y="26" fill="#0f172a" fontSize="15" fontWeight="900">{selectedOrbital.name}</text>
+            <rect x="344" y="10" width="92" height="28" rx="14" fill={selectedOrbital.character === "Bonding" ? "#dcfce7" : "#ffe4e6"} />
+            <text x="390" y="28" textAnchor="middle" fill={selectedOrbital.character === "Bonding" ? "#047857" : "#be123c"} fontSize="11" fontWeight="900">
+              {selectedOrbital.character === "Bonding" ? "พันธะ" : "ต้านพันธะ"}
+            </text>
+            <line x1="88" y1={sceneCenterY} x2="372" y2={sceneCenterY} stroke="#cbd5e1" strokeWidth="1.5" strokeDasharray="4 5" />
+
             {renderOrbitalLobes()}
 
-            {/* Atom Nuclei */}
-            {/* Nucleus A */}
-            <circle cx={150 - bondDistance * 30} cy="150" r="12" fill="#1e293b" stroke="#cbd5e1" strokeWidth="2" />
-            <text x={150 - bondDistance * 30} y="153" className="text-[8px] fill-white font-bold" textAnchor="middle">
+            <circle cx={nucleusAX} cy={sceneCenterY} r="14" fill="#1e293b" stroke="#ffffff" strokeWidth="3" />
+            <text x={nucleusAX} y={sceneCenterY + 4} fill="#ffffff" fontSize="10" fontWeight="900" textAnchor="middle">
               {selectedMolecule.id === "h2" ? "H" : "C"}
             </text>
-
-            {/* Nucleus B */}
-            <circle cx={150 + bondDistance * 30} cy="150" r="12" fill="#1e293b" stroke="#cbd5e1" strokeWidth="2" />
-            <text x={150 + bondDistance * 30} y="153" className="text-[8px] fill-white font-bold" textAnchor="middle">
+            <circle cx={nucleusBX} cy={sceneCenterY} r="14" fill="#1e293b" stroke="#ffffff" strokeWidth="3" />
+            <text x={nucleusBX} y={sceneCenterY + 4} fill="#ffffff" fontSize="10" fontWeight="900" textAnchor="middle">
               {selectedMolecule.id === "h2" ? "H" : "O"}
             </text>
+
+            {selectedOrbital.character === "Antibonding" && (
+              <g>
+                <line x1={sceneCenterX} y1="50" x2={sceneCenterX} y2="174" stroke="#64748b" strokeWidth="1.5" strokeDasharray="3 4" />
+                <text x={sceneCenterX + 9} y="56" fill="#475569" fontSize="9" fontWeight="900">ระนาบโหนด</text>
+              </g>
+            )}
+
+            <line x1={nucleusAX} y1="184" x2={nucleusBX} y2="184" stroke="#475569" strokeWidth="2" />
+            <line x1={nucleusAX} y1="178" x2={nucleusAX} y2="190" stroke="#475569" strokeWidth="2" />
+            <line x1={nucleusBX} y1="178" x2={nucleusBX} y2="190" stroke="#475569" strokeWidth="2" />
+            <text x={sceneCenterX} y="205" textAnchor="middle" fill="#334155" fontSize="12" fontWeight="900">ระยะพันธะ {bondDistance.toFixed(2)} Å</text>
+
+            <g transform="translate(24 232)">
+              <circle cx="0" cy="0" r="8" fill="#3b82f6" opacity="0.85" /><text x="15" y="4" fill="#475569" fontSize="10" fontWeight="800">เฟสบวก</text>
+              <circle cx="92" cy="0" r="8" fill="#ef4444" opacity="0.85" /><text x="107" y="4" fill="#475569" fontSize="10" fontWeight="800">เฟสลบ</text>
+              <text x="255" y="4" fill="#475569" fontSize="10" fontWeight="900">พลังงาน {currentEnergy.toFixed(2)} eV · โหนด {selectedOrbital.nodeCount}</text>
+            </g>
           </svg>
 
           {/* Potential energy curve graph at bottom */}
           <div className="w-full mt-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 h-28 relative">
             <span className="absolute left-2 top-1 text-[9px] font-bold text-slate-400">Morse Potential Energy Curve</span>
             <div className="w-full h-full">
-              <svg className="w-full h-full" viewBox="0 0 300 100">
+              <svg className="w-full h-full" viewBox="0 0 300 100" role="img" aria-label="กราฟพลังงานศักย์มอร์สตามระยะพันธะ">
+                <title>กราฟพลังงานศักย์มอร์ส</title>
                 {/* Zero Energy baseline */}
                 <line x1="30" y1="30" x2="270" y2="30" stroke="#cbd5e1" strokeWidth="1" strokeDasharray="2 2" />
 

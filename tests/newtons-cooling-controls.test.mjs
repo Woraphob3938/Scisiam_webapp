@@ -117,7 +117,7 @@ test("shared shell clears the stage above regular control docks", () => {
     source,
     /const usesRegularControlDock = usesPersistentControlDock && !hasCompactControls/,
   );
-  assert.match(source, /usesRegularControlDock\s*\?\s*"bottom-\[272px\] sm:bottom-\[272px\]"/);
+  assert.match(source, /usesRegularControlDock\s*\?\s*"sm:bottom-\[272px\]"/);
 });
 
 test("shared shell keeps advanced controls inside the fullscreen stage", () => {
@@ -147,7 +147,7 @@ test("shared shell uses one visual boundary around the experiment scene", () => 
   );
 });
 
-test("shared shell keeps its title compact and fullscreen control close to the dock", () => {
+test("shared shell keeps its title compact and fullscreen control inside the scene", () => {
   const source = readProjectFile(
     "src/components/labs/simulation/SharedSimulationShell.tsx",
   );
@@ -159,16 +159,35 @@ test("shared shell keeps its title compact and fullscreen control close to the d
   assert.match(source, /data-testid="simulation-fullscreen-toggle"/);
   assert.match(
     source,
-    /pointer-events-auto inline-block min-w-0 max-w-\[calc\(100%-64px\)\]/,
+    /pointer-events-auto block min-w-0[^\n]+sm:inline-block sm:max-w-\[calc\(100%-64px\)\]/,
   );
-  assert.match(
-    source,
-    /const fullscreenButtonBottomClass = usesRegularControlDock\s*\?\s*"bottom-\[272px\] sm:bottom-\[272px\]"\s*:\s*usesPersistentControlDock\s*\?\s*"bottom-\[188px\] sm:bottom-\[180px\]"\s*:\s*stageBottomClass/,
+  const sceneStart = source.indexOf('data-testid="simulation-stage-content"');
+  const advancedPanelStart = source.indexOf("{persistentAdvancedPanel}", sceneStart);
+  const sceneSource = source.slice(sceneStart, advancedPanelStart);
+  assert.match(sceneSource, /data-testid="simulation-fullscreen-toggle"/);
+  assert.match(sceneSource, /className="absolute bottom-3 right-3 z-30/);
+});
+
+test("shared shell stacks the mobile experiment instead of clipping overlays", () => {
+  const source = readProjectFile(
+    "src/components/labs/simulation/SharedSimulationShell.tsx",
   );
-  assert.match(
-    source,
-    /data-testid="simulation-fullscreen-toggle"[\s\S]*className=\{`absolute right-5 z-30[\s\S]*\$\{fullscreenButtonBottomClass\}`\}/,
+
+  assert.match(source, /data-testid="simulation-mobile-metric"/);
+  assert.match(source, /relative z-20 px-4 pt-4[^"]*sm:absolute/);
+  assert.match(source, /relative z-10 mx-4 mt-3 min-h-\[320px\][^"]*sm:absolute/);
+  assert.match(source, /relative z-30 mx-4 mb-4 mt-3[^"]*sm:absolute/);
+  assert.match(source, /grid grid-cols-3 gap-2[^"]*sm:flex/);
+  assert.doesNotMatch(source, /absolute right-5 top-\[148px\][^>]*sm:hidden/);
+});
+
+test("Newton cooling compact controls wrap on mobile", () => {
+  const source = readProjectFile(
+    "src/components/labs/simulation/NewtonsCoolingSimulation.tsx",
   );
+
+  assert.match(source, /grid grid-cols-2 gap-2 lg:grid-cols-3/);
+  assert.doesNotMatch(source, /auto-cols-\[minmax\(210px,1fr\)\] grid-flow-col/);
 });
 
 test("shared real-time metrics omit mission progress for every lab", () => {
