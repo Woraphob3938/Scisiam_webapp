@@ -449,6 +449,11 @@ export default function HplcChromatographySimulation() {
       showLiveMetrics={true}
       showInfoTabs={true}
       showSaveButton={true}
+      onRun={handleInject}
+      runLabel={isInjecting ? "กำลังแยกสาร" : "เริ่มทดลอง"}
+      runActive={isInjecting}
+      runDisabled={isInjecting}
+      onReset={handleReset}
       onSave={handleSaveResult}
     />
   );

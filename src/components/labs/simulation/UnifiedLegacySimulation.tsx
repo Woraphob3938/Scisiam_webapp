@@ -406,6 +406,13 @@ export default function UnifiedLegacySimulation({ labId }: { labId: UnifiedLegac
     : Math.min(100, (elapsedSeconds / 30) * 100);
   const timeLabel = `${Math.floor(elapsedSeconds / 60).toString().padStart(2, "0")}:${Math.floor(elapsedSeconds % 60).toString().padStart(2, "0")}`;
 
+  const handleRunToggle = () => setIsRunning((current) => !current);
+  const handleReset = () => {
+    setValues(config.initial);
+    setElapsedSeconds(0);
+    setIsRunning(false);
+  };
+
   const controls = (
     <div className="space-y-4">
       {config.controls.map((control) => (
@@ -428,12 +435,12 @@ export default function UnifiedLegacySimulation({ labId }: { labId: UnifiedLegac
         </label>
       ))}
       <div className="grid grid-cols-4 gap-2 pt-1">
-        <button onClick={() => setIsRunning((current) => !current)} className={`col-span-2 inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-xs font-black text-white shadow-sm ${isRunning ? "bg-slate-700 hover:bg-slate-800" : "bg-blue-600 hover:bg-blue-700"}`}>
+        <button onClick={handleRunToggle} className={`col-span-2 inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-xs font-black text-white shadow-sm ${isRunning ? "bg-slate-700 hover:bg-slate-800" : "bg-blue-600 hover:bg-blue-700"}`}>
           {isRunning ? <Pause className="h-4 w-4 fill-white stroke-none" /> : <Play className="h-4 w-4 fill-white stroke-none" />}
           {isRunning ? "หยุดชั่วคราว" : "เริ่มจำลอง"}
         </button>
         <button onClick={() => setElapsedSeconds((current) => current + 5)} className="inline-flex items-center justify-center rounded-xl border border-blue-100 bg-blue-50 text-xs font-black text-blue-700 hover:bg-blue-100">+เวลา</button>
-        <button onClick={() => { setValues(config.initial); setElapsedSeconds(0); setIsRunning(false); }} className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50" aria-label="รีเซ็ต">
+        <button onClick={handleReset} className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50" aria-label="รีเซ็ต">
           <RotateCcw className="h-4 w-4" />
         </button>
       </div>
@@ -518,6 +525,10 @@ export default function UnifiedLegacySimulation({ labId }: { labId: UnifiedLegac
       controlsTitle="แผงควบคุมการทดลอง"
       controls={controls}
       compactControls={compactControls}
+      onRun={handleRunToggle}
+      runLabel={isRunning ? "หยุดชั่วคราว" : "เริ่มทดลอง"}
+      runActive={isRunning}
+      onReset={handleReset}
       drawerSummary={drawerSummary}
       metrics={[
         { label: "ค่าหลัก", value: `${result.primary.toFixed(2)} ${result.unit}`, tone: config.accent },

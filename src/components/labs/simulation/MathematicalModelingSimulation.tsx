@@ -77,7 +77,7 @@ export default function MathematicalModelingSimulation() {
   const labId = "mathematical-modeling-lab";
 
   const [modelType, setModelType] = useState<string>("sir");
-  const [isPlaying, setIsPlaying] = useState<boolean>(true);
+  const [isPlaying, setIsPlaying] = useState<boolean>(false);
 
   // SIR Parameters
   const [infectionRate, setInfectionRate] = useState<number>(0.6); // beta
@@ -739,6 +739,10 @@ export default function MathematicalModelingSimulation() {
           </ul>
         </div>
       }
+      onRun={() => setIsPlaying((current) => !current)}
+      runLabel={isPlaying ? "หยุดทดลอง" : "ทดลอง"}
+      runActive={isPlaying}
+      onReset={handleReset}
       onSave={handleSaveResults}
     />
   );

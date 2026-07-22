@@ -339,7 +339,12 @@ export default function StatesOfMatterSimulation() {
       progressValue={`บันทึกแล้ว ${observations.length} ครั้ง`}
       progressPercent={Math.min(100, observations.length * 10)}
       tips={["ทดลองบันทึกที่ -10, 25 และ 110 °C เพื่อเปรียบเทียบครบสามสถานะ", "การเปลี่ยนสถานะจริงขึ้นกับชนิดสารและความดันด้วย"]}
-      showSaveButton={false}
+      showSaveButton={true}
+      onRun={handleToggle}
+      runLabel={isRunning ? "หยุดทดลอง" : "เริ่มทดลอง"}
+      runActive={isRunning}
+      onReset={handleReset}
+      onSave={handleSave}
     />
   );
 }

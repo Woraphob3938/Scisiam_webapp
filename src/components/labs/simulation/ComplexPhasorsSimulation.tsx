@@ -45,7 +45,7 @@ export default function ComplexPhasorsSimulation() {
   const [radius, setRadius] = useState<number>(3.0); // Magnitude r
   const [thetaDeg, setThetaDeg] = useState<number>(45.0); // Angle in degrees
   const [omega, setOmega] = useState<number>(1.0); // Angular velocity (rad/s)
-  const [isPlaying, setIsPlaying] = useState<boolean>(true);
+  const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [time, setTime] = useState<number>(0.0);
 
   // Z2 parameters for multiplication operation tab
@@ -656,6 +656,10 @@ export default function ComplexPhasorsSimulation() {
         "ในโหมดคูณ (Operation) ลองสังเกตเวกเตอร์ Z1 และ Z2 คู่อื่นๆ จะพบว่าเวกเตอร์ผลลัพธ์ Z1×Z2 จะทำมุมเท่ากับผลบวกของ Z1 และ Z2 เสมอ",
         "ในทางวิศวกรรมไฟฟ้ากระแสสลับ เวกเตอร์ Phasor ที่หมุนด้วยความเร็วเชิงมุม ω ช่วยให้คำนวณแรงดันและกระแสได้โดยการบวกลบเวกเตอร์ฉากแทนการแก้สมการอนุพันธ์ไซน์ซับซ้อน",
       ]}
+      onRun={() => setIsPlaying((current) => !current)}
+      runLabel={isPlaying ? "หยุดทดลอง" : "ทดลอง"}
+      runActive={isPlaying}
+      onReset={handleReset}
       onSave={handleSaveResults}
     />
   );

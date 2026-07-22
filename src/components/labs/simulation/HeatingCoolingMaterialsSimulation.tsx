@@ -483,6 +483,10 @@ export default function HeatingCoolingMaterialsSimulation() {
       showLiveMetrics={true}
       showInfoTabs={true}
       showSaveButton={true}
+      onRun={() => setIsRunning((value) => !value)}
+      runLabel={isRunning ? "หยุดทดลอง" : "เริ่มทดลอง"}
+      runActive={isRunning}
+      onReset={handleReset}
       onSave={handleSave}
     />
   );

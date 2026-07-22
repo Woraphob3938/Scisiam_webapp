@@ -864,6 +864,7 @@ export default function OptimizationConstraintsSimulation() {
       progressLabel="ระดับการเรียนรู้การจัดสรรทรัพยากร"
       progressValue={loggedRuns.length >= 3 ? "บันทึกการคำนวณครบ 3 ชุดแผนการผลิตแล้ว" : `${loggedRuns.length}/3 แผนการผลิตที่บันทึกไว้`}
       progressPercent={questProgress}
+      onReset={handleReset}
       onSave={handleSaveResults}
     />
   );

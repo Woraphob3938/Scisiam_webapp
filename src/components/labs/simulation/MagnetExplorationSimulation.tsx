@@ -647,6 +647,9 @@ export default function MagnetExplorationSimulation() {
           </p>
         </div>
       }
+      onRun={handleTest}
+      runLabel="ทดลอง"
+      onReset={handleReset}
       onSave={handleSave}
     />
   );

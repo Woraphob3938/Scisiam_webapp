@@ -429,6 +429,11 @@ export default function NmrSpectroscopySimulation() {
       showLiveMetrics={true}
       showInfoTabs={true}
       showSaveButton={true}
+      onRun={handlePulse}
+      runLabel={isPulsing ? "กำลังส่งพัลส์" : "เริ่มทดลอง"}
+      runActive={isPulsing}
+      runDisabled={isPulsing}
+      onReset={handleReset}
       onSave={handleSaveResult}
     />
   );

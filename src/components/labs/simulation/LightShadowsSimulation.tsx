@@ -34,7 +34,7 @@ export default function LightShadowsSimulation() {
 
   const [lightDistance, setLightDistance] = useState<number>(40); // cm from flashlight
   const [transparency, setTransparency] = useState<"opaque" | "translucent" | "transparent">("opaque");
-  const [lightOn, setLightOn] = useState<boolean>(true);
+  const [lightOn, setLightOn] = useState<boolean>(false);
 
   const [loggedRuns, setLoggedRuns] = useState<LoggedShadowRun[]>([]);
 
@@ -76,7 +76,7 @@ export default function LightShadowsSimulation() {
   const handleReset = () => {
     setLightDistance(40);
     setTransparency("opaque");
-    setLightOn(true);
+    setLightOn(false);
     setLoggedRuns([]);
   };
 
@@ -365,6 +365,10 @@ export default function LightShadowsSimulation() {
           </ul>
         </div>
       }
+      onRun={() => setLightOn((current) => !current)}
+      runLabel={lightOn ? "ปิดแสง" : "ทดลอง"}
+      runActive={lightOn}
+      onReset={handleReset}
       onSave={handleSaveResults}
     />
   );

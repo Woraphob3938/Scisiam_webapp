@@ -407,6 +407,10 @@ export default function NaturalSelectionSimulation() {
         "ทดลองปรับ Pollution Soot ไปที่ 100% (เขม่าดำสนิท) เพื่อดูผีเสื้อดำปรับตัวรอดได้มากกว่า",
         "เปรียบเทียบสถิติการขยับของความถี่ยีนในตารางเมื่อจำลองไปจนครบ 15 รุ่น",
       ]}
+      onRun={handleStartStop}
+      runLabel={isRunning ? "หยุดทดลอง" : "เริ่มทดลอง"}
+      runActive={isRunning}
+      onReset={handleReset}
       onSave={handleSave}
     />
   );

@@ -852,6 +852,10 @@ export default function MichelsonInterferometerSimulation() {
         "การเพิ่มค่าดัชนีหักเหตัวกลาง n จะเหนี่ยวนำให้เกิดเฟสเลื่อนแบบค่อยเป็นค่อยไปเช่นเดียวกับการเลื่อนตำแหน่งกระจก",
         "ภารกิจ: บันทึกข้อมูลความเข้มแสงสูงสุด (≥ 90%) และต่ำสุด (≤ 10%) รวมกันให้ครบอย่างน้อย 5 จุดบนตาราง",
       ]}
+      onRun={handleStartStop}
+      runLabel={isRunning ? "หยุดทดลอง" : "เริ่มทดลอง"}
+      runActive={isRunning}
+      onReset={handleReset}
       onSave={handleSaveResults}
     />
   );

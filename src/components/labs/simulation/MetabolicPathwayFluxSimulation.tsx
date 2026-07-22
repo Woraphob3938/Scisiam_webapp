@@ -416,6 +416,8 @@ export default function MetabolicPathwayFluxSimulation() {
           </ul>
         </div>
       }
+      onRun={handleStartSim}
+      onReset={handleReset}
       onSave={handleSaveResults}
     />
   );

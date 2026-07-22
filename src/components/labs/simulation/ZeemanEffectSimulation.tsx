@@ -889,6 +889,10 @@ export default function ZeemanEffectSimulation() {
         "ในโหมด Anomalous แถบแสงจะแยกย่อยเป็น 6 เส้นอย่างสมมาตร จากการรวมโมเมนตัมเชิงมุมของสปินและออร์บิทัล",
         "ภารกิจ: สลับโหมดเป็น Normal Zeeman แล้วจูนพารามิเตอร์เพื่อให้ระยะแยกสเปกตรัม Δλ อยู่ระหว่าง 0.05 nm - 0.06 nm ต่อเนื่องกันเป็นเวลา 5 วินาที",
       ]}
+      onRun={handleStartStop}
+      runLabel={isRunning ? "หยุดทดลอง" : "เริ่มทดลอง"}
+      runActive={isRunning}
+      onReset={handleReset}
       onSave={handleSaveResults}
     />
   );

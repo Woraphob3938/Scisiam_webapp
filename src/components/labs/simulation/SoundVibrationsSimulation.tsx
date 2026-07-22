@@ -435,6 +435,9 @@ export default function SoundVibrationsSimulation() {
           </ul>
         </div>
       }
+      onRun={handleTriggerSound}
+      runLabel="ทดลองเสียง"
+      onReset={handleReset}
       onSave={handleSaveResults}
     />
   );

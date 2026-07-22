@@ -460,6 +460,7 @@ export default function AcidsBasesAroundUsSimulation() {
       showLiveMetrics={true}
       showInfoTabs={true}
       showSaveButton={true}
+      onReset={handleReset}
       onSave={handleSave}
     />
   );

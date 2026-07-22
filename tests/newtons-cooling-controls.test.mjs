@@ -77,47 +77,123 @@ test("shared shell persistent mode keeps primary controls visible", () => {
   assert.match(source, /ตั้งค่าขั้นสูง/);
 });
 
+test("shared shell keeps experiment actions outside advanced settings", () => {
+  const source = readProjectFile(
+    "src/components/labs/simulation/SharedSimulationShell.tsx",
+  );
+  const actionStart = source.indexOf('data-testid="simulation-primary-actions"');
+  const advancedStart = source.indexOf("const persistentAdvancedPanel");
+  const advancedEnd = source.indexOf("const simulationStage");
+  const advancedSource = source.slice(advancedStart, advancedEnd);
+
+  assert.ok(actionStart > -1, "the always-visible primary action bar should exist");
+  assert.ok(actionStart < advancedStart, "primary actions should render before advanced settings");
+  assert.match(source, /onRun\?: \(\) => void/);
+  assert.match(source, /onReset\?: \(\) => void/);
+  assert.match(source, /ทดลอง/);
+  assert.match(source, /บันทึก/);
+  assert.match(source, /รีเซ็ต/);
+  assert.match(source, /role="group"/);
+  assert.doesNotMatch(advancedSource, /onClick=\{onSave\}/);
+});
+
+test("advanced controls keep keyboard focus and mobile actions reachable", () => {
+  const source = readProjectFile(
+    "src/components/labs/simulation/SharedSimulationShell.tsx",
+  );
+
+  assert.match(source, /role="dialog"/);
+  assert.match(source, /aria-modal="true"/);
+  assert.match(source, /handleAdvancedPanelKeyDown/);
+  assert.match(source, /event\.key === "Escape"/);
+  assert.match(source, /max-h-\[32vh\][^"\n]*overflow-y-auto/);
+  assert.match(source, /primaryActions && <div className="px-4 pb-4">/);
+});
+
+test("shared simulation engines expose immediate run and reset actions", () => {
+  const engines = [
+    "src/components/labs/simulation/NewtonsCoolingSimulation.tsx",
+    "src/components/labs/simulation/UnifiedLegacySimulation.tsx",
+    "src/components/labs/simulation/AppliedMathSimulation.tsx",
+  ];
+
+  for (const file of engines) {
+    const source = readProjectFile(file);
+    assert.match(source, /onRun=/, `${file} should expose its run action`);
+    assert.match(source, /onReset=/, `${file} should expose its reset action`);
+  }
+});
+
+test("compact specialist simulations expose immediate run and reset actions", () => {
+  const simulations = [
+    "BayesianReasoningSimulation.tsx",
+    "CenterVariabilitySimulation.tsx",
+    "ComplexPhasorsSimulation.tsx",
+    "CrisprGeneEditingSimulation.tsx",
+    "CurveFittingSimulation.tsx",
+    "DiscreteGraphTheorySimulation.tsx",
+    "FlowCytometrySimulation.tsx",
+    "FourierAnalysisSimulation.tsx",
+    "FunctionBuilderSimulation.tsx",
+    "GraphingLinesSimulation.tsx",
+    "LightShadowsSimulation.tsx",
+    "MathematicalModelingSimulation.tsx",
+    "MetabolicPathwayFluxSimulation.tsx",
+    "MultivariableCalculusSimulation.tsx",
+    "PcrGelElectrophoresisSimulation.tsx",
+    "ProbabilitySimulation.tsx",
+    "PushPullForcesSimulation.tsx",
+    "RatioProportionSimulation.tsx",
+    "RecombinantDnaTransformationSimulation.tsx",
+    "SoundVibrationsSimulation.tsx",
+    "StatisticalInferenceSimulation.tsx",
+    "SystemsEquationsSimulation.tsx",
+    "TrigonometryWavesSimulation.tsx",
+    "VectorAdditionSimulation.tsx",
+    "VectorFieldsGradientsSimulation.tsx",
+    "WesternBlottingSimulation.tsx",
+  ];
+
+  for (const simulation of simulations) {
+    const source = readProjectFile(`src/components/labs/simulation/${simulation}`);
+    assert.match(source, /onRun=/, `${simulation} should expose its run action`);
+    assert.match(source, /onReset=/, `${simulation} should expose its reset action`);
+  }
+});
+
 test("shared shell promotes compact controls to the persistent dock", () => {
   const source = readProjectFile(
     "src/components/labs/simulation/SharedSimulationShell.tsx",
   );
 
   assert.match(source, /const hasCompactControls =/);
-  assert.match(
-    source,
-    /const collapsedControls = compactControls \?\? controls/,
-  );
+  assert.match(source, /const collapsedControls = compactControls;/);
   assert.match(
     source,
     /usesPersistentControlDock \? persistentControlDock : controlsDrawer/,
   );
 });
 
-test("shared shell promotes regular controls into the persistent dock", () => {
+test("shared shell keeps primary actions in the persistent dock", () => {
   const source = readProjectFile(
     "src/components/labs/simulation/SharedSimulationShell.tsx",
   );
 
   assert.match(
     source,
-    /const usesPersistentControlDock = persistentControls \|\| hasCollapsedControls/,
+    /const usesPersistentControlDock = persistentControls \|\| hasCollapsedControls \|\| hasPrimaryActions/,
   );
-  assert.match(
-    source,
-    /className=\{hasCompactControls \? "min-w-0" : "max-h-\[170px\] min-w-0 overflow-y-auto pr-1"\}/,
-  );
+  assert.match(source, /primaryActions && <div className="mt-3">/);
 });
 
-test("shared shell clears the stage above regular control docks", () => {
+test("shared shell does not place full settings over the stage", () => {
   const source = readProjectFile(
     "src/components/labs/simulation/SharedSimulationShell.tsx",
   );
 
-  assert.match(
-    source,
-    /const usesRegularControlDock = usesPersistentControlDock && !hasCompactControls/,
-  );
-  assert.match(source, /usesRegularControlDock\s*\?\s*"sm:bottom-\[272px\]"/);
+  assert.match(source, /const collapsedControls = compactControls;/);
+  assert.doesNotMatch(source, /compactControls \?\? controls/);
+  assert.match(source, /usesPersistentControlDock \? persistentControlDock : controlsDrawer/);
 });
 
 test("shared shell keeps advanced controls inside the fullscreen stage", () => {
@@ -165,7 +241,7 @@ test("shared shell keeps its title compact and fullscreen control inside the sce
   const advancedPanelStart = source.indexOf("{persistentAdvancedPanel}", sceneStart);
   const sceneSource = source.slice(sceneStart, advancedPanelStart);
   assert.match(sceneSource, /data-testid="simulation-fullscreen-toggle"/);
-  assert.match(sceneSource, /className="absolute bottom-3 right-3 z-30/);
+  assert.match(sceneSource, /className="absolute bottom-3 right-3 z-50/);
 });
 
 test("shared shell stacks the mobile experiment instead of clipping overlays", () => {
@@ -253,4 +329,164 @@ test("shared manual number fields preserve an in-progress negative value", () =>
   assert.match(source, /const \[draftValue, setDraftValue\] = useState/);
   assert.match(source, /rawValue === "-"/);
   assert.match(source, /onBlur=\{restoreValidValue\}/);
+});
+
+test("legacy physics simulations expose compact controls and primary actions", () => {
+  const simulations = [
+    "HookesLawSimulation.tsx",
+    "OhmsLawSimulation.tsx",
+    "MomentumConservationSimulation.tsx",
+    "FaradaysLawSimulation.tsx",
+    "BernoullisPrincipleSimulation.tsx",
+    "PhotosynthesisRateSimulation.tsx",
+    "XpsSpectroscopySimulation.tsx",
+  ];
+
+  for (const simulation of simulations) {
+    const source = readProjectFile(`src/components/labs/simulation/${simulation}`);
+    assert.match(source, /compactControls=/, `${simulation} should keep settings clear of the stage`);
+    assert.match(source, /onRun=/, `${simulation} should expose its run action`);
+    assert.match(source, /onReset=/, `${simulation} should expose its reset action`);
+  }
+});
+
+test("fullscreen control stays above the experiment dock", () => {
+  const source = readProjectFile(
+    "src/components/labs/simulation/SharedSimulationShell.tsx",
+  );
+
+  assert.match(source, /className="absolute bottom-3 right-3 z-50/);
+});
+
+test("light and shadows waits for the learner to start", () => {
+  const source = readProjectFile(
+    "src/components/labs/simulation/LightShadowsSimulation.tsx",
+  );
+
+  assert.match(source, /useState<boolean>\(false\)/);
+});
+
+test("push and pull renders an accessible force diagram", () => {
+  const source = readProjectFile(
+    "src/components/labs/simulation/PushPullForcesSimulation.tsx",
+  );
+
+  assert.match(source, /role="img"/);
+  assert.match(source, /<title id="push-pull-title">แรงผลักและแรงดึง/);
+  assert.match(source, /id="push-pull-arrow"/);
+  assert.match(source, /markerEnd="url\(#push-pull-arrow\)"/);
+});
+
+test("remaining timed simulations expose immediate run and reset actions", () => {
+  const simulations = [
+    "BeerLambertLawSimulation.tsx",
+    "BloodTypingAgglutinationSimulation.tsx",
+    "BraggDiffractionSimulation.tsx",
+    "CellularRespirationSimulation.tsx",
+    "EnzymeKineticsSimulation.tsx",
+    "HesssLawSimulation.tsx",
+    "KeplersLawsSimulation.tsx",
+    "LeChateliersPrincipleSimulation.tsx",
+    "MendelianGeneticsSimulation.tsx",
+    "MichelsonInterferometerSimulation.tsx",
+    "MitosisCellCycleSimulation.tsx",
+    "NaturalSelectionSimulation.tsx",
+    "OsmosisPlasmolysisSimulation.tsx",
+    "PhotoelectricEffectSimulation.tsx",
+    "PhysicalChemicalChangesSimulation.tsx",
+    "PlantTranspirationSimulation.tsx",
+    "QuantumTunnelingSimulation.tsx",
+    "RelativisticKinematicsSimulation.tsx",
+    "StefanBoltzmannSimulation.tsx",
+    "SuperconductivityMeissnerSimulation.tsx",
+    "ZeemanEffectSimulation.tsx",
+  ];
+
+  for (const simulation of simulations) {
+    const source = readProjectFile(`src/components/labs/simulation/${simulation}`);
+    assert.match(source, /onRun=/, `${simulation} should expose its run action`);
+    assert.match(source, /onReset=/, `${simulation} should expose its reset action`);
+  }
+});
+
+test("specialist instrument simulations expose their real run action", () => {
+  const simulations = [
+    "EisElectrochemistrySimulation.tsx",
+    "HeatingCoolingMaterialsSimulation.tsx",
+    "HplcChromatographySimulation.tsx",
+    "NmrSpectroscopySimulation.tsx",
+  ];
+
+  for (const simulation of simulations) {
+    const source = readProjectFile(`src/components/labs/simulation/${simulation}`);
+    assert.match(source, /onRun=/, `${simulation} should expose its instrument action`);
+    assert.match(source, /onReset=/, `${simulation} should expose its reset action`);
+  }
+});
+
+test("instant-response simulations expose reset without a fake run action", () => {
+  const simulations = [
+    "AcidsBasesAroundUsSimulation.tsx",
+    "CardiovascularSystemSimulation.tsx",
+    "ChemistryConceptSimulation.tsx",
+    "DnaExtractionSimulation.tsx",
+    "FoodChainEcologySimulation.tsx",
+    "NormalDistributionSimulation.tsx",
+    "OptimizationConstraintsSimulation.tsx",
+    "RatesOfChangeSimulation.tsx",
+  ];
+
+  for (const simulation of simulations) {
+    const source = readProjectFile(`src/components/labs/simulation/${simulation}`);
+    assert.match(source, /onReset=/, `${simulation} should expose its reset action`);
+  }
+});
+
+test("foundation simulations keep their real actions outside advanced settings", () => {
+  const simulations = [
+    "DissolvingSolutionsSimulation.tsx",
+    "FloatingSinkingSimulation.tsx",
+    "MagnetExplorationSimulation.tsx",
+    "MixingAndSeparatingSimulation.tsx",
+    "SimpleCircuitsSimulation.tsx",
+    "StatesOfMatterSimulation.tsx",
+  ];
+
+  for (const simulation of simulations) {
+    const source = readProjectFile(`src/components/labs/simulation/${simulation}`);
+    assert.match(source, /onRun=/, `${simulation} should expose its run action`);
+    assert.match(source, /onReset=/, `${simulation} should expose its reset action`);
+    assert.match(source, /onSave=/, `${simulation} should expose its save action`);
+  }
+});
+
+test("full legacy settings stay in advanced controls instead of covering the stage", () => {
+  const source = readProjectFile(
+    "src/components/labs/simulation/SharedSimulationShell.tsx",
+  );
+
+  assert.match(source, /const collapsedControls = compactControls;/);
+  assert.doesNotMatch(source, /compactControls \?\? controls/);
+});
+
+test("animated simulations wait for the learner to start", () => {
+  const simulations = [
+    "BernoullisPrincipleSimulation.tsx",
+    "ComplexPhasorsSimulation.tsx",
+    "FaradaysLawSimulation.tsx",
+    "FourierAnalysisSimulation.tsx",
+    "KeplersLawsSimulation.tsx",
+    "MathematicalModelingSimulation.tsx",
+    "StefanBoltzmannSimulation.tsx",
+    "TrigonometryWavesSimulation.tsx",
+  ];
+
+  for (const simulation of simulations) {
+    const source = readProjectFile(`src/components/labs/simulation/${simulation}`);
+    assert.doesNotMatch(
+      source,
+      /\[(?:isRunning|isPlaying), set(?:IsRunning|IsPlaying)\] = useState(?:<boolean>)?\(true\)/,
+      `${simulation} should start paused`,
+    );
+  }
 });

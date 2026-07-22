@@ -20,6 +20,9 @@ import {
   LucideIcon,
   Maximize2,
   Minimize2,
+  Pause,
+  Play,
+  RotateCcw,
   Save,
   Target,
   X,
@@ -65,6 +68,11 @@ interface SharedSimulationShellProps {
   showInfoTabs?: boolean;
   showSaveButton?: boolean;
   onSave?: () => void;
+  onRun?: () => void;
+  runLabel?: string;
+  runActive?: boolean;
+  runDisabled?: boolean;
+  onReset?: () => void;
 }
 
 const accentClasses = {
@@ -163,22 +171,31 @@ export default function SharedSimulationShell({
   showInfoTabs = true,
   showSaveButton = true,
   onSave,
+  onRun,
+  runLabel = "ทดลอง",
+  runActive = false,
+  runDisabled = false,
+  onReset,
 }: SharedSimulationShellProps) {
   const resolvedAccent = categoryAccents[category] ?? accent;
   const tone = accentClasses[resolvedAccent];
   const stageShellRef = useRef<HTMLElement | null>(null);
+  const advancedPanelRef = useRef<HTMLElement | null>(null);
+  const advancedCloseRef = useRef<HTMLButtonElement | null>(null);
+  const advancedTriggerRef = useRef<HTMLButtonElement | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
   const [controlsOpen, setControlsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<InfoTab>("about");
-  const hasDrawerSummary = Boolean(drawerSummary) || showLiveMetrics || (showSaveButton && onSave);
+  const hasDrawerSummary = Boolean(drawerSummary) || showLiveMetrics;
   const labDetails = getLabDetails(labId);
   const hasCompactControls =
     compactControls !== null && compactControls !== undefined && compactControls !== false;
-  const collapsedControls = compactControls ?? controls;
+  const hasPrimaryActions = Boolean(onRun || (showSaveButton && onSave) || onReset);
+  const collapsedControls = compactControls;
   const hasCollapsedControls =
     collapsedControls !== null && collapsedControls !== undefined && collapsedControls !== false;
-  const usesPersistentControlDock = persistentControls || hasCollapsedControls;
-  const usesRegularControlDock = usesPersistentControlDock && !hasCompactControls;
+  const usesPersistentControlDock = persistentControls || hasCollapsedControls || hasPrimaryActions;
+  const usesRegularControlDock = usesPersistentControlDock && hasCollapsedControls && !hasCompactControls;
   const stageBottomClass = !usesPersistentControlDock
     ? controlsOpen
       ? "sm:bottom-[calc(32vh+48px)]"
@@ -194,6 +211,40 @@ export default function SharedSimulationShell({
     document.addEventListener("fullscreenchange", syncFullscreen);
     return () => document.removeEventListener("fullscreenchange", syncFullscreen);
   }, []);
+
+  useEffect(() => {
+    if (!controlsOpen || !usesPersistentControlDock) return;
+    advancedCloseRef.current?.focus();
+  }, [controlsOpen, usesPersistentControlDock]);
+
+  const closeAdvancedControls = () => {
+    setControlsOpen(false);
+    requestAnimationFrame(() => advancedTriggerRef.current?.focus());
+  };
+
+  const handleAdvancedPanelKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closeAdvancedControls();
+      return;
+    }
+
+    if (event.key !== "Tab") return;
+    const focusable = advancedPanelRef.current?.querySelectorAll<HTMLElement>(
+      'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])',
+    );
+    if (!focusable?.length) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  };
 
   const toggleFullscreen = async () => {
     if (isExpanded && !document.fullscreenElement) {
@@ -246,8 +297,50 @@ export default function SharedSimulationShell({
     </section>
   );
 
+  const primaryActions = hasPrimaryActions ? (
+    <div
+      data-testid="simulation-primary-actions"
+      className="grid grid-cols-3 gap-2 border-t border-slate-100 pt-3 sm:flex sm:justify-end"
+      role="group"
+      aria-label="คำสั่งหลักของการทดลอง"
+    >
+      {onRun && (
+        <button
+          type="button"
+          onClick={onRun}
+          disabled={runDisabled}
+          aria-pressed={runActive}
+          className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-xs font-black shadow-sm transition focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 sm:min-w-32 ${tone.button}`}
+        >
+          {runActive ? <Pause className="h-4 w-4" aria-hidden="true" /> : <Play className="h-4 w-4" aria-hidden="true" />}
+          <span>{runLabel}</span>
+        </button>
+      )}
+      {showSaveButton && onSave && (
+        <button
+          type="button"
+          onClick={onSave}
+          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-blue-100 bg-blue-50 px-3 py-2.5 text-xs font-black text-blue-700 transition hover:bg-blue-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 sm:min-w-28"
+        >
+          <Save className="h-4 w-4" aria-hidden="true" />
+          <span>บันทึก</span>
+        </button>
+      )}
+      {onReset && (
+        <button
+          type="button"
+          onClick={onReset}
+          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs font-black text-slate-700 transition hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 sm:min-w-28"
+        >
+          <RotateCcw className="h-4 w-4" aria-hidden="true" />
+          <span>รีเซ็ต</span>
+        </button>
+      )}
+    </div>
+  ) : null;
+
   const controlsDrawer = (
-    <section className={`rounded-2xl border border-white/70 bg-white/95 shadow-xl shadow-slate-900/10 backdrop-blur-md ${controlsOpen ? "max-h-[32vh] overflow-y-auto" : ""}`}>
+    <section className="rounded-2xl border border-white/70 bg-white/95 shadow-xl shadow-slate-900/10 backdrop-blur-md">
       <div className="flex items-center justify-between gap-3 px-4 py-4">
         <span className="flex min-w-0 items-center gap-2 text-base font-black text-slate-900">
           <Target className={`h-5 w-5 shrink-0 ${tone.text}`} />
@@ -268,20 +361,11 @@ export default function SharedSimulationShell({
       </div>
 
       {controlsOpen && (
-        <div className={`grid gap-4 border-t border-slate-100 p-4 ${hasDrawerSummary ? "lg:grid-cols-[minmax(0,1fr)_320px]" : ""}`}>
+        <div className={`grid max-h-[32vh] gap-4 overflow-y-auto border-t border-slate-100 p-4 ${hasDrawerSummary ? "lg:grid-cols-[minmax(0,1fr)_320px]" : ""}`}>
           <div>{controls}</div>
           {hasDrawerSummary && (
             <div className="flex flex-col gap-3">
               {drawerSummary ?? (showLiveMetrics && liveMetricsCard)}
-              {showSaveButton && onSave && (
-                <button
-                  onClick={onSave}
-                  className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-xs font-black shadow-sm ${tone.button}`}
-                >
-                  <Save className="h-4 w-4" />
-                  บันทึกผลการทดลอง
-                </button>
-              )}
             </div>
           )}
         </div>
@@ -294,6 +378,8 @@ export default function SharedSimulationShell({
           </div>
         </div>
       )}
+
+      {primaryActions && <div className="px-4 pb-4">{primaryActions}</div>}
     </section>
   );
 
@@ -311,7 +397,12 @@ export default function SharedSimulationShell({
           <div data-testid="simulation-classroom-submission-slot" />
           <button
             type="button"
-            onClick={() => setControlsOpen((value) => !value)}
+            ref={advancedTriggerRef}
+            onClick={(event) => {
+              advancedTriggerRef.current = event.currentTarget;
+              if (controlsOpen) closeAdvancedControls();
+              else setControlsOpen(true);
+            }}
             className={`inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-black transition hover:brightness-95 ${tone.soft}`}
             aria-expanded={controlsOpen}
             aria-controls="simulation-advanced-controls"
@@ -324,20 +415,27 @@ export default function SharedSimulationShell({
       <div className={hasCompactControls ? "min-w-0" : "max-h-[170px] min-w-0 overflow-y-auto pr-1"}>
         {collapsedControls}
       </div>
+      {primaryActions && <div className="mt-3">{primaryActions}</div>}
     </section>
   );
 
   const persistentAdvancedPanel = usesPersistentControlDock && controlsOpen && (
     <section
+      ref={advancedPanelRef}
       id="simulation-advanced-controls"
       data-testid="simulation-advanced-controls"
+      role="dialog"
+      aria-modal="true"
+      aria-label="การตั้งค่าขั้นสูง"
+      onKeyDown={handleAdvancedPanelKeyDown}
       className={`absolute inset-4 z-40 overflow-y-auto rounded-2xl border bg-white p-4 shadow-xl shadow-slate-900/15 sm:inset-x-5 sm:bottom-[210px] sm:top-[122px] md:left-auto md:w-[min(720px,calc(100%-2.5rem))] ${tone.border}`}
     >
       <div className="mb-3 flex items-center justify-between gap-3 border-b border-slate-100 pb-3">
         <h2 className="text-sm font-black text-slate-900">การตั้งค่าขั้นสูง</h2>
         <button
+          ref={advancedCloseRef}
           type="button"
-          onClick={() => setControlsOpen(false)}
+          onClick={closeAdvancedControls}
           className="grid h-10 w-10 shrink-0 place-items-center rounded-xl text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
           aria-label="ปิดการตั้งค่าขั้นสูง"
         >
@@ -345,15 +443,6 @@ export default function SharedSimulationShell({
         </button>
       </div>
       {controls}
-      {showSaveButton && onSave && (
-        <button
-          onClick={onSave}
-          className={`mt-4 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-xs font-black shadow-sm ${tone.button}`}
-        >
-          <Save className="h-4 w-4" />
-          บันทึกผลการทดลอง
-        </button>
-      )}
     </section>
   );
 
@@ -411,7 +500,7 @@ export default function SharedSimulationShell({
             type="button"
             data-testid="simulation-fullscreen-toggle"
             onClick={toggleFullscreen}
-            className="absolute bottom-3 right-3 z-30 grid h-11 w-11 place-items-center rounded-2xl border border-white/70 bg-white/92 text-slate-700 shadow-lg shadow-slate-900/10 backdrop-blur-md transition hover:text-slate-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+            className="absolute bottom-3 right-3 z-50 grid h-11 w-11 place-items-center rounded-2xl border border-white/70 bg-white/92 text-slate-700 shadow-lg shadow-slate-900/10 backdrop-blur-md transition hover:text-slate-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
             aria-label={isExpanded ? "ออกจากโหมดเต็มจอ" : "ขยายห้องทดลอง"}
           >
             {isExpanded ? <Minimize2 className="h-5 w-5" /> : <Maximize2 className="h-5 w-5" />}

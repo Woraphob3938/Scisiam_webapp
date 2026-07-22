@@ -528,6 +528,10 @@ export default function SimpleCircuitsSimulation() {
           </p>
         </div>
       }
+      onRun={() => setSwitchClosed((value) => !value)}
+      runLabel={switchClosed ? "เปิดวงจร" : "ทดลอง"}
+      runActive={switchClosed}
+      onReset={handleReset}
       onSave={handleSave}
     />
   );

@@ -7,8 +7,6 @@ import {
   Sliders,
   ChevronDown,
   Play,
-  Pause,
-  RotateCcw,
   TrendingDown,
   ClipboardList,
   Target,
@@ -682,19 +680,6 @@ export default function NewtonsCoolingSimulation() {
     lastLoggedTimeRef.current = 0;
   };
 
-  // Add Manual log point
-  const handleAddPoint = () => {
-    const mins = elapsedSeconds / 60;
-    if (dataPoints.some(p => p.time === mins)) return;
-
-    setDataPoints((prev) =>
-      [
-        ...prev,
-        { time: mins, temp: currentTemp, ambient: ambientTemp },
-      ].slice(-MAX_COOLING_DATA_POINTS),
-    );
-  };
-
   // Clear single point from table
   const handleClearPoint = (index: number) => {
     setDataPoints((prev) => prev.filter((_, idx) => idx !== index));
@@ -929,8 +914,7 @@ export default function NewtonsCoolingSimulation() {
   );
 
   const compactControls = (
-    <div className="grid gap-2 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
-      <div className="grid grid-cols-2 gap-2 lg:grid-cols-3">
+    <div className="grid grid-cols-2 gap-2 lg:grid-cols-3">
         {coolingControls.map((control) => {
           const ControlIcon = control.icon;
           const disabled = isRunning && control.shortLabel === "T₀";
@@ -968,17 +952,6 @@ export default function NewtonsCoolingSimulation() {
             </label>
           );
         })}
-      </div>
-      <div className="grid grid-cols-4 gap-2 lg:w-[330px]">
-        <button onClick={handleStartStop} className={`col-span-2 inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-xs font-black text-white shadow-sm transition active:scale-95 ${isRunning ? "bg-slate-700 hover:bg-slate-800" : "bg-blue-600 hover:bg-blue-700"}`}>
-          {isRunning ? <Pause className="h-4 w-4 fill-white stroke-none" /> : <Play className="h-4 w-4 fill-white stroke-none" />}
-          {isRunning ? "หยุดชั่วคราว" : "เริ่มทดลอง"}
-        </button>
-        <button onClick={handleAddPoint} className="inline-flex min-h-11 items-center justify-center rounded-xl border border-blue-100 bg-blue-50 px-2 text-xs font-black text-blue-700 transition hover:bg-blue-100 active:scale-95">บันทึกจุด</button>
-        <button onClick={handleReset} className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:bg-slate-50 active:scale-95" aria-label="รีเซ็ตการทดลอง">
-          <RotateCcw className="h-4 w-4" />
-        </button>
-      </div>
     </div>
   );
 
@@ -1055,6 +1028,10 @@ export default function NewtonsCoolingSimulation() {
       controls={controls}
       compactControls={compactControls}
       persistentControls
+      onRun={handleStartStop}
+      runLabel={isRunning ? "หยุดชั่วคราว" : "เริ่มทดลอง"}
+      runActive={isRunning}
+      onReset={handleReset}
       drawerSummary={drawerSummary}
       metrics={[
         { label: "อุณหภูมิตัวอย่าง", value: `${currentTemp.toFixed(1)}°C`, tone: "rose" },

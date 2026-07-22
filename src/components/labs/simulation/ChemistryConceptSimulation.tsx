@@ -820,6 +820,7 @@ export default function ChemistryConceptSimulation({ labId }: { labId: Chemistry
       progressValue={result.progressValue}
       progressPercent={result.progressPercent}
       tips={config.tips}
+      onReset={handleReset}
       onSave={handleSave}
     />
   );

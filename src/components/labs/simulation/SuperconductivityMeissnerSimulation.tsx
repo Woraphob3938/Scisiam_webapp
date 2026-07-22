@@ -496,6 +496,10 @@ export default function SuperconductivityMeissnerSimulation() {
         "เมื่อวัสดุเข้าสู่สถานะตัวนำยิ่งยวด จะกีดกันสนามแม่เหล็กภายนอกทันที ส่งผลให้แม่เหล็กเริ่มลอยตัวเหนือแผ่นตัวนำ",
         "ภารกิจ: ควบคุมความสูงในการลอยตัวของแม่เหล็กให้อยู่ในช่วง 8.0 - 12.0 mm ต่อเนื่องกันเป็นเวลา 5 วินาที",
       ]}
+      onRun={handleStartStop}
+      runLabel={isRunning ? "หยุดทดลอง" : "เริ่มทดลอง"}
+      runActive={isRunning}
+      onReset={handleReset}
       onSave={handleSaveResults}
     />
   );

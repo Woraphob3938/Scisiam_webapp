@@ -596,6 +596,9 @@ export default function WesternBlottingSimulation() {
           </ul>
         </div>
       }
+      onRun={handleStartSds}
+      runLabel="เริ่มทดลอง"
+      onReset={handleReset}
       onSave={handleSaveResults}
     />
   );

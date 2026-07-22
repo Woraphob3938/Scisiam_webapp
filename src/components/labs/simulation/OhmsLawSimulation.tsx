@@ -597,6 +597,21 @@ export default function OhmsLawSimulation() {
       scene={scene}
       controlsTitle="แผงควบคุมวงจร"
       controls={controls}
+      compactControls={
+        <div className="grid grid-cols-2 gap-2 lg:grid-cols-3">
+          <button type="button" onClick={() => setSwitchStatus((current) => !current)} className={`min-h-11 rounded-xl border px-3 text-xs font-black ${switchStatus ? "border-emerald-200 bg-emerald-50 text-emerald-700" : "border-rose-200 bg-rose-50 text-rose-700"}`}>
+            สวิตช์: {switchStatus ? "ปิดวงจร" : "เปิดวงจร"}
+          </button>
+          <label className="rounded-xl bg-slate-50 p-2 text-xs font-black text-slate-700">
+            <span className="mb-1 flex justify-between"><span>แรงดัน</span><span>{voltage.toFixed(1)} V</span></span>
+            <input aria-label="แรงดันไฟฟ้า" type="range" min="0" max="24" step="0.5" value={voltage} onChange={(event) => setVoltage(Number(event.target.value))} className="w-full accent-blue-500" />
+          </label>
+          <label className="rounded-xl bg-slate-50 p-2 text-xs font-black text-slate-700">
+            <span className="mb-1 flex justify-between"><span>ความต้านทาน</span><span>{resistance.toFixed(0)} Ω</span></span>
+            <input aria-label="ความต้านทาน" type="range" min="10" max="500" step="10" value={resistance} onChange={(event) => setResistance(Number(event.target.value))} className="w-full accent-amber-500" />
+          </label>
+        </div>
+      }
       metrics={[
         { label: "แรงดัน", value: `${voltage.toFixed(1)} V`, tone: "blue" },
         { label: "ความต้านทาน", value: `${resistance.toFixed(0)} Ω`, tone: "orange" },
@@ -649,6 +664,10 @@ export default function OhmsLawSimulation() {
         "ระวังอย่าใช้กระแสไฟฟ้าสูงเกินไปจนเกิดความร้อนสูงในวงจร",
         "จดบันทึกค่าอย่างน้อย 5 จุดเพื่อนำไปพล็อตกราฟหาค่าความชัน",
       ]}
+      onRun={handleStartStop}
+      runLabel={isRunning ? "หยุดชั่วคราว" : "ทดลอง"}
+      runActive={isRunning}
+      onReset={handleReset}
       onSave={handleSaveResults}
     />
   );

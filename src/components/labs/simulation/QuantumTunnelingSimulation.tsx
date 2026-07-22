@@ -886,6 +886,10 @@ export default function QuantumTunnelingSimulation() {
         "หากความกว้างด่านศักย์ W มีขนาดสั้นมาก โอกาสทะลุผ่านจะเพิ่มขึ้นมหาศาลแบบก้าวกระโดด",
         "ภารกิจ: รักษาค่าสัมประสิทธิ์การทะลุผ่าน (T) ให้อยู่ในช่วง 40% - 60% ต่อเนื่องเป็นเวลา 10 วินาที",
       ]}
+      onRun={handleStartStop}
+      runLabel={isRunning ? "หยุดทดลอง" : "เริ่มทดลอง"}
+      runActive={isRunning}
+      onReset={handleReset}
       onSave={handleSaveResults}
     />
   );

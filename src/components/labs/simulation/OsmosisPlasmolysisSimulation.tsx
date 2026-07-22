@@ -455,6 +455,10 @@ export default function OsmosisPlasmolysisSimulation() {
         "น้ำเข้มข้นสูง (10.0% NaCl) จะเกิดการ Plasmolysis อย่างรวดเร็ว",
         "ลองสลับกลับไปที่ 0% NaCl ทันทีหลังจากเซลล์เหี่ยว เพื่อดูการฟื้นฟูเซลล์ (Deplasmolysis)",
       ]}
+      onRun={handleStartStop}
+      runLabel={isRunning ? "หยุดทดลอง" : "เริ่มทดลอง"}
+      runActive={isRunning}
+      onReset={handleReset}
       onSave={handleSave}
     />
   );

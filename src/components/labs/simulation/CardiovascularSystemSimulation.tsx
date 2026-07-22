@@ -375,6 +375,7 @@ export default function CardiovascularSystemSimulation() {
         "เพิ่ม Recovery Minutes เพื่อดูการกลับสู่สภาวะพัก",
         "ลองเพิ่ม Stimulant Dose เพื่อดูว่าหัวใจเข้าใกล้โซนภาระสูงเร็วขึ้น",
       ]}
+      onReset={handleReset}
       onSave={handleSave}
     />
   );

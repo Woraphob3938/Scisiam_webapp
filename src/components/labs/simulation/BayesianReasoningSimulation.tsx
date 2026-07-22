@@ -598,6 +598,8 @@ export default function BayesianReasoningSimulation() {
         "ลองลด False Positive Rate ให้ใกล้ศูนย์ และสังเกตการลู่ขึ้นอย่างมีนัยสำคัญของผลลัพธ์ Posterior P(H|E)",
         "ความหมายทางกายภาพ: ข้อมูลหลักฐานใหม่ช่วยล้างความคลุมเครือที่มีอยู่เดิมให้เห็นความเด่นชัด",
       ]}
+      onRun={handleAddLog}
+      onReset={handleReset}
       onSave={handleSaveResults}
     />
   );

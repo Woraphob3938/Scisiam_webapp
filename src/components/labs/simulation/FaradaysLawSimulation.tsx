@@ -36,7 +36,7 @@ export default function FaradaysLawSimulation() {
   // Simulation state variables
   const [voltage, setVoltage] = useState<number>(0.0);
   const [bulbBrightness, setBulbBrightness] = useState<number>(0.0);
-  const [isRunning, setIsRunning] = useState<boolean>(true);
+  const [isRunning, setIsRunning] = useState<boolean>(false);
   const [elapsedSeconds, setElapsedSeconds] = useState<number>(0);
   
   // Real-time graph points for scrolling plot (length ~ 100)
@@ -206,7 +206,7 @@ export default function FaradaysLawSimulation() {
   };
 
   const handleReset = () => {
-    setIsRunning(true);
+    setIsRunning(false);
     setVoltage(0.0);
     setBulbBrightness(0.0);
     setMagnetX(15);
@@ -580,6 +580,22 @@ export default function FaradaysLawSimulation() {
       scene={scene}
       controlsTitle="แผงควบคุมฟลักซ์ขดลวด"
       controls={controls}
+      compactControls={
+        <div className="grid grid-cols-2 gap-2 lg:grid-cols-3">
+          <label className="rounded-xl bg-slate-50 p-2 text-xs font-black text-slate-700">
+            <span className="mb-1 flex justify-between"><span>ตำแหน่งแม่เหล็ก</span><span>{magnetX.toFixed(0)}%</span></span>
+            <input aria-label="ตำแหน่งแม่เหล็ก" type="range" min="0" max="100" step="1" value={magnetX} onChange={(event) => handlePositionSlider(Number(event.target.value))} className="w-full accent-cyan-500" />
+          </label>
+          <label className="rounded-xl bg-slate-50 p-2 text-xs font-black text-slate-700">
+            <span className="mb-1 flex justify-between"><span>ความแรงแม่เหล็ก</span><span>{strength}%</span></span>
+            <input aria-label="ความแรงแม่เหล็ก" type="range" min="20" max="100" step="10" value={strength} onChange={(event) => setStrength(Number(event.target.value))} className="w-full accent-cyan-500" />
+          </label>
+          <div className="flex min-h-11 items-center justify-between gap-2 rounded-xl bg-slate-50 px-3 text-xs font-black text-slate-700">
+            <span>ขดลวด</span>
+            {[1, 2, 3].map((count) => <button key={count} type="button" onClick={() => setTurns(count)} className={`h-9 min-w-9 rounded-lg ${turns === count ? "bg-amber-500 text-white" : "bg-white text-slate-600"}`}>{count}</button>)}
+          </div>
+        </div>
+      }
       metrics={[
         { label: "แรงดันเหนี่ยวนำ", value: `${voltage.toFixed(2)} V`, tone: voltage >= 0 ? "emerald" : "rose" },
         { label: "จังหวะไฟสว่าง", value: bulbBrightness > 0.6 ? "เจืดจ้า" : bulbBrightness > 0.2 ? "สว่างสลัว" : "ดับสนิท", tone: "orange" },
@@ -661,6 +677,10 @@ export default function FaradaysLawSimulation() {
         "สังเกตว่าเมื่อแม่เหล็กหยุดนิ่ง ค่าแรงดันไฟฟ้าจะกลับสู่ 0 ทันที เนื่องจากไม่มีการเปลี่ยนแปลงฟลักซ์",
         "เปรียบเทียบผลลัพธ์ระหว่างขดลวด 1 รอบ และ 3 รอบ ภายใต้การขยับด้วยความเร็วเท่ากัน",
       ]}
+      onRun={handleStartStop}
+      runLabel={isRunning ? "หยุดชั่วคราว" : "ทดลอง"}
+      runActive={isRunning}
+      onReset={handleReset}
       onSave={handleSaveResults}
     />
   );

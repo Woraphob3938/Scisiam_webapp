@@ -511,6 +511,9 @@ export default function RecombinantDnaTransformationSimulation() {
           </ul>
         </div>
       }
+      onRun={handleRunLigation}
+      runLabel="ทดลองเชื่อม DNA"
+      onReset={handleReset}
       onSave={handleSaveResults}
     />
   );

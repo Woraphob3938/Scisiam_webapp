@@ -834,6 +834,8 @@ export default function SystemsEquationsSimulation() {
         "จำง่ายๆ: เส้นตรงตั้งฉากกันเมื่อผลคูณของความชัน m₁ × m₂ มีค่าเท่ากับ -1 พอดี",
         "ลองทดลองปรับความชัน m₁ และ m₂ ให้เท่ากัน เพื่อดูการเกิดเส้นขนานที่ไม่มีทางตัดกัน",
       ]}
+      onRun={handleAddPoint}
+      onReset={handleReset}
       onSave={handleSaveResults}
     />
   );

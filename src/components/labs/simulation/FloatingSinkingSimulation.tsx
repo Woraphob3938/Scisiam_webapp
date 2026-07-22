@@ -630,6 +630,9 @@ export default function FloatingSinkingSimulation() {
           </p>
         </div>
       }
+      onRun={handleTest}
+      runLabel="ทดลอง"
+      onReset={handleReset}
       onSave={handleSave}
     />
   );

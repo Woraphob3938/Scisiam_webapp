@@ -565,6 +565,8 @@ export default function VectorAdditionSimulation() {
         "Use components when visual estimates are difficult.",
         "The resultant starts at the original tail and ends at the final head.",
       ]}
+      onRun={handleAddLog}
+      onReset={handleReset}
       onSave={handleSaveResults}
     />
   );

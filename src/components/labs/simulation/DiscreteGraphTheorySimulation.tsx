@@ -665,6 +665,8 @@ export default function DiscreteGraphTheorySimulation() {
           </ul>
         </div>
       }
+      onRun={handleAddLog}
+      onReset={handleReset}
       onSave={handleSaveResults}
     />
   );

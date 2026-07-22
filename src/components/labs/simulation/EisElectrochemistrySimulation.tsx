@@ -469,6 +469,11 @@ export default function EisElectrochemistrySimulation() {
       showLiveMetrics={true}
       showInfoTabs={true}
       showSaveButton={true}
+      onRun={handleSweep}
+      runLabel={isSweeping ? "กำลังกวาดความถี่" : "เริ่มทดลอง"}
+      runActive={isSweeping}
+      runDisabled={isSweeping}
+      onReset={handleReset}
       onSave={handleSave}
     />
   );

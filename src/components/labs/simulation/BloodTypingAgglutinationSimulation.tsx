@@ -341,6 +341,9 @@ export default function BloodTypingAgglutinationSimulation() {
         "ลองเลือก AB+ เพื่อดูตัวอย่าง universal recipient",
         "สังเกตว่าผล Rh ดูจากหลุม Anti-D เท่านั้น ไม่ได้เปลี่ยนผล ABO",
       ]}
+      onRun={handleRun}
+      runLabel="เริ่มทดลอง"
+      onReset={handleReset}
       onSave={handleSave}
     />
   );

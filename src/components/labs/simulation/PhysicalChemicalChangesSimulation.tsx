@@ -624,6 +624,11 @@ export default function PhysicalChemicalChangesSimulation() {
       showLiveMetrics={true}
       showInfoTabs={true}
       showSaveButton={true}
+      onRun={handleStart}
+      runLabel={isRunning ? "กำลังทดลอง" : "เริ่มทดลอง"}
+      runActive={isRunning}
+      runDisabled={isRunning}
+      onReset={handleReset}
       onSave={handleSave}
     />
   );

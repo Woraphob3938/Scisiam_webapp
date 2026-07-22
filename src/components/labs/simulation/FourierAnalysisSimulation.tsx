@@ -49,7 +49,7 @@ export default function FourierAnalysisSimulation() {
   const [harmonicsCount, setHarmonicsCount] = useState<number>(4); // number of active harmonic terms
   const [fundamentalFreq, setFundamentalFreq] = useState<number>(1.0); // f0 in Hz
   const [amplitude, setAmplitude] = useState<number>(100);
-  const [isPlaying, setIsPlaying] = useState<boolean>(true);
+  const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [time, setTime] = useState<number>(0);
 
   const [loggedRuns, setLoggedRuns] = useState<LoggedFourierRun[]>([]);
@@ -605,6 +605,10 @@ export default function FourierAnalysisSimulation() {
         "สังเกตว่าคลื่นสามเหลี่ยม (Triangle Wave) ลู่เข้าหาคลื่นเป้าหมายเร็วกว่าคลื่นสี่เหลี่ยมมาก เนื่องจากกำลังของฮาร์มอนิกตัวคูณลดลงแบบยกกำลังสอง n² ทำให้มี THD ต่ำกว่า",
         "สังเกตปรากฏการณ์ Gibbs (Gibbs Phenomenon) เป็นการกระเพื่อมปัดที่มุมแหลมของคลื่นสี่เหลี่ยม แม้จะเพิ่มจำนวนฮาร์มอนิกเป็นสิบเทอมก็ตาม",
       ]}
+      onRun={() => setIsPlaying((current) => !current)}
+      runLabel={isPlaying ? "หยุดทดลอง" : "ทดลอง"}
+      runActive={isPlaying}
+      onReset={handleReset}
       onSave={handleSaveResults}
     />
   );

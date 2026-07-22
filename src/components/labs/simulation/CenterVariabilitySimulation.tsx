@@ -595,6 +595,8 @@ export default function CenterVariabilitySimulation() {
         "IQR focuses on the middle half of the data.",
         "Standard deviation grows when values spread farther from the mean.",
       ]}
+      onRun={handleAddSnapshot}
+      onReset={handleReset}
       onSave={handleSaveResults}
     />
   );

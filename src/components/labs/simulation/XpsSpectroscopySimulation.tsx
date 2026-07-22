@@ -347,6 +347,20 @@ export default function XpsSpectroscopySimulation() {
           </div>
         </div>
       }
+      compactControls={
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+          <label className="rounded-xl bg-slate-50 p-2 text-xs font-black text-slate-700">
+            <span className="mb-1 block">สารเป้าหมาย</span>
+            <select aria-label="สารเป้าหมาย" value={selectedSample.id} onChange={(event) => { setSelectedSample(samples.find((sample) => sample.id === event.target.value) ?? samples[0]); handleReset(); }} className="min-h-10 w-full rounded-lg border border-slate-200 bg-white px-2">
+              {samples.map((sample) => <option key={sample.id} value={sample.id}>{sample.name}</option>)}
+            </select>
+          </label>
+          <label className="rounded-xl bg-slate-50 p-2 text-xs font-black text-slate-700">
+            <span className="mb-1 flex justify-between"><span>กำลังรังสีเอกซ์</span><span>{xrayPower} W</span></span>
+            <input aria-label="กำลังรังสีเอกซ์" disabled={isEmitting} type="range" min="50" max="300" step="50" value={xrayPower} onChange={(event) => { setXrayPower(Number(event.target.value)); handleReset(); }} className="w-full accent-orange-500" />
+          </label>
+        </div>
+      }
       metrics={getMetricDisplay()}
       graph={null}
       table={
@@ -406,6 +420,11 @@ export default function XpsSpectroscopySimulation() {
       showLiveMetrics={true}
       showInfoTabs={true}
       showSaveButton={true}
+      onRun={handleEmit}
+      runLabel={isEmitting ? "กำลังวิเคราะห์" : "ทดลอง"}
+      runActive={isEmitting}
+      runDisabled={isEmitting}
+      onReset={handleReset}
       onSave={handleSaveResult}
     />
   );

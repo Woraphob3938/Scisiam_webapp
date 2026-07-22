@@ -653,6 +653,7 @@ export default function RatesOfChangeSimulation() {
       progressLabel="ความคืบหน้ากิจกรรมการลู่เข้าแคลคูลัส"
       progressValue={loggedRuns.length >= 4 ? "บันทึกเปรียบเทียบครบ 4 ชุดข้อมูลแล้ว" : `${loggedRuns.length}/4 ชุดพิกัดการวัดที่บันทึก`}
       progressPercent={questProgress}
+      onReset={handleReset}
       onSave={handleSaveResults}
     />
   );

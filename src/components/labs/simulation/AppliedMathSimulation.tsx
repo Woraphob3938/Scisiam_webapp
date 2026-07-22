@@ -1993,7 +1993,7 @@ export default function AppliedMathSimulation({ labId }: { labId: AppliedMathLab
   );
 
   const compactControls = (
-    <div className="grid gap-3 sm:grid-cols-4">
+    <div className="grid gap-3 sm:grid-cols-3">
       {config.controls.slice(0, 3).map((spec) => (
         <label key={spec.key} className="text-xs font-black text-slate-600">
           {spec.label}:{" "}
@@ -2013,9 +2013,6 @@ export default function AppliedMathSimulation({ labId }: { labId: AppliedMathLab
           />
         </label>
       ))}
-          <button type="button" onClick={handleRecordRun} className="min-h-11 rounded-xl bg-pink-200 px-3 py-2 text-xs font-black text-pink-900 hover:bg-pink-300">
-        บันทึก run #{runs.length + 1}
-      </button>
     </div>
   );
 
@@ -2069,6 +2066,9 @@ export default function AppliedMathSimulation({ labId }: { labId: AppliedMathLab
       controlsTitle={config.controlsTitle}
       controls={controls}
       compactControls={compactControls}
+      onRun={handleRecordRun}
+      runLabel="ทดลอง"
+      onReset={handleReset}
       drawerSummary={drawerSummary}
       metrics={metrics}
       graph={<MiniAppliedGraph derived={derived} accent={config.accent} />}

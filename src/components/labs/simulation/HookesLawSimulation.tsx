@@ -758,6 +758,18 @@ export default function HookesLawSimulation() {
       }
       controlsTitle="แผงควบคุมสปริง"
       controls={controls}
+      compactControls={
+        <div className="grid grid-cols-2 gap-2">
+          <label className="rounded-xl bg-slate-50 p-2 text-xs font-black text-slate-700">
+            <span className="mb-1 flex justify-between"><span>ค่าคงที่สปริง</span><span>{springConstant.toFixed(0)} N/m</span></span>
+            <input aria-label="ค่าคงที่สปริง" type="range" min="10" max="200" step="5" value={springConstant} onChange={(event) => setSpringConstant(Number(event.target.value))} className="w-full accent-violet-500" />
+          </label>
+          <label className="rounded-xl bg-slate-50 p-2 text-xs font-black text-slate-700">
+            <span className="mb-1 flex justify-between"><span>มวลแขวน</span><span>{hangingMass} g</span></span>
+            <input aria-label="มวลแขวน" type="range" min="0" max="500" step="10" value={hangingMass} onChange={(event) => setHangingMass(Number(event.target.value))} className="w-full accent-amber-500" />
+          </label>
+        </div>
+      }
       metrics={[
         { label: "แรงดึง (F)", value: `${force.toFixed(2)} N`, tone: "rose" },
         { label: "ระยะยืด (x)", value: `${(extension * 100).toFixed(2)} cm`, tone: "emerald" },
@@ -809,6 +821,10 @@ export default function HookesLawSimulation() {
         "ความชันของกราฟแรงกับระยะยืด (F-x) จะมีค่าเท่ากับค่า k เสมอ",
         "ระวังอย่าแขวนมวลน้ำหนักเกินขีดจำกัดยืดหยุ่นของสปริง",
       ]}
+      onRun={handleStartStop}
+      runLabel={isRunning ? "หยุดชั่วคราว" : "ทดลอง"}
+      runActive={isRunning}
+      onReset={handleReset}
       onSave={handleSaveResults}
     />
   );

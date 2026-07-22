@@ -296,7 +296,13 @@ export default function MixingAndSeparatingSimulation() {
       progressValue={`ทดลองแล้ว ${trials.length} รอบ`}
       progressPercent={Math.min(100, trials.length * 10)}
       tips={["ลองใช้วิธีเดียวกันกับสารผสมหลายชนิดแล้วเปรียบเทียบ", "ผลที่ไม่สำเร็จยังเป็นหลักฐานว่าควรเลือกสมบัติอื่นในการแยก"]}
-      showSaveButton={false}
+      showSaveButton={true}
+      onRun={() => method && startSeparation(method)}
+      runLabel={isRunning ? "กำลังแยกสาร" : "เริ่มทดลอง"}
+      runActive={isRunning}
+      runDisabled={!method || isRunning}
+      onReset={resetCurrentTrial}
+      onSave={handleSave}
     />
   );
 }

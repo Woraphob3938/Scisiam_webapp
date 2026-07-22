@@ -42,7 +42,7 @@ export default function BernoullisPrincipleSimulation() {
   const [throatWidth, setThroatWidth] = useState<number>(50); // A2: 20% to 80% (percentage of inlet width)
 
   // Simulation loop states
-  const [isRunning, setIsRunning] = useState<boolean>(true);
+  const [isRunning, setIsRunning] = useState<boolean>(false);
   const [elapsedSeconds, setElapsedSeconds] = useState<number>(0);
   const [dataPoints, setDataPoints] = useState<BernoulliDataPoint[]>([]);
 
@@ -178,7 +178,7 @@ export default function BernoullisPrincipleSimulation() {
   };
 
   const handleReset = () => {
-    setIsRunning(true);
+    setIsRunning(false);
     setFlowRate(3.0);
     setThroatWidth(50);
     setElapsedSeconds(0);
@@ -476,6 +476,18 @@ export default function BernoullisPrincipleSimulation() {
       scene={scene}
       controlsTitle="แผงควบคุมมวลการไหล"
       controls={controls}
+      compactControls={
+        <div className="grid grid-cols-2 gap-2">
+          <label className="rounded-xl bg-slate-50 p-2 text-xs font-black text-slate-700">
+            <span className="mb-1 flex justify-between"><span>อัตราการไหล</span><span>{flowRate.toFixed(1)} L/s</span></span>
+            <input aria-label="อัตราการไหล" type="range" min="1" max="5" step="0.2" value={flowRate} onChange={(event) => setFlowRate(Number(event.target.value))} className="w-full accent-emerald-500" />
+          </label>
+          <label className="rounded-xl bg-slate-50 p-2 text-xs font-black text-slate-700">
+            <span className="mb-1 flex justify-between"><span>ขนาดคอคอด</span><span>{throatWidth.toFixed(0)}%</span></span>
+            <input aria-label="ขนาดคอคอด" type="range" min="20" max="80" step="5" value={throatWidth} onChange={(event) => setThroatWidth(Number(event.target.value))} className="w-full accent-emerald-500" />
+          </label>
+        </div>
+      }
       metrics={[
         { label: "ความดันปากท่อ P1", value: `${p1.toFixed(0)} kPa`, tone: "emerald" },
         { label: "ความดันคอคอด P2", value: `${p2.toFixed(1)} kPa`, tone: isCavitation ? "rose" : "cyan" },
@@ -558,6 +570,10 @@ export default function BernoullisPrincipleSimulation() {
         "เมื่อความดันลดต่ำจนเป็นศูนย์ (สุญญากาศสัมบูรณ์) จะเกิดปรากฏการณ์ต้มเย็นขึ้นภายในท่อหรือ Cavitation",
         "กด บันทึกจุด เพื่อนำข้อมูลชุดความเร็วน้ำและความต่างความดันไปจดสรุปเชิงลึกต่อไป",
       ]}
+      onRun={handleStartStop}
+      runLabel={isRunning ? "หยุดน้ำไหล" : "ทดลอง"}
+      runActive={isRunning}
+      onReset={handleReset}
       onSave={handleSaveResults}
     />
   );

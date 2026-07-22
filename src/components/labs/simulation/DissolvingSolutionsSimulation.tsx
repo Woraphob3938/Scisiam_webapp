@@ -301,7 +301,12 @@ export default function DissolvingSolutionsSimulation() {
       progressValue={`${dissolvedPercent.toFixed(0)}% ละลายแล้ว`}
       progressPercent={dissolvedPercent}
       tips={["ลองใช้ปริมาณเท่ากันแล้วเปลี่ยนเฉพาะอุณหภูมิ", "รีเซ็ตก่อนเปลี่ยนตัวแปรเพื่อให้เปรียบเทียบได้ยุติธรรม"]}
-      showSaveButton={false}
+      showSaveButton={true}
+      onRun={toggleSimulation}
+      runLabel={isRunning ? "หยุดทดลอง" : "เริ่มทดลอง"}
+      runActive={isRunning}
+      onReset={resetCurrentTrial}
+      onSave={handleSave}
     />
   );
 }

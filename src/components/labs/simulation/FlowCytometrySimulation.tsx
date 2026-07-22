@@ -412,6 +412,8 @@ export default function FlowCytometrySimulation() {
           </ul>
         </div>
       }
+      onRun={handleStartScan}
+      onReset={handleReset}
       onSave={handleSaveResults}
     />
   );

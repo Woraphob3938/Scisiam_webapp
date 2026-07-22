@@ -551,6 +551,9 @@ export default function PcrGelElectrophoresisSimulation() {
           </ul>
         </div>
       }
+      onRun={activeTab === "pcr" ? handleStartPcr : handleStartGel}
+      runLabel={activeTab === "pcr" ? "ทดลอง PCR" : "ทดลองเจล"}
+      onReset={handleReset}
       onSave={handleSaveResults}
     />
   );

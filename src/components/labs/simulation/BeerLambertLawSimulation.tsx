@@ -769,6 +769,10 @@ export default function BeerLambertLawSimulation() {
         "น้ำกลั่นบริสุทธิ์ (Blank) มีค่าการดูดกลืนแสงเป็น 0 เสมอเนื่องจากไม่มีตัวดูดกลืนแสงสี",
         "การเพิ่มความกว้างของคิวเวตต์ส่งผลตรงให้อัตราความเข้มแสงตกกระทบลดลง (ค่าดูดกลืนแสงเพิ่มขึ้น)",
       ]}
+      onRun={handleStartStop}
+      runLabel={isRunning ? "หยุดทดลอง" : "เริ่มทดลอง"}
+      runActive={isRunning}
+      onReset={handleReset}
       onSave={handleSaveResults}
     />
   );

@@ -481,6 +481,10 @@ export default function BraggDiffractionSimulation() {
         "การเพิ่มระยะห่าง d จะส่งผลให้ตำแหน่งพีคสะท้อนเสริมตัวถัดไปเกิดขึ้นที่มุมเล็กลงตามสมการตรีโกณมิติ",
         "ภารกิจ: เก็บบันทึกข้อมูล Bragg Peaks บนตารางบันทึกผล (ความเข้มสัญญาณ ≥ 85%) ให้ครอบคลุมพีคที่ไม่ซ้ำกันอย่างน้อย 3 พีค",
       ]}
+      onRun={handleStartStop}
+      runLabel={isRunning ? "หยุดทดลอง" : "เริ่มทดลอง"}
+      runActive={isRunning}
+      onReset={handleReset}
       onSave={handleSaveResults}
     />
   );

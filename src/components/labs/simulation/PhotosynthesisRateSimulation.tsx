@@ -483,6 +483,21 @@ export default function PhotosynthesisRateSimulation() {
       scene={<PlantChamberScene rate={rate} oxygen={oxygen} lightIntensity={lightIntensity} carbonDioxide={carbonDioxide} temperature={temperature} waterLevel={waterLevel} isRunning={isRunning} />}
       controlsTitle="แผงควบคุมสภาพแวดล้อม"
       controls={controls}
+      compactControls={
+        <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">
+          {[
+            { label: "แสง", value: lightIntensity, set: setLightIntensity, min: 5, max: 100, step: 1, unit: "%", tone: "accent-yellow-500" },
+            { label: "CO₂", value: carbonDioxide, set: setCarbonDioxide, min: 200, max: 1200, step: 25, unit: "ppm", tone: "accent-cyan-500" },
+            { label: "อุณหภูมิ", value: temperature, set: setTemperature, min: 10, max: 45, step: 1, unit: "°C", tone: "accent-orange-500" },
+            { label: "น้ำ", value: waterLevel, set: setWaterLevel, min: 10, max: 100, step: 5, unit: "%", tone: "accent-blue-500" },
+          ].map((control) => (
+            <label key={control.label} className="rounded-xl bg-slate-50 p-2 text-xs font-black text-slate-700">
+              <span className="mb-1 flex justify-between gap-2"><span>{control.label}</span><span>{control.value} {control.unit}</span></span>
+              <input aria-label={control.label} disabled={isRunning} type="range" min={control.min} max={control.max} step={control.step} value={control.value} onChange={(event) => control.set(Number(event.target.value))} className={`w-full ${control.tone}`} />
+            </label>
+          ))}
+        </div>
+      }
       metrics={[
         { label: "Rate", value: `${rate.toFixed(1)}%`, tone: "emerald" },
         { label: "O₂", value: oxygen.toFixed(1), tone: "cyan" },
@@ -514,6 +529,10 @@ export default function PhotosynthesisRateSimulation() {
         "แสงสูงมากแต่ CO₂ ต่ำอาจทำให้อัตราเพิ่มได้ไม่มาก",
         "บันทึกข้อมูลหลายจุดก่อนสรุปแนวโน้มของกราฟ",
       ]}
+      onRun={handleStartStop}
+      runLabel={isRunning ? "หยุดชั่วคราว" : "ทดลอง"}
+      runActive={isRunning}
+      onReset={handleReset}
       onSave={handleSave}
     />
   );

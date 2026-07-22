@@ -466,6 +466,10 @@ export default function EnzymeKineticsSimulation() {
         "ทดลองเพิ่มอุณหภูมิเป็น 60°C จะพบว่าฟองอากาศหยุดพุ่งจากการเดนิวเจอร์",
         "ศึกษาความเข้มข้นระดับต่าง ๆ ตั้งแต่ 10 mM ถึง 100 mM เพื่อวาดกราฟไฮเปอร์โบลา",
       ]}
+      onRun={handleStartStop}
+      runLabel={isRunning ? "หยุดทดลอง" : "เริ่มทดลอง"}
+      runActive={isRunning}
+      onReset={handleReset}
       onSave={handleSave}
     />
   );

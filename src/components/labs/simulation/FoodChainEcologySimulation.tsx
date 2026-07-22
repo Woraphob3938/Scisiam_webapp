@@ -450,6 +450,7 @@ export default function FoodChainEcologySimulation() {
         "เพิ่มสารพิษตั้งต้นเพื่อดูผล Biomagnification ในผู้ล่าสูงสุด",
         "เพิ่มพลังงานผู้ผลิตแล้วเทียบว่าผู้ล่าสูงสุดยังได้พลังงานน้อยเพียงใด",
       ]}
+      onReset={handleReset}
       onSave={handleSave}
     />
   );

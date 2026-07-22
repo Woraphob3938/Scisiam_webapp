@@ -713,6 +713,10 @@ export default function ProbabilitySimulation() {
         "ค่อย ๆ สังเกตความผันผวนของกราฟเมื่อสุ่มไปทีละ 1 ครั้ง เทียบกับการรัน 100 ครั้งพร้อมกัน",
         "เมื่อจำนวนการทดลองมากขึ้น ค่าเปอร์เซ็นต์สะสมจะลู่เข้าหาจุดทฤษฎีเสมอ",
       ]}
+      onRun={handleStartStop}
+      runLabel={isAutoRunning ? "หยุดทดลอง" : "ทดลอง"}
+      runActive={isAutoRunning}
+      onReset={handleReset}
       onSave={handleSaveResults}
     />
   );

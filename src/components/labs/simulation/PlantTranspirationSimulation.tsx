@@ -442,6 +442,10 @@ export default function PlantTranspirationSimulation() {
         "หากปิดไฟสนิท (0% Light Intensity) ปากใบจะปิดสนิท ทำให้อัตราการระเหยลดลงเหลือเพียงขีดการระเหยตามธรรมชาติ",
         "อุณหภูมิอากาศที่สูงขึ้นจะเพิ่มพลังงานจลน์ให้กับโมเลกุลน้ำ ทำให้การคายน้ำเพิ่มขีดจำกัดตามลำดับ",
       ]}
+      onRun={handleStartStop}
+      runLabel={isRunning ? "หยุดทดลอง" : "เริ่มทดลอง"}
+      runActive={isRunning}
+      onReset={handleReset}
       onSave={handleSave}
     />
   );

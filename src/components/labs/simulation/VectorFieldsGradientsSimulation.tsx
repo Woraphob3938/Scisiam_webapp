@@ -636,6 +636,8 @@ export default function VectorFieldsGradientsSimulation() {
           </ul>
         </div>
       }
+      onRun={handleAddLog}
+      onReset={handleReset}
       onSave={handleSaveResults}
     />
   );

@@ -418,6 +418,10 @@ export default function MendelianGeneticsSimulation() {
         "แยกการนับ genotype และ phenotype เพราะสองอย่างนี้ไม่เหมือนกัน",
         "สังเกตว่าลักษณะด้อยจะแสดงเมื่อ genotype เป็น yy เท่านั้น",
       ]}
+      onRun={handleStartStop}
+      runLabel={isRunning ? "หยุดทดลอง" : "เริ่มทดลอง"}
+      runActive={isRunning}
+      onReset={handleReset}
       onSave={handleSave}
     />
   );

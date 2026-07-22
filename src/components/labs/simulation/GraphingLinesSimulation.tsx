@@ -559,6 +559,8 @@ export default function GraphingLinesSimulation() {
         "ค่า b คือจุดที่เส้นตัดแกน y เมื่อ x = 0",
         "ลองบันทึกจุดที่ x = 0 เพื่อยืนยันค่า intercept",
       ]}
+      onRun={handleAddPoint}
+      onReset={handleReset}
       onSave={handleSaveResults}
     />
   );

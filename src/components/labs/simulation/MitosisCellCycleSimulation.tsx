@@ -456,6 +456,10 @@ export default function MitosisCellCycleSimulation() {
         "สังเกตตำแหน่งโครโมโซมใน metaphase และ anaphase ให้ชัด",
         "เมื่อ cytokinesis สำเร็จ จำนวนเซลล์จะเพิ่มเป็นสองเท่า",
       ]}
+      onRun={handleStartStop}
+      runLabel={isRunning ? "หยุดทดลอง" : "เริ่มทดลอง"}
+      runActive={isRunning}
+      onReset={handleReset}
       onSave={handleSave}
     />
   );

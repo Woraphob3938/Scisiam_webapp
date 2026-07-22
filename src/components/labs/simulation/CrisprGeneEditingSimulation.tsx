@@ -467,6 +467,8 @@ export default function CrisprGeneEditingSimulation() {
           </ul>
         </div>
       }
+      onRun={handleStartEditing}
+      onReset={handleReset}
       onSave={handleSaveResults}
     />
   );

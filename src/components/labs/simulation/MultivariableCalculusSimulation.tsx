@@ -658,6 +658,8 @@ export default function MultivariableCalculusSimulation() {
         "ลูกศร gradient ยาว = ฟังก์ชันเปลี่ยนแปลงเร็ว, สั้น = เปลี่ยนช้า",
         "เส้น contour ที่อยู่ชิดกัน = ฟังก์ชันชันมาก (gradient มีขนาดใหญ่)",
       ]}
+      onRun={handleAddLog}
+      onReset={handleReset}
       onSave={handleSaveResults}
     />
   );

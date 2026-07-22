@@ -206,7 +206,19 @@ export default function PushPullForcesSimulation() {
 
           <div className="relative flex-grow flex items-end justify-start pb-6">
             {/* Play track line */}
-            <svg viewBox="0 0 200 120" className="w-full h-auto overflow-visible">
+            <svg
+              viewBox="0 0 200 120"
+              className="h-full min-h-[240px] w-full overflow-visible"
+              role="img"
+              aria-labelledby="push-pull-title push-pull-description"
+            >
+              <title id="push-pull-title">แรงผลักและแรงดึง</title>
+              <desc id="push-pull-description">รถของเล่นบนพื้นผิวจำลอง พร้อมคนออกแรงและลูกศรแสดงทิศทางของแรง</desc>
+              <defs>
+                <marker id="push-pull-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#ef4444" />
+                </marker>
+              </defs>
               {/* Floor Surface line */}
               <line x1="10" y1="100" x2="190" y2="100" stroke={surface === "ice" ? "#93c5fd" : surface === "grass" ? "#22c55e" : "#78716c"} strokeWidth="5" />
 
@@ -258,7 +270,7 @@ export default function PushPullForcesSimulation() {
                   {actionType === "pull" ? (
                     // Pull force arrow to the right
                     <g>
-                      <line x1="-20" y1="0" x2={forceVal * 0.4} y2="0" stroke="#ef4444" strokeWidth="3.5" markerEnd="url(#arrow)" />
+                          <line x1="-20" y1="0" x2={forceVal * 0.4} y2="0" stroke="#ef4444" strokeWidth="3.5" markerEnd="url(#push-pull-arrow)" />
                       <text x="0" y="-6" fill="#ef4444" fontSize="7" fontWeight="bold">
                         ดึง (Pull)
                       </text>
@@ -266,7 +278,7 @@ export default function PushPullForcesSimulation() {
                   ) : (
                     // Push force arrow to the left
                     <g>
-                      <line x1="20" y1="0" x2={-forceVal * 0.4} y2="0" stroke="#ef4444" strokeWidth="3.5" markerEnd="url(#arrow)" />
+                          <line x1="20" y1="0" x2={-forceVal * 0.4} y2="0" stroke="#ef4444" strokeWidth="3.5" markerEnd="url(#push-pull-arrow)" />
                       <text x="0" y="-6" fill="#ef4444" fontSize="7" fontWeight="bold">
                         ผลัก (Push)
                       </text>
@@ -482,6 +494,8 @@ export default function PushPullForcesSimulation() {
           </ul>
         </div>
       }
+      onRun={handleStartSim}
+      onReset={handleReset}
       onSave={handleSaveResults}
     />
   );

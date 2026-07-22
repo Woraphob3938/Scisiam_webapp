@@ -764,6 +764,10 @@ export default function PhotoelectricEffectSimulation() {
         "ความเข้มแสงส่งผลโดยตรงต่อปริมาณอิเล็กตรอน (กระแสอิ่มตัว) แต่ไม่ส่งผลต่อระดับพลังงานจลน์สูงสุด",
         "ภารกิจ: หาแรงดันหยุดยั้งของโซเดียม (Sodium) ที่สว่าง 300 nm จนได้ค่ากระแสเป็น 0.00 μA พอดี (ใบ้ให้ว่าแรงดันจะติดลบ)"
       ]}
+      onRun={handleStartStop}
+      runLabel={isRunning ? "หยุดทดลอง" : "เริ่มทดลอง"}
+      runActive={isRunning}
+      onReset={handleReset}
       onSave={handleSaveResults}
     />
   );

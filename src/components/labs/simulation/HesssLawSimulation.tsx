@@ -719,6 +719,10 @@ export default function HesssLawSimulation() {
         "ตรวจสอบให้แน่ใจว่าได้ทำการทดลองครบทั้ง 3 ขั้นตอนเพื่อหาผลรวมเปรียบเทียบในแผงทฤษฎี",
         "ความหนาแน่นและความจุความร้อนจำเพาะของสารละลายกรดและเบสในสภาวะเจือจางอนุโลมให้เท่ากับน้ำบริสุทธิ์ได้",
       ]}
+      onRun={handleStartStop}
+      runLabel={isRunning ? "หยุดทดลอง" : "เริ่มทดลอง"}
+      runActive={isRunning}
+      onReset={handleReset}
       onSave={handleSaveResults}
     />
   );

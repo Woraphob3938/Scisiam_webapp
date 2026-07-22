@@ -411,7 +411,7 @@ export default function KeplersLawsSimulation() {
   const [showSectors, setShowSectors] = useState(true);
 
   // Simulation parameters
-  const [isRunning, setIsRunning] = useState(true);
+  const [isRunning, setIsRunning] = useState(false);
   const [meanAnomaly, setMeanAnomaly] = useState(0.0);
 
   // Data history
@@ -446,7 +446,7 @@ export default function KeplersLawsSimulation() {
   };
 
   const handleReset = () => {
-    setIsRunning(true);
+    setIsRunning(false);
     setSemiMajorAxis(1.0);
     setEccentricity(0.1);
     setSpeedMultiplier(1.0);
@@ -698,6 +698,10 @@ export default function KeplersLawsSimulation() {
         "ตามกฎข้อ 3 ค่า T²/a³ จะยังคงเป็น 1.0 เสมอ สำหรับดาวเคราะห์ดวงใด ๆ",
         "ภารกิจ: ตั้งค่ากึ่งแกนเอก (Semi-major Axis a) ให้มีค่าเป็น 4.00 AU พอดิบพอดี เพื่อยืนยันว่าได้คาบการโคจร T = 8.00 ปี"
       ]}
+      onRun={handleStartStop}
+      runLabel={isRunning ? "หยุดทดลอง" : "เริ่มทดลอง"}
+      runActive={isRunning}
+      onReset={handleReset}
       onSave={handleSaveResults}
     />
   );

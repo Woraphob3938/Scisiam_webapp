@@ -37,7 +37,7 @@ export default function TrigonometryWavesSimulation() {
   const [frequency, setFrequency] = useState<number>(1.5); // 0.5 - 5.0 Hz
   const [phase, setPhase] = useState<number>(0); // -180 to 180 degrees
 
-  const [isRunning, setIsRunning] = useState(true);
+  const [isRunning, setIsRunning] = useState(false);
   const [time, setTime] = useState(0);
 
   // Target values to match for the quest
@@ -106,7 +106,7 @@ export default function TrigonometryWavesSimulation() {
   const handleStartStop = () => setIsRunning(!isRunning);
 
   const handleReset = () => {
-    setIsRunning(true);
+    setIsRunning(false);
     setFuncType("Sin");
     setAmplitude(2.0);
     setFrequency(1.5);
@@ -622,6 +622,10 @@ export default function TrigonometryWavesSimulation() {
         "ภารกิจ: สัญญาณ Sine ให้ตรงกับเป้าหมาย (แอมพลิจูด = 3.0, ความถี่ = 2.0 Hz, เฟส = 90 องศา) เพื่อทำการกระตุ้นการสั่นพ้องเต็มพิกัด",
         "สังเกตว่าคลื่นไซน์และโคไซน์เบี่ยงเบนกันเพียงมุมเฟส 90 องศาเท่านั้น",
       ]}
+      onRun={handleStartStop}
+      runLabel={isRunning ? "หยุดทดลอง" : "ทดลอง"}
+      runActive={isRunning}
+      onReset={handleReset}
       onSave={handleSaveResults}
     />
   );

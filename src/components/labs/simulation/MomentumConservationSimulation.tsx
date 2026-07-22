@@ -1185,6 +1185,21 @@ export default function MomentumConservationSimulation() {
       scene={scene}
       controlsTitle="แผงควบคุมมวลและความเร็วรถ"
       controls={controls}
+      compactControls={
+        <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">
+          {[
+            { label: "มวลรถ 1", value: m1, set: setM1, min: 1, max: 5, step: 0.5, unit: "kg", tone: "accent-blue-500" },
+            { label: "ความเร็วรถ 1", value: u1, set: setU1, min: -5, max: 5, step: 0.5, unit: "m/s", tone: "accent-blue-500" },
+            { label: "มวลรถ 2", value: m2, set: setM2, min: 1, max: 5, step: 0.5, unit: "kg", tone: "accent-rose-500" },
+            { label: "ความเร็วรถ 2", value: u2, set: setU2, min: -5, max: 5, step: 0.5, unit: "m/s", tone: "accent-rose-500" },
+          ].map((control) => (
+            <label key={control.label} className="rounded-xl bg-slate-50 p-2 text-xs font-black text-slate-700">
+              <span className="mb-1 flex justify-between gap-2"><span>{control.label}</span><span>{control.value.toFixed(1)} {control.unit}</span></span>
+              <input aria-label={control.label} disabled={isRunning} type="range" min={control.min} max={control.max} step={control.step} value={control.value} onChange={(event) => control.set(Number(event.target.value))} className={`w-full ${control.tone}`} />
+            </label>
+          ))}
+        </div>
+      }
       metrics={[
         { label: "ความเร็ว Cart1", value: `${(hasCollided ? v1 : u1).toFixed(2)} m/s`, tone: "blue" },
         { label: "ความเร็ว Cart2", value: `${(hasCollided ? v2 : u2).toFixed(2)} m/s`, tone: "rose" },
@@ -1244,6 +1259,10 @@ export default function MomentumConservationSimulation() {
         "ในโหมดชนแบบยืดหยุ่น รถทั้งสองคันจะแยกทิศทางกันหลังชนโดยอนุรักษ์พลังงานจลน์",
         "กด บันทึกจุด เพื่อบันทึกผลการคำนวณโมเมนตัมลงในตารางบันทึกผลสำหรับการเปรียบเทียบเป้าหมายการเรียนรู้",
       ]}
+      onRun={handleStartStop}
+      runLabel={isRunning ? "หยุดเคลื่อนที่" : "ทดลอง"}
+      runActive={isRunning}
+      onReset={handleReset}
       onSave={handleSaveResults}
     />
   );

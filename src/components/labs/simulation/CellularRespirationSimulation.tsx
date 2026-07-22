@@ -489,6 +489,10 @@ export default function CellularRespirationSimulation() {
         "เมล็ดพืชแห้งจะไม่เกิดปฏิกิริยาหายใจ เนื่องจากเอนไซม์และเซลล์อยู่ในสภาพพักตัว (Dormant)",
         " KOH มีบทบาทสำคัญมากในโหมดใช้ออกซิเจน หากไม่มีกระดาษซับนี้ ปริมาตรหยดสีจะไม่ขยับเนื่องจากประจุ O2 และ CO2 คายเท่ากัน",
       ]}
+      onRun={handleStartStop}
+      runLabel={isRunning ? "หยุดทดลอง" : "เริ่มทดลอง"}
+      runActive={isRunning}
+      onReset={handleReset}
       onSave={handleSave}
     />
   );

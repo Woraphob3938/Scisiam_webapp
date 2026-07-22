@@ -337,7 +337,7 @@ export default function StefanBoltzmannSimulation() {
   const [radius, setRadius] = useState(1.0); // solar radii R_sun (0.1 to 8.0)
 
   // Simulation running state
-  const [isRunning, setIsRunning] = useState(true);
+  const [isRunning, setIsRunning] = useState(false);
 
   // Quest tracking
   const [questTime, setQuestTime] = useState(0.0); // accumulated success seconds
@@ -404,7 +404,7 @@ export default function StefanBoltzmannSimulation() {
   };
 
   const handleReset = () => {
-    setIsRunning(true);
+    setIsRunning(false);
     setTemperature(5778);
     setRadius(1.0);
     setQuestTime(0.0);
@@ -693,6 +693,10 @@ export default function StefanBoltzmannSimulation() {
         "ความเข้มเป้าหมาย 5.0e7 - 6.0e7 W/m² (อุณหภูมิประมาณ 5446 K - 5702 K)",
         "ภารกิจ: พยายามรักษาระดับอุณหภูมิให้อยู่ในช่วงความเข้มเป้าหมายติดต่อกันนาน 5 วินาที (ใบ้ให้ว่าตั้งไว้ประมาณ 5500 K - 5650 K แล้วปล่อยทิ้งไว้ 5 วินาที)"
       ]}
+      onRun={handleStartStop}
+      runLabel={isRunning ? "หยุดทดลอง" : "เริ่มทดลอง"}
+      runActive={isRunning}
+      onReset={handleReset}
       onSave={handleSaveResults}
     />
   );

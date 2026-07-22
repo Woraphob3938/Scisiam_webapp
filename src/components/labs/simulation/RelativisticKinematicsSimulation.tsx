@@ -468,6 +468,10 @@ export default function RelativisticKinematicsSimulation() {
         "ที่ Lorentz factor = 2.0 (ความเร็ว 86.6% c) ความยาววัตถุในแนวเคลื่อนที่จะหดสั้นเหลือเพียงครึ่งเดียวพอดี",
         "ภารกิจ: บินด้วยความเร็วที่ทำให้ Lorentz factor (γ) มีค่าเท่ากับ 2.0 (± 0.05) ต่อเนื่องกันเป็นเวลา 5 วินาที",
       ]}
+      onRun={handleStartStop}
+      runLabel={isRunning ? "หยุดทดลอง" : "เริ่มทดลอง"}
+      runActive={isRunning}
+      onReset={handleReset}
       onSave={handleSaveResults}
     />
   );

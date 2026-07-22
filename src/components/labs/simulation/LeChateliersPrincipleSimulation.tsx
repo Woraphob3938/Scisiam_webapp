@@ -692,6 +692,10 @@ export default function LeChateliersPrincipleSimulation() {
         "เพิ่ม Fe³⁺ หรือ SCN⁻ เพื่อเร่งการเกิดสีแดงเข้มขึ้น (เลื่อนไปทางขวา)",
         "ความเข้มข้นสูงสุดของ [Fe(SCN)]²⁺ ไม่สามารถเกินสารตั้งต้นตัวที่น้อยที่สุดได้",
       ]}
+      onRun={handleStartStop}
+      runLabel={isRunning ? "หยุดทดลอง" : "เริ่มทดลอง"}
+      runActive={isRunning}
+      onReset={handleReset}
       onSave={handleSaveResults}
     />
   );

@@ -968,6 +968,7 @@ export default function NormalDistributionSimulation() {
       progressLabel="ระดับการเรียนรู้การแจกแจงปกติ"
       progressValue={droppedBalls >= 300 ? "บรรลุเงื่อนไขจำลองกัลตันสำเร็จ" : `${droppedBalls}/300 ลูกที่ปล่อยจำลอง`}
       progressPercent={questProgress}
+      onReset={handleReset}
       onSave={handleSaveResults}
     />
   );

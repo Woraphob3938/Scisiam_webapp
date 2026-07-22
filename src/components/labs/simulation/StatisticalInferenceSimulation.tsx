@@ -745,6 +745,8 @@ export default function StatisticalInferenceSimulation() {
         "α = 0.05 คือค่ามาตรฐาน ถ้าเปลี่ยนเป็น 0.01 จะต้องมีหลักฐานแข็งกว่าจึงจะปฏิเสธ H₀",
         "สังเกตว่า 95% CI กว้างกว่า 90% CI เพราะต้องมั่นใจมากขึ้นจึงต้องครอบค่ามากขึ้น",
       ]}
+      onRun={handleAddLog}
+      onReset={handleReset}
       onSave={handleSaveResults}
     />
   );
