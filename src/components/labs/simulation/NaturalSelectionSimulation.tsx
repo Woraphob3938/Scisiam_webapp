@@ -182,15 +182,26 @@ export default function NaturalSelectionSimulation() {
       icon={Activity}
       sceneTitle="ภาพจำลองลำต้นต้นไม้ของผีเสื้อจำลอง"
       scene={
-        <div className="relative flex h-[360px] items-center justify-center overflow-hidden rounded-2xl border border-emerald-100 bg-[#0f172a] shadow-inner">
+        <div className="relative flex h-[360px] items-center justify-center overflow-hidden rounded-2xl border border-emerald-100 bg-[linear-gradient(135deg,#d1fae5_0%,#86efac_45%,#14532d_100%)] shadow-inner">
+          <div className="absolute inset-x-0 top-0 h-24 bg-[linear-gradient(180deg,rgba(186,230,253,0.82),rgba(220,252,231,0))]" />
+          <div className="absolute -left-12 top-6 h-40 w-40 rounded-full bg-emerald-900/20 blur-xl" />
+          <div className="absolute -right-10 top-10 h-48 w-48 rounded-full bg-lime-200/25 blur-2xl" />
+
           {/* Trunk visualization */}
-          <div className="absolute inset-0 transition-colors duration-500 pointer-events-none" style={{ backgroundColor: barkColor }} />
+          <div className="absolute bottom-0 left-1/2 h-[330px] w-[72%] -translate-x-1/2 rounded-t-[44%] border-x-8 border-black/10 transition-colors duration-500 pointer-events-none" style={{ backgroundColor: barkColor }} />
 
           {/* Tree trunk bark texture details */}
           <svg className="absolute inset-0 h-full w-full opacity-20 pointer-events-none" viewBox="0 0 400 300">
-            <path d="M50 0 V300 M100 0 V300 M180 0 V300 M240 0 V300 M320 0 V300 M370 0 V300" stroke="#000" strokeWidth="6" strokeDasharray="30 20" />
-            <path d="M80 0 V300 M140 0 V300 M210 0 V300 M290 0 V300 M350 0 V300" stroke="#fff" strokeWidth="2.5" strokeDasharray="15 30" />
+            <path d="M86 300C73 220 108 184 93 112C85 73 96 35 119 0M139 300C125 246 157 198 143 142C132 99 147 44 158 0M205 300C187 240 220 202 204 134C193 87 217 48 211 0M270 300C253 249 286 206 272 147C261 99 278 54 287 0M326 300C309 251 341 213 327 150C318 105 332 58 340 0" stroke="#111827" strokeWidth="6" strokeDasharray="28 15" />
+            <path d="M112 67C145 84 171 77 193 61M220 118C252 136 283 129 309 107M132 198C168 218 204 209 232 187M239 258C267 272 295 266 316 248" stroke="#ffffff" strokeWidth="3" strokeLinecap="round" />
+            <circle cx="158" cy="121" r="12" stroke="#111827" strokeWidth="4" />
+            <circle cx="280" cy="206" r="16" stroke="#111827" strokeWidth="5" />
           </svg>
+
+          <div className="absolute left-4 top-4 rounded-xl border border-white/70 bg-white/85 px-3 py-2 text-left shadow-sm backdrop-blur">
+            <span className="block text-[10px] font-black uppercase text-emerald-700">สภาพแวดล้อม</span>
+            <span className="text-xs font-bold text-slate-700">{sootLevel >= 50 ? "ป่าอุตสาหกรรม · เปลือกไม้เข้ม" : "ป่าสะอาด · เปลือกไม้สว่าง"}</span>
+          </div>
 
           {/* Bird sweeps across during generation updates */}
           {isRunning && (
@@ -202,7 +213,10 @@ export default function NaturalSelectionSimulation() {
           )}
 
           {/* Moth populations representation on trunk */}
-          <svg className="relative z-10 h-full w-full max-w-[480px] p-4" viewBox="0 0 400 300" fill="none">
+          <svg className="relative z-10 h-full w-full max-w-[520px] p-4" viewBox="0 0 400 300" fill="none" role="img" aria-label="ประชากรผีเสื้อสีอ่อนและสีเข้มบนเปลือกไม้ที่เปลี่ยนตามระดับเขม่า">
+            {isRunning && (
+              <circle cx="200" cy="145" r="92" fill="#fef9c3" opacity="0.12" stroke="#fde047" strokeWidth="3" strokeDasharray="7 9" />
+            )}
             {/* Draw light moths */}
             {Array.from({ length: Math.round(lightCount / 10) }).map((_, idx) => {
               const mx = 60 + (idx * 79) % 280;
@@ -211,8 +225,8 @@ export default function NaturalSelectionSimulation() {
               return (
                 <g key={`light-${idx}`} transform={`translate(${mx}, ${my})`}>
                   {/* Moth body (white/gray wings) */}
-                  <path d="M 0 0 L -12 -20 L -6 -6 L 0 -18 L 6 -6 L 12 -20 Z" fill="#f8fafc" stroke="#cbd5e1" strokeWidth="1.5" />
-                  <path d="M 0 0 L -14 -8 L -4 -2 L 0 -14 L 4 -2 L 14 -8 Z" fill="#f1f5f9" stroke="#94a3b8" strokeWidth="1" />
+                  <path d="M0 -5C-7 -21 -23 -19 -20 -5C-18 7 -7 7 0 1C7 7 18 7 20 -5C23 -19 7 -21 0 -5Z" fill="#f8fafc" stroke="#94a3b8" strokeWidth="1.5" />
+                  <path d="M-14 -8L-5 -4M14 -8L5 -4" stroke="#64748b" strokeWidth="1.2" />
                   <circle cx="0" cy="-6" r="2.5" fill="#334155" />
                 </g>
               );
@@ -226,13 +240,19 @@ export default function NaturalSelectionSimulation() {
               return (
                 <g key={`dark-${idx}`} transform={`translate(${mx}, ${my})`}>
                   {/* Moth body (charcoal/black wings) */}
-                  <path d="M 0 0 L -12 -20 L -6 -6 L 0 -18 L 6 -6 L 12 -20 Z" fill="#1e293b" stroke="#0f172a" strokeWidth="1.5" />
-                  <path d="M 0 0 L -14 -8 L -4 -2 L 0 -14 L 4 -2 L 14 -8 Z" fill="#0f172a" stroke="#020617" strokeWidth="1" />
+                  <path d="M0 -5C-7 -21 -23 -19 -20 -5C-18 7 -7 7 0 1C7 7 18 7 20 -5C23 -19 7 -21 0 -5Z" fill="#1e293b" stroke="#020617" strokeWidth="1.5" />
+                  <path d="M-14 -8L-5 -4M14 -8L5 -4" stroke="#64748b" strokeWidth="1.2" />
                   <circle cx="0" cy="-6" r="2.5" fill="#475569" />
                 </g>
               );
             })}
           </svg>
+
+          <div className="absolute bottom-5 left-5 flex items-center gap-3 rounded-xl border border-white/60 bg-white/88 px-3 py-2 text-[10px] font-black text-slate-700 shadow-sm backdrop-blur">
+            <span className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-full border border-slate-400 bg-white" />สีอ่อน {lightCount}%</span>
+            <span className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-full bg-slate-900" />สีเข้ม {darkCount}%</span>
+            <span className="text-emerald-700">รุ่น {generation}</span>
+          </div>
 
           {/* Camouflage status badge inside viewport */}
           <div className="absolute right-5 bottom-5 rounded-xl bg-slate-900/90 border border-slate-700/60 px-3.5 py-1.5 text-right font-bold text-xs text-white">

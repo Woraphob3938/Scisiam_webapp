@@ -73,6 +73,7 @@ function StarRadiatorScene({
   isRunning: boolean;
 }) {
   const starColor = temperatureToRGB(temperature);
+  const peakWavelengthNm = 2_897_760 / temperature;
   
   // Outer heat wave count depending on temperature / intensity
   const waves = useMemo(() => {
@@ -93,13 +94,22 @@ function StarRadiatorScene({
         <span className="block mt-0.5 text-xs font-bold text-slate-200">Blackbody Sphere Model</span>
       </div>
 
-      <svg className="relative z-10 w-full max-w-[340px] h-48" viewBox="0 0 300 160">
+      <svg className="relative z-10 h-56 w-full max-w-[520px]" viewBox="0 0 300 160" role="img" aria-label="วัตถุดำทรงกลมแผ่รังสี พร้อมแถบสเปกตรัมและตำแหน่งความยาวคลื่นสูงสุด">
         <defs>
           <radialGradient id="starGlow" cx="50%" cy="50%" r="50%">
             <stop offset="0%" stopColor={starColor} stopOpacity="1" />
             <stop offset="65%" stopColor={starColor} stopOpacity="0.8" />
             <stop offset="100%" stopColor={starColor} stopOpacity="0" />
           </radialGradient>
+          <linearGradient id="blackbody-spectrum" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stopColor="#6d28d9" />
+            <stop offset="0.2" stopColor="#2563eb" />
+            <stop offset="0.4" stopColor="#06b6d4" />
+            <stop offset="0.58" stopColor="#22c55e" />
+            <stop offset="0.72" stopColor="#facc15" />
+            <stop offset="0.86" stopColor="#f97316" />
+            <stop offset="1" stopColor="#ef4444" />
+          </linearGradient>
         </defs>
 
         {/* Heat Ripples animation */}
@@ -131,6 +141,22 @@ function StarRadiatorScene({
         {temperature > 4000 && (
           <circle cx="150" cy="80" r={starRadiusPx * 0.85} fill="none" stroke="#ffffff" strokeWidth="1" strokeDasharray="3,6" opacity="0.6" />
         )}
+        <g transform="translate(54 132)">
+          <rect width="192" height="8" rx="4" fill="url(#blackbody-spectrum)" />
+          <path
+            d={`M${Math.min(190, Math.max(2, ((peakWavelengthNm - 100) / 1900) * 192))} -4V13`}
+            stroke="#ffffff"
+            strokeWidth="2"
+          />
+          <text x="96" y="24" fill="#cbd5e1" fontSize="7.5" fontWeight="800" textAnchor="middle">
+            λmax {peakWavelengthNm.toFixed(0)} nm
+          </text>
+        </g>
+        <g transform="translate(222 24)">
+          <rect width="66" height="35" rx="12" fill="#0f172a" stroke="#334155" />
+          <text x="33" y="14" fill="#94a3b8" fontSize="6.5" fontWeight="900" textAnchor="middle">กำลังแผ่รังสี</text>
+          <text x="33" y="27" fill="#fb7185" fontSize="8" fontWeight="900" textAnchor="middle">P ∝ T⁴</text>
+        </g>
       </svg>
     </div>
   );

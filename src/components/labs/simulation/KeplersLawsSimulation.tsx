@@ -174,7 +174,27 @@ function OrbitViewport({
         <span className="text-[10px] font-bold text-slate-300">Equal areas in equal times</span>
       </div>
 
-      <svg className="relative z-10 w-full max-w-[340px] h-48" viewBox="0 0 300 160">
+      <svg className="relative z-10 h-56 w-full max-w-[520px]" viewBox="0 0 300 160" role="img" aria-label="วงโคจรวงรีของดาวเคราะห์ แสดงดวงอาทิตย์ที่จุดโฟกัสและกฎข้อสามของเคปเลอร์">
+        <defs>
+          <radialGradient id="kepler-sun-glow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#fde68a" stopOpacity="1" />
+            <stop offset="45%" stopColor="#f59e0b" stopOpacity="0.8" />
+            <stop offset="100%" stopColor="#ef4444" stopOpacity="0" />
+          </radialGradient>
+          <radialGradient id="kepler-planet-glow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#6ee7b7" stopOpacity="1" />
+            <stop offset="100%" stopColor="#059669" stopOpacity="0" />
+          </radialGradient>
+          <marker id="kepler-arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse">
+            <path d="M0 0L10 5L0 10Z" fill="#f87171" />
+          </marker>
+        </defs>
+        {[
+          [18, 24], [52, 43], [83, 18], [112, 38], [198, 20], [232, 46], [274, 26],
+          [28, 132], [66, 112], [225, 126], [266, 104], [287, 142],
+        ].map(([x, y], index) => (
+          <circle key={index} cx={x} cy={y} r={index % 3 === 0 ? 1.2 : 0.7} fill="#ffffff" opacity={0.35 + (index % 4) * 0.12} />
+        ))}
         {/* Draw swept sectors if enabled */}
         {showSectors && sectors.map(sec => (
           <path
@@ -194,7 +214,7 @@ function OrbitViewport({
 
         {/* The Sun (at Focus 1) */}
         <circle cx="150" cy="80" r="10" fill="#f59e0b" className="animate-pulse" />
-        <circle cx="150" cy="80" r="16" fill="url(#sunGlow)" opacity="0.4" />
+        <circle cx="150" cy="80" r="20" fill="url(#kepler-sun-glow)" opacity="0.72" />
         <text x="150" y="65" fill="#f59e0b" fontSize="6.5" fontWeight="black" textAnchor="middle">SUN</text>
 
         {/* Second Focus (Empty) */}
@@ -210,30 +230,25 @@ function OrbitViewport({
             y2={planetY + (relativeVelocity * 10 * (planetX - centerX + cPx)) / distance}
             stroke="#ef4444"
             strokeWidth="1.5"
-            markerEnd="url(#arrow)"
+            markerEnd="url(#kepler-arrow)"
           />
         )}
 
         {/* The Orbiting Planet */}
         <circle cx={planetX} cy={planetY} r="5" fill="#10b981" />
-        <circle cx={planetX} cy={planetY} r="9" fill="url(#planetGlow)" opacity="0.35" />
+        <circle cx={planetX} cy={planetY} r="11" fill="url(#kepler-planet-glow)" opacity="0.55" />
         <text x={planetX} y={planetY - 11} fill="#10b981" fontSize="7" fontWeight="bold" textAnchor="middle">
           v: {relativeVelocity.toFixed(2)}
         </text>
 
-        <defs>
-          <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#f59e0b" stopOpacity="1" />
-            <stop offset="100%" stopColor="#ef4444" stopOpacity="0" />
-          </radialGradient>
-          <radialGradient id="planetGlow" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#10b981" stopOpacity="1" />
-            <stop offset="100%" stopColor="#059669" stopOpacity="0" />
-          </radialGradient>
-          <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse">
-            <path d="M 0 0 L 10 5 L 0 10 z" fill="#ef4444" />
-          </marker>
-        </defs>
+        <g transform="translate(9 126)">
+          <rect width="94" height="25" rx="12.5" fill="#0f172a" stroke="#334155" />
+          <text x="47" y="16" fill="#93c5fd" fontSize="8.5" fontWeight="900" textAnchor="middle">
+            T²/a³ = 1.00
+          </text>
+        </g>
+        <text x={centerX + aPx} y={centerY + 13} fill="#fca5a5" fontSize="6.5" fontWeight="800" textAnchor="middle">ไกลดวงอาทิตย์</text>
+        <text x={centerX - aPx} y={centerY + 13} fill="#86efac" fontSize="6.5" fontWeight="800" textAnchor="middle">ใกล้ดวงอาทิตย์</text>
       </svg>
     </div>
   );

@@ -215,9 +215,24 @@ export default function PushPullForcesSimulation() {
                 <marker id="push-pull-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
                   <path d="M 0 0 L 10 5 L 0 10 z" fill="#ef4444" />
                 </marker>
+                <linearGradient id="push-pull-cart" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stopColor="#fbbf24" />
+                  <stop offset="1" stopColor="#ea580c" />
+                </linearGradient>
               </defs>
+              <rect x="8" y="18" width="184" height="82" rx="14" fill="#ffffff" opacity="0.68" />
+              <path d="M18 34H72M128 34H182" stroke="#bfdbfe" strokeWidth="1.5" strokeDasharray="4 4" />
+              <text x="100" y="30" fill="#1d4ed8" fontSize="6.5" fontWeight="900" textAnchor="middle">
+                แรงลัพธ์ = {Math.max(0, forceVal - frictionForce).toFixed(0)} N
+              </text>
               {/* Floor Surface line */}
               <line x1="10" y1="100" x2="190" y2="100" stroke={surface === "ice" ? "#93c5fd" : surface === "grass" ? "#22c55e" : "#78716c"} strokeWidth="5" />
+              {surface === "grass" && [18, 36, 54, 72, 132, 150, 168, 186].map((x) => (
+                <path key={x} d={`M${x} 99l3-7 3 7`} stroke="#15803d" strokeWidth="1" fill="none" />
+              ))}
+              {surface === "gravel" && [22, 43, 67, 139, 162, 181].map((x) => (
+                <circle key={x} cx={x} cy="96" r="2.2" fill="#57534e" />
+              ))}
 
               {/* Cartoon Character pulling or pushing the cart */}
               <g transform={`translate(${actionType === "pull" ? cartPos - 25 : cartPos + 25}, 70)`}>
@@ -238,8 +253,8 @@ export default function PushPullForcesSimulation() {
               {/* The Toy Cart */}
               <g transform={`translate(${cartPos}, 82)`}>
                 {/* Wooden Box cart */}
-                <rect x="-15" y="0" width="30" height="12" fill="#d97706" rx="1.5" />
-                <rect x="-13" y="1" width="26" height="10" fill="#f59e0b" rx="1" />
+                <rect x="-17" y="-1" width="34" height="14" fill="url(#push-pull-cart)" stroke="#9a3412" strokeWidth="1.5" rx="3" />
+                <path d="M-11 3H11M-11 8H11" stroke="#ffedd5" strokeWidth="1.2" opacity="0.8" />
 
                 {/* Wheels */}
                 <circle cx="-10" cy="13" r="4.5" fill="#1e293b" />
@@ -283,6 +298,11 @@ export default function PushPullForcesSimulation() {
                   )}
                 </g>
               )}
+              <g transform="translate(136 46)">
+                <rect width="48" height="31" rx="9" fill="#eff6ff" stroke="#bfdbfe" />
+                <text x="24" y="12" fill="#64748b" fontSize="5.5" fontWeight="900" textAnchor="middle">ความเร็วรถ</text>
+                <text x="24" y="24" fill="#1d4ed8" fontSize="8" fontWeight="900" textAnchor="middle">{Math.abs(velocity).toFixed(1)} m/s</text>
+              </g>
             </svg>
           </div>
         </div>

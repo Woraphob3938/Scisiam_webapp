@@ -66,13 +66,22 @@ function GasChamberScene({
         <p className="mt-0.5 text-xs font-bold text-slate-600">PV remains nearly constant</p>
       </div>
 
-      <svg className="relative z-10 h-full max-h-[360px] w-full max-w-[560px]" viewBox="0 0 560 360" fill="none" aria-hidden="true">
+      <svg className="relative z-10 h-full max-h-[360px] w-full max-w-[620px]" viewBox="0 0 560 360" fill="none" role="img" aria-label="กระบอกสูบแก๊สแบบอุณหภูมิคงที่ แสดงลูกสูบ ปริมาตร ความดัน และอนุภาคแก๊ส">
+        <defs>
+          <linearGradient id="boyle-gas" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stopColor="#dbeafe" stopOpacity="0.94" />
+            <stop offset="1" stopColor="#22d3ee" stopOpacity="0.45" />
+          </linearGradient>
+          <filter id="boyle-shadow" x="-20%" y="-30%" width="140%" height="180%">
+            <feDropShadow dx="0" dy="8" stdDeviation="7" floodColor="#0e7490" floodOpacity="0.18" />
+          </filter>
+        </defs>
         <ellipse cx="278" cy="298" rx="190" ry="22" fill="#dbeafe" opacity="0.55" />
 
         {/* Syringe body */}
         <g transform="translate(72, 142)">
           <rect x="0" y="0" width="290" height="86" rx="31" fill="#ffffff" stroke="#38bdf8" strokeWidth="5" />
-          <rect x="15" y="12" width={gasWidth} height="62" rx="25" fill="#bfdbfe" opacity="0.72" />
+          <rect x="15" y="12" width={gasWidth} height="62" rx="25" fill="url(#boyle-gas)" filter="url(#boyle-shadow)" />
           <path d="M44 3V83M84 3V83M124 3V83M164 3V83M204 3V83M244 3V83" stroke="#bae6fd" strokeWidth="2" />
           <rect x={pistonX} y="13" width="34" height="60" rx="13" fill="#64748b" />
           <path d={`M${pistonX + 34} 43H382`} stroke="#64748b" strokeWidth="10" strokeLinecap="round" />
@@ -83,11 +92,13 @@ function GasChamberScene({
         {/* Molecules */}
         <g className={isRunning ? "animate-pulse" : ""}>
           {[
-            [114, 175, "#22c55e"],
-            [147, 205, "#60a5fa"],
-            [185, 171, "#a78bfa"],
-            [221, 207, "#f59e0b"],
-            [258, 180, "#06b6d4"],
+            [103, 174, "#22c55e"],
+            [126, 205, "#60a5fa"],
+            [152, 171, "#a78bfa"],
+            [177, 207, "#f59e0b"],
+            [202, 180, "#06b6d4"],
+            [229, 201, "#fb7185"],
+            [252, 174, "#14b8a6"],
           ].map(([cx, cy, fill], index) => (
             <circle key={index} cx={cx as number} cy={cy as number} r="5" fill={fill as string} opacity={pistonX > (cx as number) - 72 ? 0.95 : 0.18} />
           ))}
@@ -108,6 +119,13 @@ function GasChamberScene({
           <rect x="0" y="0" width="92" height="52" rx="18" fill="#ffffff" stroke="#bae6fd" strokeWidth="3" />
           <text x="46" y="21" fill="#64748b" fontSize="10" fontWeight="900" textAnchor="middle">VOLUME</text>
           <text x="46" y="39" fill="#2563eb" fontSize="18" fontWeight="900" textAnchor="middle">{volume.toFixed(0)} ml</text>
+        </g>
+        <g transform="translate(190 274)">
+          <rect width="180" height="45" rx="18" fill="#ecfeff" stroke="#a5f3fc" strokeWidth="2.5" />
+          <text x="90" y="18" fill="#64748b" fontSize="9" fontWeight="900" textAnchor="middle">อุณหภูมิคงที่ · กฎของบอยล์</text>
+          <text x="90" y="35" fill="#0e7490" fontSize="13" fontWeight="900" textAnchor="middle">
+            PV = {(pressure * volume).toFixed(0)} kPa·ml
+          </text>
         </g>
       </svg>
     </div>

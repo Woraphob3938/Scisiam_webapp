@@ -45,6 +45,7 @@ function MotionTrackScene({
   // Photogates X positions (Gate A at 0.5m = 150px, Gate B at 1.5m = 330px)
   const gateAX = 60 + (0.5 / trackLength) * 360;
   const gateBX = 60 + (1.5 / trackLength) * 360;
+  const appliedForce = mass * acceleration;
 
   // Check if cart passed photogates
   const passedGateA = physicalX >= 0.5;
@@ -59,7 +60,18 @@ function MotionTrackScene({
         <p className="mt-0.5 text-xs font-bold text-slate-600">F = ma acceleration</p>
       </div>
 
-      <svg className="relative z-10 h-full max-h-[360px] w-full max-w-[560px]" viewBox="0 0 560 360" fill="none" aria-hidden="true">
+      <svg className="relative z-10 h-full max-h-[360px] w-full max-w-[620px]" viewBox="0 0 560 360" fill="none" role="img" aria-label="รางพลศาสตร์พร้อมรถทดลอง รอก ตุ้มน้ำหนัก โฟโตเกต และเวกเตอร์แรงตามกฎข้อสองของนิวตัน">
+        <defs>
+          <linearGradient id="newton-cart" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stopColor="#60a5fa" />
+            <stop offset="1" stopColor="#4f46e5" />
+          </linearGradient>
+          <marker id="newton-force-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0 0L10 5L0 10Z" fill="#f43f5e" />
+          </marker>
+        </defs>
+        <rect x="28" y="42" width="504" height="268" rx="28" fill="#ffffff" opacity="0.58" />
+        <path d="M40 256H506" stroke="#c4b5fd" strokeWidth="3" strokeDasharray="7 8" />
         {/* Track / Rail (Horizontal wood rail) */}
         <rect x="40" y="220" width="440" height="20" rx="2" fill="#d97706" stroke="#b45309" strokeWidth="2.5" />
         {/* Ruler ticks on track */}
@@ -106,7 +118,7 @@ function MotionTrackScene({
         {/* Cart on wheels */}
         <g transform={`translate(${cartX}, 175)`}>
           {/* Cart body */}
-          <rect x="0" y="0" width="60" height="25" rx="4" fill="#8b5cf6" stroke="#6d28d9" strokeWidth="2.5" />
+          <rect x="0" y="0" width="60" height="25" rx="7" fill="url(#newton-cart)" stroke="#3730a3" strokeWidth="2.5" />
           {/* Load on cart (mass visual block) */}
           <rect x="12" y="-12" width="36" height="12" rx="2" fill="#c084fc" stroke="#6d28d9" strokeWidth="1.5" />
           <text x="30" y="-2" fill="#3f3f46" fontSize="8" fontWeight="900" textAnchor="middle">{mass.toFixed(2)} kg</text>
@@ -117,6 +129,13 @@ function MotionTrackScene({
           <circle cx="46" cy="30" r="7" fill="#334155" stroke="#1e293b" strokeWidth="2" />
           <circle cx="46" cy="30" r="2.5" fill="#ffffff" />
         </g>
+        <g transform={`translate(${cartX + 30}, 160)`}>
+          <line x1="0" y1="0" x2={Math.min(92, 28 + appliedForce * 6)} y2="0" stroke="#f43f5e" strokeWidth="5" strokeLinecap="round" markerEnd="url(#newton-force-arrow)" />
+          <text x="0" y="-10" fill="#be123c" fontSize="10" fontWeight="900">F = {appliedForce.toFixed(2)} N</text>
+        </g>
+        {elapsedTime > 0 && (
+          <path d={`M70 211H${Math.max(70, cartX - 4)}`} stroke="#818cf8" strokeWidth="5" strokeLinecap="round" strokeDasharray="2 10" opacity="0.7" />
+        )}
 
         {/* Position indicators */}
         <g transform="translate(60, 68)">
@@ -130,6 +149,12 @@ function MotionTrackScene({
           <rect x="0" y="0" width="105" height="52" rx="18" fill="#ffffff" stroke="#ddd6fe" strokeWidth="3" />
           <text x="52" y="21" fill="#64748b" fontSize="9" fontWeight="900" textAnchor="middle">ACCELERATION</text>
           <text x="52" y="40" fill="#10b981" fontSize="17" fontWeight="900" textAnchor="middle">{acceleration.toFixed(2)} m/s²</text>
+        </g>
+        <g transform="translate(188 294)">
+          <rect width="184" height="38" rx="19" fill="#eef2ff" stroke="#c7d2fe" strokeWidth="2" />
+          <text x="92" y="24" fill="#4338ca" fontSize="12" fontWeight="900" textAnchor="middle">
+            F = ma · {mass.toFixed(2)} × {acceleration.toFixed(2)}
+          </text>
         </g>
       </svg>
     </div>

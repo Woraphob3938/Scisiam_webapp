@@ -525,31 +525,74 @@ function ChemistryScene({ labId, result }: { labId: ChemistryConceptLabId; resul
 
   return (
     <div className="relative flex min-h-[390px] items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-slate-50 via-white to-blue-50/50 p-4">
-      <svg className="h-full min-h-[320px] w-full max-w-[620px]" viewBox="0 0 620 340" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <rect x="38" y="247" width="540" height="34" rx="17" fill="#e2e8f0" opacity="0.55" />
-        <circle cx="300" cy="160" r="116" fill={accent} opacity="0.08" />
+      <svg className="h-full min-h-[320px] w-full max-w-[680px]" viewBox="0 0 620 340" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label={isGalvanic ? "เซลล์กัลวานิกสองครึ่งเซลล์ เชื่อมด้วยสะพานเกลือและวงจรอิเล็กตรอน" : isKinetics ? "ภาชนะปฏิกิริยา แสดงการชนของอนุภาคและพลังงานก่อกัมมันต์" : isAvogadro ? "กระบอกสูบแก๊ส แสดงความสัมพันธ์ระหว่างจำนวนโมลกับปริมาตร" : "อุปกรณ์ทดลองเคมี"}>
+        <defs>
+          <linearGradient id="chemistry-workbench" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#ffffff" />
+            <stop offset="1" stopColor="#e2e8f0" />
+          </linearGradient>
+          <linearGradient id="galvanic-left-solution" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#67e8f9" stopOpacity="0.55" />
+            <stop offset="1" stopColor="#0891b2" stopOpacity="0.75" />
+          </linearGradient>
+          <linearGradient id="galvanic-right-solution" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#c4b5fd" stopOpacity="0.55" />
+            <stop offset="1" stopColor="#7c3aed" stopOpacity="0.72" />
+          </linearGradient>
+          <marker id="chemistry-electron-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0 0L10 5L0 10Z" fill="#7c3aed" />
+          </marker>
+          <filter id="chemistry-apparatus-shadow" x="-20%" y="-30%" width="140%" height="180%">
+            <feDropShadow dx="0" dy="9" stdDeviation="8" floodColor="#334155" floodOpacity="0.16" />
+          </filter>
+        </defs>
+        <rect x="24" y="40" width="572" height="252" rx="30" fill="#ffffff" opacity="0.62" />
+        <rect x="38" y="247" width="540" height="34" rx="17" fill="url(#chemistry-workbench)" />
+        <circle cx="310" cy="156" r="126" fill={accent} opacity="0.065" />
 
         {isGalvanic ? (
-          <g>
+          <g filter="url(#chemistry-apparatus-shadow)">
             <rect x="135" y="137" width="108" height="110" rx="20" fill="#ecfeff" stroke="#67e8f9" strokeWidth="5" />
             <rect x="377" y="137" width="108" height="110" rx="20" fill="#faf5ff" stroke="#c4b5fd" strokeWidth="5" />
-            <path d="M161 205H219M403 205H461" stroke="#2563eb" strokeWidth="9" strokeLinecap="round" />
+            <path d="M143 188H235V239H143Z" fill="url(#galvanic-left-solution)" />
+            <path d="M385 188H477V239H385Z" fill="url(#galvanic-right-solution)" />
+            <rect x="174" y="112" width="22" height="124" rx="7" fill="#94a3b8" stroke="#475569" strokeWidth="3" />
+            <rect x="420" y="112" width="22" height="124" rx="7" fill="#f59e0b" stroke="#b45309" strokeWidth="3" />
             <path d="M187 137V91H433V137" stroke="#475569" strokeWidth="9" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M224 91C248 50 372 50 397 91" stroke="#7c3aed" strokeWidth="7" strokeLinecap="round" />
+            <path d="M224 91C248 50 372 50 397 91" stroke="#ddd6fe" strokeWidth="19" strokeLinecap="round" />
+            <path d="M224 91C248 50 372 50 397 91" stroke="#7c3aed" strokeWidth="5" strokeLinecap="round" strokeDasharray="7 8" markerEnd="url(#chemistry-electron-arrow)" />
             <circle cx="310" cy="73" r="42" fill="#ffffff" stroke="#cbd5e1" strokeWidth="6" />
             <path d="M310 73L335 51" stroke="#ef4444" strokeWidth="7" strokeLinecap="round" />
             <text x="310" y="105" fill="#7c3aed" fontSize="20" fontWeight="900" textAnchor="middle">{result.metrics[0].value}</text>
+            <path d="M196 163C242 126 378 126 420 163" stroke="#22c55e" strokeWidth="9" strokeLinecap="round" opacity="0.75" />
+            <text x="310" y="146" fill="#047857" fontSize="11" fontWeight="900" textAnchor="middle">สะพานเกลือ</text>
+            <text x="185" y="265" fill="#475569" fontSize="11" fontWeight="900" textAnchor="middle">แอโนด (−)</text>
+            <text x="431" y="265" fill="#92400e" fontSize="11" fontWeight="900" textAnchor="middle">แคโทด (+)</text>
+            <text x="310" y="39" fill="#6d28d9" fontSize="11" fontWeight="900" textAnchor="middle">e⁻ ไหลผ่านวงจรภายนอก</text>
           </g>
         ) : isKinetics ? (
           <g>
-            <rect x="180" y="104" width="160" height="150" rx="28" fill="#fff7ed" stroke="#fed7aa" strokeWidth="6" />
-            <path d="M199 220C246 180 285 203 326 134" stroke="#f97316" strokeWidth="14" strokeLinecap="round" fill="none" />
-            {[218, 256, 296, 326].map((x, index) => (
-              <circle key={x} cx={x} cy={140 + (index % 3) * 24} r="9" fill={index % 2 ? "#a855f7" : "#22c55e"} />
-            ))}
-            <circle cx="412" cy="126" r="45" fill="#ffffff" stroke="#cbd5e1" strokeWidth="6" />
-            <path d="M412 126V96M412 126L440 139" stroke="#f97316" strokeWidth="7" strokeLinecap="round" />
-            <text x="412" y="188" fill="#f97316" fontSize="18" fontWeight="900" textAnchor="middle">{result.metrics[0].value}</text>
+            <g filter="url(#chemistry-apparatus-shadow)">
+              <path d="M145 82H337L320 253H162L145 82Z" fill="#fff7ed" stroke="#fb923c" strokeWidth="6" strokeLinejoin="round" />
+              <path d="M159 170H324L316 247H166L159 170Z" fill="#fed7aa" opacity="0.58" />
+              {[182, 220, 258, 296, 194, 236, 278, 306].map((x, index) => (
+                <g key={x} transform={`translate(${x} ${126 + (index % 3) * 31})`}>
+                  <circle cx="-7" cy="0" r="8" fill={index % 2 ? "#a855f7" : "#22c55e"} />
+                  <circle cx="7" cy="0" r="8" fill={index % 2 ? "#22c55e" : "#a855f7"} />
+                </g>
+              ))}
+              <path d="M172 224C214 204 268 204 310 224" stroke="#f97316" strokeWidth="8" strokeLinecap="round" opacity="0.8" />
+            </g>
+            <g transform="translate(365 69)">
+              <rect width="206" height="176" rx="24" fill="#ffffff" stroke="#fed7aa" strokeWidth="4" />
+              <text x="20" y="28" fill="#9a3412" fontSize="11" fontWeight="900">โปรไฟล์พลังงาน</text>
+              <path d="M24 137H182M35 147V48" stroke="#cbd5e1" strokeWidth="2" />
+              <path d="M36 126C68 124 74 62 110 58C140 55 142 112 180 109" stroke="#f97316" strokeWidth="6" strokeLinecap="round" fill="none" />
+              <path d="M36 126C72 123 78 91 109 88C138 85 145 111 180 109" stroke="#22c55e" strokeWidth="4" strokeLinecap="round" fill="none" strokeDasharray="6 5" />
+              <text x="123" y="78" fill="#047857" fontSize="9" fontWeight="900">มีตัวเร่ง</text>
+              <text x="103" y="160" fill="#ea580c" fontSize="13" fontWeight="900" textAnchor="middle">{result.metrics[0].value}</text>
+            </g>
+            <text x="241" y="286" fill="#9a3412" fontSize="11" fontWeight="900" textAnchor="middle">การชนที่มีพลังงานเพียงพอทำให้เกิดผลิตภัณฑ์</text>
           </g>
         ) : isKsp ? (
           <g>
@@ -563,13 +606,26 @@ function ChemistryScene({ labId, result }: { labId: ChemistryConceptLabId; resul
           </g>
         ) : isAvogadro ? (
           <g>
-            <rect x="170" y="148" width="270" height="66" rx="22" fill="#eff6ff" stroke="#93c5fd" strokeWidth="7" />
-            <rect x="440" y="165" width="78" height="30" rx="12" fill="#ffffff" stroke="#64748b" strokeWidth="7" />
-            <path d="M181 181H430" stroke="#2563eb" strokeWidth="10" strokeLinecap="round" />
-            <path d="M204 148V92H285V148" stroke="#64748b" strokeWidth="7" strokeLinecap="round" />
-            <circle cx="244" cy="70" r="43" fill="#dbeafe" stroke="#60a5fa" strokeWidth="7" />
-            <text x="244" y="77" fill="#2563eb" fontSize="23" fontWeight="900" textAnchor="middle">gas</text>
-            <text x="310" y="260" fill="#2563eb" fontSize="20" fontWeight="900" textAnchor="middle">{result.metrics[2].value}</text>
+            <g filter="url(#chemistry-apparatus-shadow)">
+              <rect x="116" y="102" width="360" height="142" rx="34" fill="#eff6ff" stroke="#60a5fa" strokeWidth="7" />
+              <rect x="126" y="112" width="254" height="122" rx="27" fill="#bfdbfe" opacity="0.58" />
+              <rect x="382" y="110" width="24" height="126" rx="9" fill="#334155" />
+              <path d="M406 173H526" stroke="#475569" strokeWidth="12" strokeLinecap="round" />
+              <path d="M525 138V208" stroke="#475569" strokeWidth="10" strokeLinecap="round" />
+              {[152, 188, 224, 260, 296, 332, 170, 212, 252, 314].map((x, index) => (
+                <circle key={x} cx={x} cy={139 + (index % 3) * 35} r="8" fill={index % 2 ? "#2563eb" : "#06b6d4"} opacity="0.86" />
+              ))}
+            </g>
+            <g transform="translate(54 116)">
+              <rect width="48" height="115" rx="18" fill="#ffffff" stroke="#bfdbfe" strokeWidth="3" />
+              <path d="M31 18V98M20 31H31M20 55H31M20 79H31" stroke="#2563eb" strokeWidth="3" />
+              <text x="24" y="108" fill="#1d4ed8" fontSize="8" fontWeight="900" textAnchor="middle">V</text>
+            </g>
+            <g transform="translate(170 56)">
+              <rect width="280" height="35" rx="17.5" fill="#dbeafe" stroke="#93c5fd" strokeWidth="2" />
+              <text x="140" y="22" fill="#1d4ed8" fontSize="12" fontWeight="900" textAnchor="middle">อุณหภูมิและความดันคงที่ · V ∝ n</text>
+            </g>
+            <text x="296" y="282" fill="#2563eb" fontSize="17" fontWeight="900" textAnchor="middle">{result.metrics[2].value}</text>
           </g>
         ) : isElectrolysis ? (
           <g>

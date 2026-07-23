@@ -291,8 +291,12 @@ export default function FloatingSinkingSimulation() {
                 <stop offset="0" stopColor="#67e8f9" stopOpacity="0.78" />
                 <stop offset="1" stopColor="#0284c7" stopOpacity="0.74" />
               </linearGradient>
+              <filter id="buoyancy-object-shadow" x="-40%" y="-40%" width="180%" height="190%">
+                <feDropShadow dx="0" dy="7" stdDeviation="5" floodColor="#0c4a6e" floodOpacity="0.25" />
+              </filter>
             </defs>
             <rect width="760" height="360" fill="#f5fcff" />
+            <path d="M0 310H760" stroke="#e0f2fe" strokeWidth="3" strokeDasharray="8 8" />
 
             <g transform="translate(166 42)">
               <path
@@ -304,10 +308,14 @@ export default function FloatingSinkingSimulation() {
               />
               <path d="M22 116 H408 V282 Q408 300 386 300 H44 Q22 300 22 282 Z" fill={`url(#${waterId})`} />
               <path d="M22 116 Q72 103 122 116 T222 116 T322 116 T408 116" fill="none" stroke="#0ea5e9" strokeWidth="5" />
+              <path d="M34 162H54M34 208H54M34 254H54" stroke="#e0f2fe" strokeWidth="3" strokeLinecap="round" />
+              <text x="61" y="166" fill="#e0f2fe" fontSize="10" fontWeight="900">25%</text>
+              <text x="61" y="212" fill="#e0f2fe" fontSize="10" fontWeight="900">50%</text>
+              <text x="61" y="258" fill="#e0f2fe" fontSize="10" fontWeight="900">75%</text>
 
               <g
                 transform={`translate(215 ${objectY})`}
-                style={{ transition: "transform 420ms ease, opacity 220ms ease" }}
+                style={{ transition: "transform 420ms ease, opacity 220ms ease", filter: "url(#buoyancy-object-shadow)" }}
               >
                 {material === "clay" && clayShape === "boat" ? (
                   <path
@@ -365,6 +373,21 @@ export default function FloatingSinkingSimulation() {
               <text x="70" y="96" textAnchor="middle" fill="#475569" fontSize="12" fontWeight="800">
                 น้ำ = 1000 kg/m³
               </text>
+            </g>
+            <g transform="translate(579 200)">
+              <rect width="157" height="90" rx="18" fill="#ecfeff" stroke="#67e8f9" strokeWidth="2" />
+              <text x="78.5" y="26" textAnchor="middle" fill="#0369a1" fontSize="13" fontWeight="900">เปรียบเทียบความหนาแน่น</text>
+              <rect x="18" y="42" width="121" height="12" rx="6" fill="#bae6fd" />
+              <rect
+                x="18"
+                y="42"
+                width={Math.min(121, (result.averageDensityKgM3 / 1500) * 121)}
+                height="12"
+                rx="6"
+                fill={result.averageDensityKgM3 <= 1000 ? "#10b981" : "#f43f5e"}
+              />
+              <path d="M99 37V60" stroke="#0f172a" strokeWidth="2" />
+              <text x="99" y="75" textAnchor="middle" fill="#475569" fontSize="9" fontWeight="800">น้ำ 1000</text>
             </g>
           </svg>
         </div>

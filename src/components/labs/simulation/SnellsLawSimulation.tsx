@@ -74,15 +74,31 @@ function OpticalScene({
         </p>
       </div>
 
-      <svg className="relative z-10 h-full max-h-[360px] w-full max-w-[560px]" viewBox="0 0 560 360" fill="none" aria-hidden="true">
+      <svg className="relative z-10 h-full max-h-[360px] w-full max-w-[620px]" viewBox="0 0 560 360" fill="none" role="img" aria-label="โต๊ะทดลองการหักเหของแสง แสดงลำแสง เส้นแนวฉาก และมุมในตัวกลางสองชนิด">
+        <defs>
+          <linearGradient id="snell-air" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stopColor="#ffffff" stopOpacity="0.92" />
+            <stop offset="1" stopColor="#e0f2fe" stopOpacity="0.72" />
+          </linearGradient>
+          <linearGradient id="snell-medium" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#bfdbfe" stopOpacity="0.62" />
+            <stop offset="1" stopColor="#38bdf8" stopOpacity="0.32" />
+          </linearGradient>
+          <filter id="snell-beam-glow" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur stdDeviation="4" />
+          </filter>
+        </defs>
         {/* Background mediums split */}
         {/* Medium 1 - Top Half */}
-        <rect x="20" y="20" width="520" height="160" fill="#f1f5f9" rx="8" opacity="0.6" />
+        <rect x="20" y="20" width="520" height="160" fill="url(#snell-air)" rx="18" />
         {/* Medium 2 - Bottom Half */}
-        <rect x="20" y="180" width="520" height="160" fill="#dbeafe" rx="8" opacity="0.6" />
+        <rect x="20" y="180" width="520" height="160" fill="url(#snell-medium)" rx="18" />
+        <path d="M20 201C82 188 134 214 196 201C258 188 310 214 372 201C434 188 486 214 540 201" stroke="#7dd3fc" strokeWidth="2" opacity="0.65" />
 
         {/* Medium boundary line */}
         <line x1="20" y1="180" x2="540" y2="180" stroke="#3b82f6" strokeWidth="4" strokeDasharray="none" />
+        <rect x="214" y="168" width="132" height="24" rx="12" fill="#ffffff" stroke="#93c5fd" strokeWidth="2" />
+        <text x="280" y="184" fill="#1d4ed8" fontSize="9" fontWeight="900" textAnchor="middle">รอยต่อระหว่างตัวกลาง</text>
 
         {/* Medium Text labels */}
         <text x="35" y="45" fill="#475569" fontSize="11" fontWeight="800">ตัวกลางที่ 1 (ด้านบน): n₁ = {n1.toFixed(2)}</text>
@@ -106,6 +122,7 @@ function OpticalScene({
 
         {/* Light Rays */}
         {/* Incident Ray (Laser to Center) */}
+        <line x1={incidentX} y1={incidentY} x2="280" y2="180" stroke="#fb7185" strokeWidth="10" strokeLinecap="round" opacity="0.22" filter="url(#snell-beam-glow)" />
         <line x1={incidentX} y1={incidentY} x2="280" y2="180" stroke="#f43f5e" strokeWidth="3.5" strokeLinecap="round" />
         {/* Incident ray glow */}
         <line x1={incidentX} y1={incidentY} x2="280" y2="180" stroke="#ef4444" strokeWidth="8" strokeLinecap="round" opacity="0.25" />
@@ -123,6 +140,7 @@ function OpticalScene({
           <>
             {/* Refracted Ray */}
             <line x1="280" y1="180" x2={refractX} y2={refractY} stroke="#10b981" strokeWidth="3.5" strokeLinecap="round" />
+            <line x1="280" y1="180" x2={refractX} y2={refractY} stroke="#34d399" strokeWidth="10" strokeLinecap="round" opacity="0.2" filter="url(#snell-beam-glow)" />
             <line x1="280" y1="180" x2={refractX} y2={refractY} stroke="#34d399" strokeWidth="8" strokeLinecap="round" opacity="0.25" />
 
             {/* Faint reflected ray (Fresnel reflection) */}
@@ -134,6 +152,13 @@ function OpticalScene({
 
         {/* Center Point */}
         <circle cx="280" cy="180" r="5.5" fill="#facc15" stroke="#d97706" strokeWidth="1.5" />
+        <g transform="translate(414 264)">
+          <rect width="110" height="58" rx="16" fill="#ffffff" stroke={isTIR ? "#fecaca" : "#a7f3d0"} strokeWidth="2.5" />
+          <text x="55" y="20" fill="#64748b" fontSize="9" fontWeight="900" textAnchor="middle">ผลที่สังเกตได้</text>
+          <text x="55" y="42" fill={isTIR ? "#dc2626" : "#047857"} fontSize="13" fontWeight="900" textAnchor="middle">
+            {isTIR ? "สะท้อนกลับหมด" : `หักเห ${angle2.toFixed(1)}°`}
+          </text>
+        </g>
 
         {/* Angle indicator arcs and texts */}
         {angle1 > 5 && (

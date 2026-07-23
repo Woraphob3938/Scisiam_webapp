@@ -76,13 +76,23 @@ function GasBathScene({
         <p className="mt-0.5 text-xs font-bold text-slate-600">V/T stays nearly constant</p>
       </div>
 
-      <svg className="relative z-10 h-full max-h-[365px] w-full max-w-[580px]" viewBox="0 0 580 365" fill="none" aria-hidden="true">
+      <svg className="relative z-10 h-full max-h-[365px] w-full max-w-[640px]" viewBox="0 0 580 365" fill="none" role="img" aria-label="กระบอกแก๊สในอ่างควบคุมอุณหภูมิ แสดงการเปลี่ยนปริมาตรตามกฎของชาร์ลส์">
+        <defs>
+          <linearGradient id="charles-water" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#bae6fd" stopOpacity="0.55" />
+            <stop offset="1" stopColor="#0ea5e9" stopOpacity="0.42" />
+          </linearGradient>
+          <linearGradient id="charles-gas" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#fed7aa" stopOpacity="0.7" />
+            <stop offset="1" stopColor="#f97316" stopOpacity="0.52" />
+          </linearGradient>
+        </defs>
         <ellipse cx="294" cy="311" rx="188" ry="23" fill="#fed7aa" opacity="0.42" />
 
         {/* Water bath */}
         <g transform="translate(128, 76)">
           <path d="M48 22H272L250 248H70L48 22Z" fill="#ffffff" opacity="0.84" stroke="#38bdf8" strokeWidth="5" />
-          <path d="M70 118C104 105 137 129 171 116C206 104 232 108 254 120L242 237H79L70 118Z" fill="#7dd3fc" opacity="0.55" />
+          <path d="M70 118C104 105 137 129 171 116C206 104 232 108 254 120L242 237H79L70 118Z" fill="url(#charles-water)" />
           <path d="M69 119C104 105 138 129 172 116C207 104 233 108 254 120" stroke="#0891b2" strokeWidth="3" strokeLinecap="round" opacity="0.65" />
           <path className={isRunning ? "animate-pulse" : ""} d="M96 143C110 136 124 150 138 143M178 151C192 144 206 158 220 151" stroke="#ecfeff" strokeWidth="4" strokeLinecap="round" opacity="0.88" />
         </g>
@@ -90,7 +100,7 @@ function GasBathScene({
         {/* Gas cylinder */}
         <g transform="translate(245, 86)">
           <rect x="0" y="0" width="86" height="184" rx="30" fill="#f8fafc" stroke="#64748b" strokeWidth="5" />
-          <rect x="12" y={gasY - 86} width="62" height={gasHeight} rx="24" fill="#fdba74" opacity="0.72" />
+          <rect x="12" y={gasY - 86} width="62" height={gasHeight} rx="24" fill="url(#charles-gas)" />
           <path d="M14 36H72M14 68H65M14 100H72M14 132H65" stroke="#cbd5e1" strokeWidth="2.5" strokeLinecap="round" />
           <rect x="8" y={gasY - 94} width="70" height="16" rx="8" fill="#334155" />
           <path d={`M43 ${gasY - 94}V-18`} stroke="#334155" strokeWidth="7" strokeLinecap="round" />
@@ -131,6 +141,13 @@ function GasBathScene({
           <rect x="0" y="0" width="104" height="55" rx="18" fill="#ffffff" stroke="#bae6fd" strokeWidth="3" />
           <text x="52" y="22" fill="#64748b" fontSize="10" fontWeight="900" textAnchor="middle">VOLUME</text>
           <text x="52" y="42" fill="#0891b2" fontSize="18" fontWeight="900" textAnchor="middle">{volume.toFixed(0)} ml</text>
+        </g>
+        <g transform="translate(403 252)">
+          <rect width="136" height="58" rx="18" fill="#ffffff" stroke="#fed7aa" strokeWidth="2.5" />
+          <text x="68" y="21" fill="#64748b" fontSize="9" fontWeight="900" textAnchor="middle">ความดันคงที่</text>
+          <text x="68" y="42" fill="#ea580c" fontSize="13" fontWeight="900" textAnchor="middle">
+            V/T = {(volume / (temperatureC + 273.15)).toFixed(2)}
+          </text>
         </g>
       </svg>
     </div>

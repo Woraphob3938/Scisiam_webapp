@@ -189,9 +189,13 @@ export default function SimpleCircuitsSimulation() {
                   <feMergeNode in="SourceGraphic" />
                 </feMerge>
               </filter>
+              <filter id="circuit-soft-shadow" x="-20%" y="-30%" width="140%" height="170%">
+                <feDropShadow dx="0" dy="8" stdDeviation="8" floodColor="#9a3412" floodOpacity="0.14" />
+              </filter>
             </defs>
 
             <rect width="760" height="360" fill="#fffaf3" />
+            <rect x="34" y="36" width="692" height="270" rx="28" fill="#ffffff" opacity="0.72" filter="url(#circuit-soft-shadow)" />
             <path
               d="M0 302 H760"
               stroke="#fed7aa"
@@ -257,6 +261,11 @@ export default function SimpleCircuitsSimulation() {
               strokeWidth="9"
               strokeLinecap="round"
             />
+            {result.isClosed && [250, 330, 410, 490].map((x, index) => (
+              <circle key={x} cx={x} cy="158" r="5" fill="#facc15" opacity={0.7 + index * 0.08}>
+                <animate attributeName="cx" from={x} to={x + 54} dur="1.2s" repeatCount="indefinite" />
+              </circle>
+            ))}
             <path
               d="M628 251 V302 H422"
               fill="none"
@@ -289,6 +298,13 @@ export default function SimpleCircuitsSimulation() {
                 <path d="M298 282 L318 322 M318 282 L298 322" stroke="#dc2626" strokeWidth="5" />
               </>
             )}
+            <g transform="translate(286 52)">
+              <rect width="188" height="58" rx="18" fill="#ffffff" stroke={result.isClosed ? "#86efac" : "#fed7aa"} strokeWidth="3" />
+              <text x="94" y="22" fill="#64748b" fontSize="12" fontWeight="900" textAnchor="middle">มิเตอร์วัดวงจร</text>
+              <text x="94" y="44" fill={result.isClosed ? "#047857" : "#c2410c"} fontSize="17" fontWeight="900" textAnchor="middle">
+                {result.voltageVolt.toFixed(1)} V · {result.currentAmp.toFixed(2)} A
+              </text>
+            </g>
 
             {result.isClosed &&
               [250, 350, 450].map((x) => (
