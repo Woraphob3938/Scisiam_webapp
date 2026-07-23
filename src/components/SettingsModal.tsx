@@ -2,8 +2,10 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
+import Link from "next/link";
 import {
   Bot,
+  BookOpen,
   Check,
   FileText,
   KeyRound,
@@ -411,6 +413,31 @@ export default function SettingsModal({
                   label="เปิดโหมดช่วยสำหรับผู้ตาบอดสี"
                 />
               </div>
+            </div>
+          </section>
+
+          <section className="rounded-2xl border border-slate-200 bg-white p-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex min-w-0 items-start gap-3">
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-blue-50 text-blue-700 ring-1 ring-blue-100">
+                  <BookOpen className="h-5 w-5" aria-hidden="true" />
+                </span>
+                <div className="min-w-0">
+                  <h3 className="text-base font-extrabold leading-[1.45] text-slate-950">
+                    คู่มือการใช้งาน
+                  </h3>
+                  <p className="text-sm font-semibold leading-relaxed text-slate-500">
+                    ดูวิธีใช้ห้องแล็บ ชั้นเรียน การส่งงาน และเครื่องมือสำหรับคุณครู
+                  </p>
+                </div>
+              </div>
+              <Link
+                href="/guide"
+                onClick={onClose}
+                className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-xl bg-blue-600 px-4 text-sm font-extrabold text-white transition-colors hover:bg-blue-700 focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
+              >
+                เปิดคู่มือ
+              </Link>
             </div>
           </section>
 

@@ -9,7 +9,6 @@ import {
   ClipboardList,
   Lightbulb,
   PlugZap,
-  RotateCcw,
   ToggleLeft,
 } from "lucide-react";
 import SharedSimulationShell from "@/components/labs/simulation/SharedSimulationShell";
@@ -352,38 +351,17 @@ export default function SimpleCircuitsSimulation() {
               <PlugZap className="h-4 w-4" />
               {wireConnected ? "สายไฟต่อครบ" : "สายไฟถูกถอด"}
             </button>
-            <button
-              type="button"
-              onClick={() => setSwitchClosed((value) => !value)}
-              aria-pressed={switchClosed}
-              className={`${buttonBase} w-full ${
-                switchClosed
-                  ? "border-orange-500 bg-orange-500 text-white"
-                  : "border-slate-300 bg-slate-100 text-slate-700"
-              }`}
-            >
-              <ToggleLeft className="h-4 w-4" />
-              {switchClosed ? "หยุดการไหลของกระแส" : "เปิดการไหลของกระแส"}
-            </button>
           </section>
           <div className="space-y-4">
             {missionPanel}
-            <div className="grid grid-cols-2 gap-2">
+            <div>
               <button
                 type="button"
                 onClick={handleLog}
-                className={`${buttonBase} border-orange-500 bg-orange-500 text-white hover:bg-orange-600`}
+                className={`${buttonBase} w-full border-orange-500 bg-orange-500 text-white hover:bg-orange-600`}
               >
                 <ClipboardList className="h-4 w-4" />
                 จดผล
-              </button>
-              <button
-                type="button"
-                onClick={handleReset}
-                className={`${buttonBase} border-slate-200 bg-white text-slate-700 hover:bg-slate-50`}
-              >
-                <RotateCcw className="h-4 w-4" />
-                เริ่มใหม่
               </button>
             </div>
           </div>
@@ -393,28 +371,11 @@ export default function SimpleCircuitsSimulation() {
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
-            onClick={() => setSwitchClosed((value) => !value)}
-            className={`${buttonBase} border-orange-200 bg-orange-50 text-orange-800`}
-          >
-            <ToggleLeft className="h-4 w-4" />
-            {switchClosed ? "เปิดวงจร" : "ปิดวงจร"}
-          </button>
-          <button
-            type="button"
             onClick={handleLog}
             className={`${buttonBase} border-orange-500 bg-orange-500 text-white`}
           >
             <ClipboardList className="h-4 w-4" />
             จดผล
-          </button>
-          <button
-            type="button"
-            onClick={handleReset}
-            aria-label="เริ่มการทดลองใหม่"
-            className={`${buttonBase} border-slate-200 bg-white text-slate-700`}
-          >
-            <RotateCcw className="h-4 w-4" />
-            เริ่มใหม่
           </button>
         </div>
       }

@@ -4,8 +4,6 @@ import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import {
   Play,
-  Pause,
-  RotateCcw,
   Zap,
   Sliders,
   ClipboardList,
@@ -570,17 +568,6 @@ export default function OhmsLawSimulation() {
         </div>
       </div>
 
-      {/* Actions */}
-      <div className="grid grid-cols-4 gap-2 pt-1">
-        <button onClick={handleStartStop} className={`col-span-2 inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-xs font-black text-white shadow-sm ${isRunning ? "bg-slate-700" : "bg-blue-600 hover:bg-blue-700"}`}>
-          {isRunning ? <Pause className="h-4 w-4 fill-white stroke-none" /> : <Play className="h-4 w-4 fill-white stroke-none" />}
-          {isRunning ? "หยุดชั่วคราว" : "เริ่มจำลอง"}
-        </button>
-        <button onClick={handleAddPoint} className="inline-flex items-center justify-center rounded-xl border border-blue-100 bg-blue-50 text-xs font-black text-blue-700 hover:bg-blue-100">บันทึกจุด</button>
-        <button onClick={handleReset} className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50" aria-label="รีเซ็ต">
-          <RotateCcw className="h-4 w-4" />
-        </button>
-      </div>
     </div>
   );
 
@@ -610,6 +597,9 @@ export default function OhmsLawSimulation() {
             <span className="mb-1 flex justify-between"><span>ความต้านทาน</span><span>{resistance.toFixed(0)} Ω</span></span>
             <input aria-label="ความต้านทาน" type="range" min="10" max="500" step="10" value={resistance} onChange={(event) => setResistance(Number(event.target.value))} className="w-full accent-amber-500" />
           </label>
+          <button type="button" onClick={handleAddPoint} className="min-h-11 rounded-xl border border-blue-100 bg-blue-50 px-3 text-xs font-black text-blue-700 transition hover:bg-blue-100 lg:col-span-3">
+            จดค่าลงตาราง
+          </button>
         </div>
       }
       metrics={[

@@ -167,7 +167,7 @@ test("shared shell promotes compact controls to the persistent dock", () => {
   );
 
   assert.match(source, /const hasCompactControls =/);
-  assert.match(source, /const collapsedControls = compactControls;/);
+  assert.match(source, /const collapsedControls = compactControls \?\? controls;/);
   assert.match(
     source,
     /usesPersistentControlDock \? persistentControlDock : controlsDrawer/,
@@ -186,13 +186,13 @@ test("shared shell keeps primary actions in the persistent dock", () => {
   assert.match(source, /primaryActions && <div className="mt-3">/);
 });
 
-test("shared shell does not place full settings over the stage", () => {
+test("shared shell exposes full controls when a lab has no compact controls", () => {
   const source = readProjectFile(
     "src/components/labs/simulation/SharedSimulationShell.tsx",
   );
 
-  assert.match(source, /const collapsedControls = compactControls;/);
-  assert.doesNotMatch(source, /compactControls \?\? controls/);
+  assert.match(source, /const collapsedControls = compactControls \?\? controls;/);
+  assert.match(source, /const hasAdvancedControls = hasCompactControls && controls !== compactControls;/);
   assert.match(source, /usesPersistentControlDock \? persistentControlDock : controlsDrawer/);
 });
 
@@ -241,7 +241,7 @@ test("shared shell keeps its title compact and fullscreen control inside the sce
   const advancedPanelStart = source.indexOf("{persistentAdvancedPanel}", sceneStart);
   const sceneSource = source.slice(sceneStart, advancedPanelStart);
   assert.match(sceneSource, /data-testid="simulation-fullscreen-toggle"/);
-  assert.match(sceneSource, /className="absolute bottom-3 right-3 z-50/);
+  assert.match(sceneSource, /className="absolute bottom-4 right-3 z-50[^"\n]*sm:bottom-14/);
 });
 
 test("shared shell stacks the mobile experiment instead of clipping overlays", () => {
@@ -355,7 +355,7 @@ test("fullscreen control stays above the experiment dock", () => {
     "src/components/labs/simulation/SharedSimulationShell.tsx",
   );
 
-  assert.match(source, /className="absolute bottom-3 right-3 z-50/);
+  assert.match(source, /className="absolute bottom-4 right-3 z-50[^"\n]*sm:bottom-14/);
 });
 
 test("light and shadows waits for the learner to start", () => {
@@ -460,13 +460,62 @@ test("foundation simulations keep their real actions outside advanced settings",
   }
 });
 
-test("full legacy settings stay in advanced controls instead of covering the stage", () => {
+test("full legacy settings are immediately available when no compact controls exist", () => {
   const source = readProjectFile(
     "src/components/labs/simulation/SharedSimulationShell.tsx",
   );
 
-  assert.match(source, /const collapsedControls = compactControls;/);
-  assert.doesNotMatch(source, /compactControls \?\? controls/);
+  assert.match(source, /const collapsedControls = compactControls \?\? controls;/);
+});
+
+test("Newton cooling omits timing and simulation-speed controls", () => {
+  const source = readProjectFile(
+    "src/components/labs/simulation/NewtonsCoolingSimulation.tsx",
+  );
+
+  assert.doesNotMatch(source, /ช่วงบันทึกข้อมูล/);
+  assert.doesNotMatch(source, /ความเร็วการจำลอง/);
+});
+
+test("shared shell only offers advanced settings when a compact control set exists", () => {
+  const source = readProjectFile(
+    "src/components/labs/simulation/SharedSimulationShell.tsx",
+  );
+
+  assert.match(source, /\{hasAdvancedControls && \(/);
+  assert.match(source, /usesPersistentControlDock && hasAdvancedControls && controlsOpen/);
+});
+
+test("shared legacy labs keep primary actions and time shortcuts out of advanced settings", () => {
+  const source = readProjectFile(
+    "src/components/labs/simulation/UnifiedLegacySimulation.tsx",
+  );
+  const controls = source.slice(
+    source.indexOf("const controls = ("),
+    source.indexOf("const compactControls = ("),
+  );
+
+  assert.doesNotMatch(controls, /handleRunToggle/);
+  assert.doesNotMatch(controls, /setElapsedSeconds/);
+  assert.doesNotMatch(controls, /handleReset/);
+  assert.doesNotMatch(controls, /\+เวลา/);
+});
+
+test("specialized advanced controls do not duplicate shared run and reset actions", () => {
+  const cases = [
+    ["OhmsLawSimulation.tsx", /handleStartStop|handleReset/],
+    ["PhotoelectricEffectSimulation.tsx", /handleStartStop|handleReset/],
+  ];
+
+  for (const [file, duplicatedAction] of cases) {
+    const source = readProjectFile(`src/components/labs/simulation/${file}`);
+    const controlsStart = source.indexOf("const controls = (");
+    const controls = source.slice(
+      controlsStart,
+      source.indexOf("return (", controlsStart),
+    );
+    assert.doesNotMatch(controls, duplicatedAction, file);
+  }
 });
 
 test("animated simulations wait for the learner to start", () => {
