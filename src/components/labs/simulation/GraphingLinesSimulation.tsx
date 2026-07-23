@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import {
   Calculator,
   Clipboard,
@@ -312,7 +311,6 @@ function TheoryPanel({ slope, intercept, probeX }: { slope: number; intercept: n
 }
 
 export default function GraphingLinesSimulation() {
-  const router = useRouter();
   const [slope, setSlope] = useState(1.5);
   const [intercept, setIntercept] = useState(1);
   const [probeX, setProbeX] = useState(2);
@@ -425,7 +423,6 @@ export default function GraphingLinesSimulation() {
     });
 
     alert("บันทึกผลแล็บ Graphing Lines & Slope สำเร็จ");
-    router.push("/labs/graphing-lines");
   };
 
   const controls = (

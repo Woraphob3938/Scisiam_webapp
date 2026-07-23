@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import {
   Activity,
   ArrowRightLeft,
@@ -1881,7 +1880,6 @@ function CombinatoricsStage({ vars, derived, glowId }: { vars: AppliedVars; deri
 }
 
 export default function AppliedMathSimulation({ labId }: { labId: AppliedMathLabId }) {
-  const router = useRouter();
   const config = configs[labId];
   const [vars, setVars] = useState<AppliedVars>(config.defaults);
   const [runs, setRuns] = useState<MathRun[]>([]);
@@ -1953,7 +1951,6 @@ export default function AppliedMathSimulation({ labId }: { labId: AppliedMathLab
     });
 
     alert(`บันทึกผลแล็บ ${config.title} สำเร็จ`);
-    router.push(`/labs/${labId}`);
   };
 
   const controls = (

@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { useRouter } from "next/navigation";
 import {
   Sliders,
   RotateCcw,
@@ -28,7 +27,6 @@ interface LoggedOptimizationRun {
 }
 
 export default function AdvancedCalculusOptimizationSimulation() {
-  const router = useRouter();
   const labId = "advanced-calculus-optimization";
 
   // Tab mode state: "derivative" or "integral"
@@ -220,7 +218,6 @@ export default function AdvancedCalculusOptimizationSimulation() {
     });
 
     alert("บันทึกผลการทดลองวิเคราะห์แคลคูลัสขั้นสูงสำเร็จ");
-    router.push(`/labs/${labId}`);
   };
 
   return (

@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import {
   Play,
   Pause,
@@ -29,7 +28,6 @@ interface RelativityDataPoint {
 const MAX_DATA_POINTS = 500;
 
 export default function RelativisticKinematicsSimulation() {
-  const router = useRouter();
   const labId = "relativistic-kinematics";
 
   // Simulator configurations
@@ -242,7 +240,6 @@ export default function RelativisticKinematicsSimulation() {
     });
 
     alert("บันทึกรายงานผลการทดลองจลนศาสตร์สัมพัทธภาพสำเร็จ! 🎉");
-    router.push(`/labs/${labId}`);
   };
 
   // Subcomponents defined locally

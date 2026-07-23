@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import {
   Activity,
   BarChart3,
@@ -437,7 +436,6 @@ function TheoryPanel({ fit }: { fit: FitResult }) {
 }
 
 export default function CurveFittingSimulation() {
-  const router = useRouter();
   const [points, setPoints] = useState<DataPoint[]>(PRESETS.linear);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [mode, setMode] = useState<FitMode>("linear");
@@ -550,7 +548,6 @@ export default function CurveFittingSimulation() {
     });
 
     alert("Saved Curve Fitting & Trend Lines result");
-    router.push("/labs/curve-fitting");
   };
 
   const controls = (

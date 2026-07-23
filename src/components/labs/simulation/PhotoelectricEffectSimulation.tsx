@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useMemo } from "react";
-import { useRouter } from "next/navigation";
 import {
   Zap,
   Sliders,
@@ -402,7 +401,6 @@ function TheoryPanel({
 }
 
 export default function PhotoelectricEffectSimulation() {
-  const router = useRouter();
 
   // Primary states
   const [wavelength, setWavelength] = useState(300); // 100 to 800 nm
@@ -562,7 +560,6 @@ export default function PhotoelectricEffectSimulation() {
     });
 
     alert("บันทึกผลการทดลองโฟโตอิเล็กทริกสำเร็จ! 🎉");
-    router.push(`/labs/photoelectric-effect`);
   };
 
   const timeLabel = `${Math.floor(elapsedSeconds / 60).toString().padStart(2, "0")}:${Math.floor(elapsedSeconds % 60).toString().padStart(2, "0")}`;

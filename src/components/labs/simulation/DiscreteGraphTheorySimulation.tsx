@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { useRouter } from "next/navigation";
 import {
   Sliders,
   RotateCcw,
@@ -49,7 +48,6 @@ const NODES: Node[] = [
 ];
 
 export default function DiscreteGraphTheorySimulation() {
-  const router = useRouter();
   const labId = "discrete-graph-theory";
 
   const [startNode, setStartNode] = useState<string>("A");
@@ -280,7 +278,6 @@ export default function DiscreteGraphTheorySimulation() {
       durationSeconds: null,
     });
     alert("บันทึกการจำลองโครงสร้างกราฟและเครือข่ายสำเร็จ");
-    router.push(`/labs/${labId}`);
   };
 
   const questProgress = Math.min(100, Math.round((loggedRuns.length / 3) * 100));

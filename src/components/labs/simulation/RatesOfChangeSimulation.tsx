@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useCallback, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import {
   LineChart,
   RotateCcw,
@@ -30,7 +29,6 @@ interface LoggedRateChange {
 }
 
 export default function RatesOfChangeSimulation() {
-  const router = useRouter();
   const labId = "rates-of-change";
 
   // State configurations
@@ -262,7 +260,6 @@ export default function RatesOfChangeSimulation() {
     });
 
     alert("บันทึกผลแล็บ Rates of Change สำเร็จ");
-    router.push(`/labs/${labId}`);
   };
 
   return (

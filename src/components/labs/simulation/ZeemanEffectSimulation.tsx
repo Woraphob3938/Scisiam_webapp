@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useId } from "react";
-import { useRouter } from "next/navigation";
 import {
   Sliders,
   Play,
@@ -390,7 +389,6 @@ function ZeemanTheory() {
 const MAX_DATA_POINTS = 500;
 
 export default function ZeemanEffectSimulation() {
-  const router = useRouter();
   const labId = "zeeman-effect";
 
   // Simulator configurations
@@ -661,7 +659,6 @@ export default function ZeemanEffectSimulation() {
     });
 
     alert("บันทึกข้อมูลการทดลอง (การแยกเส้นสเปกตรัมและตารางบันทึกผล) สำเร็จ! 🎉");
-    router.push(`/labs/${labId}`);
   };
 
   const simControls = (

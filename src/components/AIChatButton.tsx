@@ -261,6 +261,7 @@ export default function AIChatButton() {
       {/* Floating Action Button */}
       <button
         ref={triggerRef}
+        data-tour="ai-tutor"
         type="button"
         onClick={() => {
           if (isOpen) {

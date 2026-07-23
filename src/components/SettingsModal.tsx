@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Bot,
   BookOpen,
@@ -10,11 +11,17 @@ import {
   FileText,
   KeyRound,
   Monitor,
+  MousePointerClick,
   Palette,
   Type,
   Wand2,
   X,
 } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import {
+  getTutorialStartPath,
+  requestTutorialReplay,
+} from "@/lib/onboarding-tour";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 
 export const scisiam_SETTINGS_EVENT = "scisiam_settings_updated";
@@ -118,6 +125,9 @@ export default function SettingsModal({
   onClose: () => void;
   onOpenSoftwareDisclaimer: () => void;
 }) {
+  const pathname = usePathname();
+  const router = useRouter();
+  const { role } = useAuth();
   const [aiStyle, setAiStyle] = useState<AiStyle>(() =>
     getStoredValue<AiStyle>(AI_STYLE_KEY, "simple", ["simple", "hint", "guided"])
   );
@@ -165,6 +175,16 @@ export default function SettingsModal({
     () => aiStyles.find((item) => item.id === aiStyle) || aiStyles[0],
     [aiStyle]
   );
+
+  const handleReplayTutorial = () => {
+    const startPath = getTutorialStartPath(role);
+    requestTutorialReplay();
+    onClose();
+
+    if (pathname !== startPath) {
+      router.push(startPath);
+    }
+  };
 
   const sendPasswordResetEmail = async () => {
     setPasswordResetMessage("");
@@ -427,17 +447,27 @@ export default function SettingsModal({
                     คู่มือการใช้งาน
                   </h3>
                   <p className="text-sm font-semibold leading-relaxed text-slate-500">
-                    ดูวิธีใช้ห้องแล็บ ชั้นเรียน การส่งงาน และเครื่องมือสำหรับคุณครู
+                    อ่านคู่มือแบบเต็ม หรือให้ไออุ่นพาชี้ส่วนสำคัญบนหน้าจอทีละขั้น
                   </p>
                 </div>
               </div>
-              <Link
-                href="/guide"
-                onClick={onClose}
-                className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-xl bg-blue-600 px-4 text-sm font-extrabold text-white transition-colors hover:bg-blue-700 focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
-              >
-                เปิดคู่มือ
-              </Link>
+              <div className="flex w-full shrink-0 flex-col gap-2 sm:w-auto sm:items-end">
+                <Link
+                  href="/guide"
+                  onClick={onClose}
+                  className="inline-flex min-h-11 w-full items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-sm font-extrabold text-slate-700 transition-colors hover:bg-slate-50 focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-600 focus-visible:ring-offset-2 sm:w-auto"
+                >
+                  เปิดคู่มือ
+                </Link>
+                <button
+                  type="button"
+                  onClick={handleReplayTutorial}
+                  className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 text-sm font-extrabold text-white transition-colors hover:bg-blue-700 focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-600 focus-visible:ring-offset-2 sm:w-auto"
+                >
+                  <MousePointerClick className="h-4 w-4" aria-hidden="true" />
+                  เริ่ม Tutorial แบบโต้ตอบอีกครั้ง
+                </button>
+              </div>
             </div>
           </section>
 

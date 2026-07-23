@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useMemo, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import {
   Sliders,
   RotateCcw,
@@ -33,7 +32,6 @@ interface LoggedBlotRun {
 }
 
 export default function WesternBlottingSimulation() {
-  const router = useRouter();
   const labId = "western-blotting";
 
   const [activeStage, setActiveStage] = useState<"sds" | "transfer" | "antibody" | "imager">("sds");
@@ -192,7 +190,6 @@ export default function WesternBlottingSimulation() {
       durationSeconds: null
     });
     alert("บันทึกรายงานการทดลองวิเคราะห์แบนด์โปรตีนสำเร็จ");
-    router.push(`/labs/${labId}`);
   };
 
   const questProgress = Math.min(100, Math.round((loggedRuns.length / 3) * 100));

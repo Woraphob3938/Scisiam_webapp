@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import { useRouter } from "next/navigation";
 import {
   Play,
   Pause,
@@ -330,7 +329,6 @@ function TheoryPanel({
 }
 
 export default function StefanBoltzmannSimulation() {
-  const router = useRouter();
 
   // Primary controls
   const [temperature, setTemperature] = useState(5778); // K (1000K to 12000K)
@@ -482,7 +480,6 @@ export default function StefanBoltzmannSimulation() {
     });
 
     alert("บันทึกผลการทดลอง Stefan-Boltzmann สำเร็จ! 🎉");
-    router.push(`/labs/stefan-boltzmann`);
   };
 
   // Log Intensity vs T^4 Graph for blackbody verification

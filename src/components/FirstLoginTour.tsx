@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowDown, Check, Sparkles } from "lucide-react";
+import { ArrowDown, ArrowUp, Check, ChevronLeft, Sparkles } from "lucide-react";
 
 import { usePathname } from "next/navigation";
 
@@ -11,13 +11,19 @@ import {
   DialogDescription,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  consumeTutorialReplay,
+  getTutorialStartPath,
+  TUTORIAL_REPLAY_EVENT,
+} from "@/lib/onboarding-tour";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import type { ScisiamUserRole } from "@/lib/supabase/database.types";
 
 type TourStep = {
-  selector: string;
+  selector?: string;
   title: string;
   description: string;
+  tip?: string;
 };
 
 type TargetRect = {
@@ -29,54 +35,136 @@ type TargetRect = {
 
 const studentSteps: TourStep[] = [
   {
+    title: "ยินดีต้อนรับสู่ Scisiam",
+    description:
+      "น้องไออุ่นจะพาดูส่วนสำคัญแบบสั้น ๆ ตั้งแต่เลือกแล็บ ไปจนถึงเข้าชั้นเรียนและขอความช่วยเหลือค่ะ",
+    tip: "ใช้เวลาประมาณ 1 นาที และกลับมาเปิดดูซ้ำได้จาก “ตั้งค่าบัญชี” ค่ะ",
+  },
+  {
     selector: '[data-tour="lab-search"]',
-    title: "ค้นหาห้องแล็บ",
-    description: "พิมพ์ชื่อเรื่อง หรือเลือกหมวดและระดับชั้นเพื่อค้นหาการทดลองที่ต้องการค่ะ",
+    title: "ค้นหาแล็บที่อยากทดลอง",
+    description:
+      "พิมพ์ชื่อภาษาไทย ภาษาอังกฤษ หรือคำสำคัญ เช่น “แรง” หรือ “เซลล์” ระบบจะช่วยหาแล็บที่เกี่ยวข้องให้ค่ะ",
+  },
+  {
+    selector: '[data-tour="lab-filters"]',
+    title: "กรองตามวิชาและระดับชั้น",
+    description:
+      "เลือกหมวดความรู้พื้นฐาน ฟิสิกส์ เคมี ชีววิทยา หรือคณิตศาสตร์ แล้วเลือกระดับชั้นให้ตรงกับบทเรียนได้ค่ะ",
   },
   {
     selector: '[data-tour="lab-enter"]',
     title: "เริ่มการทดลอง",
-    description: "กด “เข้าห้อง” เพื่อเปิดพื้นที่จำลอง แล้วปรับค่า สังเกตผล และบันทึกการทดลองได้เลยค่ะ",
+    description:
+      "กด “เข้าห้อง” เพื่อเปิดการจำลอง จากนั้นปรับตัวแปร กดเริ่ม สังเกตค่าที่เปลี่ยน และบันทึกผลเก็บไว้ได้ค่ะ",
+    tip: "ถ้าคุณครูมอบหมายแล็บผ่านชั้นเรียน ปุ่มส่งงานจะปรากฏในหน้าการทดลองค่ะ",
   },
   {
-    selector: 'a[href="/classrooms"]',
-    title: "เรียนร่วมกับชั้นเรียน",
-    description: "เข้าร่วมชั้นเรียนด้วยรหัสจากคุณครู แล้วส่งผลการทดลองและดูคะแนนของคุณได้ที่นี่ค่ะ",
+    selector: '[data-tour="classrooms-nav"]',
+    title: "เข้าร่วมชั้นเรียน",
+    description:
+      "เปิดเมนูชั้นเรียน แล้วใช้รหัสเชิญจากคุณครูเพื่อดูแล็บ งานที่มอบหมาย กำหนดส่ง และคะแนนของคุณค่ะ",
+  },
+  {
+    selector: '[data-tour="notifications"]',
+    title: "ไม่พลาดงานใหม่",
+    description:
+      "กระดิ่งจะแจ้งเมื่อคุณครูเพิ่มงานหรือมีความเคลื่อนไหวในชั้นเรียน กดรายการแจ้งเตือนเพื่อไปยังงานนั้นได้ทันทีค่ะ",
+  },
+  {
+    selector: '[data-tour="ai-tutor"]',
+    title: "ถาม AI ไออุ่นได้ทุกเมื่อ",
+    description:
+      "ถ้าติดตรงไหน กดน้องไออุ่นเพื่อถามเรื่องทฤษฎี ขั้นตอน หรือขอคำใบ้ในการสรุปผลทดลองได้ค่ะ",
+    tip: "ไออุ่นอาจตอบผิดได้ ควรตรวจคำตอบกับบทเรียนหรือคุณครูอีกครั้งนะคะ",
+  },
+  {
+    selector: '[data-tour="profile-menu"]',
+    title: "จัดการบัญชีและเปิดคู่มือซ้ำ",
+    description:
+      "เมนูโปรไฟล์ใช้แก้ไขข้อมูล เปลี่ยนรหัสผ่าน ปรับการแสดงผล และเปิด Tutorial นี้ซ้ำได้ค่ะ",
   },
 ];
 
 const teacherSteps: TourStep[] = [
   {
+    title: "ยินดีต้อนรับคุณครูสู่ Scisiam",
+    description:
+      "น้องไออุ่นจะพาดูจุดสำคัญสำหรับสร้างชั้นเรียน มอบหมายแล็บ และติดตามการส่งงานของนักเรียนค่ะ",
+    tip: "Tutorial นี้ใช้เวลาประมาณ 1 นาที และเปิดดูซ้ำจาก “ตั้งค่าบัญชี” ได้เสมอค่ะ",
+  },
+  {
     selector: '[data-tour="teacher-dashboard"]',
-    title: "ดูภาพรวมชั้นเรียน",
-    description: "แดชบอร์ดช่วยให้คุณครูเห็นการส่งงานของแต่ละห้องและงานที่ต้องตรวจได้ทันทีค่ะ",
+    title: "เริ่มจากภาพรวมการส่งงาน",
+    description:
+      "แดชบอร์ดสรุปจำนวนนักเรียน งานที่มอบหมาย อัตราการส่ง และเปรียบเทียบแต่ละห้อง เพื่อให้เห็นสิ่งที่ควรติดตามก่อนค่ะ",
   },
   {
-    selector: 'a[href="/classrooms"]',
-    title: "จัดการชั้นเรียน",
-    description: "สร้างชั้นเรียน เลือกแล็บ และเชิญนักเรียนเข้าห้องได้จากเมนูนี้ค่ะ",
+    selector: '[data-tour="teacher-classrooms"]',
+    title: "ไปจัดการชั้นเรียน",
+    description:
+      "กดปุ่มนี้เพื่อสร้างห้อง เลือกระดับชั้น เพิ่มแล็บ และรับรหัสเชิญสำหรับส่งให้นักเรียนค่ะ",
   },
   {
-    selector: 'a[href="/labs"]',
-    title: "เลือกแล็บให้ชั้นเรียน",
-    description: "ดูแล็บทั้งหมดเพื่อเลือกหัวข้อทดลองที่เหมาะกับชั้นเรียนของคุณครูค่ะ",
+    selector: '[data-tour="classrooms-nav"]',
+    title: "กลับเข้าชั้นเรียนได้จากเมนูหลัก",
+    description:
+      "เมนูชั้นเรียนรวมทุกห้องที่คุณครูดูแล ภายในห้องสามารถเพิ่มงาน ตรวจผลทดลอง อ่านสรุป และให้คะแนนได้ค่ะ",
+  },
+  {
+    selector: '[data-tour="labs-nav"]',
+    title: "สำรวจคลังห้องแล็บ",
+    description:
+      "เปิดคลังแล็บเพื่อทดลองเนื้อหาก่อนมอบหมาย และเลือกหัวข้อที่เหมาะกับระดับของนักเรียนค่ะ",
+  },
+  {
+    selector: '[data-tour="notifications"]',
+    title: "ติดตามการส่งงาน",
+    description:
+      "กระดิ่งจะแจ้งเมื่อมีนักเรียนส่งงาน กดรายการเพื่อเปิดชั้นเรียนและตรวจงานนั้นต่อได้เลยค่ะ",
+  },
+  {
+    selector: '[data-tour="ai-tutor"]',
+    title: "ให้ไออุ่นช่วยเตรียมคำอธิบาย",
+    description:
+      "ใช้ AI ไออุ่นช่วยอธิบายหลักการ ตั้งคำถามนำ หรือหาแนวทางสอนเพิ่มเติมได้ โดยควรตรวจความถูกต้องก่อนนำไปใช้ค่ะ",
+  },
+  {
+    selector: '[data-tour="profile-menu"]',
+    title: "ตั้งค่าบัญชีและเปิด Tutorial ซ้ำ",
+    description:
+      "เมนูนี้ใช้แก้ไขโปรไฟล์ ปรับการแสดงผล เปลี่ยนรหัสผ่าน เปิดคู่มือฉบับเต็ม หรือเริ่ม Tutorial ใหม่ค่ะ",
   },
 ];
 
-function getTargetRect(selector: string): TargetRect | null {
-  const target = document.querySelector<HTMLElement>(selector);
+function getVisibleTarget(selector?: string) {
+  if (!selector) return null;
+
+  return [...document.querySelectorAll<HTMLElement>(selector)].find((target) => {
+    const rect = target.getBoundingClientRect();
+    const style = window.getComputedStyle(target);
+    return (
+      rect.width > 0 &&
+      rect.height > 0 &&
+      style.display !== "none" &&
+      style.visibility !== "hidden"
+    );
+  }) ?? null;
+}
+
+function getTargetRect(target: HTMLElement | null): TargetRect | null {
   if (!target) return null;
 
   const rect = target.getBoundingClientRect();
-  if (rect.width === 0 || rect.height === 0 || rect.bottom < 0 || rect.top > window.innerHeight) {
-    return null;
-  }
-
+  const left = Math.max(8, rect.left - 8);
+  const right = Math.min(window.innerWidth - 8, rect.right + 8);
+  const top = Math.max(8, rect.top - 8);
+  const bottom = Math.min(window.innerHeight - 8, rect.bottom + 8);
   return {
-    top: Math.max(8, rect.top - 8),
-    left: Math.max(8, rect.left - 8),
-    width: Math.min(window.innerWidth - 16, rect.width + 16),
-    height: Math.min(window.innerHeight - 16, rect.height + 16),
+    top,
+    left,
+    width: Math.max(0, right - left),
+    height: Math.max(0, bottom - top),
   };
 }
 
@@ -86,9 +174,22 @@ export default function FirstLoginTour({ role }: { role: ScisiamUserRole }) {
   const [stepIndex, setStepIndex] = useState(0);
   const [targetRect, setTargetRect] = useState<TargetRect | null>(null);
 
-  const isSupportedRoute = pathname === "/labs" || (role === "teacher" && pathname === "/dashboard");
-  const steps = role === "teacher" && pathname === "/dashboard" ? teacherSteps : studentSteps;
+  const isTeacherTour = role === "teacher";
+  const isSupportedRoute = pathname === getTutorialStartPath(role);
+  const steps = isTeacherTour ? teacherSteps : studentSteps;
   const step = steps[stepIndex] ?? steps[0];
+
+  useEffect(() => {
+    const openReplay = () => {
+      if (!isSupportedRoute || !consumeTutorialReplay()) return;
+      setStepIndex(0);
+      setIsOpen(true);
+    };
+
+    openReplay();
+    window.addEventListener(TUTORIAL_REPLAY_EVENT, openReplay);
+    return () => window.removeEventListener(TUTORIAL_REPLAY_EVENT, openReplay);
+  }, [isSupportedRoute]);
 
   useEffect(() => {
     if (!isSupportedRoute || !isSupabaseConfigured()) return;
@@ -111,6 +212,7 @@ export default function FirstLoginTour({ role }: { role: ScisiamUserRole }) {
           .maybeSingle();
 
         if (!cancelled && profile?.onboarding_completed === false) {
+          setStepIndex(0);
           setIsOpen(true);
         }
       } catch {
@@ -128,11 +230,32 @@ export default function FirstLoginTour({ role }: { role: ScisiamUserRole }) {
   useEffect(() => {
     if (!isOpen) return;
 
-    const updateTarget = () => setTargetRect(getTargetRect(step.selector));
+    const target = getVisibleTarget(step.selector);
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const initialRect = target?.getBoundingClientRect();
+    const needsScroll =
+      initialRect &&
+      (initialRect.top < 84 || initialRect.bottom > window.innerHeight - 210);
+
+    if (target && needsScroll && window.getComputedStyle(target).position !== "fixed") {
+      target.scrollIntoView({
+        behavior: reduceMotion ? "auto" : "smooth",
+        block: "center",
+        inline: "nearest",
+      });
+    }
+
+    const updateTarget = () => setTargetRect(getTargetRect(getVisibleTarget(step.selector)));
+    const updateTimer = window.setTimeout(updateTarget, reduceMotion ? 0 : 320);
     updateTarget();
     window.addEventListener("resize", updateTarget);
+    window.addEventListener("scroll", updateTarget, true);
 
-    return () => window.removeEventListener("resize", updateTarget);
+    return () => {
+      window.clearTimeout(updateTimer);
+      window.removeEventListener("resize", updateTarget);
+      window.removeEventListener("scroll", updateTarget, true);
+    };
   }, [isOpen, step.selector]);
 
   const finishTour = async () => {
@@ -162,14 +285,24 @@ export default function FirstLoginTour({ role }: { role: ScisiamUserRole }) {
     setStepIndex((currentStep) => currentStep + 1);
   };
 
+  const goBack = () => {
+    setStepIndex((currentStep) => Math.max(0, currentStep - 1));
+  };
+
   if (!isSupportedRoute) return null;
 
+  const arrowBelowTarget = targetRect
+    ? targetRect.top + targetRect.height < window.innerHeight * 0.62
+    : true;
   const arrowLeft = targetRect
     ? Math.min(window.innerWidth - 42, Math.max(12, targetRect.left + targetRect.width / 2 - 14))
     : 0;
   const arrowTop = targetRect
-    ? Math.min(window.innerHeight - 52, targetRect.top + targetRect.height + 8)
+    ? arrowBelowTarget
+      ? Math.min(window.innerHeight - 52, targetRect.top + targetRect.height + 8)
+      : Math.max(8, targetRect.top - 35)
     : 0;
+  const TargetArrow = arrowBelowTarget ? ArrowUp : ArrowDown;
 
   return (
     <Dialog
@@ -189,7 +322,7 @@ export default function FirstLoginTour({ role }: { role: ScisiamUserRole }) {
               className="pointer-events-none fixed z-[60] rounded-2xl border-2 border-blue-500 shadow-[0_0_0_4px_rgba(255,255,255,0.8)] transition-all duration-300 motion-reduce:transition-none"
               style={targetRect}
             />
-            <ArrowDown
+            <TargetArrow
               aria-hidden="true"
               className="pointer-events-none fixed z-[60] size-7 animate-bounce text-blue-600 motion-reduce:animate-none"
               style={{ left: arrowLeft, top: arrowTop }}
@@ -203,32 +336,60 @@ export default function FirstLoginTour({ role }: { role: ScisiamUserRole }) {
               <Sparkles className="size-5" aria-hidden="true" />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-bold uppercase tracking-wide text-blue-600">เริ่มต้นใช้งาน Scisiam</p>
-              <DialogTitle className="mt-1 text-xl font-extrabold leading-[1.45] text-slate-950">
-                {step.title}
-              </DialogTitle>
-              <DialogDescription className="mt-1.5 text-sm font-medium leading-relaxed text-slate-600">
-                {step.description}
-              </DialogDescription>
+              <p className="text-xs font-bold leading-[1.45] text-blue-600">
+                {isTeacherTour ? "คู่มือสำหรับคุณครู" : "คู่มือสำหรับนักเรียน"}
+              </p>
+              <div aria-live="polite" aria-atomic="true">
+                <DialogTitle className="mt-1 text-xl font-extrabold leading-[1.45] text-slate-950">
+                  {step.title}
+                </DialogTitle>
+                <DialogDescription className="mt-1.5 text-sm font-medium leading-relaxed text-slate-600">
+                  {step.description}
+                </DialogDescription>
+                {step.tip ? (
+                  <p className="mt-2 text-xs font-semibold leading-relaxed text-blue-700">
+                    เคล็ดลับ: {step.tip}
+                  </p>
+                ) : null}
+              </div>
             </div>
           </div>
 
-          <div className="mt-5 flex items-center justify-between gap-3">
-            <span className="text-xs font-bold text-slate-500">
-              {stepIndex + 1} / {steps.length}
-            </span>
+          <div className="mt-4 flex items-center gap-1" aria-label={`ขั้นตอน ${stepIndex + 1} จาก ${steps.length}`}>
+            {steps.map((tourStep, index) => (
+              <span
+                key={tourStep.title}
+                aria-hidden="true"
+                className={`h-1.5 flex-1 rounded-full transition-colors motion-reduce:transition-none ${
+                  index <= stepIndex ? "bg-blue-600" : "bg-slate-200"
+                }`}
+              />
+            ))}
+          </div>
+
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
+            <button
+              type="button"
+              onClick={() => void finishTour()}
+              className="min-h-11 rounded-xl px-3 text-sm font-bold text-slate-600 transition-colors hover:bg-slate-100 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
+            >
+              ข้ามคู่มือ
+            </button>
             <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => void finishTour()}
-                className="min-h-10 rounded-xl px-3 text-sm font-bold text-slate-600 transition-colors hover:bg-slate-100 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
-              >
-                ข้ามคู่มือ
-              </button>
+              {stepIndex > 0 ? (
+                <button
+                  type="button"
+                  onClick={goBack}
+                  className="inline-flex min-h-11 items-center justify-center gap-1 rounded-xl border border-slate-200 bg-white px-3 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-50 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
+                >
+                  <ChevronLeft className="size-4" aria-hidden="true" />
+                  ย้อนกลับ
+                </button>
+              ) : null}
               <button
                 type="button"
                 onClick={goNext}
-                className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-xl bg-blue-600 px-4 text-sm font-bold text-white shadow-sm transition-colors hover:bg-blue-700 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-200"
+                className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl bg-blue-600 px-4 text-sm font-bold text-white shadow-sm transition-colors hover:bg-blue-700 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-200"
               >
                 {stepIndex === steps.length - 1 ? "เริ่มใช้ Scisiam" : "ถัดไป"}
                 {stepIndex === steps.length - 1 ? <Check className="size-4" aria-hidden="true" /> : null}

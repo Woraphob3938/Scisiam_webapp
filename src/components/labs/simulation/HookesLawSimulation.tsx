@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useMemo } from "react";
-import { useRouter } from "next/navigation";
 import {
   Play,
   Pause,
@@ -451,7 +450,6 @@ function SpringScene({
 }
 
 export default function HookesLawSimulation() {
-  const router = useRouter();
 
   // Spring constant k (N/m)
   const [springConstant, setSpringConstant] = useState(50.0); // 10–200 N/m
@@ -637,7 +635,6 @@ export default function HookesLawSimulation() {
       durationSeconds: Math.round(elapsedSeconds),
     });
     alert("บันทึกข้อมูลการทดลอง (กราฟแรง-ระยะยืดและตารางผล) สำเร็จ! 🎉");
-    router.push("/labs/hookes-law");
   };
 
   // SVG Spring drawing helpers

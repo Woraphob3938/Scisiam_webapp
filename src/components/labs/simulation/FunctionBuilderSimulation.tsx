@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import {
   Activity,
   ArrowRight,
@@ -354,7 +353,6 @@ function TheoryPanel({
 }
 
 export default function FunctionBuilderSimulation() {
-  const router = useRouter();
   const [mode, setMode] = useState<FunctionMode>("linear");
   const [scale, setScale] = useState(PRESETS.linear.scale);
   const [horizontalShift, setHorizontalShift] = useState(PRESETS.linear.horizontalShift);
@@ -501,7 +499,6 @@ export default function FunctionBuilderSimulation() {
     });
 
     alert("Saved Function Builder result");
-    router.push("/labs/function-builder");
   };
 
   const controls = (

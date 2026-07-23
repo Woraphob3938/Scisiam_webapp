@@ -6,7 +6,6 @@ import React, {
   useMemo,
   useCallback,
 } from "react";
-import { useRouter } from "next/navigation";
 import {
   Sliders,
   RotateCcw,
@@ -35,7 +34,6 @@ interface LoggedComplexRun {
 }
 
 export default function ComplexPhasorsSimulation() {
-  const router = useRouter();
   const labId = "complex-numbers-phasors";
 
   // Tab mode: "phasor" (rotating phasor and wave) or "operation" (multiplying two complex numbers)
@@ -205,7 +203,6 @@ export default function ComplexPhasorsSimulation() {
       durationSeconds: null,
     });
     alert("บันทึกรายงานผลการทดลอง Phasor สำเร็จ");
-    router.push(`/labs/${labId}`);
   };
 
   return (

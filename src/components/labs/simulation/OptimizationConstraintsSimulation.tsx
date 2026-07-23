@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useCallback, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import {
   Sliders,
   RotateCcw,
@@ -38,7 +37,6 @@ interface Vertex {
 }
 
 export default function OptimizationConstraintsSimulation() {
-  const router = useRouter();
   const labId = "optimization-constraints";
 
   // Capacities limits (Resource constraints limits)
@@ -348,7 +346,6 @@ export default function OptimizationConstraintsSimulation() {
     });
 
     alert("บันทึกผลแล็บ Optimization & Constraints สำเร็จ");
-    router.push(`/labs/${labId}`);
   };
 
   return (

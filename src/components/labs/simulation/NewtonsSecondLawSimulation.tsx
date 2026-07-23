@@ -2,7 +2,6 @@
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import Navbar from "@/components/Navbar";
-import { useRouter } from "next/navigation";
 import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";
 import {
   BarChart3,
@@ -197,7 +196,6 @@ function MotionGraph({ points }: { points: MotionPoint[] }) {
 }
 
 export default function NewtonsSecondLawSimulation() {
-  const router = useRouter();
   const [mass, setMass] = useState(1.0); // 0.5 to 3.0 kg
   const [force, setForce] = useState(2.0); // 1.0 to 10.0 N
   const [isRunning, setIsRunning] = useState(false);
@@ -324,7 +322,6 @@ export default function NewtonsSecondLawSimulation() {
       score: Math.min(100, experimentData.dataPoints.length * 20),
     });
     alert("บันทึกผลการทดลองกฎข้อสองของนิวตันสำเร็จ! 🎉");
-    router.push("/labs/newtons-second-law");
   };
 
   const visibleRows = dataPoints.slice(-7);

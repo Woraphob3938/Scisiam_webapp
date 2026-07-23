@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useId, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import {
   BatteryCharging,
   CheckCircle2,
@@ -30,7 +29,6 @@ const buttonBase =
   "inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border px-3 py-2 text-sm font-black transition focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2";
 
 export default function SimpleCircuitsSimulation() {
-  const router = useRouter();
   const svgId = useId().replaceAll(":", "");
   const glowId = `bulb-glow-${svgId}`;
   const copperId = `copper-${svgId}`;
@@ -122,7 +120,6 @@ export default function SimpleCircuitsSimulation() {
     });
 
     window.alert("บันทึกผลการทดลองวงจรไฟฟ้าแล้ว");
-    router.push(`/labs/${labId}`);
   };
 
   const missionPanel = (

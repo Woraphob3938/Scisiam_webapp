@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { useRouter } from "next/navigation";
 import {
   Sliders,
   RotateCcw,
@@ -28,7 +27,6 @@ interface LoggedBayesianRun {
 }
 
 export default function BayesianReasoningSimulation() {
-  const router = useRouter();
   const labId = "bayesian-reasoning-lab";
 
   // Tab mode: "grid" (100-cell grid visualization) or "tree" (probability tree)
@@ -180,7 +178,6 @@ export default function BayesianReasoningSimulation() {
       durationSeconds: null,
     });
     alert("บันทึกผลการทดลองวิเคราะห์เบย์สำเร็จ");
-    router.push(`/labs/${labId}`);
   };
 
   return (

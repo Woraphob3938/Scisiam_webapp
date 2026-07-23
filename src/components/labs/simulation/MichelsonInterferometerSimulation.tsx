@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useId } from "react";
-import { useRouter } from "next/navigation";
 import {
   Sliders,
   Play,
@@ -351,7 +350,6 @@ function MichelsonTheory() {
 const MAX_DATA_POINTS = 500;
 
 export default function MichelsonInterferometerSimulation() {
-  const router = useRouter();
   const labId = "michelson-interferometer";
 
   // Simulator configurations
@@ -625,7 +623,6 @@ export default function MichelsonInterferometerSimulation() {
     });
 
     alert("บันทึกข้อมูลการทดลอง (ความเข้มแสงเชิงแสงและตารางบันทึกผล) สำเร็จ! 🎉");
-    router.push(`/labs/${labId}`);
   };
 
   const simControls = (

@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useMemo, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import {
   Sliders,
   RotateCcw,
@@ -31,7 +30,6 @@ interface LoggedPcrRun {
 }
 
 export default function PcrGelElectrophoresisSimulation() {
-  const router = useRouter();
   const labId = "pcr-gel-electrophoresis";
 
   const [activeTab, setActiveTab] = useState<"pcr" | "gel">("pcr");
@@ -212,7 +210,6 @@ export default function PcrGelElectrophoresisSimulation() {
       durationSeconds: null
     });
     alert("บันทึกรายงานการทดลองเทคโนโลยีดีเอ็นเอสำเร็จ");
-    router.push(`/labs/${labId}`);
   };
 
   const questProgress = Math.min(100, Math.round((loggedRuns.length / 3) * 100));

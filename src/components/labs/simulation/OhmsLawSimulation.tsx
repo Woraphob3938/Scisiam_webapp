@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useMemo } from "react";
-import { useRouter } from "next/navigation";
 import {
   Play,
   Zap,
@@ -210,7 +209,6 @@ function TheoryPanel({
 }
 
 export default function OhmsLawSimulation() {
-  const router = useRouter();
 
   // Inputs
   const [voltage, setVoltage] = useState(12.0); // V (0V - 24V)
@@ -405,7 +403,6 @@ export default function OhmsLawSimulation() {
     });
 
     alert("บันทึกข้อมูลการทดลอง (กราฟกระแสไฟฟ้าและตารางผล) สำเร็จ! 🎉");
-    router.push(`/labs/ohms-law`);
   };
 
   const bandColors = getResistorColors(resistance);

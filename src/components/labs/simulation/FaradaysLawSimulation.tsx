@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useMemo } from "react";
-import { useRouter } from "next/navigation";
 import {
   RotateCcw,
   Sliders,
@@ -26,7 +25,6 @@ interface FaradayDataPoint {
 }
 
 export default function FaradaysLawSimulation() {
-  const router = useRouter();
 
   // Controls
   const [turns, setTurns] = useState<number>(3); // N = 1, 2, 3
@@ -298,7 +296,6 @@ export default function FaradaysLawSimulation() {
     });
 
     alert("บันทึกข้อมูลการทดลอง (การเหนี่ยวนำแม่เหล็กไฟฟ้า) สำเร็จ! 🎉");
-    router.push(`/labs/faradays-law`);
   };
 
   // SVG Coordinates

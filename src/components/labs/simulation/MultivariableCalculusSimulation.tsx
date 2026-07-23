@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useMemo, useCallback } from "react";
-import { useRouter } from "next/navigation";
 import {
   Sliders,
   RotateCcw,
@@ -61,7 +60,6 @@ interface LoggedGradientRun {
 }
 
 export default function MultivariableCalculusSimulation() {
-  const router = useRouter();
   const labId = "multivariable-calculus";
 
   const [surfIdx, setSurfIdx] = useState(0);
@@ -289,7 +287,6 @@ export default function MultivariableCalculusSimulation() {
       durationSeconds: null,
     });
     alert("บันทึกผลการทดลอง Multivariable Calculus สำเร็จ");
-    router.push(`/labs/${labId}`);
   };
 
   return (

@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import {
   Activity,
   ClipboardList,
@@ -730,7 +729,6 @@ function TheoryPanel({ config, result }: { config: LabConfig; result: ChemistryR
 }
 
 export default function ChemistryConceptSimulation({ labId }: { labId: ChemistryConceptLabId }) {
-  const router = useRouter();
   const config = labConfigs[labId];
   const [primary, setPrimary] = useState(config.primary.defaultValue);
   const [secondary, setSecondary] = useState(config.secondary.defaultValue);
@@ -776,7 +774,6 @@ export default function ChemistryConceptSimulation({ labId }: { labId: Chemistry
       },
       score: Math.min(100, Math.max(0, result.progressPercent)),
     });
-    router.push(`/labs/${labId}`);
   };
 
   const controls = (

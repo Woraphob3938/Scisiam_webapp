@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useMemo, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import {
   Sliders,
   RotateCcw,
@@ -30,7 +29,6 @@ interface LoggedForceRun {
 }
 
 export default function PushPullForcesSimulation() {
-  const router = useRouter();
   const labId = "push-pull-forces";
 
   const [actionType, setActionType] = useState<"push" | "pull">("push");
@@ -182,7 +180,6 @@ export default function PushPullForcesSimulation() {
       durationSeconds: null
     });
     alert("บันทึกรายงานผลการทดลองการเคลื่อนที่สำเร็จ");
-    router.push(`/labs/${labId}`);
   };
 
   const questProgress = Math.min(100, Math.round((loggedRuns.length / 3) * 100));

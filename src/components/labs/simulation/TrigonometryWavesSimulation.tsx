@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useMemo } from "react";
-import { useRouter } from "next/navigation";
 import {
   Play,
   Pause,
@@ -28,7 +27,6 @@ interface WaveDataPoint {
 }
 
 export default function TrigonometryWavesSimulation() {
-  const router = useRouter();
   const labId = "trigonometry-waves";
 
   // Wave configurations
@@ -201,7 +199,6 @@ export default function TrigonometryWavesSimulation() {
       durationSeconds: Math.round(time),
     });
     alert("บันทึกข้อมูลการทดลองสำเร็จ! 🎉");
-    router.push(`/labs/${labId}`);
   };
 
   // Wave rendering calculations

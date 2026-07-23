@@ -34,10 +34,19 @@ function getActiveItem(pathname: string) {
 function MobileNavLink({ item, activeItem }: { item: MobileNavItem; activeItem: string }) {
   const Icon = item.icon;
   const isActive = activeItem === item.name;
+  const tourTarget =
+    item.href === "/classrooms"
+      ? "classrooms-nav"
+      : item.href === "/labs"
+        ? "labs-nav"
+        : item.href === "/profile"
+          ? "profile-menu"
+          : undefined;
 
   return (
     <Link
       href={item.href}
+      data-tour={tourTarget}
       aria-current={isActive ? "page" : undefined}
       className={`flex min-h-[52px] min-w-0 flex-col items-center justify-center gap-0.5 rounded-lg px-1 text-xs font-extrabold leading-[1.35] transition-colors focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100 ${
         isActive

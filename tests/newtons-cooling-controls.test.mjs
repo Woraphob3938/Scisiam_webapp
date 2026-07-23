@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import test from "node:test";
 
@@ -167,7 +167,7 @@ test("shared shell promotes compact controls to the persistent dock", () => {
   );
 
   assert.match(source, /const hasCompactControls =/);
-  assert.match(source, /const collapsedControls = compactControls \?\? controls;/);
+  assert.match(source, /const collapsedControls = sanitizedCompactControls \?\? sanitizedControls;/);
   assert.match(
     source,
     /usesPersistentControlDock \? persistentControlDock : controlsDrawer/,
@@ -191,7 +191,7 @@ test("shared shell exposes full controls when a lab has no compact controls", ()
     "src/components/labs/simulation/SharedSimulationShell.tsx",
   );
 
-  assert.match(source, /const collapsedControls = compactControls \?\? controls;/);
+  assert.match(source, /const collapsedControls = sanitizedCompactControls \?\? sanitizedControls;/);
   assert.match(source, /const hasAdvancedControls = hasCompactControls && controls !== compactControls;/);
   assert.match(source, /usesPersistentControlDock \? persistentControlDock : controlsDrawer/);
 });
@@ -465,7 +465,7 @@ test("full legacy settings are immediately available when no compact controls ex
     "src/components/labs/simulation/SharedSimulationShell.tsx",
   );
 
-  assert.match(source, /const collapsedControls = compactControls \?\? controls;/);
+  assert.match(source, /const collapsedControls = sanitizedCompactControls \?\? sanitizedControls;/);
 });
 
 test("Newton cooling omits timing and simulation-speed controls", () => {
@@ -518,6 +518,20 @@ test("specialized advanced controls do not duplicate shared run and reset action
   }
 });
 
+test("shared shell removes duplicate primary actions from every control surface", () => {
+  const source = readProjectFile(
+    "src/components/labs/simulation/SharedSimulationShell.tsx",
+  );
+
+  assert.match(source, /function stripDuplicatePrimaryActions\(/);
+  assert.match(source, /actionHandlers\.has\(child\.props\.onClick\)/);
+  assert.match(source, /isDuplicateActionLabel\(label, actions\)/);
+  assert.match(source, /const sanitizedControls = stripDuplicatePrimaryActions\(controls, actionHandlers\)/);
+  assert.match(source, /const sanitizedCompactControls = stripDuplicatePrimaryActions\(compactControls, actionHandlers\)/);
+  assert.match(source, /\{sanitizedControls\}/);
+  assert.match(source, /const collapsedControls = sanitizedCompactControls \?\? sanitizedControls/);
+});
+
 test("animated simulations wait for the learner to start", () => {
   const simulations = [
     "BernoullisPrincipleSimulation.tsx",
@@ -538,4 +552,35 @@ test("animated simulations wait for the learner to start", () => {
       `${simulation} should start paused`,
     );
   }
+});
+
+test("saving a simulation stays in the lab instead of navigating away", () => {
+  const simulationDir = join(rootDir, "src/components/labs/simulation");
+  const simulationFiles = readdirSync(simulationDir).filter((file) =>
+    file.endsWith("Simulation.tsx"),
+  );
+
+  for (const simulation of simulationFiles) {
+    const source = readProjectFile(`src/components/labs/simulation/${simulation}`);
+    assert.doesNotMatch(
+      source,
+      /\brouter\.push\(/,
+      `${simulation} must not navigate away after saving`,
+    );
+  }
+});
+
+test("shared shell keeps results and exit actions inside the simulation workflow", () => {
+  const source = readProjectFile(
+    "src/components/labs/simulation/SharedSimulationShell.tsx",
+  );
+
+  assert.match(source, /data-testid="simulation-results-trigger"/);
+  assert.match(source, /data-testid="simulation-results-drawer"/);
+  assert.match(source, /ผลการทดลอง/);
+  assert.match(source, /บันทึกผล/);
+  assert.match(source, /ออกจากแล็บ/);
+  assert.match(source, /searchParams\.get\("classroom"\)/);
+  assert.match(source, /tab=classwork/);
+  assert.doesNotMatch(source, /\{ key: "results", label: "ผลการทดลอง"/);
 });

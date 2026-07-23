@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useMemo } from "react";
-import { useRouter } from "next/navigation";
 import {
   Play,
   Pause,
@@ -344,7 +343,6 @@ function CalorimeterScene({
 }
 
 export default function HesssLawSimulation() {
-  const router = useRouter();
 
   // Inputs
   const [reactionId, setReactionId] = useState<1 | 2 | 3>(1);
@@ -574,7 +572,6 @@ export default function HesssLawSimulation() {
       score: Math.min(100, experimentData.completedRuns.length * 34),
     });
     alert("บันทึกประวัติการแคลอริมิเตอร์กฎของเฮสส์เรียบร้อย! 🎉");
-    router.push("/labs/hesss-law");
   };
 
   const controls = (

@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useMemo } from "react";
-import { useRouter } from "next/navigation";
 import {
   Play,
   RotateCcw,
@@ -71,7 +70,6 @@ interface GaltonBall {
 }
 
 export default function NormalDistributionSimulation() {
-  const router = useRouter();
   const labId = "normal-distribution";
 
   // Mode Selection: "curve" (Normal Curve & Probability Area) vs "galton" (Galton Board)
@@ -448,7 +446,6 @@ export default function NormalDistributionSimulation() {
     });
 
     alert("บันทึกผลแล็บ Normal Distribution สำเร็จ");
-    router.push(`/labs/${labId}`);
   };
 
   // Bin bar rendering parameters

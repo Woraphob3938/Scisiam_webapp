@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect, useId, useRef } from "react";
-import { useRouter } from "next/navigation";
 import {
   Thermometer,
   Sliders,
@@ -504,7 +503,6 @@ function CoolingFormulaCard() {
 const MAX_COOLING_DATA_POINTS = 500;
 
 export default function NewtonsCoolingSimulation() {
-  const router = useRouter();
   const labId = "newtons-cooling";
 
   // Simulator configurations
@@ -788,7 +786,6 @@ export default function NewtonsCoolingSimulation() {
     });
 
     alert("บันทึกข้อมูลการทดลอง (กราฟอุณหภูมิและตารางบันทึกผล) สำเร็จ! 🎉");
-    router.push(`/labs/${labId}`);
   };
 
   const timeLabel = `${Math.floor(elapsedSeconds / 60).toString().padStart(2, "0")}:${Math.floor(elapsedSeconds % 60).toString().padStart(2, "0")}`;

@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useMemo, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
 import {
   Sliders,
   RotateCcw,
@@ -38,7 +37,6 @@ const FIELD_PRESETS = [
 ] as const;
 
 export default function VectorFieldsGradientsSimulation() {
-  const router = useRouter();
   const labId = "vector-fields-gradients";
 
   const [presetId, setPresetId] = useState<string>("rotational");
@@ -262,7 +260,6 @@ export default function VectorFieldsGradientsSimulation() {
       durationSeconds: null,
     });
     alert("บันทึกการทดลองแคลคูลัสสนามเวกเตอร์สำเร็จ");
-    router.push(`/labs/${labId}`);
   };
 
   const questProgress = Math.min(100, Math.round((loggedRuns.length / 3) * 100));

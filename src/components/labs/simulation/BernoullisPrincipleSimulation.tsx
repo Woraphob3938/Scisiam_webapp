@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useMemo } from "react";
-import { useRouter } from "next/navigation";
 import {
   Play,
   Pause,
@@ -35,7 +34,6 @@ interface Particle {
 }
 
 export default function BernoullisPrincipleSimulation() {
-  const router = useRouter();
 
   // Controls
   const [flowRate, setFlowRate] = useState<number>(3.0); // Q: 1.0 to 5.0 L/s
@@ -262,7 +260,6 @@ export default function BernoullisPrincipleSimulation() {
     });
 
     alert("บันทึกข้อมูลการทดลอง (พลศาสตร์ของไหลและหลักแบร์นูลลี) สำเร็จ! 🎉");
-    router.push(`/labs/bernoullis-principle`);
   };
 
   // Generate SVG coordinates for Venturi tube outline dynamically based on throatWidth

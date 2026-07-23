@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import {
   Play,
   Pause,
@@ -35,7 +34,6 @@ const MATERIALS = [
 ];
 
 export default function SuperconductivityMeissnerSimulation() {
-  const router = useRouter();
   const labId = "superconductivity-meissner";
 
   // Simulation controls
@@ -260,7 +258,6 @@ export default function SuperconductivityMeissnerSimulation() {
     });
 
     alert("บันทึกรายงานผลการทดลองสภาพนำยิ่งยวดสำเร็จ! 🎉");
-    router.push(`/labs/${labId}`);
   };
 
   // Subcomponents defined locally

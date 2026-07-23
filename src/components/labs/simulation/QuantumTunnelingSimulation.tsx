@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useId } from "react";
-import { useRouter } from "next/navigation";
 import {
   Sliders,
   Play,
@@ -351,7 +350,6 @@ function TunnelingTheory() {
 const MAX_DATA_POINTS = 500;
 
 export default function QuantumTunnelingSimulation() {
-  const router = useRouter();
   const labId = "quantum-tunneling";
 
   // Simulator configurations
@@ -639,7 +637,6 @@ export default function QuantumTunnelingSimulation() {
     });
 
     alert("บันทึกข้อมูลการทดลอง (สัมประสิทธิ์การทะลุผ่านและตารางบันทึกผล) สำเร็จ! 🎉");
-    router.push(`/labs/${labId}`);
   };
 
   const simControls = (

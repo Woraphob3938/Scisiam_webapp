@@ -35,7 +35,7 @@ export default function CategoryFilter({
   onCategoryChange,
 }: CategoryFilterProps) {
   return (
-    <div className="flex w-full justify-center px-2 pb-5 pt-4 md:pb-6">
+    <div data-tour="lab-filters" className="flex w-full justify-center px-2 pb-5 pt-4 md:pb-6">
       <div className="w-full max-w-[calc(100vw-1rem)] overflow-hidden rounded-full border border-slate-200/80 bg-white p-1.5 shadow-sm sm:max-w-6xl">
         <div className="grid w-full min-w-0 grid-cols-3 gap-1.5 sm:grid-cols-6">
         {categoriesList.map((category) => {

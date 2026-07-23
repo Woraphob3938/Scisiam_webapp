@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import EquipmentList from "@/components/labs/EquipmentList";
 import DetailExperimentSteps from "@/components/labs/ExperimentSteps";
@@ -144,7 +145,85 @@ const metricToneClasses: Record<NonNullable<SimulationMetric["tone"]>, string> =
   violet: "bg-violet-50 text-violet-700",
 };
 
-type InfoTab = "about" | "steps" | "theory" | "equipment" | "results" | "goals" | "tips";
+type InfoTab = "about" | "steps" | "theory" | "equipment" | "goals" | "tips";
+
+type ControlElementProps = {
+  children?: React.ReactNode;
+  onClick?: unknown;
+};
+
+function getControlLabel(node: React.ReactNode): string {
+  return React.Children.toArray(node)
+    .map((child) => {
+      if (typeof child === "string" || typeof child === "number") {
+        return String(child);
+      }
+      if (React.isValidElement<ControlElementProps>(child)) {
+        return getControlLabel(child.props.children);
+      }
+      return "";
+    })
+    .join(" ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
+}
+
+function isDuplicateActionLabel(
+  label: string,
+  actions: Pick<SharedSimulationShellProps, "onRun" | "onSave" | "onReset">,
+) {
+  if (actions.onReset && /^(รีเซ็ต|เริ่มใหม่|ตั้งใหม่)(?:\s*\(reset\))?$|^reset$/.test(label)) {
+    return true;
+  }
+
+  if (
+    actions.onRun &&
+    /^(ทดลอง|เริ่มทดลอง|เริ่มจำลอง|หยุดทดลอง|หยุดชั่วคราว|เริ่มกราฟ|พักกราฟ|เปิดวงจร|ปิดวงจร|เริ่มชนรถ|หยุดเคลื่อนที่|ปล่อยตัวรันวิ่ง(?:\s*\(start\))?)$/.test(
+      label,
+    )
+  ) {
+    return true;
+  }
+
+  return Boolean(actions.onSave && /^(บันทึก|บันทึกผล|บันทึกการทดลอง|save)$/.test(label));
+}
+
+function stripDuplicatePrimaryActions(
+  node: React.ReactNode,
+  actions: Pick<SharedSimulationShellProps, "onRun" | "onSave" | "onReset">,
+): React.ReactNode {
+  const actionHandlers = new Set<unknown>(
+    [actions.onRun, actions.onSave, actions.onReset].filter(Boolean),
+  );
+
+  return React.Children.map(node, (child) => {
+    if (!React.isValidElement<ControlElementProps>(child)) {
+      return child;
+    }
+
+    const isButton = child.type === "button";
+    const label = isButton ? getControlLabel(child.props.children) : "";
+    if (
+      isButton &&
+      (actionHandlers.has(child.props.onClick) || isDuplicateActionLabel(label, actions))
+    ) {
+      return null;
+    }
+
+    if (child.props.children === undefined) {
+      return child;
+    }
+
+    const sanitizedChildren = stripDuplicatePrimaryActions(child.props.children, actions);
+    const hadChildren = React.Children.toArray(child.props.children).length > 0;
+    if (hadChildren && React.Children.toArray(sanitizedChildren).length === 0) {
+      return null;
+    }
+
+    return React.cloneElement(child, undefined, sanitizedChildren);
+  });
+}
 
 export default function SharedSimulationShell({
   accent,
@@ -179,19 +258,31 @@ export default function SharedSimulationShell({
 }: SharedSimulationShellProps) {
   const resolvedAccent = categoryAccents[category] ?? accent;
   const tone = accentClasses[resolvedAccent];
+  const searchParams = useSearchParams();
   const stageShellRef = useRef<HTMLElement | null>(null);
   const advancedPanelRef = useRef<HTMLElement | null>(null);
   const advancedCloseRef = useRef<HTMLButtonElement | null>(null);
   const advancedTriggerRef = useRef<HTMLButtonElement | null>(null);
+  const resultsPanelRef = useRef<HTMLElement | null>(null);
+  const resultsCloseRef = useRef<HTMLButtonElement | null>(null);
+  const resultsTriggerRef = useRef<HTMLButtonElement | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
   const [controlsOpen, setControlsOpen] = useState(false);
+  const [resultsOpen, setResultsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<InfoTab>("about");
+  const classroomId = searchParams.get("classroom");
+  const exitHref = classroomId
+    ? `/classrooms/${encodeURIComponent(classroomId)}?tab=classwork`
+    : "/labs";
   const hasDrawerSummary = Boolean(drawerSummary) || showLiveMetrics;
   const labDetails = getLabDetails(labId);
   const hasCompactControls =
     compactControls !== null && compactControls !== undefined && compactControls !== false;
   const hasPrimaryActions = Boolean(onRun || (showSaveButton && onSave) || onReset);
-  const collapsedControls = compactControls ?? controls;
+  const actionHandlers = { onRun, onSave: showSaveButton ? onSave : undefined, onReset };
+  const sanitizedControls = stripDuplicatePrimaryActions(controls, actionHandlers);
+  const sanitizedCompactControls = stripDuplicatePrimaryActions(compactControls, actionHandlers);
+  const collapsedControls = sanitizedCompactControls ?? sanitizedControls;
   const hasCollapsedControls =
     collapsedControls !== null && collapsedControls !== undefined && collapsedControls !== false;
   const hasAdvancedControls = hasCompactControls && controls !== compactControls;
@@ -218,6 +309,11 @@ export default function SharedSimulationShell({
     advancedCloseRef.current?.focus();
   }, [controlsOpen, usesPersistentControlDock]);
 
+  useEffect(() => {
+    if (!resultsOpen) return;
+    resultsCloseRef.current?.focus();
+  }, [resultsOpen]);
+
   const closeAdvancedControls = () => {
     setControlsOpen(false);
     requestAnimationFrame(() => advancedTriggerRef.current?.focus());
@@ -232,6 +328,35 @@ export default function SharedSimulationShell({
 
     if (event.key !== "Tab") return;
     const focusable = advancedPanelRef.current?.querySelectorAll<HTMLElement>(
+      'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])',
+    );
+    if (!focusable?.length) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  };
+
+  const closeResults = () => {
+    setResultsOpen(false);
+    requestAnimationFrame(() => resultsTriggerRef.current?.focus());
+  };
+
+  const handleResultsPanelKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closeResults();
+      return;
+    }
+
+    if (event.key !== "Tab") return;
+    const focusable = resultsPanelRef.current?.querySelectorAll<HTMLElement>(
       'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])',
     );
     if (!focusable?.length) return;
@@ -274,7 +399,6 @@ export default function SharedSimulationShell({
     { key: "steps", label: "ขั้นตอน", icon: ListChecks },
     { key: "theory", label: "ทฤษฎี", icon: BookOpen },
     { key: "equipment", label: "อุปกรณ์", icon: Beaker },
-    { key: "results", label: "ผลการทดลอง", icon: BarChart3 },
     { key: "goals", label: "เป้าหมาย", icon: Target },
     { key: "tips", label: "คำแนะนำ", icon: CheckCircle2 },
   ];
@@ -296,6 +420,25 @@ export default function SharedSimulationShell({
         ))}
       </div>
     </section>
+  );
+
+  const resultsTrigger = (
+    <button
+      ref={resultsTriggerRef}
+      type="button"
+      data-testid="simulation-results-trigger"
+      onClick={(event) => {
+        resultsTriggerRef.current = event.currentTarget;
+        setControlsOpen(false);
+        setResultsOpen(true);
+      }}
+      className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-black text-slate-700 transition hover:bg-slate-50 hover:text-slate-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+      aria-expanded={resultsOpen}
+      aria-controls="simulation-results-drawer"
+    >
+      <BarChart3 className={`h-4 w-4 ${tone.text}`} aria-hidden="true" />
+      <span className="hidden sm:inline">ผลการทดลอง</span>
+    </button>
   );
 
   const primaryActions = hasPrimaryActions ? (
@@ -324,7 +467,7 @@ export default function SharedSimulationShell({
           className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-blue-100 bg-blue-50 px-3 py-2.5 text-xs font-black text-blue-700 transition hover:bg-blue-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 sm:min-w-28"
         >
           <Save className="h-4 w-4" aria-hidden="true" />
-          <span>บันทึก</span>
+          <span>บันทึกผล</span>
         </button>
       )}
       {onReset && (
@@ -347,8 +490,9 @@ export default function SharedSimulationShell({
           <Target className={`h-5 w-5 shrink-0 ${tone.text}`} />
           <span className="truncate">{controlsTitle}</span>
         </span>
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
           <div data-testid="simulation-classroom-submission-slot" />
+          {resultsTrigger}
           <button
             type="button"
             onClick={() => setControlsOpen((value) => !value)}
@@ -394,8 +538,9 @@ export default function SharedSimulationShell({
           <Target className={`h-5 w-5 shrink-0 ${tone.text}`} />
           <span className="truncate">{controlsTitle}</span>
         </h2>
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
           <div data-testid="simulation-classroom-submission-slot" />
+          {resultsTrigger}
           {hasAdvancedControls && (
             <button
               type="button"
@@ -445,7 +590,56 @@ export default function SharedSimulationShell({
           <X className="h-4 w-4" />
         </button>
       </div>
-      {controls}
+      {sanitizedControls}
+    </section>
+  );
+
+  const resultsDrawer = resultsOpen && (
+    <section
+      ref={resultsPanelRef}
+      id="simulation-results-drawer"
+      data-testid="simulation-results-drawer"
+      role="dialog"
+      aria-modal="true"
+      aria-label="ผลการทดลอง"
+      onKeyDown={handleResultsPanelKeyDown}
+      className={`absolute inset-4 z-50 overflow-y-auto rounded-2xl border bg-white p-4 shadow-2xl shadow-slate-900/20 sm:inset-y-5 sm:left-auto sm:right-5 sm:w-[min(560px,calc(100%-2.5rem))] ${tone.border}`}
+    >
+      <div className="sticky top-0 z-10 mb-4 flex items-center justify-between gap-3 border-b border-slate-100 bg-white pb-3">
+        <div>
+          <p className={`text-xs font-black uppercase ${tone.text}`}>Experiment results</p>
+          <h2 className="text-lg font-black text-slate-950">ผลการทดลอง</h2>
+          <p className="text-xs font-semibold leading-relaxed text-slate-500">
+            ค่าปัจจุบัน กราฟ และตารางจากการทดลองนี้
+          </p>
+        </div>
+        <button
+          ref={resultsCloseRef}
+          type="button"
+          onClick={closeResults}
+          className="grid h-11 w-11 shrink-0 place-items-center rounded-xl text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+          aria-label="ปิดผลการทดลอง"
+        >
+          <X className="h-5 w-5" aria-hidden="true" />
+        </button>
+      </div>
+
+      <div className="mb-4 grid grid-cols-2 gap-2">
+        {metrics.map((metric) => (
+          <div
+            key={metric.label}
+            className={`min-w-0 rounded-xl px-3 py-2 text-xs font-black ${metricToneClasses[metric.tone ?? resolvedAccent]}`}
+          >
+            <p className="break-words opacity-75">{metric.label}</p>
+            <p className="break-words text-sm">{metric.value}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="grid min-w-0 gap-4">
+        <div className="min-w-0 overflow-x-auto">{graph}</div>
+        <div className="min-w-0 overflow-x-auto">{table}</div>
+      </div>
     </section>
   );
 
@@ -465,11 +659,12 @@ export default function SharedSimulationShell({
           <div className="pointer-events-auto block min-w-0 rounded-2xl border border-white/70 bg-white/92 px-4 py-3 shadow-lg shadow-slate-900/10 backdrop-blur-md sm:inline-block sm:max-w-[calc(100%-64px)] xl:max-w-[calc(100%-340px)]">
           <div className="mb-1 flex flex-wrap items-center gap-2">
             <Link
-              href="/labs"
+              href={exitHref}
+              data-testid="simulation-exit-link"
               className="inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-black text-slate-700 shadow-sm transition-colors hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-1"
             >
               <ArrowLeft className="h-3.5 w-3.5" />
-              ย้อนกลับ
+              ออกจากแล็บ
             </Link>
             <span className={`rounded-full border px-2.5 py-1 text-xs font-black ${tone.soft}`}>{category}</span>
           </div>
@@ -512,6 +707,7 @@ export default function SharedSimulationShell({
       </div>
 
       {persistentAdvancedPanel}
+      {resultsDrawer}
 
       <div className="relative z-30 mx-4 mb-4 mt-3 sm:absolute sm:bottom-5 sm:left-5 sm:right-5 sm:m-0">
         {usesPersistentControlDock ? persistentControlDock : controlsDrawer}
@@ -544,12 +740,6 @@ export default function SharedSimulationShell({
           ))}
         </ul>
       </section>
-    ),
-    results: (
-      <div className="grid gap-5 xl:grid-cols-2">
-        {graph}
-        {table}
-      </div>
     ),
     theory: labDetails ? <TheoryCard details={labDetails} /> : theory,
     equipment: labDetails ? (

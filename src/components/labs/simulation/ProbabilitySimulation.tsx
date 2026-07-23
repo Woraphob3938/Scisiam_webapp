@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import {
   Play,
   Pause,
@@ -31,7 +30,6 @@ interface ProbabilityDataPoint {
 }
 
 export default function ProbabilitySimulation() {
-  const router = useRouter();
   const labId = "probability-simulation";
 
   // Simulator configurations
@@ -279,7 +277,6 @@ export default function ProbabilitySimulation() {
       durationSeconds: 15,
     });
     alert("บันทึกข้อมูลการทดลองสำเร็จ! 🎉");
-    router.push(`/labs/${labId}`);
   };
 
   // SVG Visual Renders

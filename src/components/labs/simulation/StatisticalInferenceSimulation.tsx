@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useMemo, useCallback } from "react";
-import { useRouter } from "next/navigation";
 import {
   Sliders,
   RotateCcw,
@@ -60,7 +59,6 @@ interface LoggedInferenceRun {
 }
 
 export default function StatisticalInferenceSimulation() {
-  const router = useRouter();
   const labId = "statistical-inference";
 
   const [activeTab, setActiveTab] = useState<"ci" | "hypothesis">("ci");
@@ -263,7 +261,6 @@ export default function StatisticalInferenceSimulation() {
       durationSeconds: null,
     });
     alert("บันทึกผลการทดลอง Statistical Inference สำเร็จ");
-    router.push(`/labs/${labId}`);
   };
 
   return (

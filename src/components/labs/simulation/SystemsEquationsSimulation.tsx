@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import {
   Calculator,
   Clipboard,
@@ -123,7 +122,6 @@ function MiniGraph({
 }
 
 export default function SystemsEquationsSimulation() {
-  const router = useRouter();
   const labId = "systems-of-equations";
 
   // Line 1 parameters (Blue line)
@@ -277,7 +275,6 @@ export default function SystemsEquationsSimulation() {
     });
 
     alert("บันทึกผลแล็บ Systems of Equations สำเร็จ");
-    router.push(`/labs/${labId}`);
   };
 
   // Convert coordinate values to SVG coordinates

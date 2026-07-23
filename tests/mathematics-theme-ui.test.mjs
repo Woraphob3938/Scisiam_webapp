@@ -32,7 +32,8 @@ test("lab navigation links have visible button affordances", () => {
   const shell = readProjectFile("src/components/labs/simulation/SharedSimulationShell.tsx");
 
   assert.match(hero, /href="\/labs"[\s\S]*?border-slate-200[\s\S]*?bg-white[\s\S]*?กลับไปหน้ารายชื่อห้องแล็บ/);
-  assert.match(shell, /href="\/labs"[\s\S]*?border[\s\S]*?bg-white[\s\S]*?ย้อนกลับ/);
+  assert.match(shell, /href=\{exitHref\}[\s\S]*?border[\s\S]*?bg-white[\s\S]*?ออกจากแล็บ/);
+  assert.match(shell, /searchParams\.get\("classroom"\)[\s\S]*?tab=classwork/);
   assert.doesNotMatch(shell, /รายละเอียดแล็บ/);
 });
 

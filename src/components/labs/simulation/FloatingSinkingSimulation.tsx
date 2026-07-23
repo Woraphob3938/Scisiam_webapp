@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useId, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import {
   Anchor,
   CheckCircle2,
@@ -87,7 +86,6 @@ const buttonBase =
   "inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border px-3 py-2 text-sm font-black transition focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2";
 
 export default function FloatingSinkingSimulation() {
-  const router = useRouter();
   const svgId = useId().replaceAll(":", "");
   const waterId = `water-${svgId}`;
   const titleId = `buoyancy-title-${svgId}`;
@@ -231,7 +229,6 @@ export default function FloatingSinkingSimulation() {
     });
 
     window.alert("บันทึกผลการทดลองการลอยและการจมแล้ว");
-    router.push(`/labs/${labId}`);
   };
 
   const missionPanel = (

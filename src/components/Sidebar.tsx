@@ -45,6 +45,15 @@ export default function Sidebar({ activeMenu, forceCollapsed = false }: SidebarP
               <Link
                 key={idx}
                 href={item.href}
+                data-tour={
+                  item.href === "/classrooms"
+                    ? "classrooms-nav"
+                    : item.href === "/labs"
+                      ? "labs-nav"
+                      : item.href === "/profile"
+                        ? "profile-menu"
+                        : undefined
+                }
                 className={`flex items-center rounded-xl text-sm font-bold transition-all duration-300 transform active:scale-98 focus-visible:ring-2 focus-visible:ring-blue-500 focus:outline-none ${
                   collapsed ? "justify-center p-3" : "gap-3.5 px-4.5 py-3"
                 } ${

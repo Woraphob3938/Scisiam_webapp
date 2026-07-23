@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useMemo, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import {
   Sliders,
   RotateCcw,
@@ -31,7 +30,6 @@ interface LoggedCrisprRun {
 }
 
 export default function CrisprGeneEditingSimulation() {
-  const router = useRouter();
   const labId = "crispr-gene-editing";
 
   const [gRNAComplement, setGRNAComplement] = useState<number>(90); // % matching
@@ -151,7 +149,6 @@ export default function CrisprGeneEditingSimulation() {
       durationSeconds: null
     });
     alert("บันทึกรายงานการตัดแต่งยีนสำเร็จ");
-    router.push(`/labs/${labId}`);
   };
 
   const questProgress = Math.min(100, Math.round((loggedRuns.length / 3) * 100));

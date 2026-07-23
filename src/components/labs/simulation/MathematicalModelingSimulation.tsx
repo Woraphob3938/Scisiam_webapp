@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useMemo, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import {
   Sliders,
   RotateCcw,
@@ -73,7 +72,6 @@ function createInitialParticles(modelType: string): Particle[] {
 }
 
 export default function MathematicalModelingSimulation() {
-  const router = useRouter();
   const labId = "mathematical-modeling-lab";
 
   const [modelType, setModelType] = useState<string>("sir");
@@ -357,7 +355,6 @@ export default function MathematicalModelingSimulation() {
       durationSeconds: null,
     });
     alert("บันทึกรายงานแบบจำลองคณิตศาสตร์สำเร็จ");
-    router.push(`/labs/${labId}`);
   };
 
   // Compile graph SVG points path

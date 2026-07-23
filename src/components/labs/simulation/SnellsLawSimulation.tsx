@@ -2,7 +2,6 @@
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import Navbar from "@/components/Navbar";
-import { useRouter } from "next/navigation";
 import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";
 import {
   BarChart3,
@@ -246,7 +245,6 @@ function SnellGraph({ points }: { points: SnellPoint[] }) {
 }
 
 export default function SnellsLawSimulation() {
-  const router = useRouter();
 
   const [n1, setN1] = useState(1.50); // Medium 1 Index
   const [n2, setN2] = useState(1.00); // Medium 2 Index
@@ -397,7 +395,6 @@ export default function SnellsLawSimulation() {
       score: Math.min(100, experimentData.dataPoints.length * 20),
     });
     alert("บันทึกผลการทดลองกฎของสเนลล์สำเร็จ! 🎉");
-    router.push("/labs/snells-law");
   };
 
   const visibleRows = dataPoints.slice(-7);

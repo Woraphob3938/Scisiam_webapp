@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import {
   Calculator,
   Clipboard,
@@ -374,7 +373,6 @@ function TheoryPanel({
 }
 
 export default function RatioProportionSimulation() {
-  const router = useRouter();
   const [baseA, setBaseA] = useState(2);
   const [baseB, setBaseB] = useState(3);
   const [scaleFactor, setScaleFactor] = useState(4);
@@ -520,7 +518,6 @@ export default function RatioProportionSimulation() {
     });
 
     alert("Saved Ratio & Proportion Lab result");
-    router.push("/labs/ratio-and-proportion");
   };
 
   const drawerSummary = (

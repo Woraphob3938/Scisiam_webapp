@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useMemo, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import {
   Sliders,
   RotateCcw,
@@ -29,7 +28,6 @@ interface LoggedSoundRun {
 }
 
 export default function SoundVibrationsSimulation() {
-  const router = useRouter();
   const labId = "sound-vibrations";
 
   const [pitch, setPitch] = useState<"low" | "medium" | "high">("medium");
@@ -170,7 +168,6 @@ export default function SoundVibrationsSimulation() {
       durationSeconds: null
     });
     alert("บันทึกรายงานการสั่นสะเทือนเกิดเสียงสำเร็จ");
-    router.push(`/labs/${labId}`);
   };
 
   const questProgress = Math.min(100, Math.round((loggedRuns.length / 3) * 100));

@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { useRouter } from "next/navigation";
 import {
   Sliders,
   RotateCcw,
@@ -29,7 +28,6 @@ interface LoggedShadowRun {
 }
 
 export default function LightShadowsSimulation() {
-  const router = useRouter();
   const labId = "light-and-shadows";
 
   const [lightDistance, setLightDistance] = useState<number>(40); // cm from flashlight
@@ -117,7 +115,6 @@ export default function LightShadowsSimulation() {
       durationSeconds: null
     });
     alert("บันทึกรายงานผลการเกิดเงาและแสงเดินทางสำเร็จ");
-    router.push(`/labs/${labId}`);
   };
 
   const questProgress = Math.min(100, Math.round((loggedRuns.length / 3) * 100));

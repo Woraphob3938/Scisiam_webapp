@@ -2,7 +2,6 @@
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import Navbar from "@/components/Navbar";
-import { useRouter } from "next/navigation";
 import * as THREE from "three";
 import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";
 import {
@@ -614,7 +613,6 @@ function GasGraph({ points }: { points: GasPoint[] }) {
 }
 
 export default function IdealGasLawSimulation() {
-  const router = useRouter();
   const [volume, setVolume] = useState(25.0); // 10 to 50 L
   const [temperature, setTemperature] = useState(300); // 100 to 500 K
   const [moles, setMoles] = useState(1.0); // 0.2 to 2.5 mol
@@ -731,7 +729,6 @@ export default function IdealGasLawSimulation() {
       score: Math.min(100, experimentData.dataPoints.length * 20),
     });
     alert("บันทึกผลการทดลองกฎของแก๊สอุดมคติสำเร็จ! 🎉");
-    router.push("/labs/ideal-gas-law");
   };
 
   const visibleRows = dataPoints.slice(-7);

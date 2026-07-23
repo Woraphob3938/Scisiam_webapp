@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useMemo, useRef } from "react";
-import { useRouter } from "next/navigation";
 import {
   Sliders,
   RotateCcw,
@@ -30,7 +29,6 @@ interface LoggedVectorState {
 }
 
 export default function LinearAlgebraEigenvectorsSimulation() {
-  const router = useRouter();
   const labId = "linear-algebra-eigenvectors";
   const svgRef = useRef<SVGSVGElement>(null);
 
@@ -274,7 +272,6 @@ export default function LinearAlgebraEigenvectorsSimulation() {
     });
 
     alert("บันทึกรายงานผลแล็บ Linear Algebra & Eigenvectors สำเร็จ");
-    router.push(`/labs/${labId}`);
   };
 
   return (

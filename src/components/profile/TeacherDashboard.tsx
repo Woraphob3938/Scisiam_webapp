@@ -71,6 +71,7 @@ export default function TeacherDashboard({
         </div>
         <Link
           href="/classrooms"
+          data-tour="teacher-classrooms"
           className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 text-sm font-bold text-slate-800 transition-colors hover:bg-slate-50 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
         >
           จัดการชั้นเรียน

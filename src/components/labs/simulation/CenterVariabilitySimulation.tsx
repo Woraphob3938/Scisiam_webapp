@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import {
   BarChart3,
   Calculator,
@@ -341,7 +340,6 @@ function TheoryPanel({ stats }: { stats: StatsSummary }) {
 }
 
 export default function CenterVariabilitySimulation() {
-  const router = useRouter();
   const [data, setData] = useState<number[]>(PRESETS.balanced);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [logs, setLogs] = useState<StatsLog[]>([]);
@@ -458,7 +456,6 @@ export default function CenterVariabilitySimulation() {
     });
 
     alert("Saved Center & Variability result");
-    router.push("/labs/center-and-variability");
   };
 
   const controls = (

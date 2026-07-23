@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
 import {
   Play,
   Pause,
@@ -299,7 +298,6 @@ function MomentumTheoryPanel({
 }
 
 export default function MomentumConservationSimulation() {
-  const router = useRouter();
 
   // Physics inputs
   const [m1, setM1] = useState(2.0); // 1.0 to 5.0 kg
@@ -589,7 +587,6 @@ export default function MomentumConservationSimulation() {
     });
 
     alert("บันทึกข้อมูลการทดลอง (การชนและกฎโมเมนตัม) สำเร็จ! 🎉");
-    router.push(`/labs/momentum-conservation`);
   };
 
   // Convert physical X coordinates (0 to 10m) to SVG X (40 to 520px)

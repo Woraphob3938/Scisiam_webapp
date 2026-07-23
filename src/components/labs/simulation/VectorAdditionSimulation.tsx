@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import {
   ArrowRight,
   Calculator,
@@ -315,7 +314,6 @@ function TheoryPanel({ vectorA, vectorB, result }: { vectorA: Vector; vectorB: V
 }
 
 export default function VectorAdditionSimulation() {
-  const router = useRouter();
   const [aMagnitude, setAMagnitude] = useState(5);
   const [aAngle, setAAngle] = useState(30);
   const [bMagnitude, setBMagnitude] = useState(4);
@@ -453,7 +451,6 @@ export default function VectorAdditionSimulation() {
     });
 
     alert("Saved Vector Addition Lab result");
-    router.push("/labs/vector-addition");
   };
 
   const controls = (

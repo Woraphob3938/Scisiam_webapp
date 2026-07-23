@@ -5,7 +5,6 @@ import React, {
   useEffect,
   useMemo,
 } from "react";
-import { useRouter } from "next/navigation";
 import {
   Sliders,
   RotateCcw,
@@ -42,7 +41,6 @@ interface LoggedFourierRun {
 }
 
 export default function FourierAnalysisSimulation() {
-  const router = useRouter();
   const labId = "fourier-analysis-signals";
 
   const [signalIdx, setSignalIdx] = useState(0);
@@ -270,7 +268,6 @@ export default function FourierAnalysisSimulation() {
       durationSeconds: null,
     });
     alert("บันทึกผลการทดลองวิเคราะห์สัญญาณฟูเรียร์สำเร็จ");
-    router.push(`/labs/${labId}`);
   };
 
   return (

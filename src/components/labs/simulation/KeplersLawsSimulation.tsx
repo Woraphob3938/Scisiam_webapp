@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useMemo } from "react";
-import { useRouter } from "next/navigation";
 import {
   Play,
   Pause,
@@ -402,7 +401,6 @@ function TheoryPanel({
 }
 
 export default function KeplersLawsSimulation() {
-  const router = useRouter();
 
   // Primary controls
   const [semiMajorAxis, setSemiMajorAxis] = useState(1.0); // a (0.5 to 6.0 AU)
@@ -525,7 +523,6 @@ export default function KeplersLawsSimulation() {
     });
 
     alert("บันทึกผลการทดลองกฎเคปเลอร์สำเร็จ! 🎉");
-    router.push(`/labs/keplers-laws`);
   };
 
   const controls = (

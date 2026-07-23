@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useMemo, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import {
   Sliders,
   RotateCcw,
@@ -31,7 +30,6 @@ interface LoggedFlowRun {
 }
 
 export default function FlowCytometrySimulation() {
-  const router = useRouter();
   const labId = "flow-cytometry-cycle";
 
   const [flowRate, setFlowRate] = useState<"slow" | "medium" | "fast">("slow");
@@ -163,7 +161,6 @@ export default function FlowCytometrySimulation() {
       durationSeconds: null
     });
     alert("บันทึกรายงานผลสแกนโฟลว์ไซโตเมทรีสำเร็จ");
-    router.push(`/labs/${labId}`);
   };
 
   const questProgress = Math.min(100, Math.round((loggedRuns.length / 3) * 100));

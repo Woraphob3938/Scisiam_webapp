@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { useRouter } from "next/navigation";
 import {
   Sliders,
   RotateCcw,
@@ -32,7 +31,6 @@ interface LoggedTransformationRun {
 }
 
 export default function RecombinantDnaTransformationSimulation() {
-  const router = useRouter();
   const labId = "recombinant-dna-transformation";
 
   const [activeStage, setActiveStage] = useState<"ligation" | "transformation" | "plating">("ligation");
@@ -153,7 +151,6 @@ export default function RecombinantDnaTransformationSimulation() {
       durationSeconds: null
     });
     alert("บันทึกรายงานพันธุวิศวกรรมดีเอ็นเอลูกผสมสำเร็จ");
-    router.push(`/labs/${labId}`);
   };
 
   const questProgress = Math.min(100, Math.round((loggedRuns.length / 3) * 100));

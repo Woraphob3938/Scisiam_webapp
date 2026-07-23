@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useMemo, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import {
   Sliders,
   RotateCcw,
@@ -29,7 +28,6 @@ interface LoggedFluxRun {
 }
 
 export default function MetabolicPathwayFluxSimulation() {
-  const router = useRouter();
   const labId = "metabolic-pathway-flux";
 
   const [nutrientSource, setNutrientSource] = useState<"glucose" | "fatty_acids">("glucose");
@@ -149,7 +147,6 @@ export default function MetabolicPathwayFluxSimulation() {
       durationSeconds: null
     });
     alert("บันทึกรายงานฟลักซ์ทางชีววิทยาระดับเซลล์สำเร็จ");
-    router.push(`/labs/${labId}`);
   };
 
   const questProgress = Math.min(100, Math.round((loggedRuns.length / 3) * 100));

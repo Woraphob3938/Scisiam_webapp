@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useMemo } from "react";
-import { useRouter } from "next/navigation";
 import {
   Play,
   Pause,
@@ -434,7 +433,6 @@ function CuvetteScene({
 }
 
 export default function BeerLambertLawSimulation() {
-  const router = useRouter();
 
   // Inputs
   const [selectedSoluteId, setSelectedSoluteId] = useState("potassium-permanganate");
@@ -590,7 +588,6 @@ export default function BeerLambertLawSimulation() {
       score: Math.min(100, experimentData.dataPoints.length * 20),
     });
     alert("บันทึกข้อมูลการทดลอง (กราฟ Absorbance-Concentration และตารางผลล่าสุด) สำเร็จ! 🎉");
-    router.push("/labs/beer-lambert-law");
   };
 
   const controls = (

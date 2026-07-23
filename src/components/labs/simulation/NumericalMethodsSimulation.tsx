@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
-import { useRouter } from "next/navigation";
 import {
   Sliders,
   RotateCcw,
@@ -71,7 +70,6 @@ interface LoggedRun {
 }
 
 export default function NumericalMethodsSimulation() {
-  const router = useRouter();
   const labId = "numerical-methods-lab";
 
   const [funcIdx, setFuncIdx] = useState(0);
@@ -222,7 +220,6 @@ export default function NumericalMethodsSimulation() {
       durationSeconds: null,
     });
     alert("บันทึกผลการทดลอง Numerical Methods สำเร็จ");
-    router.push(`/labs/${labId}`);
   };
 
   // Iteration tangent lines for SVG

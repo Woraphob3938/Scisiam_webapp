@@ -220,6 +220,7 @@ export default function Navbar() {
         {/* Notification Bell */}
         <div className="relative">
           <button
+            data-tour="notifications"
             onClick={() => {
               if (showNotification) {
                 closeNotifications();
@@ -303,6 +304,7 @@ export default function Navbar() {
             <>
               <button
                 ref={profileMenuTriggerRef}
+                data-tour="profile-menu"
                 type="button"
                 aria-haspopup="menu"
                 aria-expanded={showProfileMenu}

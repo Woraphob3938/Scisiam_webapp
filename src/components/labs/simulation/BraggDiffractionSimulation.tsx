@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import {
   Play,
   Pause,
@@ -28,7 +27,6 @@ interface BraggDataPoint {
 const MAX_DATA_POINTS = 500;
 
 export default function BraggDiffractionSimulation() {
-  const router = useRouter();
   const labId = "bragg-diffraction";
 
   // Simulator configurations
@@ -253,7 +251,6 @@ export default function BraggDiffractionSimulation() {
     });
 
     alert("บันทึกรายงานผลการทดลองการเลี้ยวเบนของแบรกก์สำเร็จ! 🎉");
-    router.push(`/labs/${labId}`);
   };
 
   // Subcomponents defined locally

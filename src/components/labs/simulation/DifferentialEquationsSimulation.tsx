@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useMemo } from "react";
-import { useRouter } from "next/navigation";
 import {
   Sliders,
   RotateCcw,
@@ -32,7 +31,6 @@ interface LoggedDerivRun {
 }
 
 export default function DifferentialEquationsSimulation() {
-  const router = useRouter();
   const labId = "differential-equations-lab";
 
   // Simulation variables states
@@ -287,7 +285,6 @@ export default function DifferentialEquationsSimulation() {
     });
 
     alert("บันทึกผลแล็บสมการเชิงอนุพันธ์สำเร็จ");
-    router.push(`/labs/${labId}`);
   };
 
   // Build spring coiled path zig-zag

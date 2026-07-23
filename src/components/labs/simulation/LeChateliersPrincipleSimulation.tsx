@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useMemo } from "react";
-import { useRouter } from "next/navigation";
 import {
   Play,
   Pause,
@@ -342,7 +341,6 @@ function TubeScene({
 }
 
 export default function LeChateliersPrincipleSimulation() {
-  const router = useRouter();
 
   // Concentration state of Tube 2 (Perturbed concentration)
   const [feAdded, setFeAdded] = useState(0.02);  // FeCl3 drops added (analytical concentration Fe3+)
@@ -518,7 +516,6 @@ export default function LeChateliersPrincipleSimulation() {
       score: Math.min(100, experimentData.dataPoints.length * 20),
     });
     alert("บันทึกข้อมูลการทดลอง (กราฟสมดุลเคมีและตารางผลล่าสุด) สำเร็จ! 🎉");
-    router.push("/labs/le-chateliers-principle");
   };
 
   const controls = (
