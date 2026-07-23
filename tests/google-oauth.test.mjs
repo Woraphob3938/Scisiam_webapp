@@ -49,17 +49,28 @@ test("Google OAuth always asks the user to select an account", () => {
   );
 });
 
-test("login and register expose an accessible Windows app installer link", () => {
+test("login and register expose a platform-aware app installer", () => {
   const authForm = readProjectFile("src/components/auth/AuthForm.tsx");
+  const appInstallButton = readProjectFile(
+    "src/components/auth/AppInstallButton.tsx",
+  );
   const envExample = readProjectFile(".env.example");
 
-  assert.match(authForm, /NEXT_PUBLIC_WINDOWS_DOWNLOAD_URL/);
-  assert.match(authForm, /github\.com\/Woraphob3938\/Scisiam_webapp\/releases/);
-  assert.match(authForm, /ติดตั้งแอป Windows/);
-  assert.match(authForm, /aria-label="ดาวน์โหลดและติดตั้งแอป Scisiam สำหรับ Windows"/);
-  assert.match(authForm, /target="_blank"/);
-  assert.match(authForm, /rel="noreferrer"/);
-  assert.match(authForm, /!desktopRuntime/);
+  assert.match(authForm, /<AppInstallButton desktopRuntime=\{desktopRuntime\} \/>/);
+  assert.match(appInstallButton, /NEXT_PUBLIC_WINDOWS_DOWNLOAD_URL/);
+  assert.match(
+    appInstallButton,
+    /github\.com\/Woraphob3938\/Scisiam_webapp\/releases/,
+  );
+  assert.match(appInstallButton, /ติดตั้งแอป Windows/);
+  assert.match(
+    appInstallButton,
+    /aria-label="ดาวน์โหลดและติดตั้งแอป Scisiam สำหรับ Windows"/,
+  );
+  assert.match(appInstallButton, /target="_blank"/);
+  assert.match(appInstallButton, /rel="noreferrer"/);
+  assert.match(appInstallButton, /beforeinstallprompt/);
+  assert.match(appInstallButton, /เพิ่มไปยังหน้าจอโฮม/);
   assert.match(envExample, /NEXT_PUBLIC_WINDOWS_DOWNLOAD_URL=/);
 });
 

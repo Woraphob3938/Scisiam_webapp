@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { SidebarProvider } from "@/context/SidebarContext";
 import { AuthProvider } from "@/context/AuthContext";
 import GlobalClientOverlays from "@/components/GlobalClientOverlays";
+import PwaServiceWorker from "@/components/PwaServiceWorker";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
@@ -32,9 +33,15 @@ export const metadata: Metadata = {
   title: "Scisiam - รายชื่อห้องแล็บวิทยาศาสตร์จำลองออนไลน์",
   description: "แพลตฟอร์มจำลองการทดลองวิทยาศาสตร์ออนไลน์ เรียนรู้สนุกสนานและเป็นส่วนตัวสำหรับทุกคน",
   icons: {
-    icon: "/ai-oon-logo.png",
+    icon: "/icons/scisiam-192.png",
     shortcut: "/ai-oon-logo.png",
-    apple: "/ai-oon-logo.png",
+    apple: "/icons/scisiam-192.png",
+  },
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Scisiam",
   },
   openGraph: {
     title: "Scisiam - รายชื่อห้องแล็บวิทยาศาสตร์จำลองออนไลน์",
@@ -75,6 +82,7 @@ export default function RootLayout({
               <Suspense fallback={null}>
                 <GlobalClientOverlays />
               </Suspense>
+              <PwaServiceWorker />
             </SidebarProvider>
           </AuthProvider>
           <Toaster theme="light" position="top-center" />
