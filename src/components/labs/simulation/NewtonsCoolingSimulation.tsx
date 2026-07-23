@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import {
   Thermometer,
   Sliders,
-  ChevronDown,
   Play,
   TrendingDown,
   ClipboardList,
@@ -513,8 +512,8 @@ export default function NewtonsCoolingSimulation() {
   const [ambientTemp, setAmbientTemp] = useState(25); // Ts
   const [coolingConstant, setCoolingConstant] = useState(0.12); // k
 
-  const [logInterval, setLogInterval] = useState(30); // auto log interval (10s, 30s, 60s)
-  const [simulationSpeed, setSimulationSpeed] = useState(1); // sim speed (0.5x, 1x, 2x, 5x)
+  const logInterval = 30;
+  const simulationSpeed = 1;
 
   // Simulation running loop states
   const [isRunning, setIsRunning] = useState(false);
@@ -552,9 +551,6 @@ export default function NewtonsCoolingSimulation() {
   useEffect(() => { initialTempRef.current = initialTemp; }, [initialTemp]);
   useEffect(() => { ambientTempRef.current = ambientTemp; }, [ambientTemp]);
   useEffect(() => { coolingConstantRef.current = coolingConstant; }, [coolingConstant]);
-  useEffect(() => { logIntervalRef.current = logInterval; }, [logInterval]);
-  useEffect(() => { simulationSpeedRef.current = simulationSpeed; }, [simulationSpeed]);
-
   useEffect(() => { isHeaterOnRef.current = isHeaterOn; }, [isHeaterOn]);
   useEffect(() => { questProgressRef.current = questProgress; }, [questProgress]);
   useEffect(() => { questSuccessRef.current = questSuccess; }, [questSuccess]);
@@ -855,42 +851,6 @@ export default function NewtonsCoolingSimulation() {
             );
           })}
         </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-3 pt-1">
-        <label className="block">
-          <span className="mb-1 block text-[11px] font-bold text-slate-400">ช่วงบันทึกข้อมูล</span>
-          <div className="relative">
-            <select
-              value={logInterval}
-              disabled={isRunning}
-              onChange={(e) => setLogInterval(Number(e.target.value))}
-              className="w-full appearance-none rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 focus:outline-none"
-            >
-              <option value={10}>10 วินาที</option>
-              <option value={30}>30 วินาที</option>
-              <option value={60}>1 นาที</option>
-            </select>
-            <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-          </div>
-        </label>
-
-        <label className="block">
-          <span className="mb-1 block text-[11px] font-bold text-slate-400">ความเร็วการจำลอง</span>
-          <div className="relative">
-            <select
-              value={simulationSpeed}
-              onChange={(e) => setSimulationSpeed(Number(e.target.value))}
-              className="w-full appearance-none rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 focus:outline-none"
-            >
-              <option value={0.5}>0.5x ช้า</option>
-              <option value={1}>1x (ปกติ)</option>
-              <option value={2}>2x เร็ว</option>
-              <option value={5}>5x เร็วมาก</option>
-            </select>
-            <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-          </div>
-        </label>
       </div>
 
       <div className="pt-1">

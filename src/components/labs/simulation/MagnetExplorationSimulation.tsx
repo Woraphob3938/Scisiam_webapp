@@ -6,10 +6,8 @@ import {
   CheckCircle2,
   ClipboardList,
   Compass,
-  FlaskConical,
   Gauge,
   Magnet,
-  RotateCcw,
   Ruler,
   TestTube2,
 } from "lucide-react";
@@ -465,34 +463,18 @@ export default function MagnetExplorationSimulation() {
               />
             </div>
 
-            <button
-              type="button"
-              onClick={handleTest}
-              className={`${buttonBase} w-full border-violet-600 bg-violet-600 text-white hover:bg-violet-700`}
-            >
-              <FlaskConical className="h-4 w-4" />
-              ทดลอง
-            </button>
           </section>
 
           <div className="space-y-4">
             {missionPanel}
-            <div className="grid grid-cols-2 gap-2">
+            <div>
               <button
                 type="button"
                 onClick={handleLog}
-                className={`${buttonBase} border-violet-600 bg-violet-600 text-white`}
+                className={`${buttonBase} w-full border-violet-600 bg-violet-600 text-white`}
               >
                 <ClipboardList className="h-4 w-4" />
                 จดผล
-              </button>
-              <button
-                type="button"
-                onClick={handleReset}
-                className={`${buttonBase} border-slate-200 bg-white text-slate-700`}
-              >
-                <RotateCcw className="h-4 w-4" />
-                เริ่มใหม่
               </button>
             </div>
           </div>
@@ -502,27 +484,11 @@ export default function MagnetExplorationSimulation() {
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
-            onClick={handleTest}
-            className={`${buttonBase} border-violet-600 bg-violet-600 text-white`}
-          >
-            <FlaskConical className="h-4 w-4" />
-            ทดลอง
-          </button>
-          <button
-            type="button"
             onClick={handleLog}
             className={`${buttonBase} border-violet-200 bg-violet-50 text-violet-900`}
           >
             <ClipboardList className="h-4 w-4" />
             จดผล
-          </button>
-          <button
-            type="button"
-            onClick={handleReset}
-            className={`${buttonBase} border-slate-200 bg-white text-slate-700`}
-          >
-            <RotateCcw className="h-4 w-4" />
-            เริ่มใหม่
           </button>
         </div>
       }

@@ -191,9 +191,10 @@ export default function SharedSimulationShell({
   const hasCompactControls =
     compactControls !== null && compactControls !== undefined && compactControls !== false;
   const hasPrimaryActions = Boolean(onRun || (showSaveButton && onSave) || onReset);
-  const collapsedControls = compactControls;
+  const collapsedControls = compactControls ?? controls;
   const hasCollapsedControls =
     collapsedControls !== null && collapsedControls !== undefined && collapsedControls !== false;
+  const hasAdvancedControls = hasCompactControls && controls !== compactControls;
   const usesPersistentControlDock = persistentControls || hasCollapsedControls || hasPrimaryActions;
   const usesRegularControlDock = usesPersistentControlDock && hasCollapsedControls && !hasCompactControls;
   const stageBottomClass = !usesPersistentControlDock
@@ -395,21 +396,23 @@ export default function SharedSimulationShell({
         </h2>
         <div className="flex shrink-0 items-center gap-2">
           <div data-testid="simulation-classroom-submission-slot" />
-          <button
-            type="button"
-            ref={advancedTriggerRef}
-            onClick={(event) => {
-              advancedTriggerRef.current = event.currentTarget;
-              if (controlsOpen) closeAdvancedControls();
-              else setControlsOpen(true);
-            }}
-            className={`inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-black transition hover:brightness-95 ${tone.soft}`}
-            aria-expanded={controlsOpen}
-            aria-controls="simulation-advanced-controls"
-          >
-            {controlsOpen ? "ปิดค่าขั้นสูง" : "ตั้งค่าขั้นสูง"}
-            {controlsOpen ? <ChevronsUp className="h-4 w-4" /> : <ChevronsDown className="h-4 w-4" />}
-          </button>
+          {hasAdvancedControls && (
+            <button
+              type="button"
+              ref={advancedTriggerRef}
+              onClick={(event) => {
+                advancedTriggerRef.current = event.currentTarget;
+                if (controlsOpen) closeAdvancedControls();
+                else setControlsOpen(true);
+              }}
+              className={`inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-black transition hover:brightness-95 ${tone.soft}`}
+              aria-expanded={controlsOpen}
+              aria-controls="simulation-advanced-controls"
+            >
+              {controlsOpen ? "ปิดค่าขั้นสูง" : "ตั้งค่าขั้นสูง"}
+              {controlsOpen ? <ChevronsUp className="h-4 w-4" /> : <ChevronsDown className="h-4 w-4" />}
+            </button>
+          )}
         </div>
       </div>
       <div className={hasCompactControls ? "min-w-0" : "max-h-[170px] min-w-0 overflow-y-auto pr-1"}>
@@ -419,7 +422,7 @@ export default function SharedSimulationShell({
     </section>
   );
 
-  const persistentAdvancedPanel = usesPersistentControlDock && controlsOpen && (
+  const persistentAdvancedPanel = usesPersistentControlDock && hasAdvancedControls && controlsOpen && (
     <section
       ref={advancedPanelRef}
       id="simulation-advanced-controls"
@@ -500,7 +503,7 @@ export default function SharedSimulationShell({
             type="button"
             data-testid="simulation-fullscreen-toggle"
             onClick={toggleFullscreen}
-            className="absolute bottom-3 right-3 z-50 grid h-11 w-11 place-items-center rounded-2xl border border-white/70 bg-white/92 text-slate-700 shadow-lg shadow-slate-900/10 backdrop-blur-md transition hover:text-slate-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+            className="absolute bottom-4 right-3 z-50 grid h-11 w-11 place-items-center rounded-2xl border border-white/70 bg-white/92 text-slate-700 shadow-lg shadow-slate-900/10 backdrop-blur-md transition hover:text-slate-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 sm:bottom-14"
             aria-label={isExpanded ? "ออกจากโหมดเต็มจอ" : "ขยายห้องทดลอง"}
           >
             {isExpanded ? <Minimize2 className="h-5 w-5" /> : <Maximize2 className="h-5 w-5" />}
