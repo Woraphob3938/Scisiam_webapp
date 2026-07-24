@@ -55,6 +55,7 @@ test("password recovery uses a cross-device token-hash flow without exposing acc
 
 test("account settings can send a password change email through the shared recovery flow", () => {
   const settingsModal = readProjectFile("src/components/SettingsModal.tsx");
+  const displayPreferences = readProjectFile("src/lib/display-preferences.ts");
   const globals = readProjectFile("src/app/globals.css");
 
   assert.match(settingsModal, /เปลี่ยนรหัสผ่าน/);
@@ -71,8 +72,8 @@ test("account settings can send a password change email through the shared recov
   assert.match(settingsModal, /aria-checked=\{checked\}/);
   assert.match(settingsModal, /ON/);
   assert.match(settingsModal, /OFF/);
-  assert.match(settingsModal, /scisiam_display_color_blind/);
-  assert.match(settingsModal, /dataset\.scisiamColorblind/);
+  assert.match(displayPreferences, /scisiam_display_color_blind/);
+  assert.match(displayPreferences, /dataset\.scisiamColorblind/);
   assert.match(settingsModal, /label="เปิดโหมดช่วยสำหรับผู้ตาบอดสี"/);
   assert.match(settingsModal, /onMouseDown=\{\(event\) => event\.stopPropagation\(\)\}/);
   assert.match(settingsModal, /onClick=\{\(event\) => \{/);

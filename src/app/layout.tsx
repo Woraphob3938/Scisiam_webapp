@@ -7,6 +7,7 @@ import GlobalClientOverlays from "@/components/GlobalClientOverlays";
 import PwaServiceWorker from "@/components/PwaServiceWorker";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { DISPLAY_PREFERENCES_BOOTSTRAP_SCRIPT } from "@/lib/display-preferences";
 import "./globals.css";
 
 const kanit = Kanit({
@@ -73,7 +74,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="th" className={`${notoSansThai.variable} ${kanit.variable} h-full antialiased`}>
+    <html
+      lang="th"
+      suppressHydrationWarning
+      className={`${notoSansThai.variable} ${kanit.variable} h-full antialiased`}
+    >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{ __html: DISPLAY_PREFERENCES_BOOTSTRAP_SCRIPT }}
+        />
+      </head>
       <body className="min-h-full flex flex-col bg-slate-50 text-slate-900">
         <TooltipProvider>
           <AuthProvider>

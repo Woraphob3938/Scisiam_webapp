@@ -5,12 +5,12 @@ import { createPortal } from "react-dom";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
+  Accessibility,
   Bot,
   BookOpen,
   Check,
   FileText,
   KeyRound,
-  Monitor,
   MousePointerClick,
   Palette,
   Type,
@@ -23,18 +23,19 @@ import {
   requestTutorialReplay,
 } from "@/lib/onboarding-tour";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
+import {
+  persistDisplayPreferences,
+  readDisplayPreferences,
+  type ScisiamTextSize,
+} from "@/lib/display-preferences";
 
 export const scisiam_SETTINGS_EVENT = "scisiam_settings_updated";
 
 const AI_STYLE_KEY = "scisiam_ai_tutor_style";
 const AI_DETAIL_KEY = "scisiam_ai_answer_detail";
-const TEXT_SIZE_KEY = "scisiam_display_text_size";
-const REDUCE_MOTION_KEY = "scisiam_display_reduce_motion";
-const COLOR_BLIND_KEY = "scisiam_display_color_blind";
 
 type AiStyle = "simple" | "hint" | "guided";
 type AiDetail = "short" | "normal" | "detailed";
-type TextSize = "normal" | "large";
 
 const aiStyles: Array<{
   id: AiStyle;
@@ -73,14 +74,6 @@ function getStoredValue<T extends string>(key: string, fallback: T, allowed: rea
   return allowed.includes(value as T) ? (value as T) : fallback;
 }
 
-function getStoredBoolean(key: string, fallback = false) {
-  if (typeof window === "undefined") return fallback;
-  const value = localStorage.getItem(key);
-  if (value === "true") return true;
-  if (value === "false") return false;
-  return fallback;
-}
-
 export function getScisiamAiSettings() {
   return {
     aiStyle: getStoredValue<AiStyle>(AI_STYLE_KEY, "simple", ["simple", "hint", "guided"]),
@@ -88,31 +81,20 @@ export function getScisiamAiSettings() {
   };
 }
 
-function applyDisplaySettings() {
-  if (typeof document === "undefined") return;
-
-  const textSize = getStoredValue<TextSize>(TEXT_SIZE_KEY, "normal", ["normal", "large"]);
-  const reduceMotion = getStoredBoolean(REDUCE_MOTION_KEY, false);
-  const colorBlind = getStoredBoolean(COLOR_BLIND_KEY, false);
-
-  document.documentElement.dataset.scisiamTextSize = textSize;
-  document.documentElement.dataset.scisiamReduceMotion = reduceMotion ? "true" : "false";
-  document.documentElement.dataset.scisiamColorblind = colorBlind ? "true" : "false";
-}
-
 function persistSettings(input: {
   aiStyle: AiStyle;
   aiDetail: AiDetail;
-  textSize: TextSize;
+  textSize: ScisiamTextSize;
   reduceMotion: boolean;
   colorBlind: boolean;
 }) {
   localStorage.setItem(AI_STYLE_KEY, input.aiStyle);
   localStorage.setItem(AI_DETAIL_KEY, input.aiDetail);
-  localStorage.setItem(TEXT_SIZE_KEY, input.textSize);
-  localStorage.setItem(REDUCE_MOTION_KEY, String(input.reduceMotion));
-  localStorage.setItem(COLOR_BLIND_KEY, String(input.colorBlind));
-  applyDisplaySettings();
+  persistDisplayPreferences({
+    textSize: input.textSize,
+    reduceMotion: input.reduceMotion,
+    colorBlind: input.colorBlind,
+  });
   window.dispatchEvent(new CustomEvent(scisiam_SETTINGS_EVENT));
 }
 
@@ -134,22 +116,18 @@ export default function SettingsModal({
   const [aiDetail, setAiDetail] = useState<AiDetail>(() =>
     getStoredValue<AiDetail>(AI_DETAIL_KEY, "normal", ["short", "normal", "detailed"])
   );
-  const [textSize, setTextSize] = useState<TextSize>(() =>
-    getStoredValue<TextSize>(TEXT_SIZE_KEY, "normal", ["normal", "large"])
+  const [textSize, setTextSize] = useState<ScisiamTextSize>(
+    () => readDisplayPreferences().textSize
   );
-  const [reduceMotion, setReduceMotion] = useState(() =>
-    getStoredBoolean(REDUCE_MOTION_KEY, false)
+  const [reduceMotion, setReduceMotion] = useState(
+    () => readDisplayPreferences().reduceMotion
   );
-  const [colorBlind, setColorBlind] = useState(() =>
-    getStoredBoolean(COLOR_BLIND_KEY, false)
+  const [colorBlind, setColorBlind] = useState(
+    () => readDisplayPreferences().colorBlind
   );
   const [passwordResetBusy, setPasswordResetBusy] = useState(false);
   const [passwordResetMessage, setPasswordResetMessage] = useState("");
   const [passwordResetError, setPasswordResetError] = useState(false);
-
-  useEffect(() => {
-    applyDisplaySettings();
-  }, []);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -235,23 +213,22 @@ export default function SettingsModal({
     >
       <div
         data-testid="scisiam-settings-modal"
-        className="relative flex max-h-[min(760px,calc(100vh-40px))] w-full max-w-[720px] flex-col overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-2xl shadow-slate-900/20"
+        className="relative flex max-h-[min(820px,calc(100vh-32px))] w-full max-w-[800px] flex-col overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-2xl shadow-slate-900/20"
         onMouseDown={(event) => event.stopPropagation()}
       >
         <div className="flex items-start justify-between gap-4 border-b border-slate-100 px-5 py-4 sm:px-6">
           <div className="min-w-0">
-            <div className="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-xs font-extrabold leading-[1.45] text-blue-700">
-              <Wand2 className="h-3.5 w-3.5" />
-              การตั้งค่า Scisiam
-            </div>
             <h2
               id="scisiam-settings-title"
-              className="mt-3 text-xl font-extrabold leading-[1.35] tracking-normal text-slate-950 sm:text-2xl"
+              className="flex items-center gap-2 text-xl font-extrabold leading-[1.35] tracking-normal text-slate-950 sm:text-2xl"
             >
-              ปรับ AI ไออุ่นและการแสดงผล
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-blue-50 text-blue-700">
+                <Accessibility className="h-5 w-5" aria-hidden="true" />
+              </span>
+              ตั้งค่าให้เหมาะกับคุณ
             </h2>
-            <p className="mt-1 text-sm font-semibold leading-relaxed text-slate-500">
-              เลือกวิธีให้ AI ช่วยอธิบาย และปรับหน้าจอให้อ่านสบายกับการเรียนของคุณ
+            <p className="mt-2 text-sm font-semibold leading-relaxed text-slate-500">
+              ปรับการเข้าถึง รูปแบบคำตอบของไออุ่น และการดูแลบัญชีได้ในที่เดียว
             </p>
           </div>
           <button
@@ -264,8 +241,8 @@ export default function SettingsModal({
           </button>
         </div>
 
-        <div className="grid gap-4 overflow-y-auto px-5 py-5 sm:px-6">
-          <section className="rounded-2xl border border-slate-200 bg-slate-50/60 p-4">
+        <div className="grid gap-3 overflow-y-auto bg-slate-50/50 px-5 py-5 sm:px-6">
+          <section className="order-2 rounded-2xl border border-slate-200 bg-white p-4">
             <div className="flex items-start gap-3">
               <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-blue-600 text-white">
                 <Bot className="h-5 w-5" />
@@ -335,23 +312,23 @@ export default function SettingsModal({
             </div>
           </section>
 
-          <section className="rounded-2xl border border-slate-200 bg-white p-4">
+          <section className="order-1 rounded-2xl border border-blue-100 bg-blue-50/40 p-4">
             <div className="flex items-start gap-3">
-              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-slate-900 text-white">
-                <Monitor className="h-5 w-5" />
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-blue-600 text-white">
+                <Accessibility className="h-5 w-5" />
               </span>
               <div className="min-w-0">
                 <h3 className="text-base font-extrabold leading-[1.45] text-slate-950">
-                  การแสดงผล
+                  การเข้าถึงและการแสดงผล
                 </h3>
                 <p className="text-sm font-semibold leading-relaxed text-slate-500">
-                  ใช้กับหน้าหลัก ห้องแล็บ และแผงต่าง ๆ ที่เปิดในเบราว์เซอร์นี้
+                  การตั้งค่านี้มีผลกับทุกหน้าของ Scisiam บนเบราว์เซอร์นี้
                 </p>
               </div>
             </div>
 
-            <div className="mt-4 grid gap-3">
-              <div className="grid gap-3 rounded-2xl border border-slate-200 bg-slate-50/60 p-3 sm:grid-cols-[1fr_auto] sm:items-center">
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              <div className="grid gap-3 rounded-2xl border border-slate-200 bg-white p-3 sm:col-span-2 sm:grid-cols-[1fr_auto] sm:items-center">
                 <div className="flex items-start gap-3">
                   <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-white text-slate-600">
                     <Type className="h-4.5 w-4.5" />
@@ -366,7 +343,7 @@ export default function SettingsModal({
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-2 sm:w-48">
-                  {(["normal", "large"] as TextSize[]).map((item) => (
+                  {(["normal", "large"] as ScisiamTextSize[]).map((item) => (
                     <button
                       key={item}
                       type="button"
@@ -385,13 +362,18 @@ export default function SettingsModal({
                 </div>
               </div>
 
-              <div className="flex items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-slate-50/60 p-3">
-                <span className="min-w-0">
+              <div className="flex min-h-[108px] items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-3">
+                <span className="flex min-w-0 items-start gap-3">
+                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-slate-100 text-slate-700">
+                    <Wand2 className="h-4.5 w-4.5" aria-hidden="true" />
+                  </span>
+                  <span className="min-w-0">
                   <span className="block text-sm font-extrabold leading-[1.45] text-slate-900">
                     ลดแอนิเมชัน
                   </span>
                   <span className="block text-xs font-semibold leading-relaxed text-slate-500">
                     ลดการเคลื่อนไหวของปุ่ม การ์ด และองค์ประกอบที่วนซ้ำ
+                  </span>
                   </span>
                 </span>
                 <SwitchButton
@@ -402,10 +384,10 @@ export default function SettingsModal({
               </div>
 
               <div
-                className={`scisiam-colorblind-panel flex items-center justify-between gap-4 rounded-2xl border p-3 transition-all ${
+                className={`scisiam-colorblind-panel flex min-h-[108px] items-center justify-between gap-4 rounded-2xl border bg-white p-3 transition-all ${
                   colorBlind
                     ? "border-slate-500 bg-[repeating-linear-gradient(135deg,#eff6ff_0_8px,#ffffff_8px_16px)] shadow-sm"
-                    : "border-slate-200 bg-slate-50/60"
+                    : "border-slate-200 bg-white"
                 }`}
               >
                 <span className="flex min-w-0 items-start gap-3">
@@ -436,7 +418,7 @@ export default function SettingsModal({
             </div>
           </section>
 
-          <section className="rounded-2xl border border-slate-200 bg-white p-4">
+          <section className="order-3 rounded-2xl border border-slate-200 bg-white p-4">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex min-w-0 items-start gap-3">
                 <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-blue-50 text-blue-700 ring-1 ring-blue-100">
@@ -471,7 +453,7 @@ export default function SettingsModal({
             </div>
           </section>
 
-          <section className="rounded-2xl border border-slate-200 bg-white p-4">
+          <section className="order-4 rounded-2xl border border-slate-200 bg-white p-4">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex min-w-0 items-start gap-3">
                 <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white text-slate-600 ring-1 ring-slate-200">
@@ -502,7 +484,7 @@ export default function SettingsModal({
             ) : null}
           </section>
 
-          <section className="rounded-2xl border border-slate-200 bg-white p-4">
+          <section className="order-5 rounded-2xl border border-slate-200 bg-white p-4">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex min-w-0 items-start gap-3">
                 <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-blue-50 text-blue-700 ring-1 ring-blue-100">

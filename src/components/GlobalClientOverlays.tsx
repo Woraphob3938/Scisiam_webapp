@@ -5,6 +5,10 @@ import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 
 import { useAuth } from "@/context/AuthContext";
+import {
+  applyDisplayPreferences,
+  isDisplayPreferenceKey,
+} from "@/lib/display-preferences";
 
 const AIChatButton = dynamic(() => import("@/components/AIChatButton"), { ssr: false });
 const FirstLoginTour = dynamic(() => import("@/components/FirstLoginTour"), { ssr: false });
@@ -19,6 +23,19 @@ export default function GlobalClientOverlays() {
   const { isAuthReady, isLoggedIn } = useAuth();
   const { role } = useAuth();
   const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    applyDisplayPreferences();
+
+    const syncDisplayPreferences = (event: StorageEvent) => {
+      if (isDisplayPreferenceKey(event.key)) {
+        applyDisplayPreferences();
+      }
+    };
+
+    window.addEventListener("storage", syncDisplayPreferences);
+    return () => window.removeEventListener("storage", syncDisplayPreferences);
+  }, []);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(max-width: 1023px)");
