@@ -16,19 +16,19 @@ export default function manifest(): MetadataRoute.Manifest {
     categories: ["education", "science"],
     icons: [
       {
-        src: "/icons/scisiam-192.png",
+        src: "/icons/scisiam-full-192.png",
         sizes: "192x192",
         type: "image/png",
         purpose: "any",
       },
       {
-        src: "/icons/scisiam-512.png",
+        src: "/icons/scisiam-full-512.png",
         sizes: "512x512",
         type: "image/png",
         purpose: "any",
       },
       {
-        src: "/icons/scisiam-maskable-512.png",
+        src: "/icons/scisiam-maskable-full-512.png",
         sizes: "512x512",
         type: "image/png",
         purpose: "maskable",

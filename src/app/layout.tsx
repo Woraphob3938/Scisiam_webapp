@@ -34,9 +34,9 @@ export const metadata: Metadata = {
   title: "Scisiam - รายชื่อห้องแล็บวิทยาศาสตร์จำลองออนไลน์",
   description: "แพลตฟอร์มจำลองการทดลองวิทยาศาสตร์ออนไลน์ เรียนรู้สนุกสนานและเป็นส่วนตัวสำหรับทุกคน",
   icons: {
-    icon: "/icons/scisiam-192.png",
+    icon: "/icons/scisiam-full-192.png",
     shortcut: "/ai-oon-logo.png",
-    apple: "/icons/scisiam-192.png",
+    apple: "/icons/scisiam-full-192.png",
   },
   manifest: "/manifest.webmanifest",
   appleWebApp: {

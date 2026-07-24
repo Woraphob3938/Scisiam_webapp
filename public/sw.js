@@ -1,4 +1,4 @@
-const STATIC_CACHE = "scisiam-static-v1";
+const STATIC_CACHE = "scisiam-static-v2";
 const STATIC_PATH_PREFIXES = ["/_next/static/", "/icons/"];
 const STATIC_FILES = [
   "/ai-oon-logo.png",

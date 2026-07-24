@@ -14,8 +14,9 @@ test("web app manifest makes Scisiam installable as a standalone Thai app", () =
   assert.match(manifest, /start_url:\s*"\/login"/);
   assert.match(manifest, /display:\s*"standalone"/);
   assert.match(manifest, /lang:\s*"th"/);
-  assert.match(manifest, /\/icons\/scisiam-192\.png/);
-  assert.match(manifest, /\/icons\/scisiam-512\.png/);
+  assert.match(manifest, /\/icons\/scisiam-full-192\.png/);
+  assert.match(manifest, /\/icons\/scisiam-full-512\.png/);
+  assert.match(manifest, /\/icons\/scisiam-maskable-full-512\.png/);
 });
 
 test("mobile install control prompts Android and guides iOS users", () => {
