@@ -13,10 +13,8 @@ import {
   BarChart3,
   Beaker,
   BookOpen,
-  CheckCircle2,
   ChevronsDown,
   ChevronsUp,
-  Info,
   ListChecks,
   LucideIcon,
   Maximize2,
@@ -145,7 +143,7 @@ const metricToneClasses: Record<NonNullable<SimulationMetric["tone"]>, string> =
   violet: "bg-violet-50 text-violet-700",
 };
 
-type InfoTab = "about" | "steps" | "theory" | "equipment" | "goals" | "tips";
+type InfoTab = "steps" | "theory" | "equipment";
 
 type ControlElementProps = {
   children?: React.ReactNode;
@@ -230,9 +228,6 @@ export default function SharedSimulationShell({
   labId,
   category,
   title,
-  subtitle,
-  icon: Icon,
-  sceneTitle,
   scene,
   controlsTitle,
   controls,
@@ -244,8 +239,6 @@ export default function SharedSimulationShell({
   table,
   theory,
   steps,
-  learningGoals,
-  tips,
   showLiveMetrics = true,
   showInfoTabs = true,
   showSaveButton = true,
@@ -269,7 +262,7 @@ export default function SharedSimulationShell({
   const [isExpanded, setIsExpanded] = useState(false);
   const [controlsOpen, setControlsOpen] = useState(false);
   const [resultsOpen, setResultsOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<InfoTab>("about");
+  const [activeTab, setActiveTab] = useState<InfoTab>("steps");
   const classroomId = searchParams.get("classroom");
   const exitHref = classroomId
     ? `/classrooms/${encodeURIComponent(classroomId)}?tab=classwork`
@@ -395,12 +388,9 @@ export default function SharedSimulationShell({
   };
 
   const tabs: Array<{ key: InfoTab; label: string; icon: LucideIcon }> = [
-    { key: "about", label: "ภาพรวม", icon: Info },
     { key: "steps", label: "ขั้นตอน", icon: ListChecks },
     { key: "theory", label: "ทฤษฎี", icon: BookOpen },
     { key: "equipment", label: "อุปกรณ์", icon: Beaker },
-    { key: "goals", label: "เป้าหมาย", icon: Target },
-    { key: "tips", label: "คำแนะนำ", icon: CheckCircle2 },
   ];
 
   const liveMetricsCard = (
@@ -716,31 +706,6 @@ export default function SharedSimulationShell({
   );
 
   const activeTabContent = {
-    about: (
-      <section className="rounded-2xl border border-slate-200/70 bg-white p-5 shadow-sm shadow-slate-200/40">
-        <h2 className="mb-2 flex items-center gap-2 text-base font-black text-slate-900">
-          <Icon className={`h-5 w-5 ${tone.text}`} />
-          {sceneTitle}
-        </h2>
-        <p className="max-w-4xl text-sm font-semibold leading-relaxed text-slate-500">{subtitle}</p>
-      </section>
-    ),
-    goals: (
-      <section className="rounded-2xl border border-slate-200/70 bg-white p-5 shadow-sm shadow-slate-200/40">
-        <h2 className="mb-3 flex items-center gap-2 text-base font-black text-slate-900">
-          <Target className={`h-5 w-5 ${tone.text}`} />
-          เป้าหมายการเรียนรู้
-        </h2>
-        <ul className="grid gap-2 text-sm font-semibold leading-relaxed text-slate-500 md:grid-cols-2">
-          {learningGoals.map((item) => (
-            <li key={item} className="flex gap-2 rounded-xl bg-slate-50 px-3 py-2">
-              <span className={`mt-2 h-1.5 w-1.5 shrink-0 rounded-full ${tone.icon}`} />
-              <span>{item}</span>
-            </li>
-          ))}
-        </ul>
-      </section>
-    ),
     theory: labDetails ? <TheoryCard details={labDetails} /> : theory,
     equipment: labDetails ? (
       <EquipmentList labTitle={title} details={labDetails} />
@@ -768,22 +733,6 @@ export default function SharedSimulationShell({
         })}
       </section>
     ),
-    tips: (
-      <section className="rounded-2xl border border-slate-200/70 bg-white p-5 shadow-sm shadow-slate-200/40">
-        <h2 className="mb-3 flex items-center gap-2 text-base font-black text-slate-900">
-          <CheckCircle2 className="h-5 w-5 text-emerald-600" />
-          คำแนะนำในการทดลอง
-        </h2>
-        <ul className="grid gap-2 text-sm font-semibold leading-relaxed text-slate-500 md:grid-cols-2">
-          {tips.map((item) => (
-            <li key={item} className="flex items-start gap-2 rounded-xl bg-slate-50 px-3 py-2">
-              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
-              <span>{item}</span>
-            </li>
-          ))}
-        </ul>
-      </section>
-    ),
   } satisfies Record<InfoTab, React.ReactNode>;
 
   return (
@@ -809,7 +758,7 @@ export default function SharedSimulationShell({
                       selected ? `${tone.soft} ring-1 ring-inset ${tone.border}` : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
                     }`}
                   >
-                    <TabIcon className="h-4 w-4" />
+                    <TabIcon className="h-4 w-4" aria-hidden="true" />
                     {tab.label}
                   </button>
                 );

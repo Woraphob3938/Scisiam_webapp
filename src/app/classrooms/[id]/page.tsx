@@ -841,8 +841,7 @@ function LabsPanel({
                   className="mt-auto inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 text-sm font-extrabold text-white transition-colors hover:bg-blue-700 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
                 >
                   <DoorOpen className="size-4" aria-hidden="true" />
-                  {labAssignment ? "ทดลองและส่งงาน" : "เข้าห้อง"}
-                  <ArrowRight className="size-4" aria-hidden="true" />
+                  {labAssignment ? "ทดลองและส่งงาน" : "ทดลอง"}
                 </Link>
               </div>
             </article>

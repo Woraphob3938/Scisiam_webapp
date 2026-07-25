@@ -512,6 +512,6 @@ test("classroom workspace loads private room data and exposes four stable tabs",
 
   assert.match(source, /ยังไม่มีงานของชั้นเรียน/);
   assert.match(source, /`\/labs\/\$\{lab\.id\}\/simulation/);
-  assert.match(source, /เข้าห้อง/);
+  assert.match(source, /\? "ทดลองและส่งงาน" : "ทดลอง"/);
   assert.match(source, /ไม่พบห้องหรือคุณไม่มีสิทธิ์เข้าถึง/);
 });

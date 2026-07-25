@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { ArrowRight } from "lucide-react";
 import {
   PushPullForcesSVG,
   LightShadowsSVG,
@@ -1915,11 +1914,10 @@ export default function LabCard({
           data-tour="lab-enter"
           type="button"
           onClick={() => onEnterRoom?.(lab.id)}
-          aria-label={`เข้าห้องทดลอง ${lab.title}`}
-          className={`flex min-h-11 w-full select-none items-center justify-center gap-1.5 rounded-xl px-3 py-2.5 text-xs font-bold ${themeColors.btnPrimary} cursor-pointer transition-all duration-200 active:scale-[0.98] focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100`}
+          aria-label={`ทดลอง ${lab.title}`}
+          className={`flex min-h-11 w-full select-none items-center justify-center gap-1.5 rounded-xl px-3 py-2.5 text-sm font-bold ${themeColors.btnPrimary} cursor-pointer transition-all duration-200 active:scale-[0.98] focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100`}
         >
-          <span>เข้าห้อง</span>
-          <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
+          <span>ทดลอง</span>
         </button>
       </div>
     </div>

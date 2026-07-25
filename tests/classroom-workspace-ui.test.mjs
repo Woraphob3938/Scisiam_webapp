@@ -150,7 +150,7 @@ test("lab assignments require a selected lab, max score, saved run, and conclusi
 test("classroom lab cards keep one clear entry action without redundant readiness badges", () => {
   assert.doesNotMatch(source, /readiness\.label/);
   assert.match(source, /lab\.description/);
-  assert.match(source, /เข้าห้อง/);
+  assert.match(source, /\? "ทดลองและส่งงาน" : "ทดลอง"/);
   assert.match(source, /`\/labs\/\$\{lab\.id\}\/simulation/);
   assert.match(source, /classroom=\$\{encodeURIComponent\(classroomId\)\}/);
   assert.match(source, /assignment=\$\{encodeURIComponent\(labAssignment\.id\)\}/);

@@ -73,7 +73,7 @@ test("Teacher dashboard is a separate Supabase-backed route", () => {
   assert.doesNotMatch(dashboard, /TeacherTab/);
 });
 
-test("Lab cards are Thai-first and expose only Enter Lab", () => {
+test("Lab cards are Thai-first and expose only the experiment action", () => {
   const data = read("src/data/labs.ts");
   const cards = read("src/components/LabCard.tsx");
   const listing = read("src/app/labs/page.tsx");
@@ -83,7 +83,17 @@ test("Lab cards are Thai-first and expose only Enter Lab", () => {
   assert.match(cards, /\{lab\.thaiTitle\}[\s\S]*?\{lab\.title\}/);
   assert.doesNotMatch(cards, /รายละเอียด|onViewDetails|<Eye/);
   assert.doesNotMatch(listing, /handleViewDetails|onViewDetails/);
-  assert.match(cards, /w-full[\s\S]*?เข้าห้อง/);
+  assert.match(cards, /w-full[\s\S]*?<span>ทดลอง<\/span>/);
+  assert.doesNotMatch(cards, /ArrowRight|<span>เข้าห้อง<\/span>/);
+});
+
+test("Simulation learning tabs keep only steps, theory, and equipment", () => {
+  const shell = read("src/components/labs/simulation/SharedSimulationShell.tsx");
+
+  assert.match(shell, /label: "ขั้นตอน"/);
+  assert.match(shell, /label: "ทฤษฎี"/);
+  assert.match(shell, /label: "อุปกรณ์"/);
+  assert.doesNotMatch(shell, /label: "ภาพรวม"|label: "เป้าหมาย"|label: "คำแนะนำ"/);
 });
 
 test("Active application flows contain no scoring system", () => {
