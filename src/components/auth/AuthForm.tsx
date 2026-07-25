@@ -6,6 +6,7 @@ import React, {
   useState,
   useSyncExternalStore,
 } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
   ArrowRight,
@@ -451,7 +452,7 @@ export default function AuthForm({
 
   return (
     <section
-      className="flex min-h-[calc(100svh-24px)] w-full items-center justify-center px-4 py-5 sm:px-6 lg:min-h-[calc(100svh-32px)] lg:px-10 lg:py-8"
+      className="relative flex min-h-[calc(100svh-24px)] w-full items-center justify-center overflow-hidden px-3 py-3 sm:px-6 sm:py-6 lg:min-h-[calc(100svh-32px)] lg:px-10 lg:py-8"
       aria-label={
         isForgotPassword
           ? "หน้ากู้คืนรหัสผ่าน Scisiam"
@@ -460,13 +461,44 @@ export default function AuthForm({
             : "หน้าเข้าสู่ระบบ Scisiam"
       }
     >
-      <AppInstallButton desktopRuntime={desktopRuntime} />
-      <div className="flex w-full min-w-0 items-center justify-center">
-        <div className="grid w-full max-w-[560px] gap-4">
+      <div aria-hidden="true" className="absolute inset-0">
+        <div className="absolute -left-28 top-[-8rem] h-80 w-80 rounded-full bg-cyan-200/25 blur-3xl" />
+        <div className="absolute -right-24 bottom-[-9rem] h-96 w-96 rounded-full bg-blue-300/25 blur-3xl" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(37,99,235,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(37,99,235,0.035)_1px,transparent_1px)] bg-[size:36px_36px] [mask-image:linear-gradient(to_bottom,black,transparent_76%)]" />
+      </div>
+
+      <div className="relative flex w-full min-w-0 items-center justify-center">
+        <div className="grid w-full max-w-[1120px] overflow-hidden rounded-[28px] border border-white/90 bg-white shadow-[0_28px_90px_rgba(30,64,175,0.14)] ring-1 ring-slate-200/70 lg:grid-cols-[0.88fr_1.12fr] lg:rounded-[32px]">
+          <AuthBrandPanel />
           <form
             onSubmit={handleSubmit}
-            className="w-full rounded-[28px] border border-white/80 bg-white/95 p-4 shadow-[0_24px_80px_rgba(15,23,42,0.12)] ring-1 ring-slate-200/70 backdrop-blur sm:p-6 lg:p-7"
+            className="w-full min-w-0 bg-white p-4 sm:p-7 lg:p-9 xl:p-10"
           >
+            <div className="mb-4 flex min-h-12 items-center justify-between gap-3">
+              <div className="flex min-w-0 items-center gap-2.5 lg:hidden">
+                <span className="relative h-10 w-10 shrink-0 overflow-hidden rounded-xl shadow-sm shadow-blue-200/70">
+                  <Image
+                    src="/ai-oon-avatar.png"
+                    alt="น้องไออุ่น โลโก้ Scisiam"
+                    fill
+                    sizes="40px"
+                    className="object-cover"
+                    priority
+                  />
+                </span>
+                <div className="min-w-0">
+                  <p className="scisiam-wordmark truncate text-xl text-blue-600">Scisiam</p>
+                  <p className="truncate text-[11px] font-semibold text-slate-500">
+                    ห้องทดลองวิทยาศาสตร์เสมือน
+                  </p>
+                </div>
+              </div>
+              <p className="hidden text-xs font-extrabold uppercase tracking-[0.12em] text-slate-400 lg:block">
+                Scisiam account
+              </p>
+              <AppInstallButton desktopRuntime={desktopRuntime} />
+            </div>
+
             <div className={`grid ${isRegister ? "gap-4" : "gap-5"}`}>
             {!isForgotPassword && <div className="grid grid-cols-2 gap-1 rounded-[14px] border border-slate-200 bg-slate-50 p-1">
               <button
@@ -503,7 +535,7 @@ export default function AuthForm({
                 {isForgotPassword
                   ? "กรอกอีเมลที่ใช้สมัครสมาชิก แล้วเราจะส่งลิงก์สำหรับตั้งรหัสผ่านใหม่"
                   : isRegister
-                  ? "สร้างบัญชีเพื่อเรียน ทดลอง และติดตามความคืบหน้าใน Scisiam"
+                  ? "สร้างบัญชีเพื่อเริ่มทดลอง บันทึกผล หรือจัดห้องเรียนสำหรับนักเรียนของคุณ"
                   : "ใช้อีเมลบัญชีเพื่อเข้าทำการทดลองหรือเป็นครูเพื่อจัดการห้องเรียนของคุณ"}
               </p>
             </div>
@@ -886,6 +918,50 @@ export default function AuthForm({
         returnFocusRef={emailInputRef}
       />
     </section>
+  );
+}
+
+function AuthBrandPanel() {
+  return (
+    <aside className="relative hidden min-h-[700px] overflow-hidden bg-[linear-gradient(145deg,#effaff_0%,#d9f0ff_52%,#c7e8ff_100%)] px-9 py-10 text-slate-950 lg:flex lg:flex-col xl:px-11 xl:py-12">
+      <div aria-hidden="true" className="absolute inset-0">
+        <div className="absolute -right-28 -top-24 h-80 w-80 rounded-full border-[54px] border-white/35" />
+        <div className="absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-white/50 blur-3xl" />
+      </div>
+
+      <div className="relative">
+        <div className="mb-14 flex items-center gap-3">
+          <span className="relative h-12 w-12 overflow-hidden rounded-2xl shadow-lg shadow-blue-300/50">
+            <Image
+              src="/ai-oon-avatar.png"
+              alt="น้องไออุ่น โลโก้ Scisiam"
+              fill
+              sizes="48px"
+              className="object-cover"
+              priority
+            />
+          </span>
+          <div>
+            <p className="scisiam-wordmark text-2xl text-blue-700">Scisiam</p>
+            <p className="text-xs font-semibold leading-relaxed text-slate-600">
+              ห้องทดลองวิทยาศาสตร์เสมือน
+            </p>
+          </div>
+        </div>
+
+        <p className="mb-3 text-xs font-extrabold uppercase tracking-[0.18em] text-sky-600">
+          Learn by experimenting
+        </p>
+        <h2 className="max-w-[420px] text-4xl font-extrabold leading-[1.24] text-[#10244a]">
+          ทดลองให้เห็น
+          <br />
+          แล้วเข้าใจด้วยตัวเอง
+        </h2>
+        <p className="mt-5 max-w-[390px] text-sm font-semibold leading-[1.85] text-slate-600">
+          ปรับตัวแปร สังเกตผล และเก็บบันทึกการทดลองไว้กลับมาทบทวนได้ในที่เดียว
+        </p>
+      </div>
+    </aside>
   );
 }
 

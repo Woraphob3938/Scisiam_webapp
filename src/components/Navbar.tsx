@@ -216,6 +216,9 @@ export default function Navbar() {
         <div className="hidden lg:block">
           <ClassroomActionLauncher placement="desktop" />
         </div>
+        <div className="lg:hidden [&_button]:size-11 [&_button]:rounded-xl">
+          <ClassroomActionLauncher placement="mobile" />
+        </div>
 
         {/* Notification Bell */}
         <div className="relative">

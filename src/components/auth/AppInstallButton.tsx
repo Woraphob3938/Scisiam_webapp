@@ -203,4 +203,4 @@ function InstallStep({
 }
 
 const installControlClassName =
-  "fixed right-3 top-[max(0.75rem,env(safe-area-inset-top))] z-30 inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-blue-200 bg-white/95 px-4 py-3 text-sm font-extrabold leading-[1.45] text-blue-700 shadow-lg shadow-blue-900/10 backdrop-blur transition-all hover:-translate-y-0.5 hover:border-blue-300 hover:bg-blue-50 focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-200 sm:right-5 sm:top-5";
+  "inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl border border-blue-200 bg-blue-50/70 px-3.5 py-2.5 text-xs font-extrabold leading-[1.45] text-blue-700 transition-all hover:border-blue-300 hover:bg-blue-100/70 focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-200 sm:text-sm";

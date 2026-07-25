@@ -5,7 +5,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FlaskConical, LayoutDashboard, User, UsersRound } from "lucide-react";
 
-import { ClassroomActionLauncher } from "@/components/classrooms/ClassroomActionLauncher";
 import { useAuth } from "@/context/AuthContext";
 
 type MobileNavItem = {
@@ -85,17 +84,13 @@ export default function MobileTabBar() {
         aria-hidden="true"
       />
       <nav
-        className="fixed inset-x-0 bottom-0 z-50 border-t border-slate-200/80 bg-white/95 px-2 pt-1.5 pb-[calc(0.4rem+env(safe-area-inset-bottom))] shadow-[0_-14px_35px_rgba(15,23,42,0.08)] backdrop-blur-xl lg:hidden"
+        className="fixed inset-x-0 bottom-0 z-50 border-t border-slate-200/80 bg-white/95 px-2 pt-2 pb-[calc(0.4rem+env(safe-area-inset-bottom))] shadow-[0_-14px_35px_rgba(15,23,42,0.08)] backdrop-blur-xl lg:hidden"
         aria-label="เมนูหลักบนมือถือ"
       >
-        <div className={`mx-auto grid max-w-md items-center gap-1 ${role === "teacher" ? "grid-cols-5" : "grid-cols-4"}`}>
+        <div className={`mx-auto grid max-w-md items-center gap-1 ${role === "teacher" ? "grid-cols-4" : "grid-cols-3"}`}>
           {navItems.map((item) => (
             <MobileNavLink key={item.name} item={item} activeItem={activeItem} />
           ))}
-
-          <div className="flex min-h-[56px] items-center justify-center">
-            <ClassroomActionLauncher placement="mobile" />
-          </div>
 
           <MobileNavLink
             item={{ name: "ชั้นเรียน", href: "/classrooms", icon: UsersRound }}

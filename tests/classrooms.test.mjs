@@ -461,16 +461,19 @@ test("desktop and sidebar navigation expose classroom actions", () => {
   assert.match(sidebar, /name: "ชั้นเรียน"[\s\S]+href: "\/classrooms"/);
 });
 
-test("mobile navigation uses a centered classroom action in five columns", () => {
-  const source = fs.readFileSync(path.join(root, "src", "components", "MobileTabBar.tsx"), "utf8");
+test("mobile navigation evenly spaces role menus and keeps the classroom action beside notifications", () => {
+  const mobileTabBar = fs.readFileSync(path.join(root, "src", "components", "MobileTabBar.tsx"), "utf8");
+  const navbar = fs.readFileSync(path.join(root, "src", "components", "Navbar.tsx"), "utf8");
 
-  assert.match(source, /grid-cols-5/);
-  assert.match(source, /<ClassroomActionLauncher placement="mobile" \/>/);
-  assert.match(source, /href: "\/classrooms"/);
-  assert.match(source, /pathname\.startsWith\("\/classrooms"\)/);
+  assert.match(mobileTabBar, /role === "teacher" \? "grid-cols-4" : "grid-cols-3"/);
+  assert.doesNotMatch(mobileTabBar, /ClassroomActionLauncher/);
+  assert.match(mobileTabBar, /href: "\/classrooms"/);
+  assert.match(mobileTabBar, /pathname\.startsWith\("\/classrooms"\)/);
+  assert.match(navbar, /lg:hidden \[&_button\]:size-11 \[&_button\]:rounded-xl/);
+  assert.match(navbar, /<ClassroomActionLauncher placement="mobile" \/>/);
   assert.ok(
-    source.indexOf('<ClassroomActionLauncher placement="mobile" />') < source.indexOf('href: "/classrooms"'),
-    "mobile classroom action should occupy the center before the classroom link"
+    navbar.indexOf('<ClassroomActionLauncher placement="mobile" />') < navbar.indexOf("{/* Notification Bell */}"),
+    "mobile classroom action should appear immediately before notifications"
   );
 });
 
