@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { SidebarProvider } from "@/context/SidebarContext";
 import { AuthProvider } from "@/context/AuthContext";
 import GlobalClientOverlays from "@/components/GlobalClientOverlays";
+import MobileAppSplash from "@/components/MobileAppSplash";
 import PwaServiceWorker from "@/components/PwaServiceWorker";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -85,6 +86,7 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col bg-slate-50 text-slate-900">
+        <MobileAppSplash />
         <TooltipProvider>
           <AuthProvider>
             <SidebarProvider>
