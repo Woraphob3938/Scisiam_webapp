@@ -22,14 +22,17 @@ const eslintConfig = defineConfig([
     // Local agent/tooling workspaces and generated QA artifacts are not app source.
     ".claude/**",
     ".agents/**",
+    ".codex_tmp/**",
     ".impeccable/**",
     ".obsidian/**",
     ".playwright-cli/**",
     ".superpowers/**",
+    ".worktrees/**",
     "graphify-out/**",
     "output/**",
     "qa-screenshots/**",
     "scratch/**",
+    "tmp/**",
   ]),
 ]);
 

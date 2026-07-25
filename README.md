@@ -206,6 +206,27 @@ Set `NEXT_PUBLIC_WINDOWS_DOWNLOAD_URL` in Vercel to the signed installer asset o
 
 Users only need Windows 10/11, an internet connection, and the installer. After installation, SciSiam opens the hosted web application inside the desktop window, so application updates normally deploy through Vercel without requiring a new installer. A new installer is required only when the Tauri wrapper, permissions, icon, protocol registration, or other native desktop behavior changes.
 
+### Automatic updates / การแจ้งเตือนเวอร์ชันใหม่
+
+- **เว็บและแอปที่ติดตั้งจากโทรศัพท์ (PWA):** เมื่อ Vercel deploy สำเร็จ ระบบจะตรวจเวอร์ชันใหม่ตอนเปิดหรือกลับเข้าแอป หากมีไฟล์เว็บชุดใหม่จะแสดงข้อความ **“Scisiam เวอร์ชันใหม่พร้อมใช้งาน”** พร้อมปุ่ม `อัปเดตตอนนี้` และ `ไว้ทีหลัง` การอัปเดตจะรีโหลดหน้าเฉพาะหลังผู้ใช้ยืนยัน
+- **แอป Windows:** ตัวแอปตรวจ GitHub Release เมื่อเปิดใช้งาน ถ้ามีเวอร์ชันใหม่กว่าจะถามผู้ใช้ด้วยข้อความเดียวกัน แล้วดาวน์โหลดแพ็กเกจที่ผ่านการตรวจลายเซ็นก่อนติดตั้ง
+- การเปลี่ยนหน้าเว็บทั่วไปจะถึงผู้ใช้ผ่าน Vercel ส่วนการเปลี่ยน Tauri, ไอคอน, ตัวติดตั้ง หรือพฤติกรรม Windows ต้องออก GitHub Release ใหม่
+- เวอร์ชันปัจจุบันดูได้ที่ `การตั้งค่า` ด้านล่างของหน้าต่าง
+
+การออกเวอร์ชัน Windows:
+
+1. เปลี่ยนเลขเวอร์ชันให้ตรงกันใน `package.json`, `src-tauri/Cargo.toml` และ `src-tauri/tauri.conf.json`
+2. Commit และ push โค้ดที่ผ่านการตรวจสอบเข้า `main`
+3. สร้างและ push tag เช่น `app-v0.1.1`
+4. Workflow `.github/workflows/release-desktop.yml` จะสร้าง NSIS installer, ลายเซ็นอัปเดต และ `latest.json` แล้วเผยแพร่ GitHub Release
+
+```powershell
+git tag app-v0.1.1
+git push origin app-v0.1.1
+```
+
+Repository Secrets `TAURI_SIGNING_PRIVATE_KEY` และ `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` ต้องตั้งเพียงครั้งเดียว ห้ามบันทึก private key หรือรหัสผ่านลง Git เด็ดขาด หาก private key สูญหาย แอปรุ่นเดิมจะไม่สามารถยืนยันแพ็กเกจอัปเดตจากกุญแจใหม่ได้
+
 ### Release security / ความปลอดภัยก่อนเผยแพร่
 
 Never place `GEMINI_API_KEY`, Supabase service-role credentials, database passwords, or signing credentials in Tauri source or configuration. The desktop wrapper uses the hosted SciSiam backend for server-side secrets and API access.

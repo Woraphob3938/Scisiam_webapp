@@ -16,6 +16,7 @@
   },
   "bundle": {
     "active": true,
+    "createUpdaterArtifacts": true,
     "targets": ["nsis"],
     "publisher": "SciSiam",
     "shortDescription": "SciSiam Virtual Lab for Windows",
@@ -39,6 +40,15 @@
     "deep-link": {
       "desktop": {
         "schemes": ["scisiam"]
+      }
+    },
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDEwRkFDRkJEM0RFNzYwOEIKUldTTFlPYzl2Yy82RUFYL01jMEREQVBUMDRWYlRJODF2dEZTQ1BjL25oSnUvVERmeDc5c3ZPcDIK",
+      "endpoints": [
+        "https://github.com/Woraphob3938/Scisiam_webapp/releases/latest/download/latest.json"
+      ],
+      "windows": {
+        "installMode": "passive"
       }
     }
   }

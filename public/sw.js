@@ -1,4 +1,4 @@
-const STATIC_CACHE = "scisiam-static-v2";
+const STATIC_CACHE = "scisiam-static-v3";
 const STATIC_PATH_PREFIXES = ["/_next/static/", "/icons/"];
 const STATIC_FILES = [
   "/ai-oon-logo.png",
@@ -7,8 +7,16 @@ const STATIC_FILES = [
   "/scisiam-logo.png",
 ];
 
-self.addEventListener("install", () => {
-  self.skipWaiting();
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+    caches.open(STATIC_CACHE).then((cache) => cache.addAll(STATIC_FILES)),
+  );
+});
+
+self.addEventListener("message", (event) => {
+  if (event.data?.type === "SCISIAM_SKIP_WAITING") {
+    self.skipWaiting();
+  }
 });
 
 self.addEventListener("activate", (event) => {

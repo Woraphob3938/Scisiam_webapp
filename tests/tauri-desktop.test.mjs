@@ -44,6 +44,40 @@ test("Tauri Windows scaffold uses a local launcher and a fixed deep-link scheme"
   assert.deepEqual(config.app.windows, []);
 });
 
+test("desktop updater uses signed GitHub release metadata and passive Windows install", () => {
+  const config = JSON.parse(read("src-tauri/tauri.conf.json"));
+  const cargo = read("src-tauri/Cargo.toml");
+  const runtime = read("src-tauri/src/lib.rs");
+
+  assert.equal(config.bundle.createUpdaterArtifacts, true);
+  assert.match(config.plugins.updater.pubkey, /^[A-Za-z0-9+/=]+$/);
+  assert.match(
+    Buffer.from(config.plugins.updater.pubkey, "base64").toString("utf8"),
+    /\nRW[A-Za-z0-9+/=]+\n$/,
+  );
+  assert.deepEqual(config.plugins.updater.endpoints, [
+    "https://github.com/Woraphob3938/Scisiam_webapp/releases/latest/download/latest.json",
+  ]);
+  assert.equal(config.plugins.updater.windows.installMode, "passive");
+  assert.match(cargo, /tauri-plugin-updater/);
+  assert.match(cargo, /tauri-plugin-dialog/);
+  assert.match(runtime, /UpdaterExt/);
+  assert.match(runtime, /Scisiam เวอร์ชันใหม่พร้อมใช้งาน/);
+  assert.match(runtime, /อัปเดตตอนนี้/);
+  assert.match(runtime, /ไว้ทีหลัง/);
+});
+
+test("desktop release workflow builds signed updater artifacts from version tags", () => {
+  const workflow = read(".github/workflows/release-desktop.yml");
+
+  assert.match(workflow, /app-v\*/);
+  assert.match(workflow, /TAURI_SIGNING_PRIVATE_KEY/);
+  assert.match(workflow, /TAURI_SIGNING_PRIVATE_KEY_PASSWORD/);
+  assert.match(workflow, /includeUpdaterJson:\s*true/);
+  assert.match(workflow, /tauri-apps\/tauri-action@v0/);
+  assert.match(workflow, /windows-latest/);
+});
+
 test("desktop binary commits its configured icons and dependency lockfile", () => {
   const config = JSON.parse(read("src-tauri/tauri.conf.json"));
 

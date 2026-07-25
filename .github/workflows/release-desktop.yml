@@ -1,0 +1,59 @@
+name: Release Scisiam for Windows
+
+on:
+  push:
+    tags:
+      - "app-v*"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: desktop-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: windows-latest
+    env:
+      TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+      TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Confirm tag matches app version
+        shell: pwsh
+        run: |
+          $tagVersion = "${{ github.ref_name }}".Replace("app-v", "")
+          $appVersion = (Get-Content src-tauri/tauri.conf.json | ConvertFrom-Json).version
+          if ($tagVersion -ne $appVersion) {
+            throw "Tag version $tagVersion does not match app version $appVersion"
+          }
+
+      - name: Build and publish signed Windows update
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: "Scisiam __VERSION__ สำหรับ Windows"
+          releaseBody: |
+            Scisiam เวอร์ชันใหม่พร้อมใช้งาน
+
+            ดาวน์โหลดไฟล์ติดตั้ง Windows ด้านล่าง หรือเปิดแอป Scisiam รุ่นเดิมเพื่ออัปเดตอัตโนมัติ
+          releaseDraft: false
+          prerelease: false
+          includeUpdaterJson: true
+          updaterJsonPreferNsis: true
+          args: --bundles nsis

@@ -512,9 +512,14 @@ export default function SettingsModal({
         </div>
 
         <div className="flex flex-col gap-2 border-t border-slate-100 bg-slate-50/80 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-          <p className="text-xs font-semibold leading-relaxed text-slate-500">
-            บันทึกอัตโนมัติในเครื่องนี้ สามารถเปลี่ยนได้ทุกเวลา
-          </p>
+          <div>
+            <p className="text-xs font-semibold leading-relaxed text-slate-500">
+              บันทึกอัตโนมัติในเครื่องนี้ สามารถเปลี่ยนได้ทุกเวลา
+            </p>
+            <p className="mt-0.5 text-[11px] font-bold leading-relaxed text-slate-400">
+              เวอร์ชัน Scisiam {process.env.NEXT_PUBLIC_APP_VERSION || "0.1.0"}
+            </p>
+          </div>
           <button
             type="button"
             onClick={onClose}

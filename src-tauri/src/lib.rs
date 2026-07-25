@@ -7,7 +7,11 @@ use navigation::{
 use std::sync::{Arc, Mutex};
 use tauri::{webview::NewWindowResponse, AppHandle, Manager, WebviewUrl, WebviewWindowBuilder};
 use tauri_plugin_deep_link::DeepLinkExt;
+#[cfg(desktop)]
+use tauri_plugin_dialog::{DialogExt, MessageDialogButtons, MessageDialogKind};
 use tauri_plugin_opener::OpenerExt;
+#[cfg(desktop)]
+use tauri_plugin_updater::UpdaterExt;
 use url::Url;
 
 const PRODUCTION_ORIGIN: &str = "https://scisiam-app.vercel.app";
@@ -169,15 +173,65 @@ fn create_main_window(app: &tauri::App) -> tauri::Result<()> {
     Ok(())
 }
 
+#[cfg(desktop)]
+fn check_for_updates(app: AppHandle) {
+    tauri::async_runtime::spawn(async move {
+        let updater = match app.updater() {
+            Ok(updater) => updater,
+            Err(error) => {
+                eprintln!("desktop updater unavailable: {error}");
+                return;
+            }
+        };
+        let update = match updater.check().await {
+            Ok(Some(update)) => update,
+            Ok(None) => return,
+            Err(error) => {
+                eprintln!("desktop update check failed: {error}");
+                return;
+            }
+        };
+
+        let should_update = app
+            .dialog()
+            .message(format!(
+                "เวอร์ชัน {} พร้อมติดตั้ง อัปเดตตอนนี้เพื่อรับการปรับปรุงล่าสุด",
+                update.version
+            ))
+            .title("Scisiam เวอร์ชันใหม่พร้อมใช้งาน")
+            .kind(MessageDialogKind::Info)
+            .buttons(MessageDialogButtons::OkCancelCustom(
+                "อัปเดตตอนนี้".into(),
+                "ไว้ทีหลัง".into(),
+            ))
+            .blocking_show();
+
+        if should_update {
+            if let Err(error) = update.download_and_install(|_, _| {}, || {}).await {
+                eprintln!("desktop update install failed: {error}");
+                app.dialog()
+                    .message("ยังติดตั้งอัปเดตไม่สำเร็จ กรุณาลองใหม่เมื่ออินเทอร์เน็ตพร้อม")
+                    .title("อัปเดต Scisiam ไม่สำเร็จ")
+                    .kind(MessageDialogKind::Error)
+                    .buttons(MessageDialogButtons::OkCustom("ตกลง".into()))
+                    .blocking_show();
+            }
+        }
+    });
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let mut builder = tauri::Builder::default();
 
     #[cfg(desktop)]
     {
-        builder = builder.plugin(tauri_plugin_single_instance::init(|app, _argv, _cwd| {
-            focus_main(app);
-        }));
+        builder = builder
+            .plugin(tauri_plugin_single_instance::init(|app, _argv, _cwd| {
+                focus_main(app);
+            }))
+            .plugin(tauri_plugin_dialog::init())
+            .plugin(tauri_plugin_updater::Builder::new().build());
     }
 
     builder
@@ -204,6 +258,8 @@ pub fn run() {
 
             create_main_window(app)?;
             mark_main_ready(app.handle(), &callbacks);
+            #[cfg(desktop)]
+            check_for_updates(app.handle().clone());
             Ok(())
         })
         .run(tauri::generate_context!())
