@@ -4,8 +4,6 @@ import React, { useState, useEffect, useRef, useId } from "react";
 import {
   Sliders,
   Play,
-  Pause,
-  RotateCcw,
   LineChart,
   ClipboardList,
   Target,
@@ -17,6 +15,7 @@ import {
   Zap,
 } from "lucide-react";
 import SharedSimulationShell from "@/components/labs/simulation/SharedSimulationShell";
+import CompactRangeControl from "@/components/labs/simulation/CompactRangeControl";
 import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";
 
 // --- TYPES ---
@@ -443,7 +442,6 @@ export default function QuantumTunnelingSimulation() {
           if (nextQuestProg >= 10 && !questSuccessRef.current) {
             setQuestSuccess(true);
             questSuccessRef.current = true;
-            alert("🎉 ยินดีด้วย! คุณควบคุมสัมประสิทธิ์การทะลุผ่านให้อยู่ในช่วง 40% - 60% ต่อเนื่องเป็นเวลา 10 วินาทีสำเร็จ บันทึกผลการทดลองเพื่อเก็บความคืบหน้า");
           }
         } else {
           setQuestProgress(0);
@@ -511,22 +509,6 @@ export default function QuantumTunnelingSimulation() {
 
     setLastLoggedTime(0);
     lastLoggedTimeRef.current = 0;
-  };
-
-  // Add Manual log point
-  const handleAddPoint = () => {
-    setDataPoints((prev) =>
-      [
-        ...prev,
-        {
-          time: elapsedSeconds,
-          energy: particleEnergy,
-          barrierHeight: barrierHeight,
-          barrierWidth: barrierWidth,
-          transmission: transmission,
-        },
-      ].slice(-MAX_DATA_POINTS),
-    );
   };
 
   // Clear single point from table
@@ -639,127 +621,65 @@ export default function QuantumTunnelingSimulation() {
     alert("บันทึกข้อมูลการทดลอง (สัมประสิทธิ์การทะลุผ่านและตารางบันทึกผล) สำเร็จ! 🎉");
   };
 
-  const simControls = (
-    <div className="space-y-5">
-      {/* Slider: Particle Energy */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between text-xs sm:text-sm font-bold">
-          <span className="text-slate-600">พลังงานของอนุภาค (E)</span>
-          <span className="text-purple-650 font-mono">{particleEnergy.toFixed(2)} eV</span>
-        </div>
-        <input
-          type="range"
-          min="1.0"
-          max="10.0"
-          step="0.1"
-          value={particleEnergy}
-          onChange={(e) => setParticleEnergy(parseFloat(e.target.value))}
-          className="w-full accent-purple-650"
-        />
-        <div className="flex justify-between text-[10px] text-slate-400 font-bold">
-          <span>1.0 eV</span>
-          <span>10.0 eV</span>
-        </div>
-      </div>
+  const compactControls = (
+    <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
+      <CompactRangeControl
+        label="พลังงานอนุภาค"
+        symbol="E"
+        value={particleEnergy}
+        min={1}
+        max={10}
+        step={0.1}
+        precision={1}
+        unit="eV"
+        tone="violet"
+        onChange={setParticleEnergy}
+      />
+      <CompactRangeControl
+        label="ความสูงด่านศักย์"
+        symbol="V₀"
+        value={barrierHeight}
+        min={3}
+        max={12}
+        step={0.1}
+        precision={1}
+        unit="eV"
+        tone="pink"
+        onChange={setBarrierHeight}
+      />
+      <CompactRangeControl
+        label="ความกว้างด่าน"
+        symbol="W"
+        value={barrierWidth}
+        min={0.1}
+        max={0.8}
+        step={0.01}
+        precision={2}
+        unit="nm"
+        tone="blue"
+        onChange={setBarrierWidth}
+      />
+    </div>
+  );
 
-      {/* Slider: Barrier Height */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between text-xs sm:text-sm font-bold">
-          <span className="text-slate-600">ความสูงด่านศักย์ (V₀)</span>
-          <span className="text-purple-655 font-mono">{barrierHeight.toFixed(2)} eV</span>
-        </div>
-        <input
-          type="range"
-          min="3.0"
-          max="12.0"
-          step="0.1"
-          value={barrierHeight}
-          onChange={(e) => setBarrierHeight(parseFloat(e.target.value))}
-          className="w-full accent-purple-655"
-        />
-        <div className="flex justify-between text-[10px] text-slate-400 font-bold">
-          <span>3.0 eV</span>
-          <span>12.0 eV</span>
-        </div>
-      </div>
-
-      {/* Slider: Barrier Width */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between text-xs sm:text-sm font-bold">
-          <span className="text-slate-600">ความกว้างสิ่งกีดขวาง (W)</span>
-          <span className="text-purple-655 font-mono">{barrierWidth.toFixed(2)} nm</span>
-        </div>
-        <input
-          type="range"
-          min="0.1"
-          max="0.8"
-          step="0.01"
-          value={barrierWidth}
-          onChange={(e) => setBarrierWidth(parseFloat(e.target.value))}
-          className="w-full accent-purple-655"
-        />
-        <div className="flex justify-between text-[10px] text-slate-400 font-bold">
-          <span>0.10 nm</span>
-          <span>0.80 nm</span>
-        </div>
-      </div>
-
-      {/* Simulation speed selection */}
-      <div className="space-y-2">
-        <span className="block text-xs sm:text-sm font-bold text-slate-600 font-bold">ความเร็วจำลอง</span>
-        <div className="grid grid-cols-4 gap-1.5">
-          {[0.5, 1, 2, 5].map((speed) => (
-            <button
-              key={speed}
-              onClick={() => setSimulationSpeed(speed)}
-              className={`rounded-lg py-1.5 text-xs font-black transition-all ${
-                simulationSpeed === speed
-                  ? "bg-purple-50 text-purple-700 border border-purple-200"
-                  : "bg-slate-50 text-slate-500 border border-transparent hover:bg-slate-100"
-              }`}
-            >
-              {speed}x
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Ticking Controls */}
-      <div className="flex items-center gap-2 border-t border-slate-100 pt-4">
-        <button
-          onClick={handleStartStop}
-          className={`flex-grow flex min-h-10 items-center justify-center gap-2 rounded-xl px-4 text-sm font-bold text-white transition-all active:scale-95 ${
-            isRunning
-              ? "bg-slate-700 shadow-lg shadow-slate-500/10"
-              : "bg-purple-600 shadow-lg shadow-purple-500/20 hover:bg-purple-700"
-          }`}
-        >
-          {isRunning ? (
-            <>
-              <Pause className="h-4 w-4" />
-              <span>หยุดจำลอง</span>
-            </>
-          ) : (
-            <>
-              <Play className="h-4 w-4 fill-white" />
-              <span>เริ่มจำลอง</span>
-            </>
-          )}
-        </button>
-        <button
-          onClick={handleReset}
-          className="flex min-h-10 items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 text-sm font-bold text-slate-600 transition-all hover:bg-slate-50 active:scale-95"
-          title="รีเซ็ต"
-        >
-          <RotateCcw className="h-4 w-4" />
-        </button>
-        <button
-          onClick={handleAddPoint}
-          className="flex min-h-10 items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 text-sm font-bold text-slate-700 transition-all hover:bg-slate-50 active:scale-95"
-          title="บันทึกจุดนี้"
-        >
-          <ClipboardList className="h-4 w-4 text-purple-500" />
-        </button>
+  const advancedControls = (
+    <div className="space-y-2">
+      <span className="block text-sm font-bold text-slate-600">ความเร็วจำลอง</span>
+      <div className="grid grid-cols-4 gap-2">
+        {[0.5, 1, 2, 5].map((speed) => (
+          <button
+            key={speed}
+            type="button"
+            onClick={() => setSimulationSpeed(speed)}
+            className={`min-h-10 rounded-xl border px-3 text-sm font-black transition ${
+              simulationSpeed === speed
+                ? "border-violet-200 bg-violet-50 text-violet-700"
+                : "border-slate-200 bg-white text-slate-500 hover:bg-slate-50"
+            }`}
+          >
+            {speed}x
+          </button>
+        ))}
       </div>
     </div>
   );
@@ -848,7 +768,8 @@ export default function QuantumTunnelingSimulation() {
         />
       }
       controlsTitle="แผงพารามิเตอร์ด่านศักย์"
-      controls={simControls}
+      controls={advancedControls}
+      compactControls={compactControls}
       metrics={[
         { label: "สัมประสิทธิ์ T (ทะลุผ่าน)", value: `${(transmission * 100).toFixed(1)}%`, tone: "violet" },
         { label: "สัมประสิทธิ์ R (สะท้อน)", value: `${((1 - transmission) * 100).toFixed(1)}%`, tone: "pink" },

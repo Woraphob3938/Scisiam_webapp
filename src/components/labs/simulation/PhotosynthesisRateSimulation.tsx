@@ -6,9 +6,6 @@ import {
   CheckCircle2,
   ClipboardList,
   Leaf,
-  Pause,
-  Play,
-  RotateCcw,
   Sprout,
   Sun,
   Thermometer,
@@ -174,7 +171,7 @@ function RateGraph({ points }: { points: PhotosynthesisPoint[] }) {
   const latest = points[points.length - 1];
 
   return (
-    <section className="flex min-h-[300px] flex-col rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40">
+    <section className="flex min-h-[220px] flex-col rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40">
       <div className="mb-2 flex items-center justify-between border-b border-slate-100 pb-2">
         <h3 className="flex items-center gap-2 text-sm font-black text-slate-800">
           <BarChart3 className="h-4.5 w-4.5 text-emerald-600" />
@@ -210,7 +207,7 @@ function ResultsTable({ points }: { points: PhotosynthesisPoint[] }) {
   const rows = points.slice(-7);
 
   return (
-    <section className="flex min-h-[300px] flex-col rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40">
+    <section className="flex min-h-[220px] flex-col rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40">
       <div className="mb-2 flex items-center justify-between border-b border-slate-100 pb-2">
         <h3 className="flex items-center gap-2 text-sm font-black text-slate-800">
           <ClipboardList className="h-4.5 w-4.5 text-emerald-600" />
@@ -244,7 +241,7 @@ function ResultsTable({ points }: { points: PhotosynthesisPoint[] }) {
 
 function TheoryPanel({ rate }: { rate: number }) {
   return (
-    <section className="flex min-h-[300px] flex-col rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40">
+    <section className="flex min-h-[220px] flex-col rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40">
       <h3 className="mb-2 flex items-center gap-2 border-b border-slate-100 pb-2 text-sm font-black text-slate-800">
         <Leaf className="h-4.5 w-4.5 text-emerald-600" />
         ทฤษฎีและสมการ
@@ -367,13 +364,6 @@ export default function PhotosynthesisRateSimulation() {
     }
   };
 
-  const handleAddPoint = () => {
-    const point = makePoint(elapsedMinutes, oxygen);
-    setDataPoints((previous) => [...previous, point]);
-    setLastLoggedMinute(elapsedMinutes);
-    lastLoggedMinuteRef.current = elapsedMinutes;
-  };
-
   const handleReset = () => {
     setIsRunning(false);
     isRunningRef.current = false;
@@ -388,7 +378,7 @@ export default function PhotosynthesisRateSimulation() {
 
   const handleSave = async () => {
     if (dataPoints.length === 0) {
-      alert("ยังไม่มีข้อมูล Photosynthesis Rate สำหรับบันทึก กรุณาเริ่มจำลองหรือเพิ่มจุดข้อมูลก่อน");
+      alert("ยังไม่มีข้อมูล Photosynthesis Rate สำหรับบันทึก กรุณาเริ่มจำลองก่อน");
       return;
     }
 
@@ -457,16 +447,6 @@ export default function PhotosynthesisRateSimulation() {
         );
       })}
 
-      <div className="grid grid-cols-4 gap-2 pt-1">
-        <button onClick={handleStartStop} className={`col-span-2 inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-xs font-black text-white shadow-sm ${isRunning ? "bg-slate-700" : "bg-emerald-600 hover:bg-emerald-700"}`}>
-          {isRunning ? <Pause className="h-4 w-4 fill-white stroke-none" /> : <Play className="h-4 w-4 fill-white stroke-none" />}
-          {isRunning ? "หยุดชั่วคราว" : "เริ่มจำลอง"}
-        </button>
-        <button onClick={handleAddPoint} className="inline-flex items-center justify-center rounded-xl border border-emerald-100 bg-emerald-50 text-xs font-black text-emerald-700 hover:bg-emerald-100">บันทึกจุด</button>
-        <button onClick={handleReset} className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50" aria-label="รีเซ็ต">
-          <RotateCcw className="h-4 w-4" />
-        </button>
-      </div>
     </div>
   );
 

@@ -10,8 +10,7 @@ import {
   Clipboard,
   Target,
   Sun,
-  Flame,
-  Binary
+  Flame
 } from "lucide-react";
 import SharedSimulationShell from "@/components/labs/simulation/SharedSimulationShell";
 import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";
@@ -467,7 +466,6 @@ export default function PhotoelectricEffectSimulation() {
     ) {
       const timer = setTimeout(() => {
         setQuestSuccess(true);
-        alert("🎉 ภารกิจสำเร็จ! คุณหาแรงดันหยุดยั้งของโซเดียมที่ความยาวคลื่น 300 nm ได้ถูกต้องที่ -1.85 V บันทึกผลเพื่อเก็บความคืบหน้า");
       }, 0);
       return () => clearTimeout(timer);
     }
@@ -485,20 +483,6 @@ export default function PhotoelectricEffectSimulation() {
     setMetal("sodium");
     setVoltage(0.0);
     setDataPoints([]);
-  };
-
-  const handleAddPoint = () => {
-    const newPoint: PhotoelectricDataPoint = {
-      index: dataPoints.length + 1,
-      metal,
-      wavelength,
-      frequency,
-      photonEnergy,
-      intensity,
-      voltage,
-      current
-    };
-    setDataPoints(prev => [...prev, newPoint]);
   };
 
   const handleClearPoint = (idx: number) => {
@@ -536,16 +520,24 @@ export default function PhotoelectricEffectSimulation() {
   };
 
   const handleSaveResults = async () => {
-    if (dataPoints.length === 0) {
-      alert("ไม่พบข้อมูลการทดลองสำหรับบันทึกผล! กรุณากดเริ่มทดลองและเก็บบันทึกข้อมูลก่อน");
-      return;
-    }
+    const currentPoint: PhotoelectricDataPoint = {
+      index: dataPoints.length + 1,
+      metal,
+      wavelength,
+      frequency,
+      photonEnergy,
+      intensity,
+      voltage,
+      current,
+    };
+    const pointsToSave = [...dataPoints, currentPoint].slice(-20);
+    setDataPoints(pointsToSave);
 
     const experimentData = {
       labId: "photoelectric-effect",
       timestamp: new Date().toLocaleString("th-TH"),
       metal,
-      dataPoints
+      dataPoints: pointsToSave,
     };
 
     await saveExperimentAndSync({
@@ -565,113 +557,52 @@ export default function PhotoelectricEffectSimulation() {
   const timeLabel = `${Math.floor(elapsedSeconds / 60).toString().padStart(2, "0")}:${Math.floor(elapsedSeconds % 60).toString().padStart(2, "0")}`;
 
   const controls = (
-    <div className="space-y-4">
-      {/* Metal Choice */}
-      <div className="block">
-        <span className="mb-1 block text-xs font-bold text-slate-600">🎯 เลือกเป้าโลหะ (Metal Target)</span>
-        <div className="grid grid-cols-3 gap-2">
-          {Object.entries(METALS).map(([key, config]) => (
-            <button
-              key={key}
-              onClick={() => setMetal(key)}
-              className={`py-1.5 text-[10px] font-black rounded-xl border transition active:scale-95 cursor-pointer ${
-                metal === key
-                  ? "bg-blue-600 text-white border-blue-600"
-                  : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50"
-              }`}
-            >
-              {config.name.split(" ")[0]}
-              <span className="block font-bold text-[8px] opacity-75">{config.w0} eV</span>
-            </button>
-          ))}
-        </div>
+    <div className="space-y-3">
+      <p className="text-sm font-black text-slate-800">เลือกโลหะเป้าหมาย</p>
+      <p className="text-xs font-semibold leading-relaxed text-slate-500">
+        โลหะแต่ละชนิดมีฟังก์ชันงานต่างกัน จึงต้องใช้พลังงานโฟตอนไม่เท่ากัน
+      </p>
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+        {Object.entries(METALS).map(([key, config]) => (
+          <button
+            key={key}
+            type="button"
+            onClick={() => setMetal(key)}
+            aria-pressed={metal === key}
+            className={`min-h-12 rounded-xl border px-3 py-2 text-xs font-black transition focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${
+              metal === key
+                ? "border-blue-600 bg-blue-600 text-white"
+                : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+            }`}
+          >
+            {config.name.split(" ")[0]}
+            <span className="block text-[10px] font-bold opacity-75">{config.w0} eV</span>
+          </button>
+        ))}
       </div>
+    </div>
+  );
 
-      {/* Wavelength (nm) */}
-      <div className="group bg-slate-50/50 p-2.5 rounded-2xl border border-slate-100 hover:border-slate-200/50 transition-all select-none">
-        <div className="flex justify-between items-center text-xs font-bold mb-1">
-          <span className="text-slate-600 flex items-center gap-1.5">
-            <Sun className="w-3.5 h-3.5 text-amber-500" />
-            ความยาวคลื่นแสง (Wavelength)
-          </span>
-          <span className="text-blue-600 font-extrabold text-xs bg-blue-50 px-2 py-0.5 rounded border border-blue-100">
-            {wavelength} nm
-          </span>
-        </div>
-        <input
-          type="range"
-          min="100"
-          max="800"
-          step="5"
-          value={wavelength}
-          onChange={(e) => setWavelength(Number(e.target.value))}
-          className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-500"
-        />
-        <div className="flex justify-between text-[8px] font-bold text-slate-400 mt-1">
-          <span>UV (100nm)</span>
-          <span>Green (550nm)</span>
-          <span>IR (800nm)</span>
-        </div>
-      </div>
-
-      {/* Intensity (%) */}
-      <div className="group bg-slate-50/50 p-2.5 rounded-2xl border border-slate-100 hover:border-slate-200/50 transition-all select-none">
-        <div className="flex justify-between items-center text-xs font-bold mb-1">
-          <span className="text-slate-600 flex items-center gap-1.5">
-            <Flame className="w-3.5 h-3.5 text-rose-500" />
-            ความเข้มแสง (Intensity)
-          </span>
-          <span className="text-rose-600 font-extrabold text-xs bg-rose-50 px-2 py-0.5 rounded border border-rose-100">
-            {intensity} %
-          </span>
-        </div>
-        <input
-          type="range"
-          min="0"
-          max="100"
-          step="1"
-          value={intensity}
-          onChange={(e) => setIntensity(Number(e.target.value))}
-          className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-rose-500"
-        />
-      </div>
-
-      {/* Stopping Voltage (V) */}
-      <div className="group bg-slate-50/50 p-2.5 rounded-2xl border border-slate-100 hover:border-slate-200/50 transition-all select-none">
-        <div className="flex justify-between items-center text-xs font-bold mb-1">
-          <span className="text-slate-600 flex items-center gap-1.5">
-            <Binary className="w-3.5 h-3.5 text-indigo-500" />
-            แรงดันไฟฟ้า (Voltage)
-          </span>
-          <span className="text-indigo-600 font-extrabold text-xs bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100">
-            {voltage.toFixed(2)} V
-          </span>
-        </div>
-        <input
-          type="range"
-          min="-5.0"
-          max="5.0"
-          step="0.01"
-          value={voltage}
-          onChange={(e) => setVoltage(Number(e.target.value))}
-          className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-500"
-        />
-        <div className="flex items-center gap-1 mt-2">
-          {[-1.0, -0.1, 0.1, 1.0].map((val) => (
-            <button
-              key={val}
-              onClick={() => setVoltage((prev) => Math.max(-5.0, Math.min(5.0, Number((prev + val).toFixed(2)))))}
-              className="flex-1 py-1 text-[9px] font-black text-slate-600 bg-white border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50 transition active:scale-95"
-            >
-              {val > 0 ? `+${val.toFixed(1)}V` : `${val.toFixed(1)}V`}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <button onClick={handleAddPoint} className="inline-flex min-h-11 w-full items-center justify-center rounded-xl border border-blue-100 bg-blue-50 px-3 text-xs font-black text-blue-700 transition hover:bg-blue-100 active:scale-[0.99]">
-        จดค่าลงตาราง
-      </button>
+  const compactControls = (
+    <div className="grid gap-3 md:grid-cols-3">
+      <label className="rounded-xl bg-slate-50 p-3 text-xs font-black text-slate-700">
+        <span className="mb-2 flex justify-between gap-2">
+          <span>ความยาวคลื่น</span><span>{wavelength} nm</span>
+        </span>
+        <input aria-label="ความยาวคลื่นแสง" type="range" min="100" max="800" step="5" value={wavelength} onChange={(event) => setWavelength(Number(event.target.value))} className="w-full accent-blue-500" />
+      </label>
+      <label className="rounded-xl bg-slate-50 p-3 text-xs font-black text-slate-700">
+        <span className="mb-2 flex justify-between gap-2">
+          <span>ความเข้มแสง</span><span>{intensity}%</span>
+        </span>
+        <input aria-label="ความเข้มแสง" type="range" min="0" max="100" step="1" value={intensity} onChange={(event) => setIntensity(Number(event.target.value))} className="w-full accent-rose-500" />
+      </label>
+      <label className="rounded-xl bg-slate-50 p-3 text-xs font-black text-slate-700">
+        <span className="mb-2 flex justify-between gap-2">
+          <span>แรงดันไฟฟ้า</span><span>{voltage.toFixed(2)} V</span>
+        </span>
+        <input aria-label="แรงดันไฟฟ้า" type="range" min="-5" max="5" step="0.01" value={voltage} onChange={(event) => setVoltage(Number(event.target.value))} className="w-full accent-indigo-500" />
+      </label>
     </div>
   );
 
@@ -697,6 +628,7 @@ export default function PhotoelectricEffectSimulation() {
       }
       controlsTitle="แผงความถี่และแสงตัวกระตุ้น"
       controls={controls}
+      compactControls={compactControls}
       metrics={[
         { label: "แรงดันเบี่ยง", value: `${voltage.toFixed(2)} V`, tone: "blue" },
         { label: "กระแสวัดได้", value: `${current.toFixed(2)} μA`, tone: "emerald" },

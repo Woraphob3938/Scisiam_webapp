@@ -248,7 +248,7 @@ test("elementary physics labs have dedicated interactive simulations", () => {
     assert.match(simulation, /<SharedSimulationShell/);
     assert.match(simulation, /saveExperimentAndSync/);
     assert.match(simulation, /aria-labelledby/);
-    assert.match(simulation, /ภารกิจ/);
+    assert.doesNotMatch(simulation, /ภารกิจสั้น 3 ขั้น|จดผล/);
     assert.match(simulation, new RegExp(modelFunction));
   }
 });
@@ -931,6 +931,7 @@ test("local Supabase migrations mirror the deployed migration history", () => {
     "20260712074502",
     "20260712103406",
     "20260712114647",
+    "20260726140000",
   ];
 
   assert.deepEqual(
@@ -1114,6 +1115,60 @@ test("ideal gas 3D chamber uses a centered camera composition", () => {
 
   assert.match(source, /camera\.position\.set\(0,\s*2\.4,\s*distanceRef\.current\)/);
   assert.match(source, /camera\.lookAt\(0,\s*0\.45,\s*0\)/);
+});
+
+test("ideal gas WebGL canvas cannot grow the mobile layout", () => {
+  const source = readProjectFile(
+    "src/components/labs/simulation/IdealGasLawSimulation.tsx",
+  );
+
+  assert.match(source, /renderer\.domElement\.style\.width\s*=\s*"100%"/);
+  assert.match(source, /renderer\.domElement\.style\.height\s*=\s*"100%"/);
+  assert.match(source, /overflow-x-hidden/);
+});
+
+test("Newton and Faraday start controls create visible motion", () => {
+  const newton = readProjectFile(
+    "src/components/labs/simulation/NewtonsSecondLawSimulation.tsx",
+  );
+  const unified = readProjectFile(
+    "src/components/labs/simulation/UnifiedLegacySimulation.tsx",
+  );
+  const faraday = readProjectFile(
+    "src/components/labs/simulation/FaradaysLawSimulation.tsx",
+  );
+
+  assert.match(newton, /data-testid="newtons-second-law-dynamics-rig"/);
+  assert.match(newton, /setIsRunning\(\(current\)\s*=>\s*!current\)/);
+  assert.match(unified, /import\s+\{\s*MotionTrackScene\s*\}/);
+  assert.match(unified, /elapsedTime=\{elapsedSeconds\}/);
+  assert.match(faraday, /automaticMagnetX/);
+  assert.match(faraday, /tickPhysics\(automaticMagnetX\)/);
+});
+
+test("Bernoulli uses a full-width readable Venturi rig", () => {
+  const source = readProjectFile(
+    "src/components/labs/simulation/BernoullisPrincipleSimulation.tsx",
+  );
+
+  assert.match(source, /data-testid="bernoulli-venturi-rig"/);
+  assert.match(source, /viewBox="0 0 720 320"/);
+});
+
+test("numeric quest conditions never interrupt simulations with success alerts", () => {
+  const simulationDir = join(rootDir, "src/components/labs/simulation");
+  const simulationFiles = readdirSync(simulationDir).filter((file) =>
+    file.endsWith("Simulation.tsx"),
+  );
+
+  for (const simulation of simulationFiles) {
+    const source = readProjectFile(`src/components/labs/simulation/${simulation}`);
+    assert.doesNotMatch(
+      source,
+      /alert\([^)]*(?:ภารกิจสำเร็จ|ยินดีด้วย|ทำสำเร็จ|สำเร็จภารกิจ)/,
+      `${simulation} must not interrupt the learner when a numeric quest condition is met`,
+    );
+  }
 });
 
 test("local Supabase CLI state is ignored by Git", () => {

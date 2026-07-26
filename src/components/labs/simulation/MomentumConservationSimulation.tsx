@@ -526,7 +526,6 @@ export default function MomentumConservationSimulation() {
     const isQuestV = Math.abs(finalV1 - 1.0) < 0.02 && Math.abs(finalV2 - 1.0) < 0.02;
     if (collisionType === "Inelastic" && isQuestV && !questSuccess) {
       setQuestSuccess(true);
-      alert("🎉 ภารกิจสำเร็จ! ตั้งค่าการชนแบบไม่ยืดหยุ่นให้ได้ความเร็วปลายร่วมกัน v = 1.0 m/s บันทึกผลเพื่อเก็บความคืบหน้า");
     }
   };
 

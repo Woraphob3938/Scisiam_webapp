@@ -3,8 +3,6 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import {
   Play,
-  Pause,
-  RotateCcw,
   Sliders,
   Trash,
   Download,
@@ -15,6 +13,7 @@ import {
   Target,
 } from "lucide-react";
 import SharedSimulationShell from "@/components/labs/simulation/SharedSimulationShell";
+import CompactRangeControl from "@/components/labs/simulation/CompactRangeControl";
 import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";
 
 export interface CalorimetryDataPoint {
@@ -575,7 +574,7 @@ export default function HesssLawSimulation() {
   };
 
   const controls = (
-    <div className="space-y-4 text-left">
+    <div className="space-y-3 text-left">
       {/* Reaction select */}
       <div className="group bg-slate-50/50 p-3 rounded-2xl border border-slate-100 hover:border-slate-200/50 transition-all select-none">
         <label className="block text-xs font-bold text-slate-600 mb-1.5">เลือกขั้นตอนปฏิกิริยา</label>
@@ -603,51 +602,14 @@ export default function HesssLawSimulation() {
         </div>
       </div>
 
-      {/* NaOH mass solid (only for rx 1 & 2) */}
-      <div className="group bg-slate-50/50 p-3 rounded-2xl border border-slate-100 hover:border-slate-200/50 transition-all select-none">
-        <div className="flex justify-between items-center text-xs font-bold mb-1.5">
-          <span className="text-slate-600">มวลของตัวละลาย NaOH</span>
-          <span className="text-orange-600 font-extrabold text-[10px] bg-orange-50 px-1.5 py-0.5 rounded border border-orange-100">
-            {naohMass.toFixed(1)} g
-          </span>
-        </div>
-        <input
-          type="range" min="1.0" max="4.0" step="0.5" value={naohMass}
-          onChange={(e) => setNaohMass(Number(e.target.value))}
-          className="w-full h-1 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-orange-500"
-        />
-        <div className="flex justify-between text-[8.5px] text-slate-400 font-semibold mt-1">
-          <span>น้อย (1.0g)</span>
-          <span>มาก (4.0g)</span>
-        </div>
-      </div>
-
-      {/* Solution volume */}
-      <div className="group bg-slate-50/50 p-3 rounded-2xl border border-slate-100 hover:border-slate-200/50 transition-all select-none">
-        <div className="flex justify-between items-center text-xs font-bold mb-1.5">
-          <span className="text-slate-600">ปริมาตรสารละลายในถ้วย</span>
-          <span className="text-indigo-600 font-extrabold text-[10px] bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-100">
-            {solutionVol.toFixed(0)} mL
-          </span>
-        </div>
-        <input
-          type="range" min="50" max="150" step="10" value={solutionVol}
-          onChange={(e) => setSolutionVol(Number(e.target.value))}
-          className="w-full h-1 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-500"
-        />
-      </div>
-
-      {/* Actions */}
-      <div className="grid grid-cols-3 gap-2 pt-1">
-        <button onClick={handleStartStop} className={`col-span-2 inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-xs font-black text-white shadow-sm ${isRunning ? "bg-slate-700 hover:bg-slate-800" : "bg-orange-500 hover:bg-orange-600"}`}>
-          {isRunning ? <Pause className="h-4 w-4 fill-white stroke-none" /> : <Play className="h-4 w-4 fill-white stroke-none" />}
-          {isRunning ? `${elapsedSeconds.toFixed(0)}s หยุด` : "บันทึกความร้อน"}
-        </button>
-        <button onClick={handleReset} className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50" aria-label="รีเซ็ต">
-          <RotateCcw className="h-4 w-4" />
-        </button>
-      </div>
     </div>
+  );
+
+  const compactControls = (
+    <>
+      <CompactRangeControl label="มวล NaOH" symbol="m" value={naohMass} min={1} max={4} step={0.5} precision={1} unit="g" tone="orange" onChange={setNaohMass} />
+      <CompactRangeControl label="ปริมาตรสารละลาย" symbol="V" value={solutionVol} min={50} max={150} step={10} precision={0} unit="mL" tone="violet" onChange={setSolutionVol} />
+    </>
   );
 
   return (
@@ -670,6 +632,7 @@ export default function HesssLawSimulation() {
       }
       controlsTitle="แผงควบคุมแคลอริมิเตอร์"
       controls={controls}
+      compactControls={compactControls}
       metrics={[
         { label: "อุณหภูมิปัจจุบัน", value: `${tempC.toFixed(1)} °C`, tone: "rose" },
         { label: "ขั้นที่ใช้งาน", value: `ปฏิกิริยาที่ ${reactionId}`, tone: "orange" },

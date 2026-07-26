@@ -2,9 +2,9 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import SharedSimulationShell from "./SharedSimulationShell";
+import CompactRangeControl from "./CompactRangeControl";
 import {
   Info,
-  RefreshCw,
   Radio,
   Settings,
 } from "lucide-react";
@@ -202,6 +202,24 @@ export default function NmrSpectroscopySimulation() {
     });
   };
 
+  const compactControls = (
+    <CompactRangeControl
+      label="กำลังสนามแม่เหล็ก"
+      symbol="B₀"
+      value={magneticField}
+      min={1}
+      max={7}
+      step={0.5}
+      precision={1}
+      unit="T"
+      tone="cyan"
+      onChange={(value) => {
+        setMagneticField(value);
+        handleReset();
+      }}
+    />
+  );
+
   return (
     <SharedSimulationShell
       accent="cyan"
@@ -300,6 +318,7 @@ export default function NmrSpectroscopySimulation() {
         </div>
       }
       controlsTitle="ตั้งค่าสารตัวอย่างและสนามแม่เหล็ก"
+      compactControls={compactControls}
       controls={
         <div className="flex flex-col gap-4 w-full">
           <div>
@@ -324,48 +343,6 @@ export default function NmrSpectroscopySimulation() {
             </div>
           </div>
 
-          <hr className="border-slate-100 dark:border-slate-800" />
-
-          <div>
-            <div className="flex justify-between text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">
-              <span>กำลังสนามแม่เหล็ก (B0)</span>
-              <span className="text-cyan-600 dark:text-cyan-400 font-bold">{magneticField.toFixed(1)} Tesla</span>
-            </div>
-            <input
-              type="range"
-              min="1.0"
-              max="7.0"
-              step="0.5"
-              value={magneticField}
-              onChange={(e) => {
-                setMagneticField(parseFloat(e.target.value));
-                handleReset();
-              }}
-              className="w-full accent-cyan-600"
-            />
-            <div className="flex justify-between text-[10px] text-slate-400 mt-1">
-              <span>1.0 T (~42 MHz)</span>
-              <span>4.7 T (~200 MHz)</span>
-              <span>7.0 T (~300 MHz)</span>
-            </div>
-          </div>
-
-          <div className="flex gap-2 mt-2">
-            <button
-              onClick={handlePulse}
-              disabled={isPulsing}
-              className="flex-1 py-2 px-4 bg-cyan-600 hover:bg-cyan-700 disabled:opacity-50 text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
-            >
-              <Radio className="w-4 h-4 animate-pulse" />
-              ส่งสัญญาณ RF (Pulse)
-            </button>
-            <button
-              onClick={handleReset}
-              className="py-2 px-3 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg text-xs font-semibold flex items-center justify-center transition-colors"
-            >
-              <RefreshCw className="w-4 h-4 text-slate-500" />
-            </button>
-          </div>
         </div>
       }
       metrics={getMetricDisplay()}

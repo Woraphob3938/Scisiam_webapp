@@ -320,7 +320,7 @@ export default function DnaExtractionSimulation() {
         { label: "อุณหภูมิแอลกอฮอล์", value: `${ethanolTemp}°C`, tone: "blue" },
       ]}
       graph={
-        <section className="flex min-h-[300px] flex-col rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40">
+        <section className="flex min-h-[220px] flex-col rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40">
           <div className="mb-2 flex items-center justify-between border-b border-slate-100 pb-2">
             <h3 className="flex items-center gap-2 text-sm font-black text-slate-800 leading-normal">
               <BarChart3 className="h-4.5 w-4.5 text-violet-600" />
@@ -346,7 +346,7 @@ export default function DnaExtractionSimulation() {
         </section>
       }
       table={
-        <section className="flex min-h-[300px] flex-col rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40">
+        <section className="flex min-h-[220px] flex-col rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40">
           <div className="mb-2 flex items-center justify-between border-b border-slate-100 pb-2">
             <h3 className="flex items-center gap-2 text-sm font-black text-slate-800 leading-normal">
               <ClipboardList className="h-4.5 w-4.5 text-violet-600" />
@@ -379,7 +379,7 @@ export default function DnaExtractionSimulation() {
         </section>
       }
       theory={
-        <section className="flex min-h-[300px] flex-col rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40">
+        <section className="flex min-h-[220px] flex-col rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40">
           <h3 className="mb-2 flex items-center gap-2 border-b border-slate-100 pb-2 text-sm font-black text-slate-800 leading-normal">
             <Compass className="h-4.5 w-4.5 text-violet-600" />
             ทฤษฎีสารชีวเคมีดีเอ็นเอ
@@ -415,6 +415,9 @@ export default function DnaExtractionSimulation() {
         "ไม่ควรใช้เวลาย่อย Lysis นานเกิน 8 นาที เพราะเอนไซม์นิวคลีเอสในไซโตพลาสซึมจะเริ่มทำลายดีเอ็นเอ",
         "หากใช้แอลกอฮอล์ที่อุณหภูมิห้อง (25°C) สารจะตกตะกอนได้ไม่สมบูรณ์และปริมาณจะลดฮวบ",
       ]}
+      onRun={handleNextStep}
+      runLabel={step >= 4 ? "สกัดเสร็จแล้ว" : "ทำขั้นตอนถัดไป"}
+      runDisabled={step >= 4}
       onReset={handleReset}
       onSave={handleSave}
     />

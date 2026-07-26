@@ -24,7 +24,7 @@ interface MotionPoint {
   t2: number;
 }
 
-function MotionTrackScene({
+export function MotionTrackScene({
   mass,
   acceleration,
   elapsedTime,
@@ -39,12 +39,12 @@ function MotionTrackScene({
   // Calculate physical position x = 0.5 * a * t^2
   const physicalX = Math.min(trackLength, 0.5 * acceleration * elapsedTime * elapsedTime);
   
-  // Map physicalX (0 to 2.0m) to SVG X (60 to 420px)
-  const cartX = 60 + (physicalX / trackLength) * 360;
+  // Map physicalX (0 to 2.0m) to the usable track.
+  const cartX = 94 + (physicalX / trackLength) * 390;
 
   // Photogates X positions (Gate A at 0.5m = 150px, Gate B at 1.5m = 330px)
-  const gateAX = 60 + (0.5 / trackLength) * 360;
-  const gateBX = 60 + (1.5 / trackLength) * 360;
+  const gateAX = 94 + (0.5 / trackLength) * 390;
+  const gateBX = 94 + (1.5 / trackLength) * 390;
   const appliedForce = mass * acceleration;
 
   // Check if cart passed photogates
@@ -52,108 +52,87 @@ function MotionTrackScene({
   const passedGateB = physicalX >= 1.5;
 
   return (
-    <div className="relative flex h-full min-h-[340px] items-center justify-center overflow-hidden rounded-2xl border border-violet-100 bg-[linear-gradient(135deg,#fcfaff_0%,#f5f3ff_48%,#f8fafc_100%)]">
-      <div className="absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:18px_18px] opacity-35" />
-      
-      <div className="absolute left-5 top-5 rounded-2xl border border-white/70 bg-white/80 px-3 py-2 text-left shadow-sm backdrop-blur">
-        <p className="text-[10px] font-black uppercase text-violet-600">dynamics system</p>
-        <p className="mt-0.5 text-xs font-bold text-slate-600">F = ma acceleration</p>
-      </div>
-
-      <svg className="relative z-10 h-full max-h-[360px] w-full max-w-[620px]" viewBox="0 0 560 360" fill="none" role="img" aria-label="รางพลศาสตร์พร้อมรถทดลอง รอก ตุ้มน้ำหนัก โฟโตเกต และเวกเตอร์แรงตามกฎข้อสองของนิวตัน">
+    <div
+      data-testid="newtons-second-law-dynamics-rig"
+      className="relative flex h-full min-h-[320px] items-center justify-center overflow-hidden bg-[linear-gradient(145deg,#eef2ff_0%,#f8fafc_52%,#ede9fe_100%)]"
+    >
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(99,102,241,.07)_1px,transparent_1px),linear-gradient(90deg,rgba(99,102,241,.07)_1px,transparent_1px)] [background-size:32px_32px]" />
+      <svg className="relative z-10 h-full min-h-[320px] w-full" viewBox="0 0 720 320" fill="none" role="img" aria-label="ชุดทดลองกฎข้อสองของนิวตัน แสดงรถทดลอง ราง รอก ตุ้มน้ำหนัก โฟโตเกต และแรงที่กระทำ">
         <defs>
           <linearGradient id="newton-cart" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stopColor="#60a5fa" />
-            <stop offset="1" stopColor="#4f46e5" />
+            <stop offset="0" stopColor="#818cf8" />
+            <stop offset="1" stopColor="#4338ca" />
           </linearGradient>
+          <linearGradient id="newton-rail" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#cbd5e1" />
+            <stop offset="1" stopColor="#64748b" />
+          </linearGradient>
+          <filter id="newton-shadow" x="-30%" y="-30%" width="160%" height="180%">
+            <feDropShadow dx="0" dy="7" stdDeviation="6" floodColor="#312e81" floodOpacity=".2" />
+          </filter>
           <marker id="newton-force-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
-            <path d="M0 0L10 5L0 10Z" fill="#f43f5e" />
+            <path d="M0 0L10 5L0 10Z" fill="#f97316" />
           </marker>
         </defs>
-        <rect x="28" y="42" width="504" height="268" rx="28" fill="#ffffff" opacity="0.58" />
-        <path d="M40 256H506" stroke="#c4b5fd" strokeWidth="3" strokeDasharray="7 8" />
-        {/* Track / Rail (Horizontal wood rail) */}
-        <rect x="40" y="220" width="440" height="20" rx="2" fill="#d97706" stroke="#b45309" strokeWidth="2.5" />
-        {/* Ruler ticks on track */}
-        {Array.from({ length: 21 }).map((_, i) => (
-          <line
-            key={i}
-            x1={60 + i * 18}
-            y1="220"
-            x2={60 + i * 18}
-            y2={i % 5 === 0 ? "232" : "226"}
-            stroke="#ffffff"
-            strokeWidth="1.5"
-          />
+        <g transform="translate(34 24)">
+          <rect width="166" height="52" rx="16" fill="#ffffff" fillOpacity=".88" stroke="#c7d2fe" />
+          <text x="16" y="21" fill="#6366f1" fontSize="10" fontWeight="900">DYNAMICS TRACK</text>
+          <text x="16" y="39" fill="#334155" fontSize="13" fontWeight="800">F = ma · รถทดลองแรงเสียดทานต่ำ</text>
+        </g>
+        <g transform="translate(498 24)">
+          <rect width="188" height="52" rx="16" fill="#111827" fillOpacity=".94" />
+          <text x="16" y="20" fill="#a5b4fc" fontSize="9" fontWeight="900">MOTION SENSOR</text>
+          <text x="16" y="41" fill="#ffffff" fontSize="16" fontWeight="900">
+            x {physicalX.toFixed(2)} m · a {acceleration.toFixed(2)} m/s²
+          </text>
+        </g>
+        <ellipse cx="352" cy="276" rx="290" ry="16" fill="#312e81" opacity=".09" />
+        <rect x="64" y="226" width="536" height="21" rx="10" fill="url(#newton-rail)" />
+        <rect x="74" y="232" width="516" height="5" rx="2.5" fill="#e2e8f0" />
+        {Array.from({ length: 11 }).map((_, index) => (
+          <g key={index}>
+            <line x1={94 + index * 39} y1="239" x2={94 + index * 39} y2={index % 5 === 0 ? 252 : 247} stroke="#475569" strokeWidth="1.5" />
+            {index % 5 === 0 && (
+              <text x={94 + index * 39} y="265" fill="#64748b" fontSize="9" fontWeight="800" textAnchor="middle">
+                {(index / 5).toFixed(1)} m
+              </text>
+            )}
+          </g>
         ))}
-
-        {/* Pulley wheel at right edge (480, 220) */}
-        <circle cx="480" cy="220" r="14" fill="#64748b" stroke="#334155" strokeWidth="2" />
-        <circle cx="480" cy="220" r="4" fill="#ffffff" />
-
-        {/* String from Cart to hanging mass */}
-        {/* String horizontal part */}
-        <line x1={cartX + 60} y1="195" x2="480" y2="206" stroke="#334155" strokeWidth="1.5" />
-        {/* String vertical part */}
-        <line x1="494" y1="220" x2="494" y2="270" stroke="#334155" strokeWidth="1.5" />
-
-        {/* Hanging mass */}
-        <rect x="484" y="270" width="20" height="24" rx="2" fill="#475569" stroke="#334155" strokeWidth="1.5" />
-        <text x="494" y="286" fill="#ffffff" fontSize="9" fontWeight="900" textAnchor="middle">F</text>
-
-        {/* Photogate A (Gate 1) bracket */}
-        <g transform={`translate(${gateAX - 8}, 160)`}>
-          <rect x="0" y="0" width="16" height="60" rx="3" fill="#334155" opacity="0.85" />
-          <circle cx="8" cy="12" r="5" fill={passedGateA ? "#22c55e" : "#ef4444"} />
-          <text x="8" y="44" fill="#ffffff" fontSize="8" fontWeight="950" textAnchor="middle">A</text>
+        <circle cx="600" cy="226" r="23" fill="#f8fafc" stroke="#475569" strokeWidth="6" />
+        <circle cx="600" cy="226" r="6" fill="#6366f1" />
+        <path d={`M${cartX + 82} 194H600A23 23 0 0 1 623 217V270`} stroke="#334155" strokeWidth="3" />
+        <g transform="translate(604 266)" filter="url(#newton-shadow)">
+          <path d="M2 0H36L32 45H6Z" fill="#f97316" stroke="#c2410c" strokeWidth="2" />
+          <text x="19" y="27" fill="#ffffff" fontSize="11" fontWeight="900" textAnchor="middle">F</text>
         </g>
-
-        {/* Photogate B (Gate 2) bracket */}
-        <g transform={`translate(${gateBX - 8}, 160)`}>
-          <rect x="0" y="0" width="16" height="60" rx="3" fill="#334155" opacity="0.85" />
-          <circle cx="8" cy="12" r="5" fill={passedGateB ? "#22c55e" : "#ef4444"} />
-          <text x="8" y="44" fill="#ffffff" fontSize="8" fontWeight="950" textAnchor="middle">B</text>
-        </g>
-
-        {/* Cart on wheels */}
-        <g transform={`translate(${cartX}, 175)`}>
-          {/* Cart body */}
-          <rect x="0" y="0" width="60" height="25" rx="7" fill="url(#newton-cart)" stroke="#3730a3" strokeWidth="2.5" />
-          {/* Load on cart (mass visual block) */}
-          <rect x="12" y="-12" width="36" height="12" rx="2" fill="#c084fc" stroke="#6d28d9" strokeWidth="1.5" />
-          <text x="30" y="-2" fill="#3f3f46" fontSize="8" fontWeight="900" textAnchor="middle">{mass.toFixed(2)} kg</text>
-          
-          {/* Wheels */}
-          <circle cx="14" cy="30" r="7" fill="#334155" stroke="#1e293b" strokeWidth="2" />
-          <circle cx="14" cy="30" r="2.5" fill="#ffffff" />
-          <circle cx="46" cy="30" r="7" fill="#334155" stroke="#1e293b" strokeWidth="2" />
-          <circle cx="46" cy="30" r="2.5" fill="#ffffff" />
-        </g>
-        <g transform={`translate(${cartX + 30}, 160)`}>
-          <line x1="0" y1="0" x2={Math.min(92, 28 + appliedForce * 6)} y2="0" stroke="#f43f5e" strokeWidth="5" strokeLinecap="round" markerEnd="url(#newton-force-arrow)" />
-          <text x="0" y="-10" fill="#be123c" fontSize="10" fontWeight="900">F = {appliedForce.toFixed(2)} N</text>
-        </g>
+        {[{ x: gateAX, label: "A", passed: passedGateA }, { x: gateBX, label: "B", passed: passedGateB }].map((gate) => (
+          <g key={gate.label} transform={`translate(${gate.x - 13} 145)`}>
+            <path d="M0 80V12Q0 0 12 0H26Q38 0 38 12V80" stroke="#334155" strokeWidth="7" strokeLinecap="round" />
+            <circle cx="19" cy="13" r="7" fill={gate.passed ? "#22c55e" : "#f59e0b"} stroke="#ffffff" strokeWidth="3" />
+            <text x="19" y="104" fill="#475569" fontSize="10" fontWeight="900" textAnchor="middle">GATE {gate.label}</text>
+          </g>
+        ))}
         {elapsedTime > 0 && (
-          <path d={`M70 211H${Math.max(70, cartX - 4)}`} stroke="#818cf8" strokeWidth="5" strokeLinecap="round" strokeDasharray="2 10" opacity="0.7" />
+          <path d={`M94 216H${Math.max(94, cartX - 8)}`} stroke="#818cf8" strokeWidth="6" strokeLinecap="round" strokeDasharray="2 11" opacity=".75" />
         )}
-
-        {/* Position indicators */}
-        <g transform="translate(60, 68)">
-          <rect x="0" y="0" width="105" height="52" rx="18" fill="#ffffff" stroke="#ddd6fe" strokeWidth="3" />
-          <text x="52" y="21" fill="#64748b" fontSize="9" fontWeight="900" textAnchor="middle">POSITION</text>
-          <text x="52" y="40" fill="#7c3aed" fontSize="17" fontWeight="900" textAnchor="middle">{physicalX.toFixed(2)} m</text>
+        <g transform={`translate(${cartX} 176)`} filter="url(#newton-shadow)">
+          <rect x="0" y="0" width="84" height="40" rx="12" fill="url(#newton-cart)" stroke="#3730a3" strokeWidth="2" />
+          <rect x="20" y="-27" width="44" height="28" rx="6" fill="#ddd6fe" stroke="#7c3aed" strokeWidth="2" />
+          <text x="42" y="-9" fill="#4c1d95" fontSize="11" fontWeight="900" textAnchor="middle">{mass.toFixed(2)} kg</text>
+          <circle cx="20" cy="44" r="9" fill="#1e293b" />
+          <circle cx="64" cy="44" r="9" fill="#1e293b" />
+          <circle cx="20" cy="44" r="3" fill="#c7d2fe" />
+          <circle cx="64" cy="44" r="3" fill="#c7d2fe" />
         </g>
-
-        {/* Speed / Acc indicator */}
-        <g transform="translate(395, 68)">
-          <rect x="0" y="0" width="105" height="52" rx="18" fill="#ffffff" stroke="#ddd6fe" strokeWidth="3" />
-          <text x="52" y="21" fill="#64748b" fontSize="9" fontWeight="900" textAnchor="middle">ACCELERATION</text>
-          <text x="52" y="40" fill="#10b981" fontSize="17" fontWeight="900" textAnchor="middle">{acceleration.toFixed(2)} m/s²</text>
+        <g transform={`translate(${cartX + 42} 158)`}>
+          <line x1="-28" y1="0" x2={Math.min(112, 34 + appliedForce * 7)} y2="0" stroke="#f97316" strokeWidth="6" strokeLinecap="round" markerEnd="url(#newton-force-arrow)" />
+          <text x="-28" y="-12" fill="#c2410c" fontSize="11" fontWeight="900">แรงลัพธ์ {appliedForce.toFixed(2)} N</text>
         </g>
-        <g transform="translate(188 294)">
-          <rect width="184" height="38" rx="19" fill="#eef2ff" stroke="#c7d2fe" strokeWidth="2" />
-          <text x="92" y="24" fill="#4338ca" fontSize="12" fontWeight="900" textAnchor="middle">
-            F = ma · {mass.toFixed(2)} × {acceleration.toFixed(2)}
+        <g transform="translate(236 282)">
+          <rect width="248" height="28" rx="14" fill="#ffffff" fillOpacity=".86" stroke="#c7d2fe" />
+          <text x="124" y="19" fill="#4338ca" fontSize="12" fontWeight="900" textAnchor="middle">
+            F = ma = {mass.toFixed(2)} × {acceleration.toFixed(2)} = {appliedForce.toFixed(2)} N
           </text>
         </g>
       </svg>
@@ -282,12 +261,16 @@ export default function NewtonsSecondLawSimulation() {
   }, [isRunning, acceleration]);
 
   const handleStartStop = () => {
-    if (elapsedSeconds > 0 && !isRunning) {
+    if (isRunning) {
+      setIsRunning((current) => !current);
+      return;
+    }
+    if (elapsedSeconds > 0) {
       // Re-run from zero
       setElapsedSeconds(0);
       elapsedSecondsRef.current = 0;
     }
-    setIsRunning(true);
+    setIsRunning((current) => !current);
   };
 
   const handleLogPoint = () => {
@@ -304,7 +287,6 @@ export default function NewtonsSecondLawSimulation() {
     // Quest Check: Check if logged point has acceleration equal to 4.0 m/s²
     if (Math.abs(acceleration - 4.0) < 0.05 && !questSuccess) {
       setQuestSuccess(true);
-      alert("🎉 ยินดีด้วย! คุณตั้งค่าให้มีความเร่ง a = 4.0 m/s² สำเร็จ บันทึกผลเพื่อเก็บความคืบหน้า");
     }
   };
 

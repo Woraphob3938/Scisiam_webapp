@@ -2,9 +2,6 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import {
-  Play,
-  Pause,
-  RotateCcw,
   Sliders,
   ClipboardList,
   Target,
@@ -15,6 +12,7 @@ import {
   Trash2,
 } from "lucide-react";
 import SharedSimulationShell from "./SharedSimulationShell";
+import CompactRangeControl from "./CompactRangeControl";
 import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";
 
 interface SuperconductivityDataPoint {
@@ -148,7 +146,6 @@ export default function SuperconductivityMeissnerSimulation() {
     if (questProgress >= 5.0 && !questSuccess) {
       const timeoutId = setTimeout(() => {
         setQuestSuccess(true);
-        alert("🎉 ยินดีด้วย! คุณสามารถควบคุมอุณหภูมิและสนามแม่เหล็กเพื่อลอยแม่เหล็กได้ในระยะสมดุล (8 - 12 mm) ต่อเนื่องครบ 5 วินาทีสำเร็จ!");
       }, 0);
       return () => clearTimeout(timeoutId);
     }
@@ -167,21 +164,6 @@ export default function SuperconductivityMeissnerSimulation() {
     setQuestSuccess(false);
     setDataPoints([]);
     setLastLoggedTime(0);
-  };
-
-  const handleAddPoint = () => {
-    setDataPoints((prev) =>
-      [
-        ...prev,
-        {
-          time: elapsedSeconds,
-          temperature,
-          magneticField,
-          resistance: currentResistance,
-          levitationHeight,
-        },
-      ].slice(-MAX_DATA_POINTS),
-    );
   };
 
   const handleClearPoint = (index: number) => {
@@ -260,112 +242,59 @@ export default function SuperconductivityMeissnerSimulation() {
     alert("บันทึกรายงานผลการทดลองสภาพนำยิ่งยวดสำเร็จ! 🎉");
   };
 
-  // Subcomponents defined locally
-  const simControls = (
-    <div className="space-y-5">
-      {/* Preset Material */}
-      <div className="space-y-2">
-        <label className="block text-xs sm:text-sm font-bold text-slate-650">วัสดุตัวนำยิ่งยวด</label>
-        <div className="grid grid-cols-3 gap-1.5">
-          {MATERIALS.map((mat, idx) => (
-            <button
-              key={mat.name}
-              onClick={() => {
-                setSelectedMaterialIdx(idx);
-                // Adjust starting temperature to slightly above material Tc
-                setTemperature(Math.round(mat.tc * 1.3));
-              }}
-              className={`rounded-lg py-1.5 text-[10px] sm:text-xs font-black transition-all ${
-                selectedMaterialIdx === idx
-                  ? "bg-violet-50 text-violet-700 border border-violet-200"
-                  : "bg-slate-50 text-slate-500 border border-transparent hover:bg-slate-100"
-              }`}
-            >
-              {mat.name.split(" ")[0]}
-            </button>
-          ))}
-        </div>
-        <p className="text-[10px] text-slate-400 font-bold">อุณหภูมิวิกฤตวิเคราะห์ (T_c) = {Tc.toFixed(1)} K</p>
-      </div>
+  const compactControls = (
+    <div className="grid grid-cols-2 gap-3">
+      <CompactRangeControl
+        label="อุณหภูมิระบบ"
+        symbol="T"
+        value={temperature}
+        min={4}
+        max={150}
+        step={0.5}
+        precision={1}
+        unit="K"
+        tone="violet"
+        onChange={setTemperature}
+      />
+      <CompactRangeControl
+        label="สนามแม่เหล็ก"
+        symbol="B"
+        value={magneticField}
+        min={0.1}
+        max={2}
+        step={0.05}
+        precision={2}
+        unit="T"
+        tone="blue"
+        onChange={setMagneticField}
+      />
+    </div>
+  );
 
-      {/* Slider: Temperature */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between text-xs sm:text-sm font-bold">
-          <span className="text-slate-600">อุณหภูมิระบบ (T)</span>
-          <span className="text-violet-650 font-mono">{temperature.toFixed(1)} K</span>
-        </div>
-        <input
-          type="range"
-          min="4.0"
-          max="150.0"
-          step="0.5"
-          value={temperature}
-          onChange={(e) => setTemperature(parseFloat(e.target.value))}
-          className="w-full accent-violet-650"
-        />
-        <div className="flex justify-between text-[10px] text-slate-400 font-bold">
-          <span>4 K</span>
-          <span>150 K</span>
-        </div>
+  const advancedControls = (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <span className="text-sm font-bold text-slate-600">วัสดุตัวนำยิ่งยวด</span>
+        <span className="text-xs font-bold text-violet-600">T₍c₎ {Tc.toFixed(1)} K</span>
       </div>
-
-      {/* Slider: Magnetic Field */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between text-xs sm:text-sm font-bold">
-          <span className="text-slate-600">สนามแม่เหล็กภายนอก (B)</span>
-          <span className="text-violet-650 font-mono">{magneticField.toFixed(2)} T</span>
-        </div>
-        <input
-          type="range"
-          min="0.1"
-          max="2.0"
-          step="0.05"
-          value={magneticField}
-          onChange={(e) => setMagneticField(parseFloat(e.target.value))}
-          className="w-full accent-violet-650"
-        />
-        <div className="flex justify-between text-[10px] text-slate-400 font-bold">
-          <span>0.1 T</span>
-          <span>2.0 T</span>
-        </div>
-      </div>
-
-      {/* Actions */}
-      <div className="flex items-center gap-2 border-t border-slate-100 pt-4">
-        <button
-          onClick={handleStartStop}
-          className={`flex-grow flex min-h-10 items-center justify-center gap-2 rounded-xl px-4 text-sm font-bold text-white transition-all active:scale-95 ${
-            isRunning
-              ? "bg-slate-700 shadow-lg shadow-slate-500/10"
-              : "bg-violet-600 shadow-lg shadow-violet-500/20 hover:bg-violet-700"
-          }`}
-        >
-          {isRunning ? (
-            <>
-              <Pause className="h-4 w-4" />
-              <span>หยุดตรวจจับ</span>
-            </>
-          ) : (
-            <>
-              <Play className="h-4 w-4 fill-white" />
-              <span>เริ่มตรวจจับ</span>
-            </>
-          )}
-        </button>
-        <button
-          onClick={handleReset}
-          className="flex min-h-10 items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 text-sm font-bold text-slate-600 transition-all hover:bg-slate-50 active:scale-95"
-          title="รีเซ็ต"
-        >
-          <RotateCcw className="h-4 w-4" />
-        </button>
-        <button
-          onClick={handleAddPoint}
-          className="flex min-h-10 items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 text-sm font-bold text-slate-700 transition-all hover:bg-slate-50 active:scale-95"
-          title="บันทึกจุด"
-        >
-          <ClipboardList className="h-4 w-4 text-violet-500" />
-        </button>
+      <div className="grid grid-cols-3 gap-2">
+        {MATERIALS.map((material, index) => (
+          <button
+            key={material.name}
+            type="button"
+            onClick={() => {
+              setSelectedMaterialIdx(index);
+              setTemperature(Math.round(material.tc * 1.3));
+            }}
+            className={`min-h-10 rounded-xl border px-2 text-xs font-black transition ${
+              selectedMaterialIdx === index
+                ? "border-violet-200 bg-violet-50 text-violet-700"
+                : "border-slate-200 bg-white text-slate-500 hover:bg-slate-50"
+            }`}
+          >
+            {material.name.split(" ")[0]}
+          </button>
+        ))}
       </div>
     </div>
   );
@@ -458,7 +387,8 @@ export default function SuperconductivityMeissnerSimulation() {
         />
       }
       controlsTitle="แผงควบคุมสภาวะอุณหภูมิแม่เหล็กไฟฟ้า"
-      controls={simControls}
+      controls={advancedControls}
+      compactControls={compactControls}
       metrics={[
         { label: "อุณหภูมิระบบ", value: `${temperature.toFixed(1)} K`, tone: "violet" },
         { label: "ความต้านทานไฟฟ้า", value: `${currentResistance.toFixed(4)} Ω`, tone: currentResistance === 0 ? "emerald" : "orange" },

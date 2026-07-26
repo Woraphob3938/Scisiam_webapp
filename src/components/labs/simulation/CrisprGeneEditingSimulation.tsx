@@ -3,7 +3,6 @@
 import React, { useState, useMemo, useEffect } from "react";
 import {
   Sliders,
-  RotateCcw,
   ClipboardList,
   Activity,
   Play,
@@ -16,6 +15,7 @@ import {
   Target,
 } from "lucide-react";
 import SharedSimulationShell from "@/components/labs/simulation/SharedSimulationShell";
+import CompactRangeControl from "@/components/labs/simulation/CompactRangeControl";
 import ManualNumberInput from "@/components/labs/simulation/ManualNumberInput";
 import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";
 
@@ -81,13 +81,13 @@ export default function CrisprGeneEditingSimulation() {
     setIsEditing(true);
   };
 
-  const handleAddLog = () => {
+  const createCurrentRun = (index: number): LoggedCrisprRun => {
     let finalStatus = "ล้มเหลว (ไร้จุดจับ)";
     if (editingEfficiency > 0) {
       finalStatus = repairPathway === "nhej" ? "Knock-out สำเร็จ" : "ยีน GFP แทรกสำเร็จ";
     }
-    const run: LoggedCrisprRun = {
-      index: loggedRuns.length + 1,
+    return {
+      index,
       gRNAComplement,
       pamPresent,
       repairPathway: repairPathway === "nhej" ? "NHEJ (ปิดการทำงาน)" : "HDR (ตัดต่อแทรกยีน)",
@@ -95,7 +95,6 @@ export default function CrisprGeneEditingSimulation() {
       offTargetRisk,
       status: finalStatus
     };
-    setLoggedRuns((prev) => [...prev, run]);
   };
 
   const handleClearLog = (idx: number) => {
@@ -131,21 +130,19 @@ export default function CrisprGeneEditingSimulation() {
   };
 
   const handleSaveResults = async () => {
-    if (loggedRuns.length === 0) {
-      alert("กรุณากดบันทึกค่าพารามิเตอร์จำลองอย่างน้อย 1 ครั้งก่อนส่งออกรายงาน");
-      return;
-    }
+    const runs = [...loggedRuns, createCurrentRun(loggedRuns.length + 1)];
+    setLoggedRuns(runs);
     await saveExperimentAndSync({
       localStorageKey: "scisiam_saved_crispr_gene_experiment",
-      localPayload: { labId, timestamp: new Date().toLocaleString("th-TH"), loggedRuns },
+      localPayload: { labId, timestamp: new Date().toLocaleString("th-TH"), loggedRuns: runs },
       labId,
       title: "CRISPR-Cas9 Gene Editing",
       variables: { gRNAComplement, pamPresent, repairPathway },
       liveValues: { editingEfficiency, offTargetRisk },
-      graphPoints: loggedRuns.map((r) => ({ index: r.index, x: r.gRNAComplement, y: r.efficiency })),
-      tableRows: loggedRuns,
-      summary: { runsCount: loggedRuns.length, maxEfficiency: Math.max(...loggedRuns.map((r) => r.efficiency)) },
-      score: Math.min(100, Math.max(40, 40 + loggedRuns.length * 15)),
+      graphPoints: runs.map((r) => ({ index: r.index, x: r.gRNAComplement, y: r.efficiency })),
+      tableRows: runs,
+      summary: { runsCount: runs.length, maxEfficiency: Math.max(...runs.map((r) => r.efficiency)) },
+      score: Math.min(100, Math.max(40, 40 + runs.length * 15)),
       durationSeconds: null
     });
     alert("บันทึกรายงานการตัดแต่งยีนสำเร็จ");
@@ -312,31 +309,25 @@ export default function CrisprGeneEditingSimulation() {
               เริ่มการทำงานตัดแต่งยีน (Edit)
             </button>
           </section>
-
-          {/* Action buttons */}
-          <div className="grid grid-cols-2 gap-3">
-            <button onClick={handleAddLog} className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs font-bold text-slate-700 shadow-sm transition-all hover:bg-slate-50 active:scale-97 cursor-pointer">
-              <ClipboardList className="h-3.5 w-3.5 text-emerald-500" />
-              บันทึกจุดวัด
-            </button>
-            <button onClick={handleReset} className="flex items-center justify-center gap-2 rounded-xl border border-emerald-100 bg-emerald-50/50 px-3 py-2.5 text-xs font-bold text-emerald-700 shadow-sm transition-all hover:bg-emerald-50 active:scale-97 cursor-pointer">
-              <RotateCcw className="h-3.5 w-3.5" />
-              รีเซ็ตจำลอง
-            </button>
-          </div>
         </div>
       }
       compactControls={
-        <div className="flex items-center gap-2 font-sans flex-wrap">
-          <button onClick={() => setGRNAComplement((c) => Math.max(50, c - 10))} className="px-2 py-1 text-xs font-bold rounded bg-slate-100">
-            gRNA -10%
-          </button>
-          <button onClick={() => setGRNAComplement((c) => Math.min(100, c + 10))} className="px-2 py-1 text-xs font-bold rounded bg-slate-100">
-            gRNA +10%
-          </button>
-          <button onClick={handleReset} className="px-2 py-1 text-xs font-bold rounded bg-emerald-500 text-white">
-            Reset
-          </button>
+        <div className="grid min-w-0 grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          <CompactRangeControl label="ความเข้าคู่ gRNA" symbol="g" value={gRNAComplement} min={50} max={100} step={5} unit="%" tone="emerald" onChange={setGRNAComplement} />
+          <fieldset className="min-w-0 rounded-2xl border border-slate-200 bg-slate-50/80 p-3">
+            <legend className="px-1 text-xs font-bold text-slate-600">ตำแหน่ง PAM</legend>
+            <div className="mt-1 grid grid-cols-2 gap-1.5">
+              <button type="button" onClick={() => setPamPresent(true)} className={`min-h-9 rounded-xl border px-2 text-xs font-black ${pamPresent ? "border-emerald-300 bg-emerald-50 text-emerald-700" : "border-slate-200 bg-white text-slate-500"}`}>มี PAM</button>
+              <button type="button" onClick={() => setPamPresent(false)} className={`min-h-9 rounded-xl border px-2 text-xs font-black ${!pamPresent ? "border-emerald-300 bg-emerald-50 text-emerald-700" : "border-slate-200 bg-white text-slate-500"}`}>ไม่มี PAM</button>
+            </div>
+          </fieldset>
+          <fieldset className="min-w-0 rounded-2xl border border-slate-200 bg-slate-50/80 p-3">
+            <legend className="px-1 text-xs font-bold text-slate-600">วิถีซ่อมแซม</legend>
+            <div className="mt-1 grid grid-cols-2 gap-1.5">
+              <button type="button" onClick={() => setRepairPathway("nhej")} className={`min-h-9 rounded-xl border px-2 text-xs font-black ${repairPathway === "nhej" ? "border-emerald-300 bg-emerald-50 text-emerald-700" : "border-slate-200 bg-white text-slate-500"}`}>NHEJ</button>
+              <button type="button" onClick={() => setRepairPathway("hdr")} className={`min-h-9 rounded-xl border px-2 text-xs font-black ${repairPathway === "hdr" ? "border-emerald-300 bg-emerald-50 text-emerald-700" : "border-slate-200 bg-white text-slate-500"}`}>HDR</button>
+            </div>
+          </fieldset>
         </div>
       }
       metrics={[
@@ -346,7 +337,7 @@ export default function CrisprGeneEditingSimulation() {
         { label: "ความต้องการสัญลักษณ์ PAM", value: pamPresent ? "5'-NGG-3' ตรวจพบ" : "ไม่พบสัญลักษณ์", tone: undefined }
       ]}
       graph={
-        <section className="flex min-h-[300px] flex-col rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40 font-sans">
+        <section className="flex min-h-[220px] flex-col rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40 font-sans">
           <div className="mb-2 flex items-center justify-between border-b border-slate-100 pb-2">
             <h3 className="flex items-center gap-2 text-sm font-black text-slate-800">
               <Sparkles className="h-4.5 w-4.5 text-emerald-600" />
@@ -376,7 +367,7 @@ export default function CrisprGeneEditingSimulation() {
         </section>
       }
       table={
-        <section className="flex min-h-[300px] flex-col rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40 font-sans">
+        <section className="flex min-h-[220px] flex-col rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40 font-sans">
           <div className="flex items-center justify-between border-b border-slate-100 pb-2 mb-2">
             <h3 className="flex items-center gap-2 text-sm font-black text-slate-800">
               <ClipboardList className="h-4.5 w-4.5 text-emerald-500" />

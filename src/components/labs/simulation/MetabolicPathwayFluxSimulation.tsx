@@ -3,7 +3,6 @@
 import React, { useState, useMemo, useEffect } from "react";
 import {
   Sliders,
-  RotateCcw,
   ClipboardList,
   Activity,
   Play,
@@ -85,18 +84,15 @@ export default function MetabolicPathwayFluxSimulation() {
     setSimTime(0);
   };
 
-  const handleAddLog = () => {
-    const run: LoggedFluxRun = {
-      index: loggedRuns.length + 1,
+  const createCurrentRun = (index: number): LoggedFluxRun => ({
+      index,
       nutrientSource: nutrientSource === "glucose" ? "กลูโคส (Glucose)" : "กรดไขมัน (Fatty Acids)",
       oxygenLevel: oxygenLevel === "low" ? "ต่ำ (Low)" : oxygenLevel === "normal" ? "ปกติ (Normal)" : "สูง (High)",
       glycolysisFlux,
       tcaFlux,
       lactateFlux,
       atpProduction
-    };
-    setLoggedRuns((prev) => [...prev, run]);
-  };
+    });
 
   const handleClearLog = (idx: number) => {
     setLoggedRuns((prev) => prev.filter((r) => r.index !== idx));
@@ -129,21 +125,19 @@ export default function MetabolicPathwayFluxSimulation() {
   };
 
   const handleSaveResults = async () => {
-    if (loggedRuns.length === 0) {
-      alert("กรุณากดบันทึกค่าพารามิเตอร์จำลองอย่างน้อย 1 ครั้งก่อนส่งออกรายงาน");
-      return;
-    }
+    const runs = [...loggedRuns, createCurrentRun(loggedRuns.length + 1)];
+    setLoggedRuns(runs);
     await saveExperimentAndSync({
       localStorageKey: "scisiam_saved_metabolic_flux_experiment",
-      localPayload: { labId, timestamp: new Date().toLocaleString("th-TH"), loggedRuns },
+      localPayload: { labId, timestamp: new Date().toLocaleString("th-TH"), loggedRuns: runs },
       labId,
       title: "Metabolic Pathway Flux Analysis",
       variables: { nutrientSource, oxygenLevel },
       liveValues: { glycolysisFlux, tcaFlux, lactateFlux, atpProduction },
-      graphPoints: loggedRuns.map((r) => ({ index: r.index, x: r.glycolysisFlux, y: r.atpProduction })),
-      tableRows: loggedRuns,
-      summary: { runsCount: loggedRuns.length, maxAtp: Math.max(...loggedRuns.map((r) => r.atpProduction)) },
-      score: Math.min(100, Math.max(40, 40 + loggedRuns.length * 15)),
+      graphPoints: runs.map((r) => ({ index: r.index, x: r.glycolysisFlux, y: r.atpProduction })),
+      tableRows: runs,
+      summary: { runsCount: runs.length, maxAtp: Math.max(...runs.map((r) => r.atpProduction)) },
+      score: Math.min(100, Math.max(40, 40 + runs.length * 15)),
       durationSeconds: null
     });
     alert("บันทึกรายงานฟลักซ์ทางชีววิทยาระดับเซลล์สำเร็จ");
@@ -261,31 +255,30 @@ export default function MetabolicPathwayFluxSimulation() {
               รันการจำลองอัตราฟลักซ์
             </button>
           </section>
-
-          {/* Action buttons */}
-          <div className="grid grid-cols-2 gap-3">
-            <button onClick={handleAddLog} className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs font-bold text-slate-700 shadow-sm transition-all hover:bg-slate-50 active:scale-97 cursor-pointer">
-              <ClipboardList className="h-3.5 w-3.5 text-emerald-500" />
-              บันทึกจุดวัด
-            </button>
-            <button onClick={handleReset} className="flex items-center justify-center gap-2 rounded-xl border border-emerald-100 bg-emerald-50/50 px-3 py-2.5 text-xs font-bold text-emerald-700 shadow-sm transition-all hover:bg-emerald-50 active:scale-97 cursor-pointer">
-              <RotateCcw className="h-3.5 w-3.5" />
-              รีเซ็ตจำลอง
-            </button>
-          </div>
         </div>
       }
       compactControls={
-        <div className="flex items-center gap-2 font-sans flex-wrap">
-          <button onClick={() => setOxygenLevel("low")} className="px-2 py-1 text-xs font-bold rounded bg-slate-100">
-            O2 Low
-          </button>
-          <button onClick={() => setOxygenLevel("high")} className="px-2 py-1 text-xs font-bold rounded bg-slate-100">
-            O2 High
-          </button>
-          <button onClick={handleReset} className="px-2 py-1 text-xs font-bold rounded bg-emerald-500 text-white">
-            Reset
-          </button>
+        <div className="grid min-w-0 grid-cols-1 gap-2 sm:grid-cols-2">
+          <fieldset className="min-w-0 rounded-2xl border border-slate-200 bg-slate-50/80 p-3">
+            <legend className="px-1 text-xs font-bold text-slate-600">แหล่งพลังงาน</legend>
+            <div className="mt-1 grid grid-cols-2 gap-1.5">
+              {(["glucose", "fatty_acids"] as const).map((source) => (
+                <button key={source} type="button" onClick={() => setNutrientSource(source)} className={`min-h-9 rounded-xl border px-2 text-xs font-black ${nutrientSource === source ? "border-emerald-300 bg-emerald-50 text-emerald-700" : "border-slate-200 bg-white text-slate-500"}`}>
+                  {source === "glucose" ? "กลูโคส" : "กรดไขมัน"}
+                </button>
+              ))}
+            </div>
+          </fieldset>
+          <fieldset className="min-w-0 rounded-2xl border border-slate-200 bg-slate-50/80 p-3">
+            <legend className="px-1 text-xs font-bold text-slate-600">ระดับออกซิเจน</legend>
+            <div className="mt-1 grid grid-cols-3 gap-1.5">
+              {(["low", "normal", "high"] as const).map((level) => (
+                <button key={level} type="button" onClick={() => setOxygenLevel(level)} className={`min-h-9 rounded-xl border px-2 text-xs font-black ${oxygenLevel === level ? "border-emerald-300 bg-emerald-50 text-emerald-700" : "border-slate-200 bg-white text-slate-500"}`}>
+                  {level === "low" ? "ต่ำ" : level === "normal" ? "ปกติ" : "สูง"}
+                </button>
+              ))}
+            </div>
+          </fieldset>
         </div>
       }
       metrics={[
@@ -295,7 +288,7 @@ export default function MetabolicPathwayFluxSimulation() {
         { label: "Fermentation (Lactate) Flux", value: `${lactateFlux} mmol/g/h`, tone: lactateFlux > 5 ? "orange" : undefined }
       ]}
       graph={
-        <section className="flex min-h-[300px] flex-col rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40 font-sans">
+        <section className="flex min-h-[220px] flex-col rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40 font-sans">
           <div className="mb-2 flex items-center justify-between border-b border-slate-100 pb-2">
             <h3 className="flex items-center gap-2 text-sm font-black text-slate-800">
               <Sparkles className="h-4.5 w-4.5 text-emerald-600" />
@@ -325,7 +318,7 @@ export default function MetabolicPathwayFluxSimulation() {
         </section>
       }
       table={
-        <section className="flex min-h-[300px] flex-col rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40 font-sans">
+        <section className="flex min-h-[220px] flex-col rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40 font-sans">
           <div className="flex items-center justify-between border-b border-slate-100 pb-2 mb-2">
             <h3 className="flex items-center gap-2 text-sm font-black text-slate-800">
               <ClipboardList className="h-4.5 w-4.5 text-emerald-500" />

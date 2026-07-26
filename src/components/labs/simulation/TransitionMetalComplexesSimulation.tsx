@@ -82,10 +82,7 @@ export default function TransitionMetalComplexesSimulation() {
       l => l.metal === selectedMetal.name && l.ligand === selectedLigand.name
     );
 
-    if (isDuplicate) {
-      window.alert("การบันทึกสารเชิงซ้อนนี้มีอยู่แล้ว");
-      return;
-    }
+    if (isDuplicate) return;
 
     const newLog = {
       id: Date.now(),
@@ -100,8 +97,20 @@ export default function TransitionMetalComplexesSimulation() {
     setLogs(prev => [newLog, ...prev]);
   };
 
+  const handleRun = () => {
+    handleExcite();
+    handleLogResult();
+  };
+
   const handleClearLogs = () => {
     setLogs([]);
+  };
+
+  const handleReset = () => {
+    setSelectedMetal(metals[0]);
+    setSelectedLigand(ligands[1]);
+    setShowExcitation(false);
+    setExcitationProgress(0);
   };
 
   const handleSave = async () => {
@@ -149,6 +158,41 @@ export default function TransitionMetalComplexesSimulation() {
     { label: "ความยาวคลื่นแสงที่ดูดกลืน", value: `${wavelength} nm` },
     { label: "จำนวนอิเล็กตรอนใน d-orbital", value: `${selectedMetal.dElectrons} e⁻` },
   ];
+
+  const compactControls = (
+    <div className="grid w-full gap-3 md:grid-cols-2">
+      <label className="rounded-2xl border border-slate-200 bg-slate-50 p-3 text-sm font-bold text-slate-700">
+        ไอออนโลหะ
+        <select
+          value={selectedMetal.id}
+          onChange={(event) => {
+            const metal = metals.find((item) => item.id === event.target.value);
+            if (metal) setSelectedMetal(metal);
+          }}
+          className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 font-bold text-slate-900 outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-100"
+        >
+          {metals.map((metal) => (
+            <option key={metal.id} value={metal.id}>{metal.name}</option>
+          ))}
+        </select>
+      </label>
+      <label className="rounded-2xl border border-slate-200 bg-slate-50 p-3 text-sm font-bold text-slate-700">
+        ลิแกนด์
+        <select
+          value={selectedLigand.id}
+          onChange={(event) => {
+            const ligand = ligands.find((item) => item.id === event.target.value);
+            if (ligand) setSelectedLigand(ligand);
+          }}
+          className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 font-bold text-slate-900 outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-100"
+        >
+          {ligands.map((ligand) => (
+            <option key={ligand.id} value={ligand.id}>{ligand.name}</option>
+          ))}
+        </select>
+      </label>
+    </div>
+  );
 
   return (
     <SharedSimulationShell
@@ -199,66 +243,14 @@ export default function TransitionMetalComplexesSimulation() {
             <span className="h-8 w-5 rounded border border-slate-300" style={{ backgroundColor: complexColor.hex }} />
             สีสารละลาย: {complexColor.name}
           </div>
-          <button onClick={handleExcite} disabled={showExcitation} className="absolute bottom-4 right-5 inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-black text-white shadow-sm hover:bg-indigo-700 disabled:opacity-60">
-            <Sparkles className="h-4 w-4" /> กระตุ้นอิเล็กตรอน
-          </button>
         </div>
       }
+      compactControls={compactControls}
       controlsTitle="เลือกโลหะและลิแกนด์เชิงซ้อน"
       controls={
-        <div className="flex flex-col gap-4 w-full">
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">เลือกไอออนโลหะแทรนซิชัน</label>
-            <div className="grid grid-cols-3 gap-2">
-              {metals.map(m => (
-                <button
-                  key={m.id}
-                  onClick={() => setSelectedMetal(m)}
-                  className={`px-2 py-2.5 text-xs font-semibold rounded-lg border text-center transition-all ${
-                    selectedMetal.id === m.id
-                      ? "bg-indigo-50 border-indigo-300 text-indigo-700 dark:bg-indigo-950/40 dark:border-indigo-800 dark:text-indigo-300 shadow-sm"
-                      : "bg-white border-slate-200 text-slate-600 dark:bg-slate-850 dark:border-slate-700 dark:text-slate-350 hover:bg-slate-50"
-                  }`}
-                >
-                  {m.name.split(" - ")[0]}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <hr className="border-slate-100 dark:border-slate-800" />
-
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">เลือกประเภทลิแกนด์</label>
-            <div className="grid grid-cols-1 gap-1.5">
-              {ligands.map(l => (
-                <button
-                  key={l.id}
-                  onClick={() => setSelectedLigand(l)}
-                  className={`px-3 py-2 text-xs font-semibold rounded-lg border text-left transition-all ${
-                    selectedLigand.id === l.id
-                      ? "bg-indigo-50 border-indigo-300 text-indigo-700 dark:bg-indigo-950/40 dark:border-indigo-800 dark:text-indigo-300 shadow-sm"
-                      : "bg-white border-slate-200 text-slate-600 dark:bg-slate-850 dark:border-slate-700 dark:text-slate-350 hover:bg-slate-50"
-                  }`}
-                >
-                  <div className="flex justify-between items-center">
-                    <span>{l.name}</span>
-                    <span className={`text-[9px] px-2 py-0.5 rounded ${
-                      l.strength === "Strong-field" ? "bg-red-50 text-red-600 dark:bg-red-950/20" :
-                      l.strength === "Weak-field" ? "bg-slate-100 text-slate-500" : "bg-blue-50 text-blue-600"
-                    }`}>{l.strength}</span>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <button
-            onClick={handleLogResult}
-            className="w-full py-2 border border-dashed border-indigo-300 dark:border-indigo-800 text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-950/20 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1"
-          >
-            บันทึกการจับคู่นี้ลงตาราง
-          </button>
+        <div className="rounded-2xl border border-violet-100 bg-violet-50/70 p-4 text-sm leading-relaxed text-slate-700">
+          ลิแกนด์สนามแรงทำให้ช่องว่างพลังงาน Δ₀ กว้างขึ้น ทดลองสลับคู่โลหะและลิแกนด์จากแผงหลักแล้วกด
+          “กระตุ้นอิเล็กตรอน” เพื่อดูการเปลี่ยนระดับพลังงาน
         </div>
       }
       metrics={getMetricDisplay()}
@@ -337,6 +329,10 @@ export default function TransitionMetalComplexesSimulation() {
       showLiveMetrics={true}
       showInfoTabs={true}
       showSaveButton={true}
+      onRun={handleRun}
+      runLabel={showExcitation ? "กำลังกระตุ้น" : "กระตุ้นอิเล็กตรอน"}
+      runDisabled={showExcitation}
+      onReset={handleReset}
       onSave={handleSave}
     />
   );

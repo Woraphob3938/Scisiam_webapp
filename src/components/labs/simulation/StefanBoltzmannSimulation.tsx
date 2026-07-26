@@ -2,9 +2,6 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import {
-  Play,
-  Pause,
-  RotateCcw,
   Sliders,
   ClipboardList,
   Trash,
@@ -407,7 +404,6 @@ export default function StefanBoltzmannSimulation() {
             const nextTime = Number((prev + 0.1).toFixed(1));
             if (nextTime >= 5.0) {
               setQuestSuccess(true);
-              alert("🎉 ภารกิจสำเร็จ! คุณควบคุมความเข้มของการแผ่รังสีให้อยู่ในช่วง 5.0e7 - 6.0e7 W/m² ต่อเนื่องเป็นเวลา 5 วินาที บันทึกผลเพื่อเก็บความคืบหน้า");
               return 5.0;
             }
             return nextTime;
@@ -435,18 +431,15 @@ export default function StefanBoltzmannSimulation() {
     setDataPoints([]);
   };
 
-  const handleAddPoint = () => {
-    const newPoint: StefanDataPoint = {
-      index: dataPoints.length + 1,
+  const createCurrentPoint = (index: number): StefanDataPoint => ({
+      index,
       temperature,
       radius,
       intensity,
       totalPower,
       relativeLuminosity,
       peakWavelength
-    };
-    setDataPoints(prev => [...prev, newPoint]);
-  };
+  });
 
   const handleClearPoint = (idx: number) => {
     setDataPoints(prev => prev.filter(p => p.index !== idx).map((p, i) => ({ ...p, index: i + 1 })));
@@ -483,15 +476,13 @@ export default function StefanBoltzmannSimulation() {
   };
 
   const handleSaveResults = async () => {
-    if (dataPoints.length === 0) {
-      alert("ไม่พบข้อมูลการทดลองสำหรับบันทึกผล! กรุณากดเริ่มทดลองและเก็บบันทึกข้อมูลก่อน");
-      return;
-    }
+    const nextDataPoints = [...dataPoints, createCurrentPoint(dataPoints.length + 1)];
+    setDataPoints(nextDataPoints);
 
     const experimentData = {
       labId: "stefan-boltzmann",
       timestamp: new Date().toLocaleString("th-TH"),
-      dataPoints
+      dataPoints: nextDataPoints
     };
 
     await saveExperimentAndSync({
@@ -578,16 +569,15 @@ export default function StefanBoltzmannSimulation() {
     </section>
   );
 
-  const controls = (
-    <div className="space-y-4">
-      {/* Temperature control */}
-      <div className="group bg-slate-50/50 p-2.5 rounded-2xl border border-slate-100 hover:border-slate-200/50 transition-all select-none">
-        <div className="flex justify-between items-center text-xs font-bold mb-1">
-          <span className="text-slate-600 flex items-center gap-1.5">
+  const compactControls = (
+    <div className="grid gap-3 sm:grid-cols-2">
+      <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-3">
+        <div className="mb-2 flex items-center justify-between gap-3 text-xs font-bold">
+          <span className="flex items-center gap-1.5 text-slate-600">
             <Flame className="w-3.5 h-3.5 text-rose-500" />
-            อุณหภูมิร่างกายดาว (Temperature T)
+            อุณหภูมิวัตถุดำ T
           </span>
-          <span className="text-rose-600 font-extrabold text-xs bg-rose-50 px-2 py-0.5 rounded border border-rose-100">
+          <span className="rounded-lg border border-rose-100 bg-rose-50 px-2 py-1 font-extrabold text-rose-700">
             {temperature} K
           </span>
         </div>
@@ -600,21 +590,19 @@ export default function StefanBoltzmannSimulation() {
           onChange={(e) => setTemperature(Number(e.target.value))}
           className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-rose-500"
         />
-        <div className="flex justify-between text-[8px] font-bold text-slate-400 mt-1">
+        <div className="mt-1 flex justify-between text-[10px] font-bold text-slate-400">
           <span>1000 K</span>
-          <span>Sun (5778 K)</span>
           <span>12000 K</span>
         </div>
       </div>
 
-      {/* Radius control */}
-      <div className="group bg-slate-50/50 p-2.5 rounded-2xl border border-slate-100 hover:border-slate-200/50 transition-all select-none">
-        <div className="flex justify-between items-center text-xs font-bold mb-1">
-          <span className="text-slate-600 flex items-center gap-1.5">
+      <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-3">
+        <div className="mb-2 flex items-center justify-between gap-3 text-xs font-bold">
+          <span className="flex items-center gap-1.5 text-slate-600">
             <Sun className="w-3.5 h-3.5 text-amber-500" />
-            รัศมีร่างกายดาว (Radius R)
+            รัศมีวัตถุ R
           </span>
-          <span className="text-amber-600 font-extrabold text-xs bg-amber-50 px-2 py-0.5 rounded border border-amber-100">
+          <span className="rounded-lg border border-amber-100 bg-amber-50 px-2 py-1 font-extrabold text-amber-700">
             {radius.toFixed(2)} R_☉
           </span>
         </div>
@@ -627,23 +615,10 @@ export default function StefanBoltzmannSimulation() {
           onChange={(e) => setRadius(Number(e.target.value))}
           className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-amber-500"
         />
-        <div className="flex justify-between text-[8px] font-bold text-slate-400 mt-1">
+        <div className="mt-1 flex justify-between text-[10px] font-bold text-slate-400">
           <span>0.1 R_☉</span>
-          <span>Sun (1.0 R_☉)</span>
           <span>4.0 R_☉</span>
         </div>
-      </div>
-
-      {/* Controls box */}
-      <div className="grid grid-cols-4 gap-2 pt-1">
-        <button onClick={handleStartStop} className={`col-span-2 inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-xs font-black text-white shadow-sm transition active:scale-95 cursor-pointer ${isRunning ? "bg-slate-700" : "bg-blue-600 hover:bg-blue-700"}`}>
-          {isRunning ? <Pause className="h-4 w-4 fill-white stroke-none" /> : <Play className="h-4 w-4 fill-white stroke-none" />}
-          {isRunning ? "หยุดจำลอง" : "เริ่มจำลอง"}
-        </button>
-        <button onClick={handleAddPoint} className="inline-flex items-center justify-center rounded-xl border border-blue-100 bg-blue-50 text-xs font-black text-blue-700 hover:bg-blue-100 cursor-pointer active:scale-95 transition">บันทึกจุด</button>
-        <button onClick={handleReset} className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 cursor-pointer active:scale-95 transition" aria-label="รีเซ็ต">
-          <RotateCcw className="h-4 w-4" />
-        </button>
       </div>
     </div>
   );
@@ -666,7 +641,8 @@ export default function StefanBoltzmannSimulation() {
         />
       }
       controlsTitle="แผงกำหนดมิติดวงดาว"
-      controls={controls}
+      controls={compactControls}
+      compactControls={compactControls}
       metrics={[
         { label: "ความเข้มคลื่น I", value: `${intensity.toExponential(3)} W/m²`, tone: "rose" },
         { label: "กำลังแผ่รวม P", value: `${totalPower.toExponential(3)} W`, tone: "orange" },

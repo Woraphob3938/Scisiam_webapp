@@ -2,9 +2,6 @@
 
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import {
-  Play,
-  Pause,
-  RotateCcw,
   Sliders,
   Trash,
   Download,
@@ -14,9 +11,9 @@ import {
   ClipboardList,
   Target,
   Thermometer,
-  Zap,
 } from "lucide-react";
 import SharedSimulationShell from "@/components/labs/simulation/SharedSimulationShell";
+import CompactRangeControl from "@/components/labs/simulation/CompactRangeControl";
 import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";
 
 export interface EquilibriumDataPoint {
@@ -440,7 +437,24 @@ export default function LeChateliersPrincipleSimulation() {
     return () => { if (timer) clearInterval(timer); };
   }, [isRunning]);
 
-  const handleStartStop = () => setIsRunning(!isRunning);
+  const handleStartStop = () => {
+    if (!isRunning) {
+      setDataPoints((previous) => [
+        ...previous,
+        {
+          index: previous.length + 1,
+          time: parseFloat(elapsedSeconds.toFixed(1)),
+          fe3: parseFloat(feAdded.toFixed(4)),
+          scn: parseFloat(scnAdded.toFixed(4)),
+          naf: parseFloat(nafAdded.toFixed(4)),
+          temp: parseFloat(tempC.toFixed(0)),
+          concentration: parseFloat(liveConc.toFixed(4)),
+          colorStr: perturbedColor,
+        },
+      ]);
+    }
+    setIsRunning(!isRunning);
+  };
 
   const handleReset = () => {
     setIsRunning(false);
@@ -451,22 +465,6 @@ export default function LeChateliersPrincipleSimulation() {
     setTempC(25.0);
     setQuestProgress(0);
     setDataPoints([]);
-  };
-
-  const handleAddPoint = () => {
-    setDataPoints((prev) => [
-      ...prev,
-      {
-        index: prev.length + 1,
-        time: parseFloat(elapsedSeconds.toFixed(1)),
-        fe3: parseFloat(feAdded.toFixed(4)),
-        scn: parseFloat(scnAdded.toFixed(4)),
-        naf: parseFloat(nafAdded.toFixed(4)),
-        temp: parseFloat(tempC.toFixed(0)),
-        concentration: parseFloat(liveConc.toFixed(4)),
-        colorStr: perturbedColor,
-      },
-    ]);
   };
 
   const handleClearPoint = (idx: number) => {
@@ -518,103 +516,13 @@ export default function LeChateliersPrincipleSimulation() {
     alert("บันทึกข้อมูลการทดลอง (กราฟสมดุลเคมีและตารางผลล่าสุด) สำเร็จ! 🎉");
   };
 
-  const controls = (
-    <div className="space-y-4 text-left">
-      {/* Tube 2 concentration controls */}
-      <div className="bg-slate-50/50 p-3 rounded-2xl border border-slate-100 hover:border-slate-200/50 transition-all select-none">
-        <h4 className="text-[10px] font-black text-slate-500 uppercase mb-2">หลอด 2: ปรับความเข้มข้นสารตั้งต้น</h4>
-        
-        {/* Fe3+ added */}
-        <div className="mb-3">
-          <div className="flex justify-between items-center text-xs font-bold mb-1">
-            <span className="text-slate-600 flex items-center gap-1">
-              <FlaskConical className="w-3.5 h-3.5 text-rose-500" />
-              ความเข้มข้นเริ่มต้น Fe³⁺
-            </span>
-            <span className="text-rose-600 font-extrabold text-[10px] bg-rose-50 px-1.5 py-0.5 rounded border border-rose-100">
-              {feAdded.toFixed(4)} M
-            </span>
-          </div>
-          <input
-            type="range" min="0.005" max="0.05" step="0.002" value={feAdded}
-            onChange={(e) => setFeAdded(Number(e.target.value))}
-            className="w-full h-1 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-rose-500"
-          />
-        </div>
-
-        {/* SCN- added */}
-        <div>
-          <div className="flex justify-between items-center text-xs font-bold mb-1">
-            <span className="text-slate-600 flex items-center gap-1">
-              <FlaskConical className="w-3.5 h-3.5 text-indigo-500" />
-              ความเข้มข้นเริ่มต้น SCN⁻
-            </span>
-            <span className="text-indigo-600 font-extrabold text-[10px] bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-100">
-              {scnAdded.toFixed(4)} M
-            </span>
-          </div>
-          <input
-            type="range" min="0.005" max="0.05" step="0.002" value={scnAdded}
-            onChange={(e) => setScnAdded(Number(e.target.value))}
-            className="w-full h-1 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-500"
-          />
-        </div>
-      </div>
-
-      {/* Tube 3 NaF controls */}
-      <div className="bg-slate-50/50 p-3 rounded-2xl border border-slate-100 hover:border-slate-200/50 transition-all select-none">
-        <div className="flex justify-between items-center text-xs font-bold mb-1.5">
-          <span className="text-slate-600 flex items-center gap-1">
-            <Zap className="w-3.5 h-3.5 text-blue-500" />
-            หลอด 3: ปริมาณ NaF (ทำลาย Fe³⁺)
-          </span>
-          <span className="text-blue-600 font-extrabold text-[10px] bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100">
-            {nafAdded.toFixed(3)} M
-          </span>
-        </div>
-        <input
-          type="range" min="0.0" max="0.1" step="0.005" value={nafAdded}
-          onChange={(e) => setNafAdded(Number(e.target.value))}
-          className="w-full h-1 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-500"
-        />
-        <p className="text-[9px] text-slate-400 font-semibold mt-1 leading-[1.3]">Fluoride ไอออนจะจับกับ Fe³⁺ เกิดเป็น [FeF₆]³⁻ ที่ไม่มีสี ทำให้สารละลายสีจางลง</p>
-      </div>
-
-      {/* Tube 4 Temp controls */}
-      <div className="bg-slate-50/50 p-3 rounded-2xl border border-slate-100 hover:border-slate-200/50 transition-all select-none">
-        <div className="flex justify-between items-center text-xs font-bold mb-1.5">
-          <span className="text-slate-600 flex items-center gap-1">
-            <Thermometer className="w-3.5 h-3.5 text-orange-500" />
-            หลอด 4: อุณหภูมิอ่างควบคุม (Temp)
-          </span>
-          <span className="text-orange-600 font-extrabold text-[10px] bg-orange-50 px-1.5 py-0.5 rounded border border-orange-100">
-            {tempC.toFixed(0)} °C
-          </span>
-        </div>
-        <input
-          type="range" min="10" max="80" step="1" value={tempC}
-          onChange={(e) => setTempC(Number(e.target.value))}
-          className="w-full h-1 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-orange-500"
-        />
-        <div className="flex justify-between text-[9px] text-slate-400 font-semibold mt-1">
-          <span>แช่น้ำแข็ง (10°C)</span>
-          <span>ห้อง (25°C)</span>
-          <span>ต้มร้อน (80°C)</span>
-        </div>
-      </div>
-
-      {/* Action Buttons */}
-      <div className="grid grid-cols-4 gap-2 pt-1">
-        <button onClick={handleStartStop} className={`col-span-2 inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-xs font-black text-white shadow-sm ${isRunning ? "bg-slate-700" : "bg-blue-600 hover:bg-blue-700"}`}>
-          {isRunning ? <Pause className="h-4 w-4 fill-white stroke-none" /> : <Play className="h-4 w-4 fill-white stroke-none" />}
-          {isRunning ? `${elapsedSeconds.toFixed(0)}s หยุด` : "เริ่มจำลอง"}
-        </button>
-        <button onClick={handleAddPoint} className="inline-flex items-center justify-center rounded-xl border border-blue-100 bg-blue-50 text-[11px] font-black text-blue-700 hover:bg-blue-100">บันทึกจุด</button>
-        <button onClick={handleReset} className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50" aria-label="รีเซ็ต">
-          <RotateCcw className="h-4 w-4" />
-        </button>
-      </div>
-    </div>
+  const compactControls = (
+    <>
+      <CompactRangeControl label="Fe³⁺ เริ่มต้น" symbol="Fe" value={feAdded} min={0.005} max={0.05} step={0.002} precision={4} unit="M" tone="pink" onChange={setFeAdded} />
+      <CompactRangeControl label="SCN⁻ เริ่มต้น" symbol="SCN" value={scnAdded} min={0.005} max={0.05} step={0.002} precision={4} unit="M" tone="violet" onChange={setScnAdded} />
+      <CompactRangeControl label="ปริมาณ NaF" symbol="NaF" value={nafAdded} min={0} max={0.1} step={0.005} precision={3} unit="M" tone="blue" onChange={setNafAdded} />
+      <CompactRangeControl label="อุณหภูมิอ่าง" symbol="T" value={tempC} min={10} max={80} step={1} precision={0} unit="°C" tone="orange" onChange={setTempC} />
+    </>
   );
 
   return (
@@ -637,7 +545,7 @@ export default function LeChateliersPrincipleSimulation() {
         />
       }
       controlsTitle="แผงควบคุมการรบกวนสมดุล"
-      controls={controls}
+      compactControls={compactControls}
       metrics={[
         { label: "[Fe(SCN)]²⁺ หลอด 2", value: `${liveConc.toFixed(4)} M`, tone: "rose" },
         { label: "อุณหภูมิหลอด 4", value: `${tempC.toFixed(0)} °C`, tone: "orange" },

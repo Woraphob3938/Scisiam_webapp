@@ -341,7 +341,6 @@ export default function SnellsLawSimulation() {
         if (nextQuestProg >= 5 && !questSuccessRef.current) {
           setQuestSuccess(true);
           questSuccessRef.current = true;
-          alert("🎉 ยินดีด้วย! คุณค้นหามุมวิกฤตของน้ำไปสู่อากาศและสังเกตการสะท้อนกลับหมดได้สำเร็จ บันทึกผลเพื่อเก็บความคืบหน้า");
         }
       } else {
         setQuestProgress(0);

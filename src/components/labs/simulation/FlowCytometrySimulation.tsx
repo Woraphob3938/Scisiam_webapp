@@ -3,7 +3,6 @@
 import React, { useState, useMemo, useEffect } from "react";
 import {
   Sliders,
-  RotateCcw,
   ClipboardList,
   Activity,
   Play,
@@ -15,6 +14,7 @@ import {
   Target,
 } from "lucide-react";
 import SharedSimulationShell from "@/components/labs/simulation/SharedSimulationShell";
+import CompactRangeControl from "@/components/labs/simulation/CompactRangeControl";
 import ManualNumberInput from "@/components/labs/simulation/ManualNumberInput";
 import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";
 
@@ -97,9 +97,8 @@ export default function FlowCytometrySimulation() {
     setIsScanning(true);
   };
 
-  const handleAddLog = () => {
-    const run: LoggedFlowRun = {
-      index: loggedRuns.length + 1,
+  const createCurrentRun = (index: number): LoggedFlowRun => ({
+      index,
       flowRate: flowRate === "slow" ? "ช้า (Slow)" : flowRate === "medium" ? "กลาง (Medium)" : "เร็ว (Fast)",
       dyeConc,
       cellsAnalyzed: scannedCount || 1000,
@@ -107,9 +106,7 @@ export default function FlowCytometrySimulation() {
       sPercent,
       g2mPercent,
       cvPercent
-    };
-    setLoggedRuns((prev) => [...prev, run]);
-  };
+    });
 
   const handleClearLog = (idx: number) => {
     setLoggedRuns((prev) => prev.filter((r) => r.index !== idx));
@@ -143,21 +140,19 @@ export default function FlowCytometrySimulation() {
   };
 
   const handleSaveResults = async () => {
-    if (loggedRuns.length === 0) {
-      alert("กรุณากดบันทึกค่าพารามิเตอร์จำลองอย่างน้อย 1 ครั้งก่อนส่งออกรายงาน");
-      return;
-    }
+    const runs = [...loggedRuns, createCurrentRun(loggedRuns.length + 1)];
+    setLoggedRuns(runs);
     await saveExperimentAndSync({
       localStorageKey: "scisiam_saved_flow_cytometry_experiment",
-      localPayload: { labId, timestamp: new Date().toLocaleString("th-TH"), loggedRuns },
+      localPayload: { labId, timestamp: new Date().toLocaleString("th-TH"), loggedRuns: runs },
       labId,
       title: "Flow Cytometry Cell Analysis",
       variables: { flowRate, dyeConc },
       liveValues: { cvPercent, scannedCount },
-      graphPoints: loggedRuns.map((r) => ({ index: r.index, x: r.dyeConc, y: r.cvPercent })),
-      tableRows: loggedRuns,
-      summary: { runsCount: loggedRuns.length, minCv: Math.min(...loggedRuns.map((r) => r.cvPercent)) },
-      score: Math.min(100, Math.max(40, 40 + loggedRuns.length * 15)),
+      graphPoints: runs.map((r) => ({ index: r.index, x: r.dyeConc, y: r.cvPercent })),
+      tableRows: runs,
+      summary: { runsCount: runs.length, minCv: Math.min(...runs.map((r) => r.cvPercent)) },
+      score: Math.min(100, Math.max(40, 40 + runs.length * 15)),
       durationSeconds: null
     });
     alert("บันทึกรายงานผลสแกนโฟลว์ไซโตเมทรีสำเร็จ");
@@ -246,31 +241,21 @@ export default function FlowCytometrySimulation() {
               รันสแกนเซลล์เดี่ยว
             </button>
           </section>
-
-          {/* Action buttons */}
-          <div className="grid grid-cols-2 gap-3">
-            <button onClick={handleAddLog} className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs font-bold text-slate-700 shadow-sm transition-all hover:bg-slate-50 active:scale-97 cursor-pointer">
-              <ClipboardList className="h-3.5 w-3.5 text-emerald-500" />
-              บันทึกจุดวัด
-            </button>
-            <button onClick={handleReset} className="flex items-center justify-center gap-2 rounded-xl border border-emerald-100 bg-emerald-50/50 px-3 py-2.5 text-xs font-bold text-emerald-700 shadow-sm transition-all hover:bg-emerald-50 active:scale-97 cursor-pointer">
-              <RotateCcw className="h-3.5 w-3.5" />
-              รีเซ็ตจำลอง
-            </button>
-          </div>
         </div>
       }
       compactControls={
-        <div className="flex items-center gap-2 font-sans flex-wrap">
-          <button onClick={() => setDyeConc((d) => Math.max(0.2, d - 0.2))} className="px-2 py-1 text-xs font-bold rounded bg-slate-100">
-            Dye -0.2
-          </button>
-          <button onClick={() => setDyeConc((d) => Math.min(2.0, d + 0.2))} className="px-2 py-1 text-xs font-bold rounded bg-slate-100">
-            Dye +0.2
-          </button>
-          <button onClick={handleReset} className="px-2 py-1 text-xs font-bold rounded bg-emerald-500 text-white">
-            Reset
-          </button>
+        <div className="grid min-w-0 grid-cols-1 gap-2 sm:grid-cols-2">
+          <CompactRangeControl label="ความเข้มข้นสีย้อม PI" symbol="C" value={dyeConc} min={0.2} max={2} step={0.2} precision={1} unit="μg/mL" tone="emerald" onChange={setDyeConc} />
+          <fieldset className="min-w-0 rounded-2xl border border-slate-200 bg-slate-50/80 p-3">
+            <legend className="px-1 text-xs font-bold text-slate-600">อัตราการไหล</legend>
+            <div className="mt-1 grid grid-cols-3 gap-1.5">
+              {(["slow", "medium", "fast"] as const).map((rate) => (
+                <button key={rate} type="button" onClick={() => setFlowRate(rate)} className={`min-h-9 rounded-xl border px-2 text-xs font-black ${flowRate === rate ? "border-emerald-300 bg-emerald-50 text-emerald-700" : "border-slate-200 bg-white text-slate-500"}`}>
+                  {rate === "slow" ? "ช้า" : rate === "medium" ? "กลาง" : "เร็ว"}
+                </button>
+              ))}
+            </div>
+          </fieldset>
         </div>
       }
       metrics={[
@@ -280,7 +265,7 @@ export default function FlowCytometrySimulation() {
         { label: "สัดส่วนประชากรเฟส G2/M (4n)", value: `${g2mPercent}%`, tone: undefined }
       ]}
       graph={
-        <section className="flex min-h-[300px] flex-col rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40 font-sans">
+        <section className="flex min-h-[220px] flex-col rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40 font-sans">
           <div className="mb-2 flex items-center justify-between border-b border-slate-100 pb-2">
             <h3 className="flex items-center gap-2 text-sm font-black text-slate-800">
               <Sparkles className="h-4.5 w-4.5 text-emerald-600" />
@@ -319,7 +304,7 @@ export default function FlowCytometrySimulation() {
         </section>
       }
       table={
-        <section className="flex min-h-[300px] flex-col rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40 font-sans">
+        <section className="flex min-h-[220px] flex-col rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40 font-sans">
           <div className="flex items-center justify-between border-b border-slate-100 pb-2 mb-2">
             <h3 className="flex items-center gap-2 text-sm font-black text-slate-800">
               <ClipboardList className="h-4.5 w-4.5 text-emerald-500" />

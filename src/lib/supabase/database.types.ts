@@ -461,6 +461,21 @@ export type Database = {
         Update: never;
         Relationships: [];
       };
+      push_subscriptions: {
+        Row: {
+          id: string;
+          user_id: string;
+          endpoint: string;
+          p256dh: string;
+          auth_key: string;
+          user_agent: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
       ai_usage_events: {
         Row: {
           id: string;
@@ -666,6 +681,21 @@ export type Database = {
           p_classroom_id: string;
         };
         Returns: number;
+      };
+      upsert_push_subscription: {
+        Args: {
+          p_endpoint: string;
+          p_p256dh: string;
+          p_auth_key: string;
+          p_user_agent?: string | null;
+        };
+        Returns: boolean;
+      };
+      delete_push_subscription: {
+        Args: {
+          p_endpoint: string;
+        };
+        Returns: boolean;
       };
     };
     Enums: {

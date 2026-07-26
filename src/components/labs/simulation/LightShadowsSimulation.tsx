@@ -3,9 +3,7 @@
 import React, { useState, useMemo } from "react";
 import {
   Sliders,
-  RotateCcw,
   ClipboardList,
-  Activity,
   Zap,
   Sparkles,
   Clipboard,
@@ -55,17 +53,14 @@ export default function LightShadowsSimulation() {
     return "0.05";
   }, [transparency, lightOn]);
 
-  const handleAddLog = () => {
-    const run: LoggedShadowRun = {
-      index: loggedRuns.length + 1,
+  const createCurrentRun = (index: number): LoggedShadowRun => ({
+      index,
       lightDistance,
       transparency: transparency === "opaque" ? "ทึบแสง (Opaque)" : transparency === "translucent" ? "โปร่งแสง (Translucent)" : "โปร่งใส (Transparent)",
       lightState: lightOn ? "เปิดไฟ" : "ปิดไฟ",
       shadowWidth,
       shadowDarkness: transparency === "opaque" ? "เข้มมาก" : transparency === "translucent" ? "จาง/มีสี" : "จางจนเกือบมองไม่เห็น"
-    };
-    setLoggedRuns((prev) => [...prev, run]);
-  };
+  });
 
   const handleClearLog = (idx: number) => {
     setLoggedRuns((prev) => prev.filter((r) => r.index !== idx));
@@ -97,27 +92,51 @@ export default function LightShadowsSimulation() {
   };
 
   const handleSaveResults = async () => {
-    if (loggedRuns.length === 0) {
-      alert("กรุณากดบันทึกค่าพารามิเตอร์จำลองอย่างน้อย 1 ครั้งก่อนส่งออกรายงาน");
-      return;
-    }
+    const nextRuns = [...loggedRuns, createCurrentRun(loggedRuns.length + 1)];
+    setLoggedRuns(nextRuns);
+
     await saveExperimentAndSync({
       localStorageKey: "scisiam_saved_light_shadows_experiment",
-      localPayload: { labId, timestamp: new Date().toLocaleString("th-TH"), loggedRuns },
+      localPayload: { labId, timestamp: new Date().toLocaleString("th-TH"), loggedRuns: nextRuns },
       labId,
       title: "Light and Shadows",
       variables: { lightDistance, transparency, lightOn },
       liveValues: { shadowWidth, shadowDarkness },
-      graphPoints: loggedRuns.map((r) => ({ index: r.index, x: r.lightDistance, y: r.shadowWidth })),
-      tableRows: loggedRuns,
-      summary: { runsCount: loggedRuns.length, maxShadow: Math.max(...loggedRuns.map((r) => r.shadowWidth)) },
-      score: Math.min(100, Math.max(40, 40 + loggedRuns.length * 15)),
+      graphPoints: nextRuns.map((r) => ({ index: r.index, x: r.lightDistance, y: r.shadowWidth })),
+      tableRows: nextRuns,
+      summary: { runsCount: nextRuns.length, maxShadow: Math.max(...nextRuns.map((r) => r.shadowWidth)) },
+      score: Math.min(100, Math.max(40, 40 + nextRuns.length * 15)),
       durationSeconds: null
     });
     alert("บันทึกรายงานผลการเกิดเงาและแสงเดินทางสำเร็จ");
   };
 
   const questProgress = Math.min(100, Math.round((loggedRuns.length / 3) * 100));
+  const compactControls = (
+    <div className="grid gap-3 md:grid-cols-[1.1fr_1fr]">
+      <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-3">
+        <ManualNumberInput label="ระยะวัตถุจากไฟฉาย" ariaLabel="ระยะห่างของวัตถุจากไฟฉาย" value={lightDistance} min={15} max={85} step={5} onChange={setLightDistance} tone="blue" />
+      </div>
+      <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-3">
+        <span className="mb-2 block text-xs font-bold text-slate-600">วัสดุที่ขวางแสง</span>
+        <div className="grid grid-cols-3 gap-1">
+          {(["opaque", "translucent", "transparent"] as const).map((mode) => (
+            <button
+              key={mode}
+              type="button"
+              onClick={() => setTransparency(mode)}
+              aria-pressed={transparency === mode}
+              className={`rounded-lg border px-1 py-2 text-[11px] font-bold ${
+                transparency === mode ? "border-amber-400 bg-amber-50 text-amber-800" : "border-slate-200 bg-white text-slate-600"
+              }`}
+            >
+              {mode === "opaque" ? "ทึบแสง" : mode === "translucent" ? "โปร่งแสง" : "โปร่งใส"}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <SharedSimulationShell
@@ -130,12 +149,22 @@ export default function LightShadowsSimulation() {
       icon={Eye}
       sceneTitle="วิชวลแสดงการฉายแสงเงาตกกระทบ (Projection Screen)"
       scene={
-        <div className="relative flex h-full min-h-[300px] flex-col overflow-hidden rounded-2xl border border-blue-100 bg-slate-950 p-4 select-none">
+        <div
+          data-testid="light-shadow-experiment-scene"
+          className="relative flex h-full min-h-[300px] flex-col overflow-hidden bg-slate-950 p-4 select-none"
+        >
           <div className="absolute inset-0 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:20px_20px] opacity-10" />
 
           {/* Flashlight projecting light cone and shadow */}
           <div className="relative flex-grow flex items-center justify-center pb-6">
-            <svg viewBox="0 0 200 120" className="w-full max-w-[280px] h-auto overflow-visible">
+            <svg
+              viewBox="0 0 200 120"
+              className="h-auto w-full max-w-[340px] overflow-visible"
+              role="img"
+              aria-labelledby="light-shadow-title light-shadow-description"
+            >
+              <title id="light-shadow-title">การเกิดเงาจากไฟฉาย วัตถุ และฉากรับภาพ</title>
+              <desc id="light-shadow-description">ลำแสงเดินทางจากไฟฉายผ่านวัตถุไปยังฉาก แสดงขนาดและความเข้มของเงาตามระยะและชนิดวัสดุ</desc>
               {/* Flashlight source (left: x=15, y=60) */}
               <g transform="translate(15, 60)">
                 <rect x="-10" y="-5" width="20" height="10" fill="#475569" rx="1.5" />
@@ -165,6 +194,13 @@ export default function LightShadowsSimulation() {
 
               {/* Shadow on the wall screen */}
               {lightOn && shadowWidth > 0 && <rect x="169" y={60 - shadowWidth / 2} width="3" height={shadowWidth} fill={transparency === "translucent" ? "#047857" : "#020617"} opacity={shadowDarkness} rx="1" />}
+              {lightOn && (
+                <g transform="translate(132 14)">
+                  <rect width="60" height="18" rx="7" fill="#0f172a" stroke="#334155" />
+                  <text x="30" y="8" fill="#94a3b8" fontSize="5" fontWeight="800" textAnchor="middle">เงาบนฉาก</text>
+                  <text x="30" y="14" fill="#f8fafc" fontSize="5.5" fontWeight="900" textAnchor="middle">{shadowWidth}px · ความเข้ม {Math.round(Number(shadowDarkness) * 100)}%</text>
+                </g>
+              )}
 
               {/* Dimension label showing distance */}
               {lightOn && (
@@ -180,65 +216,8 @@ export default function LightShadowsSimulation() {
         </div>
       }
       controlsTitle="ควบคุมการทดลองแสงและเงา"
-      controls={
-        <div className="flex flex-col gap-4 font-sans">
-          <section className="flex flex-col gap-4 rounded-2xl border border-slate-200/70 bg-white p-5 shadow-sm">
-            <h3 className="flex items-center gap-2 text-sm font-black text-slate-800 border-b border-slate-100 pb-2">
-              <Sliders className="h-4.5 w-4.5 text-blue-500" />
-              1. ปรับระยะทางและสวิตช์ไฟ
-            </h3>
-
-            <div className="flex items-center justify-between">
-              <label className="text-[11px] font-bold text-slate-500">สถานะปุ่มไฟฉาย</label>
-              <button type="button" onClick={() => setLightOn(!lightOn)} className={`px-3 py-1.5 text-xs font-black rounded-lg border transition-all cursor-pointer ${lightOn ? "bg-amber-50 border-amber-200 text-amber-700 font-extrabold" : "bg-slate-50 border-slate-200 text-slate-400"}`}>
-                {lightOn ? "💡 เปิดไฟ" : "🔌 ปิดไฟ"}
-              </button>
-            </div>
-
-            <ManualNumberInput label="ระยะห่างของเล่นจากไฟฉาย (cm)" ariaLabel="ระยะห่างของเล่น" value={lightDistance} min={15} max={85} step={5} onChange={setLightDistance} tone="blue" />
-          </section>
-
-          <section className="flex flex-col gap-4 rounded-2xl border border-slate-200/70 bg-white p-5 shadow-sm">
-            <h3 className="flex items-center gap-2 text-sm font-black text-slate-800 border-b border-slate-100 pb-2">
-              <Activity className="h-4.5 w-4.5 text-blue-500" />
-              2. เลือกประเภทวัสดุของเล่น
-            </h3>
-
-            <div className="grid grid-cols-3 gap-1.5">
-              {(["opaque", "translucent", "transparent"] as const).map((mode) => (
-                <button key={mode} type="button" onClick={() => setTransparency(mode)} className={`rounded-xl border py-2 text-[10px] font-bold transition-all cursor-pointer ${transparency === mode ? "border-blue-600 bg-blue-50 text-blue-700 font-black" : "border-slate-200 bg-white text-slate-500"}`}>
-                  {mode === "opaque" ? "ทึบแสง" : mode === "translucent" ? "โปร่งแสง" : "โปร่งใส"}
-                </button>
-              ))}
-            </div>
-          </section>
-
-          {/* Action buttons */}
-          <div className="grid grid-cols-2 gap-3">
-            <button onClick={handleAddLog} className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs font-bold text-slate-700 shadow-sm transition-all hover:bg-slate-50 active:scale-97 cursor-pointer">
-              <ClipboardList className="h-3.5 w-3.5 text-blue-500" />
-              จดบันทึกผล
-            </button>
-            <button onClick={handleReset} className="flex items-center justify-center gap-2 rounded-xl border border-blue-100 bg-blue-50/50 px-3 py-2.5 text-xs font-bold text-blue-700 shadow-sm transition-all hover:bg-blue-50 active:scale-97 cursor-pointer">
-              <RotateCcw className="h-3.5 w-3.5" />
-              ตั้งใหม่ (Reset)
-            </button>
-          </div>
-        </div>
-      }
-      compactControls={
-        <div className="flex items-center gap-2 font-sans flex-wrap">
-          <button onClick={() => setLightDistance((d) => Math.max(15, d - 10))} className="px-2 py-1 text-xs font-bold rounded bg-slate-100">
-            Distance -10cm
-          </button>
-          <button onClick={() => setLightDistance((d) => Math.min(85, d + 10))} className="px-2 py-1 text-xs font-bold rounded bg-slate-100">
-            Distance +10cm
-          </button>
-          <button onClick={handleReset} className="px-2 py-1 text-xs font-bold rounded bg-blue-500 text-white">
-            Reset
-          </button>
-        </div>
-      }
+      controls={compactControls}
+      compactControls={compactControls}
       metrics={[
         { label: "ความกว้างเงาที่ฉากรับ", value: `${shadowWidth} พิกเซล`, tone: "blue" },
         { label: "ระดับความโปร่งใสของยีน", value: transparency === "opaque" ? "ทึบแสงค้าง" : transparency === "translucent" ? "กึ่งโปร่งแสง" : "โปร่งใสทะลุ", tone: "blue" },

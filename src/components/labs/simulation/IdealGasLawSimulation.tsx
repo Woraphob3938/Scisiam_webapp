@@ -181,6 +181,10 @@ export function GasChamber3DScene({
 
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     host.appendChild(renderer.domElement);
+    renderer.domElement.style.width = "100%";
+    renderer.domElement.style.height = "100%";
+    renderer.domElement.style.maxWidth = "100%";
+    renderer.domElement.style.display = "block";
 
     scene.background = new THREE.Color(0xf8fafc);
     scene.add(root);
@@ -662,7 +666,6 @@ export default function IdealGasLawSimulation() {
         if (nextQuestProg >= 10 && !questSuccessRef.current) {
           setQuestSuccess(true);
           questSuccessRef.current = true;
-          alert("🎉 ยินดีด้วย! คุณผ่านภารกิจรักษาสมดุลความดันแก๊สให้อยู่ในช่วง 300 kPa - 400 kPa บันทึกผลเพื่อเก็บความคืบหน้า");
         }
       } else {
         setQuestProgress(0);
@@ -734,10 +737,10 @@ export default function IdealGasLawSimulation() {
   const visibleRows = dataPoints.slice(-7);
 
   return (
-    <div className="relative flex min-h-screen flex-col bg-[#f8fafc] pb-12">
+    <div className="relative flex min-h-screen flex-col overflow-x-hidden bg-[#f8fafc] pb-12">
       <Navbar />
 
-      <main className="mx-auto w-full max-w-[1440px] px-4 py-6 sm:px-12 md:px-20">
+      <main className="mx-auto min-w-0 w-full max-w-[1440px] px-4 py-6 sm:px-12 md:px-20">
         <div className="flex flex-col gap-5">
           {/* Banner */}
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:items-start">

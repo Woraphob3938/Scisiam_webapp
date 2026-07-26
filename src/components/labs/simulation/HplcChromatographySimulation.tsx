@@ -2,12 +2,12 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import SharedSimulationShell from "./SharedSimulationShell";
+import CompactRangeControl from "./CompactRangeControl";
 import {
   Info,
-  Play,
-  RefreshCw,
   Layers,
   Sliders,
+  Play,
 } from "lucide-react";
 import { labsById } from "@/data/labs";
 import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";
@@ -208,6 +208,41 @@ export default function HplcChromatographySimulation() {
     });
   };
 
+  const compactControls = (
+    <>
+      <CompactRangeControl
+        label="สัดส่วน Acetonitrile"
+        symbol="ACN"
+        value={solventPercent}
+        min={20}
+        max={80}
+        step={5}
+        precision={0}
+        unit="%"
+        tone="emerald"
+        onChange={(value) => {
+          setSolventPercent(value);
+          handleReset();
+        }}
+      />
+      <CompactRangeControl
+        label="อัตราการไหล"
+        symbol="Q"
+        value={flowRate}
+        min={0.5}
+        max={2}
+        step={0.1}
+        precision={1}
+        unit="mL/min"
+        tone="cyan"
+        onChange={(value) => {
+          setFlowRate(value);
+          handleReset();
+        }}
+      />
+    </>
+  );
+
   return (
     <SharedSimulationShell
       accent="emerald"
@@ -301,6 +336,7 @@ export default function HplcChromatographySimulation() {
         </div>
       }
       controlsTitle="ตั้งค่า Solvent และ อัตราการชะสาร"
+      compactControls={compactControls}
       controls={
         <div className="flex flex-col gap-4 w-full">
           <div>
@@ -325,66 +361,6 @@ export default function HplcChromatographySimulation() {
             </div>
           </div>
 
-          <hr className="border-slate-100 dark:border-slate-800" />
-
-          <div>
-            <div className="flex justify-between text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">
-              <span>สัดส่วน Acetonitrile (%)</span>
-              <span className="text-emerald-600 dark:text-emerald-400 font-bold">{solventPercent} %</span>
-            </div>
-            <input
-              type="range"
-              min="20"
-              max="80"
-              step="5"
-              value={solventPercent}
-              onChange={(e) => {
-                setSolventPercent(parseInt(e.target.value));
-                handleReset();
-              }}
-              className="w-full accent-emerald-600"
-            />
-            <div className="flex justify-between text-[10px] text-slate-400 mt-1">
-              <span>20% (ขั้วสูง-สารชะช้า)</span>
-              <span>80% (ขั้วต่ำ-สารชะไวมาก)</span>
-            </div>
-          </div>
-
-          <div>
-            <div className="flex justify-between text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">
-              <span>อัตราการไหลคอลัมน์ (Flow Rate)</span>
-              <span className="text-emerald-600 dark:text-emerald-400 font-bold">{flowRate.toFixed(2)} mL/min</span>
-            </div>
-            <input
-              type="range"
-              min="0.5"
-              max="2.0"
-              step="0.1"
-              value={flowRate}
-              onChange={(e) => {
-                setFlowRate(parseFloat(e.target.value));
-                handleReset();
-              }}
-              className="w-full accent-emerald-600"
-            />
-          </div>
-
-          <div className="flex gap-2 mt-2">
-            <button
-              onClick={handleInject}
-              disabled={isInjecting}
-              className="flex-1 py-2 px-4 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
-            >
-              <Play className="w-4 h-4" />
-              ฉีดสารละลาย (Inject)
-            </button>
-            <button
-              onClick={handleReset}
-              className="py-2 px-3 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg text-xs font-semibold flex items-center justify-center transition-colors"
-            >
-              <RefreshCw className="w-4 h-4 text-slate-500" />
-            </button>
-          </div>
         </div>
       }
       metrics={getMetricDisplay()}

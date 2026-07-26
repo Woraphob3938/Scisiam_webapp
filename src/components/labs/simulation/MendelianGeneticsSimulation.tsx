@@ -7,9 +7,6 @@ import {
   ClipboardList,
   Dna,
   GitBranch,
-  Pause,
-  Play,
-  RotateCcw,
   Shuffle,
 } from "lucide-react";
 import SharedSimulationShell from "@/components/labs/simulation/SharedSimulationShell";
@@ -134,7 +131,7 @@ function RatioGraph({ points }: { points: MendelPoint[] }) {
   const recessivePct = (counts.recessive / total) * 100;
 
   return (
-    <section className="flex min-h-[300px] flex-col rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40">
+    <section className="flex min-h-[220px] flex-col rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40">
       <div className="mb-2 flex items-center justify-between border-b border-slate-100 pb-2">
         <h3 className="flex items-center gap-2 text-sm font-black text-slate-800">
           <BarChart3 className="h-4.5 w-4.5 text-violet-600" />
@@ -166,7 +163,7 @@ function ResultsTable({ points }: { points: MendelPoint[] }) {
   const rows = points.slice(-7);
 
   return (
-    <section className="flex min-h-[300px] flex-col rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40">
+    <section className="flex min-h-[220px] flex-col rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40">
       <div className="mb-2 flex items-center justify-between border-b border-slate-100 pb-2">
         <h3 className="flex items-center gap-2 text-sm font-black text-slate-800">
           <ClipboardList className="h-4.5 w-4.5 text-violet-600" />
@@ -200,7 +197,7 @@ function ResultsTable({ points }: { points: MendelPoint[] }) {
 
 function TheoryPanel() {
   return (
-    <section className="flex min-h-[300px] flex-col rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40">
+    <section className="flex min-h-[220px] flex-col rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40">
       <h3 className="mb-2 flex items-center gap-2 border-b border-slate-100 pb-2 text-sm font-black text-slate-800">
         <Dna className="h-4.5 w-4.5 text-violet-600" />
         ทฤษฎีและสมการ
@@ -280,11 +277,6 @@ export default function MendelianGeneticsSimulation() {
     isRunningRef.current = nextRunning;
   };
 
-  const handleAddOffspring = () => {
-    if (results.length >= sampleSize) return;
-    setResults((previous) => [...previous, createOffspring(previous.length + 1)]);
-  };
-
   const handleReset = () => {
     setIsRunning(false);
     isRunningRef.current = false;
@@ -294,7 +286,7 @@ export default function MendelianGeneticsSimulation() {
 
   const handleSave = async () => {
     if (results.length === 0) {
-      alert("ยังไม่มีข้อมูล Mendelian Genetics สำหรับบันทึก กรุณาเริ่มจำลองหรือสุ่มลูกหลานก่อน");
+      alert("ยังไม่มีข้อมูล Mendelian Genetics สำหรับบันทึก กรุณาเริ่มทดลองก่อน");
       return;
     }
 
@@ -361,16 +353,6 @@ export default function MendelianGeneticsSimulation() {
         <input type="range" min={16} max={128} step={8} value={sampleSize} disabled={isRunning || results.length > 0} onChange={(event) => setSampleSize(Number(event.target.value))} className="h-1.5 w-full rounded-full bg-slate-100 accent-violet-500 disabled:opacity-45" />
       </label>
 
-      <div className="grid grid-cols-4 gap-2 pt-1">
-        <button onClick={handleStartStop} className={`col-span-2 inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-xs font-black text-white shadow-sm ${isRunning ? "bg-slate-700" : "bg-violet-600 hover:bg-violet-700"}`}>
-          {isRunning ? <Pause className="h-4 w-4 fill-white stroke-none" /> : <Play className="h-4 w-4 fill-white stroke-none" />}
-          {isRunning ? "หยุดชั่วคราว" : "เริ่มสุ่ม"}
-        </button>
-        <button onClick={handleAddOffspring} className="inline-flex items-center justify-center rounded-xl border border-violet-100 bg-violet-50 text-xs font-black text-violet-700 hover:bg-violet-100">สุ่ม 1</button>
-        <button onClick={handleReset} className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50" aria-label="รีเซ็ต">
-          <RotateCcw className="h-4 w-4" />
-        </button>
-      </div>
     </div>
   );
 

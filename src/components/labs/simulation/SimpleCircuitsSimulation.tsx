@@ -3,7 +3,6 @@
 import React, { useId, useMemo, useState } from "react";
 import {
   BatteryCharging,
-  CheckCircle2,
   CircuitBoard,
   ClipboardList,
   Lightbulb,
@@ -46,39 +45,11 @@ export default function SimpleCircuitsSimulation() {
     [cellCount, switchClosed, wireConnected],
   );
 
-  const missionEvidence = useMemo(() => {
-    const powered = loggedRuns.some((run) => run.isClosed && run.currentAmp > 0);
-    const interrupted = loggedRuns.some(
-      (run) => !run.isClosed && run.currentAmp === 0,
-    );
-    const comparedCells =
-      loggedRuns.some((run) => run.isClosed && run.cellCount === 1) &&
-      loggedRuns.some((run) => run.isClosed && run.cellCount === 2);
-    return [powered, interrupted, comparedCells];
-  }, [loggedRuns]);
-
-  const completedMissions = missionEvidence.filter(Boolean).length;
-  const progressPercent = (completedMissions / missionEvidence.length) * 100;
   const statusText = !wireConnected
     ? "สายไฟขาด วงจรไม่ครบ"
     : switchClosed
       ? "วงจรปิด หลอดไฟทำงาน"
       : "สวิตช์เปิด กระแสหยุด";
-
-  const handleLog = () => {
-    const run: CircuitRun = {
-      index: loggedRuns.length + 1,
-      cellCount,
-      wireConnected,
-      switchClosed,
-      voltageVolt: result.voltageVolt,
-      currentAmp: result.currentAmp,
-      powerWatt: result.powerWatt,
-      isClosed: result.isClosed,
-    };
-
-    setLoggedRuns((previous) => [...previous, run].slice(-12));
-  };
 
   const handleReset = () => {
     setCellCount(1);
@@ -88,32 +59,38 @@ export default function SimpleCircuitsSimulation() {
   };
 
   const handleSave = async () => {
-    if (loggedRuns.length === 0) {
-      window.alert("กรุณาจดบันทึกผลอย่างน้อย 1 ครั้งก่อนบันทึกการทดลอง");
-      return;
-    }
+    const currentRun: CircuitRun = {
+      index: loggedRuns.length + 1,
+      cellCount,
+      wireConnected,
+      switchClosed,
+      voltageVolt: result.voltageVolt,
+      currentAmp: result.currentAmp,
+      powerWatt: result.powerWatt,
+      isClosed: result.isClosed,
+    };
+    const runsToSave = [...loggedRuns, currentRun].slice(-12);
+    setLoggedRuns(runsToSave);
 
     await saveExperimentAndSync({
       localStorageKey: "scisiam_saved_simple_circuits_experiment",
       localPayload: {
         labId,
         savedAt: new Date().toISOString(),
-        loggedRuns,
-        completedMissions,
+        loggedRuns: runsToSave,
       },
       labId,
       title: "วงจรไฟฟ้าอย่างง่าย",
       variables: { cellCount, wireConnected, switchClosed, resistanceOhm: 6 },
       liveValues: result,
-      graphPoints: loggedRuns.map((run) => ({
+      graphPoints: runsToSave.map((run) => ({
         index: run.index,
         voltageVolt: run.voltageVolt,
         currentAmp: run.currentAmp,
       })),
-      tableRows: loggedRuns,
+      tableRows: runsToSave,
       summary: {
-        completedMissions,
-        runsCount: loggedRuns.length,
+        runsCount: runsToSave.length,
         latestStatus: statusText,
       },
       durationSeconds: null,
@@ -122,36 +99,40 @@ export default function SimpleCircuitsSimulation() {
     window.alert("บันทึกผลการทดลองวงจรไฟฟ้าแล้ว");
   };
 
-  const missionPanel = (
-    <section className="rounded-xl border border-orange-200 bg-orange-50 p-3">
-      <p className="mb-2 text-xs font-black text-orange-900">
-        ภารกิจสั้น 3 ขั้น
-      </p>
-      <ol className="space-y-2">
-        {[
-          "ทำให้หลอดไฟติดและจดบันทึก",
-          "ทำให้กระแสเป็นศูนย์ด้วยสวิตช์หรือสายไฟ",
-          "เปรียบเทียบวงจร 1 เซลล์กับ 2 เซลล์",
-        ].map((mission, index) => (
-          <li
-            key={mission}
-            className="flex items-start gap-2 text-xs font-bold leading-relaxed text-slate-700"
+  const compactControls = (
+    <div className="grid gap-3 md:grid-cols-[1fr_1fr]">
+      <div className="grid grid-cols-2 gap-2">
+        {([1, 2] as const).map((count) => (
+          <button
+            key={count}
+            type="button"
+            onClick={() => setCellCount(count)}
+            aria-pressed={cellCount === count}
+            className={`${buttonBase} ${
+              cellCount === count
+                ? "border-orange-500 bg-orange-50 text-orange-800"
+                : "border-slate-200 bg-white text-slate-600"
+            }`}
           >
-            <CheckCircle2
-              className={`mt-0.5 h-4 w-4 shrink-0 ${
-                missionEvidence[index] ? "text-emerald-600" : "text-slate-300"
-              }`}
-            />
-            <span>{mission}</span>
-          </li>
+            <BatteryCharging className="h-4 w-4" />
+            {count} เซลล์
+          </button>
         ))}
-      </ol>
-      {completedMissions === 3 && (
-        <p className="mt-3 rounded-lg bg-white px-3 py-2 text-xs font-black text-emerald-700">
-          ปลดล็อกทดลองอิสระแล้ว ลองสร้างรูปแบบวงจรของตนเองได้เลย
-        </p>
-      )}
-    </section>
+      </div>
+      <button
+        type="button"
+        onClick={() => setWireConnected((value) => !value)}
+        aria-pressed={wireConnected}
+        className={`${buttonBase} ${
+          wireConnected
+            ? "border-emerald-300 bg-emerald-50 text-emerald-800"
+            : "border-rose-300 bg-rose-50 text-rose-800"
+        }`}
+      >
+        <PlugZap className="h-4 w-4" />
+        {wireConnected ? "สายไฟต่อครบ" : "สายไฟถูกถอด"}
+      </button>
+    </div>
   );
 
   return (
@@ -165,7 +146,7 @@ export default function SimpleCircuitsSimulation() {
       icon={CircuitBoard}
       sceneTitle="โต๊ะทดลองวงจรไฟฟ้า"
       scene={
-        <div className="h-full min-h-[300px] overflow-hidden rounded-2xl border border-orange-100 bg-[#fffaf3]">
+        <div data-testid="simple-circuit-experiment-scene" className="h-full min-h-[300px] overflow-hidden bg-[#fffaf3]">
           <svg
             viewBox="0 0 760 360"
             className="h-full w-full"
@@ -327,72 +308,7 @@ export default function SimpleCircuitsSimulation() {
         </div>
       }
       controlsTitle="แผงต่อวงจร"
-      controls={
-        <div className="grid gap-4 lg:grid-cols-2">
-          <section className="space-y-4 rounded-xl border border-slate-200 bg-white p-4">
-            <div>
-              <p className="mb-2 text-xs font-black text-slate-500">จำนวนเซลล์ไฟฟ้า</p>
-              <div className="grid grid-cols-2 gap-2">
-                {([1, 2] as const).map((count) => (
-                  <button
-                    key={count}
-                    type="button"
-                    onClick={() => setCellCount(count)}
-                    aria-pressed={cellCount === count}
-                    className={`${buttonBase} ${
-                      cellCount === count
-                        ? "border-orange-500 bg-orange-50 text-orange-800"
-                        : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
-                    }`}
-                  >
-                    <BatteryCharging className="h-4 w-4" />
-                    {count} เซลล์
-                  </button>
-                ))}
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={() => setWireConnected((value) => !value)}
-              aria-pressed={wireConnected}
-              className={`${buttonBase} w-full ${
-                wireConnected
-                  ? "border-emerald-300 bg-emerald-50 text-emerald-800"
-                  : "border-rose-300 bg-rose-50 text-rose-800"
-              }`}
-            >
-              <PlugZap className="h-4 w-4" />
-              {wireConnected ? "สายไฟต่อครบ" : "สายไฟถูกถอด"}
-            </button>
-          </section>
-          <div className="space-y-4">
-            {missionPanel}
-            <div>
-              <button
-                type="button"
-                onClick={handleLog}
-                className={`${buttonBase} w-full border-orange-500 bg-orange-500 text-white hover:bg-orange-600`}
-              >
-                <ClipboardList className="h-4 w-4" />
-                จดผล
-              </button>
-            </div>
-          </div>
-        </div>
-      }
-      compactControls={
-        <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={handleLog}
-            className={`${buttonBase} border-orange-500 bg-orange-500 text-white`}
-          >
-            <ClipboardList className="h-4 w-4" />
-            จดผล
-          </button>
-        </div>
-      }
-      drawerSummary={missionPanel}
+      compactControls={compactControls}
       metrics={[
         { label: "แรงดันไฟฟ้า", value: `${result.voltageVolt.toFixed(1)} V`, tone: "orange" },
         { label: "กระแสไฟฟ้า", value: `${result.currentAmp.toFixed(2)} A`, tone: "blue" },
@@ -411,7 +327,7 @@ export default function SimpleCircuitsSimulation() {
           </h3>
           {loggedRuns.length === 0 ? (
             <p className="grid min-h-52 place-items-center text-sm font-bold text-slate-400">
-              จดผลเพื่อสร้างกราฟ
+                  บันทึกผลเพื่อสร้างกราฟ
             </p>
           ) : (
             <svg viewBox="0 0 520 230" className="w-full" role="img" aria-label="กราฟแท่งกระแสไฟฟ้าของแต่ละการทดลอง">
@@ -479,15 +395,12 @@ export default function SimpleCircuitsSimulation() {
         { label: "เลือกจำนวนเซลล์และตรวจสายไฟ", icon: BatteryCharging },
         { label: "ปิดสวิตช์เพื่อให้วงจรครบ", icon: ToggleLeft },
         { label: "สังเกตหลอดไฟและค่ากระแส", icon: Lightbulb },
-        { label: "จดผลเพื่อผ่านภารกิจ", icon: ClipboardList },
+        { label: "บันทึกผลการทดลอง", icon: ClipboardList },
       ]}
-      progressLabel="ความคืบหน้าภารกิจ"
-      progressValue={`${completedMissions}/3 ภารกิจ`}
-      progressPercent={progressPercent}
       tips={[
         "ถ้าหลอดไฟไม่ติด ให้ตรวจทั้งสายไฟและสวิตช์ เพราะอย่างใดอย่างหนึ่งที่เปิดอยู่ทำให้วงจรขาด",
         "วงจรนี้ใช้ความต้านทานคงที่ 6 โอห์มเพื่อให้เปรียบเทียบจำนวนเซลล์ได้ง่าย",
-        "เมื่อผ่านครบสามภารกิจแล้ว สามารถเปลี่ยนค่าและจดผลเพิ่มเติมได้อย่างอิสระ",
+        "ลองเปรียบเทียบวงจร 1 เซลล์กับ 2 เซลล์เพื่อดูผลต่อกระแสและความสว่าง",
       ]}
       theory={
         <div className="space-y-3 text-sm font-semibold leading-relaxed text-slate-600">

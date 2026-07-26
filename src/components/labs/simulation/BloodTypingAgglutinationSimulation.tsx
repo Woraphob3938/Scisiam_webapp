@@ -254,7 +254,7 @@ export default function BloodTypingAgglutinationSimulation() {
         { label: "รอบทดสอบ", value: `${mixCount} ครั้ง`, tone: "blue" },
       ]}
       graph={
-        <section className="flex min-h-[300px] flex-col rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40">
+        <section className="flex min-h-[220px] flex-col rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40">
           <div className="mb-2 flex items-center justify-between border-b border-slate-100 pb-2">
             <h3 className="flex items-center gap-2 text-sm font-black text-slate-800 leading-normal">
               <BarChart3 className="h-4.5 w-4.5 text-rose-600" />
@@ -276,7 +276,7 @@ export default function BloodTypingAgglutinationSimulation() {
         </section>
       }
       table={
-        <section className="flex min-h-[300px] flex-col rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40">
+        <section className="flex min-h-[220px] flex-col rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40">
           <div className="mb-2 flex items-center justify-between border-b border-slate-100 pb-2">
             <h3 className="flex items-center gap-2 text-sm font-black text-slate-800 leading-normal">
               <ClipboardList className="h-4.5 w-4.5 text-rose-600" />
@@ -309,7 +309,7 @@ export default function BloodTypingAgglutinationSimulation() {
         </section>
       }
       theory={
-        <section className="flex min-h-[300px] flex-col rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40">
+        <section className="flex min-h-[220px] flex-col rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40">
           <h3 className="mb-2 flex items-center gap-2 border-b border-slate-100 pb-2 text-sm font-black text-slate-800 leading-normal">
             <Compass className="h-4.5 w-4.5 text-rose-600" />
             ทฤษฎี ABO/Rh

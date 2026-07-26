@@ -433,6 +433,13 @@ export async function createClassroomAssignment(
     throwClassroomActionError(error.code, error.message);
   }
   if (!data) throw new Error("ไม่สามารถเพิ่มงานได้ในขณะนี้");
+
+  await fetch("/api/push/classroom-assignment", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ assignmentId: data }),
+  }).catch(() => null);
+
   return data;
 }
 

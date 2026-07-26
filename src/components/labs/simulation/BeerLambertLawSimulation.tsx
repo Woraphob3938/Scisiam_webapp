@@ -2,9 +2,6 @@
 
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import {
-  Play,
-  Pause,
-  RotateCcw,
   Sliders,
   Trash,
   Download,
@@ -15,6 +12,7 @@ import {
   Target,
 } from "lucide-react";
 import SharedSimulationShell from "@/components/labs/simulation/SharedSimulationShell";
+import CompactRangeControl from "@/components/labs/simulation/CompactRangeControl";
 import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";
 
 export interface BeerLambertDataPoint {
@@ -502,7 +500,6 @@ export default function BeerLambertLawSimulation() {
           if (nextProg >= 12 && !questSuccessRef.current) {
             setQuestSuccess(true);
             questSuccessRef.current = true;
-            alert("🎉 ยินดีด้วย! คุณปรับแต่งสเปกโทรจนได้ค่าการดูดกลืนแสงจุนสี 0.8 - 1.2 เป็นเวลา 12 วินาทีต่อเนื่องสำเร็จ บันทึกผลเพื่อเก็บความคืบหน้า");
           }
         } else {
           setQuestProgress(0);
@@ -513,7 +510,23 @@ export default function BeerLambertLawSimulation() {
     return () => { if (timer) clearInterval(timer); };
   }, [isRunning]);
 
-  const handleStartStop = () => setIsRunning(!isRunning);
+  const handleStartStop = () => {
+    if (!isRunning) {
+      setDataPoints((previous) => [
+        ...previous,
+        {
+          index: previous.length + 1,
+          soluteId: solute.id,
+          soluteName: solute.formula,
+          wavelength,
+          concentration,
+          width: cuvetteWidth,
+          absorbance,
+        },
+      ]);
+    }
+    setIsRunning(!isRunning);
+  };
 
   const handleReset = () => {
     setIsRunning(false);
@@ -524,21 +537,6 @@ export default function BeerLambertLawSimulation() {
     setCuvetteWidth(1.0);
     setQuestProgress(0);
     setDataPoints([]);
-  };
-
-  const handleAddPoint = () => {
-    setDataPoints((prev) => [
-      ...prev,
-      {
-        index: prev.length + 1,
-        soluteId: solute.id,
-        soluteName: solute.formula,
-        wavelength,
-        concentration,
-        width: cuvetteWidth,
-        absorbance,
-      },
-    ]);
   };
 
   const handleClearPoint = (idx: number) => {
@@ -591,7 +589,7 @@ export default function BeerLambertLawSimulation() {
   };
 
   const controls = (
-    <div className="space-y-4 text-left">
+    <div className="space-y-3 text-left">
       {/* Solute Selector */}
       <div className="group bg-slate-50/50 p-3 rounded-2xl border border-slate-100 hover:border-slate-200/50 transition-all select-none">
         <label className="block text-xs font-bold text-slate-600 mb-1.5">เลือกสารละลายตัวอย่าง</label>
@@ -617,79 +615,18 @@ export default function BeerLambertLawSimulation() {
         </div>
       </div>
 
-      {/* Wavelength Slider */}
-      <div className="group bg-slate-50/50 p-3 rounded-2xl border border-slate-100 hover:border-slate-200/50 transition-all select-none">
-        <div className="flex justify-between items-center text-xs font-bold mb-1.5">
-          <span className="text-slate-600">ความยาวคลื่นวิเคราะห์ (&lambda;)</span>
-          <div className="flex items-center gap-1.5">
-            <button
-              onClick={handleAutoCalibrate}
-              className="text-[9px] font-black bg-cyan-100 text-cyan-700 border border-cyan-200 px-1.5 py-0.5 rounded hover:bg-cyan-200"
-            >
-              Peak ({solute.peakWavelength} nm)
-            </button>
-            <span className="text-cyan-600 font-extrabold text-[10px] bg-cyan-50 px-1.5 py-0.5 rounded border border-cyan-100">
-              {wavelength} nm
-            </span>
-          </div>
-        </div>
-        <input
-          type="range" min="380" max="780" step="5" value={wavelength}
-          onChange={(e) => setWavelength(Number(e.target.value))}
-          className="w-full h-1 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-cyan-500"
-        />
-      </div>
-
-      {/* Concentration Slider */}
-      <div className="group bg-slate-50/50 p-3 rounded-2xl border border-slate-100 hover:border-slate-200/50 transition-all select-none">
-        <div className="flex justify-between items-center text-xs font-bold mb-1.5">
-          <span className="text-slate-600">ความเข้มข้นสารละลาย (c)</span>
-          <span className="text-indigo-600 font-extrabold text-[10px] bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-100">
-            {concentration.toFixed(3)} M
-          </span>
-        </div>
-        <input
-          type="range" min="0.01" max="0.5" step="0.01" value={concentration}
-          onChange={(e) => setConcentration(Number(e.target.value))}
-          className="w-full h-1 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-500"
-        />
-        <div className="flex items-center gap-1.5 mt-2">
-          {[-0.10, -0.01, 0.01, 0.10].map((val) => (
-            <button key={val} onClick={() => setConcentration((prev) => Math.max(0.01, Math.min(0.5, prev + val)))}
-              className="flex-1 py-1 text-[10px] font-black text-slate-600 bg-white border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50 transition active:scale-95">
-              {val > 0 ? `+${val.toFixed(2)}` : `${val.toFixed(2)}`}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Cuvette Width Slider */}
-      <div className="group bg-slate-50/50 p-3 rounded-2xl border border-slate-100 hover:border-slate-200/50 transition-all select-none">
-        <div className="flex justify-between items-center text-xs font-bold mb-1.5">
-          <span className="text-slate-600">ความกว้างคิวเวตต์ช่องแสงผ่าน (b)</span>
-          <span className="text-amber-600 font-extrabold text-[10px] bg-amber-50 px-1.5 py-0.5 rounded border border-amber-100">
-            {cuvetteWidth.toFixed(1)} cm
-          </span>
-        </div>
-        <input
-          type="range" min="1.0" max="2.0" step="0.1" value={cuvetteWidth}
-          onChange={(e) => setCuvetteWidth(Number(e.target.value))}
-          className="w-full h-1 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-amber-500"
-        />
-      </div>
-
-      {/* Actions */}
-      <div className="grid grid-cols-4 gap-2 pt-1">
-        <button onClick={handleStartStop} className={`col-span-2 inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-xs font-black text-white shadow-sm ${isRunning ? "bg-slate-700" : "bg-blue-600 hover:bg-blue-700"}`}>
-          {isRunning ? <Pause className="h-4 w-4 fill-white stroke-none" /> : <Play className="h-4 w-4 fill-white stroke-none" />}
-          {isRunning ? `${elapsedSeconds.toFixed(0)}s หยุด` : "เริ่มจำลอง"}
-        </button>
-        <button onClick={handleAddPoint} className="inline-flex items-center justify-center rounded-xl border border-blue-100 bg-blue-50 text-[11px] font-black text-blue-700 hover:bg-blue-100">บันทึกจุด</button>
-        <button onClick={handleReset} className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50" aria-label="รีเซ็ต">
-          <RotateCcw className="h-4 w-4" />
-        </button>
-      </div>
+      <button type="button" onClick={handleAutoCalibrate} className="w-full rounded-xl border border-cyan-200 bg-cyan-50 px-3 py-2.5 text-xs font-black text-cyan-700 transition hover:bg-cyan-100">
+        ปรับไปยังจุดดูดกลืนสูงสุด ({solute.peakWavelength} nm)
+      </button>
     </div>
+  );
+
+  const compactControls = (
+    <>
+      <CompactRangeControl label="ความยาวคลื่น" symbol="λ" value={wavelength} min={380} max={780} step={5} precision={0} unit="nm" tone="cyan" onChange={setWavelength} />
+      <CompactRangeControl label="ความเข้มข้น" symbol="c" value={concentration} min={0.01} max={0.5} step={0.01} precision={3} unit="M" tone="violet" onChange={setConcentration} />
+      <CompactRangeControl label="ความกว้างคิวเวตต์" symbol="b" value={cuvetteWidth} min={1} max={2} step={0.1} precision={1} unit="cm" tone="amber" onChange={setCuvetteWidth} />
+    </>
   );
 
   return (
@@ -713,6 +650,7 @@ export default function BeerLambertLawSimulation() {
       }
       controlsTitle="แผงควบคุมสเปกโทรโฟโตมิเตอร์"
       controls={controls}
+      compactControls={compactControls}
       metrics={[
         { label: "ค่าดูดกลืนแสง A", value: `${absorbance.toFixed(3)} A`, tone: "rose" },
         { label: "ความเข้มข้น c", value: `${concentration.toFixed(3)} M`, tone: "cyan" },

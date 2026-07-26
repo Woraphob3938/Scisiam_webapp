@@ -1,12 +1,10 @@
 "use client";
 
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import {
   Sliders,
-  RotateCcw,
   ClipboardList,
   Activity,
-  Play,
   Zap,
   Sparkles,
   Clipboard,
@@ -38,6 +36,7 @@ export default function SoundVibrationsSimulation() {
   const [isVibrating, setIsVibrating] = useState<boolean>(false);
   const [vibeOffset, setVibeOffset] = useState<number>(0);
   const [waveOffset, setWaveOffset] = useState<number>(0);
+  const stopTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [loggedRuns, setLoggedRuns] = useState<LoggedSoundRun[]>([]);
 
@@ -95,27 +94,28 @@ export default function SoundVibrationsSimulation() {
   }, [isVibrating, pitch, loudness, medium]);
 
   const handleTriggerSound = () => {
+    if (stopTimerRef.current) clearTimeout(stopTimerRef.current);
     setIsVibrating(true);
-    // Auto stop vibration after 2 seconds
-    setTimeout(() => {
+    stopTimerRef.current = setTimeout(() => {
       setIsVibrating(false);
       setVibeOffset(0);
       setWaveOffset(0);
     }, 2000);
   };
 
-  const handleAddLog = () => {
-    const run: LoggedSoundRun = {
-      index: loggedRuns.length + 1,
+  useEffect(() => () => {
+    if (stopTimerRef.current) clearTimeout(stopTimerRef.current);
+  }, []);
+
+  const createCurrentRun = (index: number): LoggedSoundRun => ({
+      index,
       pitch: pitch === "low" ? "ต่ำ (Low)" : pitch === "medium" ? "กลาง (Medium)" : "สูง (High)",
       loudness: loudness === "soft" ? "เบา (Soft)" : loudness === "normal" ? "ปกติ (Normal)" : "ดัง (Hard)",
       medium: medium === "air" ? "อากาศ" : medium === "water" ? "น้ำ" : "เหล็ก/ไม้",
       frequencyHz,
       amplitudeDb,
       travelSpeed
-    };
-    setLoggedRuns((prev) => [...prev, run]);
-  };
+  });
 
   const handleClearLog = (idx: number) => {
     setLoggedRuns((prev) => prev.filter((r) => r.index !== idx));
@@ -150,27 +150,60 @@ export default function SoundVibrationsSimulation() {
   };
 
   const handleSaveResults = async () => {
-    if (loggedRuns.length === 0) {
-      alert("กรุณากดบันทึกค่าพารามิเตอร์จำลองอย่างน้อย 1 ครั้งก่อนส่งออกรายงาน");
-      return;
-    }
+    const nextRuns = [...loggedRuns, createCurrentRun(loggedRuns.length + 1)];
+    setLoggedRuns(nextRuns);
+
     await saveExperimentAndSync({
       localStorageKey: "scisiam_saved_sound_vibrations_experiment",
-      localPayload: { labId, timestamp: new Date().toLocaleString("th-TH"), loggedRuns },
+      localPayload: { labId, timestamp: new Date().toLocaleString("th-TH"), loggedRuns: nextRuns },
       labId,
       title: "Sound Vibrations",
       variables: { pitch, loudness, medium },
       liveValues: { frequencyHz, amplitudeDb, travelSpeed },
-      graphPoints: loggedRuns.map((r) => ({ index: r.index, x: r.frequencyHz, y: r.amplitudeDb })),
-      tableRows: loggedRuns,
-      summary: { runsCount: loggedRuns.length, maxDb: Math.max(...loggedRuns.map((r) => r.amplitudeDb)) },
-      score: Math.min(100, Math.max(40, 40 + loggedRuns.length * 15)),
+      graphPoints: nextRuns.map((r) => ({ index: r.index, x: r.frequencyHz, y: r.amplitudeDb })),
+      tableRows: nextRuns,
+      summary: { runsCount: nextRuns.length, maxDb: Math.max(...nextRuns.map((r) => r.amplitudeDb)) },
+      score: Math.min(100, Math.max(40, 40 + nextRuns.length * 15)),
       durationSeconds: null
     });
     alert("บันทึกรายงานการสั่นสะเทือนเกิดเสียงสำเร็จ");
   };
 
   const questProgress = Math.min(100, Math.round((loggedRuns.length / 3) * 100));
+  const compactControls = (
+    <div className="grid gap-3 lg:grid-cols-3">
+      <SoundChoiceGroup
+        label="ระดับเสียง"
+        value={pitch}
+        options={[
+          ["low", "ต่ำ"],
+          ["medium", "กลาง"],
+          ["high", "สูง"],
+        ]}
+        onChange={setPitch}
+      />
+      <SoundChoiceGroup
+        label="แรงเคาะ"
+        value={loudness}
+        options={[
+          ["soft", "เบา"],
+          ["normal", "กลาง"],
+          ["hard", "แรง"],
+        ]}
+        onChange={setLoudness}
+      />
+      <SoundChoiceGroup
+        label="ตัวกลาง"
+        value={medium}
+        options={[
+          ["air", "อากาศ"],
+          ["water", "น้ำ"],
+          ["steel", "เหล็ก"],
+        ]}
+        onChange={setMedium}
+      />
+    </div>
+  );
 
   return (
     <SharedSimulationShell
@@ -183,11 +216,21 @@ export default function SoundVibrationsSimulation() {
       icon={Activity}
       sceneTitle="วิชวลแสดงการสั่นเกิดคลื่นเสียง (Soundwave Tube)"
       scene={
-        <div className="relative flex h-full min-h-[300px] flex-col overflow-hidden rounded-2xl border border-blue-100 bg-[linear-gradient(135deg,#f0f9ff_0%,#e0f2fe_48%,#f8fafc_100%)] p-4 select-none">
+        <div
+          data-testid="sound-vibration-experiment-scene"
+          className="relative flex h-full min-h-[300px] flex-col overflow-hidden bg-[linear-gradient(180deg,#f0f9ff_0%,#e0f2fe_55%,#f8fafc_100%)] p-4 select-none"
+        >
           <div className="absolute inset-0 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:20px_20px] opacity-25" />
 
           <div className="relative flex-grow flex items-center justify-center pb-6">
-            <svg viewBox="0 0 200 120" className="w-full max-w-[280px] h-auto overflow-visible">
+            <svg
+              viewBox="0 0 220 120"
+              className="h-auto w-full max-w-[380px] overflow-visible"
+              role="img"
+              aria-labelledby="sound-vibration-title sound-vibration-description"
+            >
+              <title id="sound-vibration-title">การสั่นของส้อมเสียงและการเดินทางของคลื่นเสียง</title>
+              <desc id="sound-vibration-description">ส้อมเสียงสร้างคลื่นผ่านตัวกลางไปยังไมโครโฟน พร้อมแสดงความถี่ ความดัง และความเร็วเสียง</desc>
               {/* Sound Source (vibrating tuning fork/string) (left: x=25) */}
               <g transform="translate(25, 60)">
                 {/* Tuning fork base stem */}
@@ -214,95 +257,32 @@ export default function SoundVibrationsSimulation() {
                 </g>
               )}
 
-              {/* Recipient Ear (right: x=165) */}
-              <g transform="translate(165, 60)">
-                <path d="M 0,-15 A 15,15 0 0,1 0,15 L -5,12 A 10,10 0 0,0 -5,-12 Z" fill="#f59e0b" />
-                <text x="0" y="24" fill="#d97706" fontSize="6" fontWeight="bold" textAnchor="middle">
-                  หูผู้ฟัง
-                </text>
+              <g transform="translate(172, 35)">
+                <rect width="39" height="48" rx="9" fill="#0f172a" stroke="#334155" />
+                <path d="M7 25h25" stroke="#1e293b" />
+                <path
+                  d={Array.from({ length: 24 }).map((_, x) => {
+                    const amp = loudness === "soft" ? 2 : loudness === "normal" ? 5 : 9;
+                    const y = 25 + Math.sin((x + waveOffset) * (pitch === "low" ? 0.25 : pitch === "medium" ? 0.5 : 0.85)) * amp;
+                    return `${x === 0 ? "M" : "L"} ${7 + x},${y}`;
+                  }).join(" ")}
+                  fill="none"
+                  stroke="#22d3ee"
+                  strokeWidth="1.5"
+                />
+                <text x="19.5" y="11" fill="#94a3b8" fontSize="4.8" fontWeight="800" textAnchor="middle">เครื่องรับเสียง</text>
+                <text x="19.5" y="42" fill="#f8fafc" fontSize="5.5" fontWeight="900" textAnchor="middle">{frequencyHz} Hz</text>
               </g>
+              <text x="110" y="108" fill="#475569" fontSize="6" fontWeight="900" textAnchor="middle">
+                ตัวกลาง: {medium === "air" ? "อากาศ" : medium === "water" ? "น้ำ" : "เหล็ก"} · ความเร็ว {travelSpeed} m/s
+              </text>
             </svg>
           </div>
         </div>
       }
       controlsTitle="ปุ่มวิทยุตั้งระดับเสียง"
-      controls={
-        <div className="flex flex-col gap-4 font-sans">
-          <section className="flex flex-col gap-4 rounded-2xl border border-slate-200/70 bg-white p-5 shadow-sm">
-            <h3 className="flex items-center gap-2 text-sm font-black text-slate-800 border-b border-slate-100 pb-2">
-              <Sliders className="h-4.5 w-4.5 text-blue-500" />
-              1. ปรับระดับความดัง & ความสูงต่ำ
-            </h3>
-
-            <div className="flex flex-col gap-1.5">
-              <label className="text-[11px] font-bold text-slate-500">ระดับเสียงความถี่ (Pitch / Frequency)</label>
-              <div className="grid grid-cols-3 gap-1.5">
-                {(["low", "medium", "high"] as const).map((p) => (
-                  <button key={p} type="button" onClick={() => setPitch(p)} className={`rounded-lg border py-1.5 text-xs font-bold transition-all cursor-pointer ${pitch === p ? "border-blue-600 bg-blue-50 text-blue-700 font-extrabold" : "border-slate-200 bg-white text-slate-500"}`}>
-                    {p === "low" ? "เสียงต่ำ 🔉" : p === "medium" ? "เสียงกลาง 🔊" : "เสียงสูง ⚡"}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              <label className="text-[11px] font-bold text-slate-500">ระดับความแรงสั่นสะเทือน (Loudness)</label>
-              <div className="grid grid-cols-3 gap-1.5">
-                {(["soft", "normal", "hard"] as const).map((l) => (
-                  <button key={l} type="button" onClick={() => setLoudness(l)} className={`rounded-lg border py-1.5 text-xs font-bold transition-all cursor-pointer ${loudness === l ? "border-blue-600 bg-blue-50 text-blue-700 font-extrabold" : "border-slate-200 bg-white text-slate-500"}`}>
-                    {l === "soft" ? "เคาะเบา ๆ" : l === "normal" ? "เคาะปานกลาง" : "เคาะแรง ๆ"}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          <section className="flex flex-col gap-4 rounded-2xl border border-slate-200/70 bg-white p-5 shadow-sm">
-            <h3 className="flex items-center gap-2 text-sm font-black text-slate-800 border-b border-slate-100 pb-2">
-              <Activity className="h-4.5 w-4.5 text-blue-500" />
-              2. เลือกชนิดตัวกลางนำเสียง
-            </h3>
-
-            <div className="grid grid-cols-3 gap-1.5">
-              {(["air", "water", "steel"] as const).map((m) => (
-                <button key={m} type="button" onClick={() => setMedium(m)} className={`rounded-xl border py-2 text-[10px] font-black transition-all cursor-pointer ${medium === m ? "border-blue-600 bg-blue-50 text-blue-700 font-black" : "border-slate-200 bg-white text-slate-500"}`}>
-                  {m === "air" ? "อากาศ" : m === "water" ? "น้ำเหลว" : "แผ่นเหล็ก"}
-                </button>
-              ))}
-            </div>
-
-            <button onClick={handleTriggerSound} disabled={isVibrating} className="mt-2 flex items-center justify-center gap-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:bg-slate-100 disabled:text-slate-400 py-2.5 text-xs font-bold text-white shadow-md cursor-pointer">
-              <Play className="h-3.5 w-3.5" />
-              เคาะซ่อมเสียงเพื่อสั่นสะเทือน
-            </button>
-          </section>
-
-          {/* Action buttons */}
-          <div className="grid grid-cols-2 gap-3">
-            <button onClick={handleAddLog} className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs font-bold text-slate-700 shadow-sm transition-all hover:bg-slate-50 active:scale-97 cursor-pointer">
-              <ClipboardList className="h-3.5 w-3.5 text-blue-500" />
-              จดบันทึกผล
-            </button>
-            <button onClick={handleReset} className="flex items-center justify-center gap-2 rounded-xl border border-blue-100 bg-blue-50/50 px-3 py-2.5 text-xs font-bold text-blue-700 shadow-sm transition-all hover:bg-blue-50 active:scale-97 cursor-pointer">
-              <RotateCcw className="h-3.5 w-3.5" />
-              ตั้งใหม่ (Reset)
-            </button>
-          </div>
-        </div>
-      }
-      compactControls={
-        <div className="flex items-center gap-2 font-sans flex-wrap">
-          <button onClick={() => setMedium("air")} className="px-2 py-1 text-xs font-bold rounded bg-slate-100">
-            Air
-          </button>
-          <button onClick={() => setMedium("steel")} className="px-2 py-1 text-xs font-bold rounded bg-slate-100">
-            Steel
-          </button>
-          <button onClick={handleReset} className="px-2 py-1 text-xs font-bold rounded bg-blue-500 text-white">
-            Reset
-          </button>
-        </div>
-      }
+      controls={compactControls}
+      compactControls={compactControls}
       metrics={[
         { label: "ความถี่การสั่นเสียง", value: `${frequencyHz} เฮิรตซ์ (Hz)`, tone: "blue" },
         { label: "ระดับความดังเสียงเคาะ", value: `${amplitudeDb} เดซิเบล (dB)`, tone: "blue" },
@@ -433,9 +413,46 @@ export default function SoundVibrationsSimulation() {
         </div>
       }
       onRun={handleTriggerSound}
-      runLabel="ทดลองเสียง"
+      runLabel={isVibrating ? "กำลังสั่น" : "เคาะส้อมเสียง"}
+      runDisabled={isVibrating}
+      runActive={isVibrating}
       onReset={handleReset}
       onSave={handleSaveResults}
     />
+  );
+}
+
+function SoundChoiceGroup<T extends string>({
+  label,
+  value,
+  options,
+  onChange,
+}: {
+  label: string;
+  value: T;
+  options: readonly (readonly [T, string])[];
+  onChange: (value: T) => void;
+}) {
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-3">
+      <span className="mb-2 block text-xs font-bold text-slate-600">{label}</span>
+      <div className="grid grid-cols-3 gap-1">
+        {options.map(([option, optionLabel]) => (
+          <button
+            key={option}
+            type="button"
+            onClick={() => onChange(option)}
+            aria-pressed={value === option}
+            className={`rounded-lg border px-1 py-2 text-[11px] font-bold ${
+              value === option
+                ? "border-cyan-400 bg-cyan-50 text-cyan-800"
+                : "border-slate-200 bg-white text-slate-600"
+            }`}
+          >
+            {optionLabel}
+          </button>
+        ))}
+      </div>
+    </div>
   );
 }

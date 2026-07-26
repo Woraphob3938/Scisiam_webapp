@@ -192,7 +192,10 @@ test("shared shell exposes full controls when a lab has no compact controls", ()
   );
 
   assert.match(source, /const collapsedControls = sanitizedCompactControls \?\? sanitizedControls;/);
-  assert.match(source, /const hasAdvancedControls = hasCompactControls && controls !== compactControls;/);
+  assert.match(
+    source,
+    /const hasAdvancedControls =[\s\S]*hasCompactControls &&[\s\S]*controls !== null &&[\s\S]*controls !== undefined &&[\s\S]*controls !== compactControls;/,
+  );
   assert.match(source, /usesPersistentControlDock \? persistentControlDock : controlsDrawer/);
 });
 
@@ -477,6 +480,39 @@ test("Newton cooling omits timing and simulation-speed controls", () => {
   assert.doesNotMatch(source, /ความเร็วการจำลอง/);
 });
 
+test("Kepler and Stefan-Boltzmann keep core controls visible without point logging or speed controls", () => {
+  for (const simulation of [
+    "KeplersLawsSimulation.tsx",
+    "StefanBoltzmannSimulation.tsx",
+  ]) {
+    const source = readProjectFile(`src/components/labs/simulation/${simulation}`);
+
+    assert.match(source, /const compactControls = \(/, simulation);
+    assert.match(source, /compactControls=\{compactControls\}/, simulation);
+    assert.doesNotMatch(source, /บันทึกจุด/, simulation);
+    assert.doesNotMatch(source, /ความเร็วจำลอง|ความเร็วการจำลอง/, simulation);
+  }
+});
+
+test("foundation force, light, and sound labs expose their real controls and redesigned experiment scenes", () => {
+  const cases = [
+    ["PushPullForcesSimulation.tsx", "push-pull-experiment-scene"],
+    ["LightShadowsSimulation.tsx", "light-shadow-experiment-scene"],
+    ["SoundVibrationsSimulation.tsx", "sound-vibration-experiment-scene"],
+  ];
+
+  for (const [simulation, sceneTestId] of cases) {
+    const source = readProjectFile(`src/components/labs/simulation/${simulation}`);
+
+    assert.match(source, new RegExp(`data-testid="${sceneTestId}"`), simulation);
+    assert.match(source, /compactControls=\{compactControls\}/, simulation);
+    assert.match(source, /onRun=/, simulation);
+    assert.match(source, /onReset=/, simulation);
+    assert.match(source, /onSave=/, simulation);
+    assert.doesNotMatch(source, /จดบันทึกผล/, simulation);
+  }
+});
+
 test("shared shell only offers advanced settings when a compact control set exists", () => {
   const source = readProjectFile(
     "src/components/labs/simulation/SharedSimulationShell.tsx",
@@ -583,4 +619,207 @@ test("shared shell keeps results and exit actions inside the simulation workflow
   assert.match(source, /searchParams\.get\("classroom"\)/);
   assert.match(source, /tab=classwork/);
   assert.doesNotMatch(source, /\{ key: "results", label: "ผลการทดลอง"/);
+});
+
+test("photoelectric controls follow the shared shell pattern without manual point logging", () => {
+  const source = readProjectFile(
+    "src/components/labs/simulation/PhotoelectricEffectSimulation.tsx",
+  );
+
+  assert.match(source, /const compactControls = \(/);
+  assert.match(source, /compactControls=\{compactControls\}/);
+  assert.doesNotMatch(source, /จดค่าลงตาราง/);
+  assert.match(source, /const currentPoint: PhotoelectricDataPoint = \{/);
+});
+
+test("Ohm and Hooke labs save the current reading without duplicate point buttons", () => {
+  const ohm = readProjectFile(
+    "src/components/labs/simulation/OhmsLawSimulation.tsx",
+  );
+  const hooke = readProjectFile(
+    "src/components/labs/simulation/HookesLawSimulation.tsx",
+  );
+
+  assert.doesNotMatch(ohm, /จดค่าลงตาราง/);
+  assert.match(ohm, /const currentPoint: OhmsDataPoint = \{/);
+  assert.doesNotMatch(hooke, /บันทึกจุด/);
+  assert.match(hooke, /const currentPoint: HookesDataPoint = \{/);
+});
+
+test("foundation circuit, buoyancy, and magnet labs keep real controls visible without missions or log buttons", () => {
+  const cases = [
+    ["SimpleCircuitsSimulation.tsx", "simple-circuit-experiment-scene"],
+    ["FloatingSinkingSimulation.tsx", null],
+    ["MagnetExplorationSimulation.tsx", null],
+  ];
+
+  for (const [simulation, sceneTestId] of cases) {
+    const source = readProjectFile(`src/components/labs/simulation/${simulation}`);
+
+    assert.match(source, /const compactControls = \(/, simulation);
+    assert.match(source, /compactControls=\{compactControls\}/, simulation);
+    assert.match(source, /onRun=/, simulation);
+    assert.match(source, /onReset=/, simulation);
+    assert.match(source, /onSave=/, simulation);
+    assert.doesNotMatch(source, /ภารกิจสั้น 3 ขั้น|จดผล/, simulation);
+    if (sceneTestId) {
+      assert.match(source, new RegExp(`data-testid="${sceneTestId}"`));
+      assert.match(source, /aria-labelledby=/);
+    }
+  }
+});
+
+test("advanced physics labs use compact controls with primary actions outside advanced settings", () => {
+  const simulations = [
+    "QuantumTunnelingSimulation.tsx",
+    "MichelsonInterferometerSimulation.tsx",
+    "ZeemanEffectSimulation.tsx",
+    "SuperconductivityMeissnerSimulation.tsx",
+    "BraggDiffractionSimulation.tsx",
+    "RelativisticKinematicsSimulation.tsx",
+  ];
+
+  for (const simulation of simulations) {
+    const source = readProjectFile(`src/components/labs/simulation/${simulation}`);
+
+    assert.match(source, /const compactControls = \(/, simulation);
+    assert.match(source, /compactControls=\{compactControls\}/, simulation);
+    assert.match(source, /onRun=/, simulation);
+    assert.match(source, /onReset=/, simulation);
+    assert.match(source, /onSave=/, simulation);
+    assert.doesNotMatch(source, /title="บันทึกจุด/, simulation);
+  }
+});
+
+test("chemistry labs use compact controls with primary actions outside advanced settings", () => {
+  const simulations = [
+    "LeChateliersPrincipleSimulation.tsx",
+    "BeerLambertLawSimulation.tsx",
+    "HesssLawSimulation.tsx",
+    "ChemistryConceptSimulation.tsx",
+    "StatesOfMatterSimulation.tsx",
+    "AcidsBasesAroundUsSimulation.tsx",
+    "HeatingCoolingMaterialsSimulation.tsx",
+    "PhysicalChemicalChangesSimulation.tsx",
+    "NmrSpectroscopySimulation.tsx",
+    "HplcChromatographySimulation.tsx",
+    "TransitionMetalComplexesSimulation.tsx",
+    "EisElectrochemistrySimulation.tsx",
+    "QuantumChemistryOrbitalsSimulation.tsx",
+  ];
+
+  for (const simulation of simulations) {
+    const source = readProjectFile(`src/components/labs/simulation/${simulation}`);
+
+    assert.match(source, /const compactControls = \(/, simulation);
+    assert.match(source, /compactControls=\{compactControls\}/, simulation);
+    assert.match(source, /onRun=/, simulation);
+    assert.match(source, /onReset=/, simulation);
+    assert.match(source, /onSave=/, simulation);
+    assert.doesNotMatch(source, /compactControls=\{controls\}/, simulation);
+  }
+});
+
+test("shared compact controls auto-fit without covering the chemistry stage", () => {
+  const shell = readProjectFile(
+    "src/components/labs/simulation/SharedSimulationShell.tsx",
+  );
+  const compactRange = readProjectFile(
+    "src/components/labs/simulation/CompactRangeControl.tsx",
+  );
+
+  assert.match(shell, /repeat\(auto-fit, minmax\(min\(100%, 11\.5rem\), 1fr\)\)/);
+  assert.match(shell, /sm:bottom-\[300px\] lg:bottom-\[220px\]/);
+  assert.match(compactRange, /rounded-xl border border-slate-100/);
+  assert.doesNotMatch(compactRange, /rounded-2xl border border-slate-200 bg-slate-50\/80 p-3/);
+});
+
+test("biology labs keep compact controls and primary actions visible without manual point logging", () => {
+  const simulations = [
+    "PhotosynthesisRateSimulation.tsx",
+    "MendelianGeneticsSimulation.tsx",
+    "MitosisCellCycleSimulation.tsx",
+    "OsmosisPlasmolysisSimulation.tsx",
+    "EnzymeKineticsSimulation.tsx",
+    "DnaExtractionSimulation.tsx",
+    "CellularRespirationSimulation.tsx",
+    "PlantTranspirationSimulation.tsx",
+    "NaturalSelectionSimulation.tsx",
+    "BloodTypingAgglutinationSimulation.tsx",
+    "FoodChainEcologySimulation.tsx",
+    "CardiovascularSystemSimulation.tsx",
+    "PcrGelElectrophoresisSimulation.tsx",
+    "CrisprGeneEditingSimulation.tsx",
+    "RecombinantDnaTransformationSimulation.tsx",
+    "FlowCytometrySimulation.tsx",
+    "WesternBlottingSimulation.tsx",
+    "MetabolicPathwayFluxSimulation.tsx",
+  ];
+
+  for (const simulation of simulations) {
+    const source = readProjectFile(`src/components/labs/simulation/${simulation}`);
+
+    assert.match(source, /onRun=/, `${simulation} should expose its experiment action`);
+    assert.match(source, /onReset=/, `${simulation} should expose its reset action`);
+    assert.match(source, /onSave=/, `${simulation} should expose its save action`);
+    assert.doesNotMatch(
+      source,
+      /เพิ่มจุด|บันทึกจุด(?:วัด)?|จดค่าลงตาราง/,
+      `${simulation} should not require manual point logging`,
+    );
+    assert.doesNotMatch(
+      source,
+      /<section className="flex min-h-\[300px\]/,
+      `${simulation} result cards should stay compact`,
+    );
+  }
+
+  const specializedControls = [
+    "PcrGelElectrophoresisSimulation.tsx",
+    "CrisprGeneEditingSimulation.tsx",
+    "RecombinantDnaTransformationSimulation.tsx",
+    "FlowCytometrySimulation.tsx",
+    "WesternBlottingSimulation.tsx",
+    "MetabolicPathwayFluxSimulation.tsx",
+  ];
+
+  for (const simulation of specializedControls) {
+    const source = readProjectFile(`src/components/labs/simulation/${simulation}`);
+    assert.match(
+      source,
+      /CompactRangeControl|<fieldset/,
+      `${simulation} should expose compact, lab-specific controls`,
+    );
+    assert.doesNotMatch(
+      source,
+      /Cycles -5|gRNA -10|Time -5s|Dye -0\.2|Expose -1s|O2 Low/,
+      `${simulation} should not expose temporary increment controls`,
+    );
+  }
+
+  const pcr = readProjectFile(
+    "src/components/labs/simulation/PcrGelElectrophoresisSimulation.tsx",
+  );
+  assert.match(
+    pcr,
+    /Math\.min\(cycleCount, c \+ 1\)/,
+    "PCR progress should never exceed the selected cycle count",
+  );
+
+  const shell = readProjectFile(
+    "src/components/labs/simulation/SharedSimulationShell.tsx",
+  );
+  assert.match(shell, /เพิ่มจุด\|บันทึกจุด/, "manual point logging should be filtered");
+  assert.match(shell, /lg:grid-cols-3/, "fallback controls should use a compact grid");
+  assert.match(shell, /max-h-\[260px\]/, "result cards should stay below the stage");
+  assert.match(
+    shell,
+    /min-w-0 max-w-full overflow-hidden/,
+    "the mobile experiment shell should not expand beyond the viewport",
+  );
+  assert.match(
+    shell,
+    /overflow-x-clip/,
+    "the simulation page should not create horizontal scrolling on mobile",
+  );
 });

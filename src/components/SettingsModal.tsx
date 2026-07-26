@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   Accessibility,
+  BellRing,
   Bot,
   BookOpen,
   Check,
@@ -28,6 +29,12 @@ import {
   readDisplayPreferences,
   type ScisiamTextSize,
 } from "@/lib/display-preferences";
+import {
+  disablePushNotifications,
+  enablePushNotifications,
+  getPushNotificationStatus,
+  type PushNotificationStatus,
+} from "@/lib/push-notifications";
 
 export const scisiam_SETTINGS_EVENT = "scisiam_settings_updated";
 
@@ -128,6 +135,10 @@ export default function SettingsModal({
   const [passwordResetBusy, setPasswordResetBusy] = useState(false);
   const [passwordResetMessage, setPasswordResetMessage] = useState("");
   const [passwordResetError, setPasswordResetError] = useState(false);
+  const [pushStatus, setPushStatus] =
+    useState<PushNotificationStatus>("unsupported");
+  const [pushBusy, setPushBusy] = useState(false);
+  const [pushMessage, setPushMessage] = useState("");
 
   useEffect(() => {
     if (!isOpen) return;
@@ -148,6 +159,13 @@ export default function SettingsModal({
   useEffect(() => {
     persistSettings({ aiStyle, aiDetail, textSize, reduceMotion, colorBlind });
   }, [aiStyle, aiDetail, textSize, reduceMotion, colorBlind]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    void getPushNotificationStatus()
+      .then(setPushStatus)
+      .catch(() => setPushStatus("unsupported"));
+  }, [isOpen]);
 
   const selectedAiStyle = useMemo(
     () => aiStyles.find((item) => item.id === aiStyle) || aiStyles[0],
@@ -198,6 +216,35 @@ export default function SettingsModal({
     }
   };
 
+  const togglePushNotifications = async (enabled: boolean) => {
+    setPushBusy(true);
+    setPushMessage("");
+
+    try {
+      if (enabled) {
+        await enablePushNotifications();
+        setPushStatus("enabled");
+        setPushMessage("เปิดแจ้งเตือนงานจากห้องเรียนแล้ว");
+      } else {
+        await disablePushNotifications();
+        setPushStatus("prompt");
+        setPushMessage("ปิดแจ้งเตือนบนโทรศัพท์แล้ว");
+      }
+    } catch (error) {
+      const currentStatus = await getPushNotificationStatus().catch(
+        (): PushNotificationStatus => "unsupported",
+      );
+      setPushStatus(currentStatus);
+      setPushMessage(
+        error instanceof Error
+          ? error.message
+          : "เปลี่ยนการตั้งค่าแจ้งเตือนไม่สำเร็จ",
+      );
+    } finally {
+      setPushBusy(false);
+    }
+  };
+
   const portalTarget = typeof document === "undefined" ? null : document.body;
   if (!isOpen || !portalTarget) return null;
 
@@ -242,6 +289,52 @@ export default function SettingsModal({
         </div>
 
         <div className="grid gap-3 overflow-y-auto bg-slate-50/50 px-5 py-5 sm:px-6">
+          <section className="order-1 rounded-2xl border border-blue-100 bg-blue-50/40 p-4 sm:hidden">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex min-w-0 items-start gap-3">
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-blue-600 text-white">
+                  <BellRing className="h-5 w-5" aria-hidden="true" />
+                </span>
+                <div className="min-w-0">
+                  <h3 className="text-base font-extrabold leading-[1.45] text-slate-950">
+                    แจ้งเตือนงานจากห้องเรียน
+                  </h3>
+                  <p className="text-sm font-semibold leading-relaxed text-slate-500">
+                    รับแจ้งเตือนบนโทรศัพท์เมื่อคุณครูเพิ่มงาน แม้กำลังใช้แอปอื่นอยู่
+                  </p>
+                </div>
+              </div>
+              <SwitchButton
+                checked={pushStatus === "enabled"}
+                onChange={(checked) => void togglePushNotifications(checked)}
+                label="รับแจ้งเตือนงานจากห้องเรียนบนโทรศัพท์"
+                disabled={
+                  pushBusy ||
+                  pushStatus === "blocked" ||
+                  pushStatus === "unsupported" ||
+                  pushStatus === "unavailable"
+                }
+              />
+            </div>
+            {pushStatus === "blocked" ? (
+              <p className="mt-3 text-xs font-bold leading-relaxed text-amber-700">
+                โทรศัพท์บล็อกการแจ้งเตือนไว้ กรุณาเปิดสิทธิ์ให้ Scisiam ในการตั้งค่าโทรศัพท์
+              </p>
+            ) : pushStatus === "unsupported" ? (
+              <p className="mt-3 text-xs font-bold leading-relaxed text-amber-700">
+                หากใช้ iPhone กรุณาเพิ่ม Scisiam ไปยังหน้าจอโฮมก่อน แล้วเปิดจากไอคอนแอป
+              </p>
+            ) : pushStatus === "unavailable" ? (
+              <p className="mt-3 text-xs font-bold leading-relaxed text-slate-500">
+                ระบบแจ้งเตือนบนโทรศัพท์ยังไม่ได้ตั้งค่าบนเซิร์ฟเวอร์
+              </p>
+            ) : pushMessage ? (
+              <p className="mt-3 text-xs font-bold leading-relaxed text-blue-700" role="status">
+                {pushMessage}
+              </p>
+            ) : null}
+          </section>
+
           <section className="order-2 rounded-2xl border border-slate-200 bg-white p-4">
             <div className="flex items-start gap-3">
               <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-blue-600 text-white">
@@ -538,10 +631,12 @@ function SwitchButton({
   checked,
   onChange,
   label,
+  disabled = false,
 }: {
   checked: boolean;
   onChange: (checked: boolean) => void;
   label: string;
+  disabled?: boolean;
 }) {
   return (
     <button
@@ -549,12 +644,13 @@ function SwitchButton({
       role="switch"
       aria-checked={checked}
       aria-label={label}
+      disabled={disabled}
       onMouseDown={(event) => event.stopPropagation()}
       onClick={(event) => {
         event.stopPropagation();
         onChange(!checked);
       }}
-      className={`relative h-8 w-14 shrink-0 rounded-full border-2 p-0.5 transition-colors focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100 ${
+      className={`relative h-8 w-14 shrink-0 rounded-full border-2 p-0.5 transition-colors focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100 disabled:cursor-not-allowed disabled:opacity-50 ${
         checked ? "border-blue-600 bg-blue-600" : "border-slate-300 bg-slate-200"
       }`}
     >

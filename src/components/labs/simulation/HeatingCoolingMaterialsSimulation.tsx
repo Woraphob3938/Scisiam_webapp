@@ -2,14 +2,13 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import SharedSimulationShell from "./SharedSimulationShell";
+import CompactRangeControl from "./CompactRangeControl";
 import {
   Beaker,
   Thermometer,
-  RotateCcw,
   Info,
-  Play,
-  Pause,
   Flame,
+  Play,
 } from "lucide-react";
 import { labsById } from "@/data/labs";
 import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";
@@ -102,11 +101,11 @@ export default function HeatingCoolingMaterialsSimulation() {
 
   const matState = getCurrentState(temperature);
 
-  const handleLogObservation = () => {
+  const createCurrentObservation = (): SimulationLog => {
     const note = temperature <= selectedMaterial.meltingPoint ? "แข็งตัวเป็นของแข็ง" :
                  (temperature >= selectedMaterial.boilingPoint ? "เดือดกลายเป็นแก๊ส" : "หลอมเหลวเป็นของเหลว");
 
-    const newLog: SimulationLog = {
+    return {
       id: observations.reduce((maxId, item) => Math.max(maxId, item.id), 0) + 1,
       time: Math.round(elapsedSeconds),
       temperature,
@@ -114,8 +113,6 @@ export default function HeatingCoolingMaterialsSimulation() {
       state: matState.label,
       note,
     };
-
-    setObservations(prev => [newLog, ...prev]);
   };
 
   const handleClearLogs = () => {
@@ -123,10 +120,10 @@ export default function HeatingCoolingMaterialsSimulation() {
   };
 
   const handleSave = async () => {
-    if (observations.length === 0) {
-      window.alert("กรุณาบันทึกข้อมูลตารางทดลองอย่างน้อย 1 รายการก่อนบันทึกผล");
-      return;
-    }
+    const savedObservations = observations.length > 0
+      ? observations
+      : [createCurrentObservation()];
+    if (observations.length === 0) setObservations(savedObservations);
 
     setIsSaving(true);
     try {
@@ -135,7 +132,7 @@ export default function HeatingCoolingMaterialsSimulation() {
         localPayload: {
           labId,
           timestamp: new Date().toISOString(),
-          observations,
+          observations: savedObservations,
         },
         labId,
         title: "การร้อนและเย็นของวัสดุ",
@@ -145,13 +142,13 @@ export default function HeatingCoolingMaterialsSimulation() {
           temperature,
           state: matState.id,
         },
-        graphPoints: observations.map(o => ({
+        graphPoints: savedObservations.map(o => ({
           x: o.time,
           y: o.temperature,
         })),
-        tableRows: observations,
+        tableRows: savedObservations,
         summary: {
-          logCount: observations.length,
+          logCount: savedObservations.length,
           finalState: matState.label,
           finalTemp: temperature,
         },
@@ -278,6 +275,24 @@ export default function HeatingCoolingMaterialsSimulation() {
     return null;
   };
 
+  const compactControls = (
+    <CompactRangeControl
+      label="อุณหภูมิแวดล้อม"
+      symbol="T"
+      value={envTemp}
+      min={-15}
+      max={150}
+      step={5}
+      precision={0}
+      unit="°C"
+      tone="orange"
+      onChange={(value) => {
+        envTempRef.current = value;
+        setEnvTemp(value);
+      }}
+    />
+  );
+
   return (
     <SharedSimulationShell
       accent="orange"
@@ -331,6 +346,7 @@ export default function HeatingCoolingMaterialsSimulation() {
         </div>
       }
       controlsTitle="ตั้งค่าวัสดุและแหล่งความร้อน"
+      compactControls={compactControls}
       controls={
         <div className="flex flex-col gap-4 w-full">
           <div>
@@ -355,57 +371,6 @@ export default function HeatingCoolingMaterialsSimulation() {
             </div>
           </div>
 
-          <hr className="border-slate-100 dark:border-slate-800" />
-
-          <div>
-            <div className="flex justify-between text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">
-              <span>ตั้งค่าแหล่งจ่ายอุณหภูมิ</span>
-              <span className="text-orange-600 dark:text-orange-400 font-bold">{envTemp} °C</span>
-            </div>
-            <input
-              type="range"
-              min="-15"
-              max="150"
-              step="5"
-              value={envTemp}
-              onChange={(e) => {
-                const nextTemperature = parseInt(e.target.value);
-                envTempRef.current = nextTemperature;
-                setEnvTemp(nextTemperature);
-              }}
-              className="w-full accent-orange-600"
-            />
-            <div className="flex justify-between text-[10px] text-slate-400 mt-1">
-              <span>ฟรีซเซอร์ (-15 °C)</span>
-              <span>อุณหภูมิห้อง (25 °C)</span>
-              <span>เตาต้ม (150 °C)</span>
-            </div>
-          </div>
-
-          <div className="flex gap-2 mt-2">
-            <button
-              onClick={() => setIsRunning(!isRunning)}
-              className={`flex-1 py-2 px-4 text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors ${
-                isRunning ? "bg-red-500 hover:bg-red-600" : "bg-emerald-600 hover:bg-emerald-700"
-              }`}
-            >
-              {isRunning ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-              {isRunning ? "หยุดจำลอง" : "เริ่มจำลอง"}
-            </button>
-            <button
-              onClick={handleReset}
-              className="py-2 px-3 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg text-xs font-semibold flex items-center justify-center transition-colors"
-            >
-              <RotateCcw className="w-4 h-4 text-slate-500" />
-            </button>
-          </div>
-
-          <button
-            onClick={handleLogObservation}
-            className="w-full py-2 border border-dashed border-orange-300 dark:border-orange-800 text-orange-600 hover:bg-orange-50 dark:text-orange-400 dark:hover:bg-orange-950/20 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1"
-          >
-            บันทึกค่าลงตารางทดลอง
-          </button>
         </div>
       }
       metrics={getMetricDisplay()}

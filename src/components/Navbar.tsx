@@ -13,6 +13,7 @@ import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import { listMyClassroomNotifications, markClassroomNotificationsRead, type ClassroomNotification } from "@/lib/supabase/classrooms";
 import { getProfileAvatarSrc } from "@/lib/supabase/profile-avatar";
 import { useAuth } from "@/context/AuthContext";
+import { disablePushNotifications } from "@/lib/push-notifications";
 
 type NavbarNotification = {
   id: string;
@@ -140,6 +141,7 @@ export default function Navbar() {
     setShowProfileMenu(false);
 
     if (isSupabaseConfigured()) {
+      await disablePushNotifications().catch(() => null);
       await createClient().auth.signOut();
     }
 
@@ -190,7 +192,7 @@ export default function Navbar() {
 
   return (
     <>
-    <nav className="sticky top-0 z-50 flex min-h-[64px] w-full items-center justify-between border-b border-slate-100 bg-white/85 px-3 py-2 shadow-xs backdrop-blur-md transition-all duration-300 sm:px-8 sm:py-3.5">
+    <nav className="mobile-chrome-top sticky top-0 z-50 flex min-h-[64px] w-full items-center justify-between border-b border-slate-100 bg-white/85 px-3 py-2 shadow-xs backdrop-blur-md sm:px-8 sm:py-3.5">
       {/* Logo Section */}
       <div className="flex min-w-0 items-center gap-2 select-none sm:gap-3">
         <button
@@ -205,7 +207,7 @@ export default function Navbar() {
           <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-xl bg-white shadow-md shadow-blue-500/20 transition-all duration-300 group-hover:scale-105">
             <Image src="/ai-oon-logo.png" alt="โลโก้ Scisiam น้องไออุ่น" fill sizes="40px" className="object-contain p-0.5" priority />
           </div>
-          <span className="scisiam-wordmark truncate whitespace-nowrap bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 bg-clip-text text-xl text-transparent select-none sm:text-2xl">
+          <span className="scisiam-wordmark hidden truncate whitespace-nowrap bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 bg-clip-text text-xl text-transparent select-none sm:inline sm:text-2xl">
             Scisiam
           </span>
         </Link>

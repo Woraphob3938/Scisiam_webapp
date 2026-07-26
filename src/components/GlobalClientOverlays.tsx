@@ -12,6 +12,7 @@ import {
 
 const AIChatButton = dynamic(() => import("@/components/AIChatButton"), { ssr: false });
 const FirstLoginTour = dynamic(() => import("@/components/FirstLoginTour"), { ssr: false });
+const MobileChromeController = dynamic(() => import("@/components/MobileChromeController"), { ssr: false });
 const MobileTabBar = dynamic(() => import("@/components/MobileTabBar"), { ssr: false });
 
 function isAuthRoute(pathname: string) {
@@ -56,7 +57,12 @@ export default function GlobalClientOverlays() {
     <>
       <AIChatButton />
       <FirstLoginTour role={role} />
-      {isMobile ? <MobileTabBar /> : null}
+      {isMobile ? (
+        <>
+          <MobileChromeController />
+          <MobileTabBar />
+        </>
+      ) : null}
     </>
   );
 }

@@ -4,8 +4,6 @@ import React, { useState, useEffect, useRef, useId } from "react";
 import {
   Sliders,
   Play,
-  Pause,
-  RotateCcw,
   LineChart,
   ClipboardList,
   Target,
@@ -17,6 +15,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import SharedSimulationShell from "@/components/labs/simulation/SharedSimulationShell";
+import CompactRangeControl from "@/components/labs/simulation/CompactRangeControl";
 import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";
 
 // --- TYPES ---
@@ -458,7 +457,6 @@ export default function MichelsonInterferometerSimulation() {
 
       if (brightPoints >= 2 && darkPoints >= 2 && (brightPoints + darkPoints) >= 5 && !questSuccess) {
         setQuestSuccess(true);
-        alert("🎉 ยินดีด้วย! คุณเก็บบันทึกข้อมูลยอดแสงสว่างสุดและยอดมืดสุดได้อย่างครอบคลุม (อย่างน้อยฝั่งละ 2 จุด รวมกันครบ 5 จุด) บันทึกรายงานผลเพื่อเคลียร์ภารกิจนี้");
       }
     }, 0);
 
@@ -497,22 +495,6 @@ export default function MichelsonInterferometerSimulation() {
     lastLoggedTimeRef.current = 0;
     setQuestProgress(0);
     setQuestSuccess(false);
-  };
-
-  // Add Manual log point
-  const handleAddPoint = () => {
-    setDataPoints((prev) =>
-      [
-        ...prev,
-        {
-          time: elapsedSeconds,
-          wavelength,
-          mirrorOffset,
-          refractiveIndex,
-          intensity,
-        },
-      ].slice(-MAX_DATA_POINTS),
-    );
   };
 
   // Clear single point from table
@@ -625,108 +607,42 @@ export default function MichelsonInterferometerSimulation() {
     alert("บันทึกข้อมูลการทดลอง (ความเข้มแสงเชิงแสงและตารางบันทึกผล) สำเร็จ! 🎉");
   };
 
-  const simControls = (
-    <div className="space-y-5">
-      {/* Slider: Wavelength */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between text-xs sm:text-sm font-bold">
-          <span className="text-slate-600">ความยาวคลื่นเลเซอร์ (λ)</span>
-          <span className="text-red-650 font-mono">{wavelength.toFixed(1)} nm</span>
-        </div>
-        <input
-          type="range"
-          min="400"
-          max="700"
-          step="1"
-          value={wavelength}
-          onChange={(e) => setWavelength(parseInt(e.target.value))}
-          className="w-full accent-red-650"
-        />
-        <div className="flex justify-between text-[10px] text-slate-400 font-bold">
-          <span>400 nm (ม่วง)</span>
-          <span>700 nm (แดง)</span>
-        </div>
-      </div>
-
-      {/* Slider: Mirror Offset */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between text-xs sm:text-sm font-bold">
-          <span className="text-slate-600">การเลื่อนกระจก M2 (Piezo)</span>
-          <span className="text-red-650 font-mono">{mirrorOffset.toFixed(4)} µm</span>
-        </div>
-        <input
-          type="range"
-          min="0.0"
-          max="5.0"
-          step="0.01"
-          value={mirrorOffset}
-          onChange={(e) => setMirrorOffset(parseFloat(e.target.value))}
-          className="w-full accent-red-650"
-        />
-        <div className="flex justify-between text-[10px] text-slate-400 font-bold">
-          <span>0.00 µm</span>
-          <span>5.00 µm</span>
-        </div>
-      </div>
-
-      {/* Slider: Medium Refractive Index */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between text-xs sm:text-sm font-bold">
-          <span className="text-slate-600">ดัชนีหักเหแก๊สในเซลล์ (n)</span>
-          <span className="text-red-650 font-mono">{refractiveIndex.toFixed(4)}</span>
-        </div>
-        <input
-          type="range"
-          min="1.0000"
-          max="1.0050"
-          step="0.0001"
-          value={refractiveIndex}
-          onChange={(e) => setRefractiveIndex(parseFloat(e.target.value))}
-          className="w-full accent-red-650"
-        />
-        <div className="flex justify-between text-[10px] text-slate-400 font-bold">
-          <span>1.0000 (สุญญากาศ)</span>
-          <span>1.0050</span>
-        </div>
-      </div>
-
-      {/* Button Controls */}
-      <div className="flex items-center gap-2 border-t border-slate-100 pt-4">
-        <button
-          onClick={handleStartStop}
-          className={`flex-grow flex min-h-10 items-center justify-center gap-2 rounded-xl px-4 text-sm font-bold text-white transition-all active:scale-95 ${
-            isRunning
-              ? "bg-slate-700 shadow-lg shadow-slate-500/10"
-              : "bg-red-650 shadow-lg shadow-red-500/20 hover:bg-red-700"
-          }`}
-        >
-          {isRunning ? (
-            <>
-              <Pause className="h-4 w-4" />
-              <span>หยุดจำลอง</span>
-            </>
-          ) : (
-            <>
-              <Play className="h-4 w-4 fill-white" />
-              <span>เริ่มจำลอง</span>
-            </>
-          )}
-        </button>
-        <button
-          onClick={handleReset}
-          className="flex min-h-10 items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 text-sm font-bold text-slate-600 transition-all hover:bg-slate-50 active:scale-95"
-          title="รีเซ็ต"
-        >
-          <RotateCcw className="h-4 w-4" />
-        </button>
-        <button
-          onClick={handleAddPoint}
-          className="flex min-h-10 items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 text-sm font-bold text-slate-700 transition-all hover:bg-slate-50 active:scale-95"
-          title="บันทึกจุดนี้"
-        >
-          <ClipboardList className="h-4 w-4 text-red-500" />
-        </button>
-      </div>
+  const compactControls = (
+    <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
+      <CompactRangeControl
+        label="ความยาวคลื่นเลเซอร์"
+        symbol="λ"
+        value={wavelength}
+        min={400}
+        max={700}
+        step={1}
+        unit="nm"
+        tone="pink"
+        onChange={setWavelength}
+      />
+      <CompactRangeControl
+        label="ตำแหน่งกระจก M2"
+        symbol="d"
+        value={mirrorOffset}
+        min={0}
+        max={5}
+        step={0.01}
+        precision={2}
+        unit="µm"
+        tone="blue"
+        onChange={setMirrorOffset}
+      />
+      <CompactRangeControl
+        label="ดัชนีหักเหแก๊ส"
+        symbol="n"
+        value={refractiveIndex}
+        min={1}
+        max={1.005}
+        step={0.0001}
+        precision={4}
+        tone="violet"
+        onChange={setRefractiveIndex}
+      />
     </div>
   );
 
@@ -814,7 +730,7 @@ export default function MichelsonInterferometerSimulation() {
         />
       }
       controlsTitle="แผงพารามิเตอร์ระบบทัศนศาสตร์"
-      controls={simControls}
+      compactControls={compactControls}
       metrics={[
         { label: "ความเข้มแสง I", value: `${(intensity * 100).toFixed(1)}%`, tone: "rose" },
         { label: "ความยาวคลื่น λ", value: `${wavelength.toFixed(0)} nm`, tone: "orange" },

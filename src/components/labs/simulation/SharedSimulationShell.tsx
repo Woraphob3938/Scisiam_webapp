@@ -49,7 +49,7 @@ interface SharedSimulationShellProps {
   sceneTitle: string;
   scene: React.ReactNode;
   controlsTitle: string;
-  controls: React.ReactNode;
+  controls?: React.ReactNode;
   compactControls?: React.ReactNode;
   persistentControls?: boolean;
   drawerSummary?: React.ReactNode;
@@ -59,9 +59,9 @@ interface SharedSimulationShellProps {
   theory: React.ReactNode;
   steps: SimulationStep[];
   learningGoals: string[];
-  progressLabel: string;
-  progressValue: string;
-  progressPercent: number;
+  progressLabel?: string;
+  progressValue?: string;
+  progressPercent?: number;
   tips: string[];
   showLiveMetrics?: boolean;
   showInfoTabs?: boolean;
@@ -171,6 +171,10 @@ function isDuplicateActionLabel(
   label: string,
   actions: Pick<SharedSimulationShellProps, "onRun" | "onSave" | "onReset">,
 ) {
+  if (/^(เพิ่มจุด|บันทึกจุด(?:วัด)?|จดค่าลงตาราง|จดผล)$/.test(label)) {
+    return true;
+  }
+
   if (actions.onReset && /^(รีเซ็ต|เริ่มใหม่|ตั้งใหม่)(?:\s*\(reset\))?$|^reset$/.test(label)) {
     return true;
   }
@@ -278,9 +282,19 @@ export default function SharedSimulationShell({
   const collapsedControls = sanitizedCompactControls ?? sanitizedControls;
   const hasCollapsedControls =
     collapsedControls !== null && collapsedControls !== undefined && collapsedControls !== false;
-  const hasAdvancedControls = hasCompactControls && controls !== compactControls;
+  const hasAdvancedControls =
+    hasCompactControls &&
+    controls !== null &&
+    controls !== undefined &&
+    controls !== compactControls;
   const usesPersistentControlDock = persistentControls || hasCollapsedControls || hasPrimaryActions;
   const usesRegularControlDock = usesPersistentControlDock && hasCollapsedControls && !hasCompactControls;
+  const compactControlGridStyle = hasCompactControls
+    ? { gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 11.5rem), 1fr))" }
+    : undefined;
+  const compactControlGridClass = hasCompactControls
+    ? "grid min-w-0 items-stretch gap-2 [&>:only-child]:col-span-full"
+    : "grid min-w-0 grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 [&>.space-y-4]:contents [&_label]:m-0 [&_label]:rounded-xl [&_label]:border [&_label]:border-slate-100 [&_label]:bg-slate-50/80 [&_label]:p-2.5";
   const stageBottomClass = !usesPersistentControlDock
     ? controlsOpen
       ? "sm:bottom-[calc(32vh+48px)]"
@@ -289,7 +303,7 @@ export default function SharedSimulationShell({
         : "sm:bottom-[104px]"
     : usesRegularControlDock
       ? "sm:bottom-[272px]"
-      : "sm:bottom-[220px]";
+      : "sm:bottom-[300px] lg:bottom-[220px]";
 
   useEffect(() => {
     const syncFullscreen = () => setIsExpanded(document.fullscreenElement === stageShellRef.current);
@@ -508,7 +522,10 @@ export default function SharedSimulationShell({
 
       {!controlsOpen && hasCollapsedControls && (
         <div className="border-t border-slate-100 px-4 pb-4 pt-1">
-          <div className={compactControls ? "" : "max-h-[170px] overflow-y-auto pr-1"}>
+          <div
+            className={compactControlGridClass}
+            style={compactControlGridStyle}
+          >
             {collapsedControls}
           </div>
         </div>
@@ -521,7 +538,7 @@ export default function SharedSimulationShell({
   const persistentControlDock = (
     <section
       data-testid="persistent-control-dock"
-      className="rounded-2xl border border-white/70 bg-white/95 p-3 shadow-xl shadow-slate-900/10 backdrop-blur-md"
+      className="w-full min-w-0 max-w-full overflow-hidden rounded-2xl border border-white/70 bg-white/95 p-3 shadow-xl shadow-slate-900/10 backdrop-blur-md"
     >
       <div className="mb-2 flex items-center justify-between gap-3">
         <h2 className="flex min-w-0 items-center gap-2 text-sm font-black text-slate-900 sm:text-base">
@@ -550,7 +567,10 @@ export default function SharedSimulationShell({
           )}
         </div>
       </div>
-      <div className={hasCompactControls ? "min-w-0" : "max-h-[170px] min-w-0 overflow-y-auto pr-1"}>
+      <div
+        className={compactControlGridClass}
+        style={compactControlGridStyle}
+      >
         {collapsedControls}
       </div>
       {primaryActions && <div className="mt-3">{primaryActions}</div>}
@@ -566,7 +586,7 @@ export default function SharedSimulationShell({
       aria-modal="true"
       aria-label="การตั้งค่าขั้นสูง"
       onKeyDown={handleAdvancedPanelKeyDown}
-      className={`absolute inset-4 z-40 overflow-y-auto rounded-2xl border bg-white p-4 shadow-xl shadow-slate-900/15 sm:inset-x-5 sm:bottom-[210px] sm:top-[122px] md:left-auto md:w-[min(720px,calc(100%-2.5rem))] ${tone.border}`}
+      className={`absolute inset-4 z-40 overflow-y-auto rounded-2xl border bg-white p-4 shadow-xl shadow-slate-900/15 sm:inset-x-5 sm:bottom-[290px] sm:top-[122px] md:left-auto md:w-[min(720px,calc(100%-2.5rem))] lg:bottom-[210px] ${tone.border}`}
     >
       <div className="mb-3 flex items-center justify-between gap-3 border-b border-slate-100 pb-3">
         <h2 className="text-sm font-black text-slate-900">การตั้งค่าขั้นสูง</h2>
@@ -627,8 +647,8 @@ export default function SharedSimulationShell({
       </div>
 
       <div className="grid min-w-0 gap-4">
-        <div className="min-w-0 overflow-x-auto">{graph}</div>
-        <div className="min-w-0 overflow-x-auto">{table}</div>
+        <div className="max-h-[260px] min-w-0 overflow-auto">{graph}</div>
+        <div className="max-h-[260px] min-w-0 overflow-auto">{table}</div>
       </div>
     </section>
   );
@@ -636,7 +656,7 @@ export default function SharedSimulationShell({
   const simulationStage = (
     <section
       ref={stageShellRef}
-      className={`relative overflow-hidden border border-slate-200 bg-slate-900 shadow-2xl shadow-slate-300/60 ${
+      className={`relative w-full min-w-0 max-w-full overflow-hidden border border-slate-200 bg-slate-900 shadow-2xl shadow-slate-300/60 ${
         isExpanded
           ? "fixed inset-0 z-[100] h-screen min-h-screen w-screen rounded-none border-0 shadow-none"
           : "min-h-[760px] rounded-[24px] sm:h-[72vh] sm:min-h-[620px] sm:max-h-[840px]"
@@ -736,11 +756,11 @@ export default function SharedSimulationShell({
   } satisfies Record<InfoTab, React.ReactNode>;
 
   return (
-    <div className="relative flex min-h-screen flex-col bg-[#f8fafc] pb-12">
+    <div className="relative flex min-h-screen min-w-0 flex-col overflow-x-clip bg-[#f8fafc] pb-12">
       <Navbar />
 
-      <main className="mx-auto w-full max-w-[1440px] px-4 py-6 sm:px-12 md:px-20">
-        <div className="flex flex-col gap-6">
+      <main className="mx-auto w-full min-w-0 max-w-[1440px] overflow-x-clip px-4 py-6 sm:px-12 md:px-20">
+        <div className="flex min-w-0 flex-col gap-6">
               {simulationStage}
 
               {showInfoTabs && <section className="space-y-4">

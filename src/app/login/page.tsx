@@ -1,4 +1,12 @@
 import AuthForm from "@/components/auth/AuthForm";
+import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
+
+function getSafeNextPath(next: string | undefined) {
+  return next?.startsWith("/") && !next.startsWith("//") && !next.startsWith("/login")
+    ? next
+    : "/labs";
+}
 
 export default async function LoginPage({
   searchParams,
@@ -9,9 +17,23 @@ export default async function LoginPage({
     oauth?: string;
     registered?: string;
     reset?: string;
+    next?: string;
   }>;
 }) {
-  const { confirmed, email, oauth, registered, reset } = await searchParams;
+  const { confirmed, email, oauth, registered, reset, next } = await searchParams;
+
+  if (isSupabaseConfigured()) {
+    let hasSession = false;
+    try {
+      const supabase = await createClient();
+      const { data } = await supabase.auth.getClaims();
+      hasSession = Boolean(data?.claims);
+    } catch {
+      // Keep the login form available during a temporary auth/network outage.
+    }
+    if (hasSession) redirect(getSafeNextPath(next));
+  }
+
   const registeredEmail = typeof email === "string" && email.includes("@") ? email : "";
   const initialNotice =
     reset === "success"

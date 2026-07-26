@@ -3,8 +3,6 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import {
   Play,
-  Pause,
-  RotateCcw,
   Sliders,
   Trash,
   Download,
@@ -554,7 +552,6 @@ export default function HookesLawSimulation() {
           if (nextProg >= 15 && !questSuccessRef.current) {
             setQuestSuccess(true);
             questSuccessRef.current = true;
-            alert("🎉 ยินดีด้วย! คุณรักษาระยะยืดสปริงให้อยู่ระหว่าง 0.02 m – 0.04 m ต่อเนื่อง 15 วินาทีสำเร็จ บันทึกผลเพื่อเก็บความคืบหน้า");
           }
         } else {
           setQuestProgress(0);
@@ -574,13 +571,6 @@ export default function HookesLawSimulation() {
     setSpringConstant(50);
     setQuestProgress(0);
     setDataPoints([]);
-  };
-
-  const handleAddPoint = () => {
-    setDataPoints((prev) => [
-      ...prev,
-      { index: prev.length + 1, mass: hangingMass, force: parseFloat(force.toFixed(3)), extension: parseFloat(extension.toFixed(4)) },
-    ]);
   };
 
   const handleClearPoint = (idx: number) => {
@@ -610,12 +600,19 @@ export default function HookesLawSimulation() {
   };
 
   const handleSaveResults = async () => {
-    if (dataPoints.length === 0) { alert("ไม่พบข้อมูลการทดลองสำหรับบันทึกผล!"); return; }
+    const currentPoint: HookesDataPoint = {
+      index: dataPoints.length + 1,
+      mass: hangingMass,
+      force: parseFloat(force.toFixed(3)),
+      extension: parseFloat(extension.toFixed(4)),
+    };
+    const pointsToSave = [...dataPoints, currentPoint].slice(-20);
+    setDataPoints(pointsToSave);
     const experimentData = {
       labId: "hookes-law",
       timestamp: new Date().toLocaleString("th-TH"),
       springConstant,
-      dataPoints,
+      dataPoints: pointsToSave,
     };
     await saveExperimentAndSync({
       localStorageKey: "scisiam_saved_hookes_experiment",
@@ -624,14 +621,14 @@ export default function HookesLawSimulation() {
       title: "Hooke's Law of Elasticity",
       variables: { springConstant, hangingMass },
       liveValues: { force, extension, elapsedSeconds, questProgress, questSuccess },
-      graphPoints: dataPoints,
-      tableRows: dataPoints,
+      graphPoints: pointsToSave,
+      tableRows: pointsToSave,
       summary: {
         springConstant,
-        dataPointCount: dataPoints.length,
+        dataPointCount: pointsToSave.length,
         finalExtension: extension,
       },
-      score: questSuccess ? 100 : Math.min(100, dataPoints.length * 20),
+      score: questSuccess ? 100 : Math.min(100, pointsToSave.length * 20),
       durationSeconds: Math.round(elapsedSeconds),
     });
     alert("บันทึกข้อมูลการทดลอง (กราฟแรง-ระยะยืดและตารางผล) สำเร็จ! 🎉");
@@ -720,17 +717,6 @@ export default function HookesLawSimulation() {
         </div>
       </div>
 
-      {/* Actions */}
-      <div className="grid grid-cols-4 gap-2 pt-1">
-        <button onClick={handleStartStop} className={`col-span-2 inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-xs font-black text-white shadow-sm ${isRunning ? "bg-slate-700" : "bg-blue-600 hover:bg-blue-700"}`}>
-          {isRunning ? <Pause className="h-4 w-4 fill-white stroke-none" /> : <Play className="h-4 w-4 fill-white stroke-none" />}
-          {isRunning ? "หยุดชั่วคราว" : "เริ่มจำลอง"}
-        </button>
-        <button onClick={handleAddPoint} className="inline-flex items-center justify-center rounded-xl border border-blue-100 bg-blue-50 text-xs font-black text-blue-700 hover:bg-blue-100">บันทึกจุด</button>
-        <button onClick={handleReset} className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50" aria-label="รีเซ็ต">
-          <RotateCcw className="h-4 w-4" />
-        </button>
-      </div>
     </div>
   );
 

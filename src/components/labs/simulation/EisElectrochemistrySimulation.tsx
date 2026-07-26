@@ -2,12 +2,12 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import SharedSimulationShell from "./SharedSimulationShell";
+import CompactRangeControl from "./CompactRangeControl";
 import {
   Info,
-  Play,
-  RefreshCw,
   Zap,
   Disc,
+  Play,
 } from "lucide-react";
 import { labsById } from "@/data/labs";
 import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";
@@ -129,39 +129,27 @@ export default function EisElectrochemistrySimulation() {
   // eslint-disable-next-line react-hooks/exhaustive-deps -- RAF sweep loop intentionally uses the current animation closure.
   }, [isSweeping, sweepProgress]);
 
-  const handleLogResult = () => {
-    if (sweepData.length === 0) {
-      window.alert("กรุณารันความถี่กระแสสลับให้เสร็จสิ้นก่อนเก็บข้อมูล");
-      return;
-    }
-
-    const isDuplicate = logs.some(l => l.electrode === selectedElectrode.name);
-    if (isDuplicate) {
-      window.alert("มีข้อมูลบันทึกขั้วนี้อยู่แล้ว");
-      return;
-    }
-
-    const newLog = {
-      id: Date.now(),
-      electrode: selectedElectrode.name,
-      rs: selectedElectrode.rs,
-      rct: selectedElectrode.rct,
-      cdl: selectedElectrode.cdl,
-      acAmp: acAmplitude,
-    };
-
-    setLogs(prev => [newLog, ...prev]);
-  };
-
   const handleClearLogs = () => {
     setLogs([]);
   };
 
   const handleSave = async () => {
-    if (logs.length === 0) {
-      window.alert("กรุณาบันทึกข้อมูลตารางอย่างน้อย 1 รายการก่อนส่งผล");
+    if (sweepData.length === 0) {
+      window.alert("กรุณาเริ่มทดลองเพื่อเก็บข้อมูลอิมพีแดนซ์ก่อนบันทึก");
       return;
     }
+
+    const savedLogs = logs.some((log) => log.electrode === selectedElectrode.name)
+      ? logs
+      : [{
+          id: Date.now(),
+          electrode: selectedElectrode.name,
+          rs: selectedElectrode.rs,
+          rct: selectedElectrode.rct,
+          cdl: selectedElectrode.cdl,
+          acAmp: acAmplitude,
+        }, ...logs];
+    if (savedLogs.length !== logs.length) setLogs(savedLogs);
 
     setIsSaving(true);
     try {
@@ -170,7 +158,7 @@ export default function EisElectrochemistrySimulation() {
         localPayload: {
           labId,
           timestamp: new Date().toISOString(),
-          logs,
+          logs: savedLogs,
         },
         labId,
         title: "อิมพีแดนซ์ไฟฟ้าเคมี",
@@ -184,9 +172,9 @@ export default function EisElectrochemistrySimulation() {
           x: d.real,
           y: d.imag,
         })),
-        tableRows: logs,
+        tableRows: savedLogs,
         summary: {
-          electrodesTested: logs.length,
+          electrodesTested: savedLogs.length,
           lastRct: selectedElectrode.rct,
         },
         durationSeconds: 40,
@@ -202,6 +190,24 @@ export default function EisElectrochemistrySimulation() {
     { label: "ความต้านทานถ่ายโอนประจุ (Rct)", value: `${selectedElectrode.rct} Ω` },
     { label: "ความจุไฟฟ้าสลายขั้ว (Cdl)", value: `${selectedElectrode.cdl} µF` },
   ];
+
+  const compactControls = (
+    <CompactRangeControl
+      label="แอมพลิจูดกระแสสลับ"
+      symbol="AC"
+      value={acAmplitude}
+      min={5}
+      max={20}
+      step={1}
+      precision={0}
+      unit="mV"
+      tone="orange"
+      onChange={(value) => {
+        setAcAmplitude(value);
+        handleReset();
+      }}
+    />
+  );
 
   return (
     <SharedSimulationShell
@@ -318,6 +324,7 @@ export default function EisElectrochemistrySimulation() {
         </div>
       }
       controlsTitle="เลือกขั้ววัดและกำหนดกระแสสลับ"
+      compactControls={compactControls}
       controls={
         <div className="flex flex-col gap-4 w-full">
           <div>
@@ -343,50 +350,6 @@ export default function EisElectrochemistrySimulation() {
             </div>
           </div>
 
-          <hr className="border-slate-100 dark:border-slate-800" />
-
-          <div>
-            <div className="flex justify-between text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">
-              <span>แอมพลิจูดกระแสสลับ (AC Amplitude)</span>
-              <span className="text-orange-600 dark:text-orange-400 font-bold">{acAmplitude} mV</span>
-            </div>
-            <input
-              type="range"
-              min="5"
-              max="20"
-              step="1"
-              value={acAmplitude}
-              onChange={(e) => {
-                setAcAmplitude(parseInt(e.target.value));
-                handleReset();
-              }}
-              className="w-full accent-orange-600"
-            />
-          </div>
-
-          <div className="flex gap-2 mt-2">
-            <button
-              onClick={handleSweep}
-              disabled={isSweeping}
-              className="flex-1 py-2 px-4 bg-orange-600 hover:bg-orange-700 disabled:opacity-50 text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
-            >
-              <Play className="w-4 h-4" />
-              กวาดความถี่ (Sweep)
-            </button>
-            <button
-              onClick={handleLogResult}
-              disabled={isSweeping || sweepData.length === 0}
-              className="py-2 px-3 border border-orange-200 text-orange-700 hover:bg-orange-50 disabled:opacity-50 disabled:hover:bg-transparent dark:border-orange-900/60 dark:text-orange-300 dark:hover:bg-orange-950/30 rounded-lg text-xs font-semibold flex items-center justify-center transition-colors"
-            >
-              บันทึกค่า
-            </button>
-            <button
-              onClick={handleReset}
-              className="py-2 px-3 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg text-xs font-semibold flex items-center justify-center transition-colors"
-            >
-              <RefreshCw className="w-4 h-4 text-slate-500" />
-            </button>
-          </div>
         </div>
       }
       metrics={getMetricDisplay()}

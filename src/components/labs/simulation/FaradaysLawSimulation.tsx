@@ -121,7 +121,6 @@ export default function FaradaysLawSimulation() {
       if (nextCount >= 5 && !questSuccessRef.current) {
         setQuestSuccess(true);
         questSuccessRef.current = true;
-        alert("🎉 ภารกิจสำเร็จ! เหนี่ยวนำแรงดันไฟฟ้าสูงสุด >= 8.0 V ครบ 5 ครั้ง บันทึกผลเพื่อเก็บความคืบหน้า");
       }
     }
 
@@ -153,14 +152,15 @@ export default function FaradaysLawSimulation() {
     const timer = setInterval(() => {
       if (isRunningRef.current) {
         const delta = 0.05;
-        setElapsedSeconds((prev) => prev + delta);
-        
-        // Decay voltage back to zero representing static state
-        const decayRate = 0.85;
-        setVoltage((prev) => prev * decayRate);
-        setBulbBrightness((prev) => prev * decayRate);
-        lastUpdateTime.current = Date.now();
-        lastMagnetX.current = magnetXRef.current;
+        const nextElapsed = elapsedSecondsRef.current + delta;
+        setElapsedSeconds(nextElapsed);
+        elapsedSecondsRef.current = nextElapsed;
+
+        // Running the experiment automatically moves the magnet through the coil.
+        const automaticMagnetX = 60 + Math.sin(nextElapsed * 2.8) * 34;
+        setMagnetX(automaticMagnetX);
+        magnetXRef.current = automaticMagnetX;
+        tickPhysics(automaticMagnetX);
       }
     }, 50);
 
@@ -200,7 +200,7 @@ export default function FaradaysLawSimulation() {
   };
 
   const handleStartStop = () => {
-    setIsRunning(!isRunning);
+    setIsRunning((current) => !current);
   };
 
   const handleReset = () => {

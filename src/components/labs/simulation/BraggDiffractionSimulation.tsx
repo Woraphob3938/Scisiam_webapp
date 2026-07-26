@@ -2,9 +2,6 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import {
-  Play,
-  Pause,
-  RotateCcw,
   Sliders,
   ClipboardList,
   Target,
@@ -14,6 +11,7 @@ import {
   Trash2,
 } from "lucide-react";
 import SharedSimulationShell from "./SharedSimulationShell";
+import CompactRangeControl from "./CompactRangeControl";
 import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";
 
 interface BraggDataPoint {
@@ -141,7 +139,6 @@ export default function BraggDiffractionSimulation() {
       setQuestProgress(uniqueCount);
       if (uniqueCount >= 3 && !questSuccess) {
         setQuestSuccess(true);
-        alert("🎉 ยินดีด้วย! คุณเก็บบันทึกจุดเลี้ยวเบนสูงสุดของรังสี (Bragg peaks) สำเร็จครบ 3 อันดับที่ไม่ซ้ำซ้อนกัน เรียบร้อยแล้ว!");
       }
     }, 0);
 
@@ -162,21 +159,6 @@ export default function BraggDiffractionSimulation() {
     setQuestSuccess(false);
     setDataPoints([]);
     setLastLoggedTime(0);
-  };
-
-  const handleAddPoint = () => {
-    setDataPoints((prev) =>
-      [
-        ...prev,
-        {
-          time: elapsedSeconds,
-          wavelength,
-          latticeSpacing,
-          angle,
-          intensity,
-        },
-      ].slice(-MAX_DATA_POINTS),
-    );
   };
 
   const handleClearPoint = (index: number) => {
@@ -253,109 +235,44 @@ export default function BraggDiffractionSimulation() {
     alert("บันทึกรายงานผลการทดลองการเลี้ยวเบนของแบรกก์สำเร็จ! 🎉");
   };
 
-  // Subcomponents defined locally
-  const simControls = (
-    <div className="space-y-5">
-      {/* Slider: Angle */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between text-xs sm:text-sm font-bold">
-          <span className="text-slate-650">มุมตกกระทบ (θ)</span>
-          <span className="text-emerald-650 font-mono">{angle.toFixed(1)}°</span>
-        </div>
-        <input
-          type="range"
-          min="5.0"
-          max="85.0"
-          step="0.2"
-          value={angle}
-          onChange={(e) => setAngle(parseFloat(e.target.value))}
-          className="w-full accent-emerald-650"
-        />
-        <div className="flex justify-between text-[10px] text-slate-400 font-bold">
-          <span>5°</span>
-          <span>85°</span>
-        </div>
-      </div>
-
-      {/* Slider: Wavelength */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between text-xs sm:text-sm font-bold">
-          <span className="text-slate-600">ความยาวคลื่นรังสีเอกซ์ (λ)</span>
-          <span className="text-emerald-650 font-mono">{wavelength.toFixed(2)} Å</span>
-        </div>
-        <input
-          type="range"
-          min="0.5"
-          max="2.5"
-          step="0.01"
-          value={wavelength}
-          onChange={(e) => setWavelength(parseFloat(e.target.value))}
-          className="w-full accent-emerald-650"
-        />
-        <div className="flex justify-between text-[10px] text-slate-400 font-bold">
-          <span>0.50 Å</span>
-          <span>2.50 Å</span>
-        </div>
-      </div>
-
-      {/* Slider: Lattice Spacing */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between text-xs sm:text-sm font-bold">
-          <span className="text-slate-600">ระยะห่างระนาบผลึก (d)</span>
-          <span className="text-emerald-650 font-mono">{latticeSpacing.toFixed(2)} Å</span>
-        </div>
-        <input
-          type="range"
-          min="1.5"
-          max="4.0"
-          step="0.01"
-          value={latticeSpacing}
-          onChange={(e) => setLatticeSpacing(parseFloat(e.target.value))}
-          className="w-full accent-emerald-650"
-        />
-        <div className="flex justify-between text-[10px] text-slate-400 font-bold">
-          <span>1.50 Å</span>
-          <span>4.00 Å</span>
-        </div>
-      </div>
-
-      {/* Actions */}
-      <div className="flex items-center gap-2 border-t border-slate-100 pt-4">
-        <button
-          onClick={handleStartStop}
-          className={`flex-grow flex min-h-10 items-center justify-center gap-2 rounded-xl px-4 text-sm font-bold text-white transition-all active:scale-95 ${
-            isRunning
-              ? "bg-slate-700 shadow-lg shadow-slate-500/10"
-              : "bg-emerald-600 shadow-lg shadow-emerald-500/20 hover:bg-emerald-700"
-          }`}
-        >
-          {isRunning ? (
-            <>
-              <Pause className="h-4 w-4" />
-              <span>หยุดตรวจจับ</span>
-            </>
-          ) : (
-            <>
-              <Play className="h-4 w-4 fill-white" />
-              <span>เริ่มตรวจจับ</span>
-            </>
-          )}
-        </button>
-        <button
-          onClick={handleReset}
-          className="flex min-h-10 items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 text-sm font-bold text-slate-600 transition-all hover:bg-slate-50 active:scale-95"
-          title="รีเซ็ต"
-        >
-          <RotateCcw className="h-4 w-4" />
-        </button>
-        <button
-          onClick={handleAddPoint}
-          className="flex min-h-10 items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 text-sm font-bold text-slate-700 transition-all hover:bg-slate-50 active:scale-95"
-          title="บันทึกจุด"
-        >
-          <ClipboardList className="h-4 w-4 text-emerald-500" />
-        </button>
-      </div>
+  const compactControls = (
+    <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
+      <CompactRangeControl
+        label="มุมตกกระทบ"
+        symbol="θ"
+        value={angle}
+        min={5}
+        max={85}
+        step={0.2}
+        precision={1}
+        unit="°"
+        tone="emerald"
+        onChange={setAngle}
+      />
+      <CompactRangeControl
+        label="ความยาวคลื่นรังสีเอกซ์"
+        symbol="λ"
+        value={wavelength}
+        min={0.5}
+        max={2.5}
+        step={0.01}
+        precision={2}
+        unit="Å"
+        tone="blue"
+        onChange={setWavelength}
+      />
+      <CompactRangeControl
+        label="ระยะระนาบผลึก"
+        symbol="d"
+        value={latticeSpacing}
+        min={1.5}
+        max={4}
+        step={0.01}
+        precision={2}
+        unit="Å"
+        tone="violet"
+        onChange={setLatticeSpacing}
+      />
     </div>
   );
 
@@ -443,7 +360,7 @@ export default function BraggDiffractionSimulation() {
         />
       }
       controlsTitle="แผงพารามิเตอร์รังสีเอกซ์และระยะโครงผลึก"
-      controls={simControls}
+      compactControls={compactControls}
       metrics={[
         { label: "ความเข้มสัญญาณดิสเพรส", value: `${(intensity * 100).toFixed(1)}%`, tone: "emerald" },
         { label: "มุมสะท้อนกวาด", value: `${angle.toFixed(1)}°`, tone: "cyan" },

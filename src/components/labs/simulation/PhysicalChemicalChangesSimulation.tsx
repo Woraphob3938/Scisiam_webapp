@@ -5,10 +5,10 @@ import SharedSimulationShell from "./SharedSimulationShell";
 import {
   Beaker,
   Info,
-  Play,
   CheckCircle,
   XCircle,
   Award,
+  Play,
 } from "lucide-react";
 import { labsById } from "@/data/labs";
 import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";
@@ -368,6 +368,18 @@ export default function PhysicalChemicalChangesSimulation() {
     }
   };
 
+  const compactControls = (
+    <div className="flex min-h-[5.5rem] items-center justify-between gap-4 rounded-2xl border border-orange-100 bg-orange-50/70 px-5 py-3">
+      <div>
+        <p className="text-sm font-extrabold text-slate-800">กิจกรรมที่เลือก</p>
+        <p className="mt-1 text-xs font-semibold text-slate-500">{selectedActivity.name}</p>
+      </div>
+      <span className="rounded-full bg-white px-3 py-1.5 text-xs font-extrabold text-orange-700 shadow-sm">
+        {progress.toFixed(0)}%
+      </span>
+    </div>
+  );
+
   return (
     <SharedSimulationShell
       accent="orange"
@@ -400,6 +412,7 @@ export default function PhysicalChemicalChangesSimulation() {
         </div>
       }
       controlsTitle="สำรวจปฏิกิริยาและระบุประเภท"
+      compactControls={compactControls}
       controls={
         <div className="flex flex-col gap-4 w-full">
           <div>
@@ -426,15 +439,6 @@ export default function PhysicalChemicalChangesSimulation() {
               ))}
             </div>
           </div>
-
-          <button
-            onClick={handleStart}
-            disabled={isRunning && progress < 100}
-            className="w-full py-2 bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 text-white rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-colors"
-          >
-            <Play className="w-4 h-4" />
-            เริ่มทำการทดลอง / ทริกเกอร์
-          </button>
 
           {/* Interactive Quiz section shown after running reaction */}
           {progress >= 100 && (

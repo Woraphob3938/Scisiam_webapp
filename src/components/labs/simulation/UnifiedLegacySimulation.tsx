@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import SharedSimulationShell from "@/components/labs/simulation/SharedSimulationShell";
 import { GasChamber3DScene } from "@/components/labs/simulation/IdealGasLawSimulation";
+import { MotionTrackScene } from "@/components/labs/simulation/NewtonsSecondLawSimulation";
 import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";
 
 export type UnifiedLegacyLabId =
@@ -202,11 +203,13 @@ function LabScene({
   result,
   values,
   isRunning,
+  elapsedSeconds,
 }: {
   labId: UnifiedLegacyLabId;
   result: ReturnType<typeof calculate>;
   values: Partial<Record<ControlKey, number>>;
   isRunning: boolean;
+  elapsedSeconds: number;
 }) {
   const sceneId = useId().replace(/:/g, "");
 
@@ -218,6 +221,16 @@ function LabScene({
         moles={getValue(values, "moles")}
         pressure={result.primary}
         isRunning={isRunning}
+      />
+    );
+  }
+
+  if (labId === "newtons-second-law") {
+    return (
+      <MotionTrackScene
+        mass={getValue(values, "mass")}
+        acceleration={result.primary}
+        elapsedTime={elapsedSeconds}
       />
     );
   }
@@ -247,17 +260,7 @@ function LabScene({
         <title id={`${sceneId}-title`}>{configs[labId].sceneTitle}</title>
         <desc id={`${sceneId}-description`}>อุปกรณ์ทดลองตอบสนองตามค่าที่ผู้เรียนกำหนดและแสดงผลลัพธ์ปัจจุบัน</desc>
         <ellipse cx="360" cy="355" rx="230" ry="28" fill="#dbeafe" opacity="0.7" />
-        {labId === "newtons-second-law" ? (
-          <>
-            <line x1="140" y1="280" x2="580" y2="280" stroke="#64748b" strokeWidth="8" strokeLinecap="round" />
-            <rect x="285" y="215" width="115" height="62" rx="14" fill="#60a5fa" stroke="#2563eb" strokeWidth="5" />
-            <circle cx="315" cy="286" r="15" fill="#0f172a" />
-            <circle cx="370" cy="286" r="15" fill="#0f172a" />
-            <path d="M410 245H560" stroke="#22c55e" strokeWidth="8" strokeLinecap="round" />
-            <path d="M560 245L535 228M560 245L535 262" stroke="#22c55e" strokeWidth="8" strokeLinecap="round" />
-            <text x="360" y="250" textAnchor="middle" fill="#ffffff" fontSize="18" fontWeight="900">a = {result.primary.toFixed(2)}</text>
-          </>
-        ) : labId === "snells-law" ? (
+        {labId === "snells-law" ? (
           <>
             <rect x="135" y="215" width="450" height="116" rx="18" fill="#dbeafe" opacity="0.9" />
             <line x1="360" y1="95" x2="360" y2="350" stroke="#94a3b8" strokeWidth="4" strokeDasharray="8 8" />
@@ -436,7 +439,7 @@ export default function UnifiedLegacySimulation({ labId }: { labId: UnifiedLegac
   );
 
   const compactControls = (
-    <div className="grid gap-3 lg:grid-cols-3">
+    <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
       {config.controls.map((control) => (
         <label key={control.key} className="rounded-xl border border-slate-100 bg-slate-50/80 px-3 py-2">
           <div className="mb-2 flex items-center justify-between gap-2">
@@ -509,7 +512,15 @@ export default function UnifiedLegacySimulation({ labId }: { labId: UnifiedLegac
       statusLabel={isRunning ? "กำลังจำลอง" : "พร้อมทดลอง"}
       icon={config.icon}
       sceneTitle={config.sceneTitle}
-      scene={<LabScene labId={labId} result={result} values={values} isRunning={isRunning} />}
+      scene={
+        <LabScene
+          labId={labId}
+          result={result}
+          values={values}
+          isRunning={isRunning}
+          elapsedSeconds={elapsedSeconds}
+        />
+      }
       controlsTitle="แผงควบคุมการทดลอง"
       controls={controls}
       compactControls={compactControls}

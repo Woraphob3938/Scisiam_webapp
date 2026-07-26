@@ -3,7 +3,6 @@
 import React, { useState, useMemo, useEffect } from "react";
 import {
   Sliders,
-  RotateCcw,
   ClipboardList,
   Activity,
   Play,
@@ -17,6 +16,7 @@ import {
   Target,
 } from "lucide-react";
 import SharedSimulationShell from "@/components/labs/simulation/SharedSimulationShell";
+import CompactRangeControl from "@/components/labs/simulation/CompactRangeControl";
 import ManualNumberInput from "@/components/labs/simulation/ManualNumberInput";
 import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";
 
@@ -120,9 +120,8 @@ export default function WesternBlottingSimulation() {
     }, 1200);
   };
 
-  const handleAddLog = () => {
-    const run: LoggedBlotRun = {
-      index: loggedRuns.length + 1,
+  const createCurrentRun = (index: number): LoggedBlotRun => ({
+      index,
       acrylamidePercent,
       transferTime,
       blockingBuffer: blockingBuffer === "milk" ? "Skim Milk (นมแห้ง)" : "BSA (ซีรัมแอลบูมิน)",
@@ -130,9 +129,7 @@ export default function WesternBlottingSimulation() {
       transferEfficiency,
       bandIntensity,
       sNrRatio
-    };
-    setLoggedRuns((prev) => [...prev, run]);
-  };
+    });
 
   const handleClearLog = (idx: number) => {
     setLoggedRuns((prev) => prev.filter((r) => r.index !== idx));
@@ -172,21 +169,19 @@ export default function WesternBlottingSimulation() {
   };
 
   const handleSaveResults = async () => {
-    if (loggedRuns.length === 0) {
-      alert("กรุณากดบันทึกค่าพารามิเตอร์จำลองอย่างน้อย 1 ครั้งก่อนส่งออกรายงาน");
-      return;
-    }
+    const runs = [...loggedRuns, createCurrentRun(loggedRuns.length + 1)];
+    setLoggedRuns(runs);
     await saveExperimentAndSync({
       localStorageKey: "scisiam_saved_western_blotting_experiment",
-      localPayload: { labId, timestamp: new Date().toLocaleString("th-TH"), loggedRuns },
+      localPayload: { labId, timestamp: new Date().toLocaleString("th-TH"), loggedRuns: runs },
       labId,
       title: "Western Blotting Protein Detection",
       variables: { acrylamidePercent, transferTime, blockingBuffer, exposureTime },
       liveValues: { transferEfficiency, bandIntensity, sNrRatio },
-      graphPoints: loggedRuns.map((r) => ({ index: r.index, x: r.transferTime, y: r.transferEfficiency })),
-      tableRows: loggedRuns,
-      summary: { runsCount: loggedRuns.length, maxIntensity: Math.max(...loggedRuns.map((r) => r.bandIntensity)) },
-      score: Math.min(100, Math.max(40, 40 + loggedRuns.length * 15)),
+      graphPoints: runs.map((r) => ({ index: r.index, x: r.transferTime, y: r.transferEfficiency })),
+      tableRows: runs,
+      summary: { runsCount: runs.length, maxIntensity: Math.max(...runs.map((r) => r.bandIntensity)) },
+      score: Math.min(100, Math.max(40, 40 + runs.length * 15)),
       durationSeconds: null
     });
     alert("บันทึกรายงานการทดลองวิเคราะห์แบนด์โปรตีนสำเร็จ");
@@ -439,31 +434,13 @@ export default function WesternBlottingSimulation() {
               <ManualNumberInput label="ระยะเวลาเปิดรับแสงเลนส์ (วินาที)" ariaLabel="เวลาเปิดรับแสงเลนส์" value={exposureTime} min={1} max={15} step={1} onChange={setExposureTime} tone="emerald" />
             </section>
           )}
-
-          {/* Action buttons */}
-          <div className="grid grid-cols-2 gap-3">
-            <button onClick={handleAddLog} className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs font-bold text-slate-700 shadow-sm transition-all hover:bg-slate-50 active:scale-97 cursor-pointer">
-              <ClipboardList className="h-3.5 w-3.5 text-emerald-500" />
-              บันทึกจุดวัด
-            </button>
-            <button onClick={handleReset} className="flex items-center justify-center gap-2 rounded-xl border border-emerald-100 bg-emerald-50/50 px-3 py-2.5 text-xs font-bold text-emerald-700 shadow-sm transition-all hover:bg-emerald-50 active:scale-97 cursor-pointer">
-              <RotateCcw className="h-3.5 w-3.5" />
-              รีเซ็ตจำลอง
-            </button>
-          </div>
         </div>
       }
       compactControls={
-        <div className="flex items-center gap-2 font-sans flex-wrap">
-          <button onClick={() => setExposureTime((e) => Math.max(1, e - 1))} className="px-2 py-1 text-xs font-bold rounded bg-slate-100">
-            Expose -1s
-          </button>
-          <button onClick={() => setExposureTime((e) => Math.min(15, e + 1))} className="px-2 py-1 text-xs font-bold rounded bg-slate-100">
-            Expose +1s
-          </button>
-          <button onClick={handleReset} className="px-2 py-1 text-xs font-bold rounded bg-emerald-500 text-white">
-            Reset
-          </button>
+        <div className="grid min-w-0 grid-cols-1 gap-2 sm:grid-cols-3">
+          <CompactRangeControl label="ความเข้มข้นเจล" symbol="Gel" value={acrylamidePercent} min={10} max={15} step={1} unit="%" tone="emerald" onChange={setAcrylamidePercent} />
+          <CompactRangeControl label="เวลาถ่ายโอน" symbol="t" value={transferTime} min={20} max={100} step={5} unit="นาที" tone="blue" onChange={setTransferTime} />
+          <CompactRangeControl label="เวลาเปิดรับแสง" symbol="E" value={exposureTime} min={1} max={15} step={1} unit="วินาที" tone="violet" onChange={setExposureTime} />
         </div>
       }
       metrics={[
@@ -473,7 +450,7 @@ export default function WesternBlottingSimulation() {
         { label: "ความละเอียดเจล (Acrylamide)", value: `${acrylamidePercent}%`, tone: undefined }
       ]}
       graph={
-        <section className="flex min-h-[300px] flex-col rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40 font-sans">
+        <section className="flex min-h-[220px] flex-col rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40 font-sans">
           <div className="mb-2 flex items-center justify-between border-b border-slate-100 pb-2">
             <h3 className="flex items-center gap-2 text-sm font-black text-slate-800">
               <Sparkles className="h-4.5 w-4.5 text-emerald-600" />
@@ -503,7 +480,7 @@ export default function WesternBlottingSimulation() {
         </section>
       }
       table={
-        <section className="flex min-h-[300px] flex-col rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40 font-sans">
+        <section className="flex min-h-[220px] flex-col rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40 font-sans">
           <div className="flex items-center justify-between border-b border-slate-100 pb-2 mb-2">
             <h3 className="flex items-center gap-2 text-sm font-black text-slate-800">
               <ClipboardList className="h-4.5 w-4.5 text-emerald-500" />

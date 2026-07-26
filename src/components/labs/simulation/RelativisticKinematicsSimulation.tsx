@@ -2,9 +2,6 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import {
-  Play,
-  Pause,
-  RotateCcw,
   Sliders,
   ClipboardList,
   Target,
@@ -15,6 +12,7 @@ import {
   Trash2,
 } from "lucide-react";
 import SharedSimulationShell from "./SharedSimulationShell";
+import CompactRangeControl from "./CompactRangeControl";
 import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";
 
 interface RelativityDataPoint {
@@ -128,7 +126,6 @@ export default function RelativisticKinematicsSimulation() {
     if (questProgress >= 5.0 && !questSuccess) {
       const timeoutId = setTimeout(() => {
         setQuestSuccess(true);
-        alert("🎉 ยินดีด้วย! คุณสามารถจูนยานอวกาศให้วิ่งด้วย Lorentz factor (γ) มีค่าเป็น 2.0 (ความเร็ว 86.6% ของแสง) ได้นานครบ 5 วินาทีสำเร็จ!");
       }, 0);
       return () => clearTimeout(timeoutId);
     }
@@ -148,21 +145,6 @@ export default function RelativisticKinematicsSimulation() {
     setQuestSuccess(false);
     setDataPoints([]);
     setLastLoggedTime(0);
-  };
-
-  const handleAddPoint = () => {
-    setDataPoints((prev) =>
-      [
-        ...prev,
-        {
-          time: elapsedSeconds,
-          velocityFraction,
-          lorentzFactor: gamma,
-          contractedLength,
-          kineticEnergyJoules: kineticEnergy,
-        },
-      ].slice(-MAX_DATA_POINTS),
-    );
   };
 
   const handleClearPoint = (index: number) => {
@@ -242,110 +224,54 @@ export default function RelativisticKinematicsSimulation() {
     alert("บันทึกรายงานผลการทดลองจลนศาสตร์สัมพัทธภาพสำเร็จ! 🎉");
   };
 
-  // Subcomponents defined locally
-  const simControls = (
-    <div className="space-y-5">
-      {/* Slider: Velocity Fraction v/c */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between text-xs sm:text-sm font-bold">
-          <span className="text-slate-650">ความเร็วสัมพัทธ์ (v/c)</span>
-          <span className="text-pink-650 font-mono">{(velocityFraction * 100).toFixed(1)}% c</span>
-        </div>
-        <input
-          type="range"
-          min="0.00"
-          max="0.99"
-          step="0.01"
-          value={velocityFraction}
-          onChange={(e) => setVelocityFraction(parseFloat(e.target.value))}
-          className="w-full accent-pink-650"
-        />
-        <div className="flex justify-between text-[10px] text-slate-400 font-bold">
-          <span>0.0c (หยุดนิ่ง)</span>
-          <span>0.99c (ความเร็วแสง)</span>
-        </div>
-      </div>
+  const compactControls = (
+    <div className="grid grid-cols-2 gap-3">
+      <CompactRangeControl
+        label="สัดส่วนความเร็วแสง"
+        symbol="v/c"
+        value={velocityFraction}
+        min={0}
+        max={0.99}
+        step={0.01}
+        precision={2}
+        tone="pink"
+        onChange={setVelocityFraction}
+      />
+      <CompactRangeControl
+        label="ความยาวขณะหยุดนิ่ง"
+        symbol="L₀"
+        value={restLength}
+        min={10}
+        max={100}
+        step={1}
+        unit="m"
+        tone="blue"
+        onChange={setRestLength}
+      />
+    </div>
+  );
 
-      {/* Slider: Rest Length L0 */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between text-xs sm:text-sm font-bold">
-          <span className="text-slate-600">ความยาวของยานเมื่อหยุดนิ่ง (L₀)</span>
-          <span className="text-pink-650 font-mono">{restLength.toFixed(1)} m</span>
-        </div>
-        <input
-          type="range"
-          min="10.0"
-          max="100.0"
-          step="1.0"
-          value={restLength}
-          onChange={(e) => setRestLength(parseFloat(e.target.value))}
-          className="w-full accent-pink-650"
-        />
-        <div className="flex justify-between text-[10px] text-slate-400 font-bold">
-          <span>10 m</span>
-          <span>100 m</span>
-        </div>
-      </div>
-
-      {/* Rest Mass Preset */}
-      <div className="space-y-2">
-        <label className="block text-xs sm:text-sm font-bold text-slate-600">มวลเมื่อหยุดนิ่ง (m₀)</label>
-        <div className="grid grid-cols-2 gap-1.5">
-          {[
-            { label: "ยานโพรบ (1,000 kg)", val: 1000 },
-            { label: "ยานเล็ก (50,000 kg)", val: 50000 },
-          ].map((m) => (
-            <button
-              key={m.label}
-              onClick={() => setRestMass(m.val)}
-              className={`rounded-lg py-1.5 text-[10px] sm:text-xs font-black transition-all ${
-                restMass === m.val
-                  ? "bg-pink-50 text-pink-700 border border-pink-200"
-                  : "bg-slate-50 text-slate-500 border border-transparent hover:bg-slate-100"
-              }`}
-            >
-              {m.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Actions */}
-      <div className="flex items-center gap-2 border-t border-slate-100 pt-4">
-        <button
-          onClick={handleStartStop}
-          className={`flex-grow flex min-h-10 items-center justify-center gap-2 rounded-xl px-4 text-sm font-bold text-white transition-all active:scale-95 ${
-            isRunning
-              ? "bg-slate-700 shadow-lg shadow-slate-500/10"
-              : "bg-pink-650 shadow-lg shadow-pink-500/20 hover:bg-pink-700"
-          }`}
-        >
-          {isRunning ? (
-            <>
-              <Pause className="h-4 w-4" />
-              <span>หยุดตรวจจับ</span>
-            </>
-          ) : (
-            <>
-              <Play className="h-4 w-4 fill-white" />
-              <span>เริ่มตรวจจับ</span>
-            </>
-          )}
-        </button>
-        <button
-          onClick={handleReset}
-          className="flex min-h-10 items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 text-sm font-bold text-slate-600 transition-all hover:bg-slate-50 active:scale-95"
-          title="รีเซ็ต"
-        >
-          <RotateCcw className="h-4 w-4" />
-        </button>
-        <button
-          onClick={handleAddPoint}
-          className="flex min-h-10 items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 text-sm font-bold text-slate-700 transition-all hover:bg-slate-50 active:scale-95"
-          title="บันทึกจุด"
-        >
-          <ClipboardList className="h-4 w-4 text-pink-500" />
-        </button>
+  const advancedControls = (
+    <div className="space-y-3">
+      <span className="block text-sm font-bold text-slate-600">มวลขณะหยุดนิ่ง (m₀)</span>
+      <div className="grid grid-cols-2 gap-2">
+        {[
+          { label: "ยานโพรบ · 1,000 kg", value: 1000 },
+          { label: "ยานขนาดเล็ก · 50,000 kg", value: 50000 },
+        ].map((preset) => (
+          <button
+            key={preset.value}
+            type="button"
+            onClick={() => setRestMass(preset.value)}
+            className={`min-h-10 rounded-xl border px-3 text-xs font-black transition ${
+              restMass === preset.value
+                ? "border-pink-200 bg-pink-50 text-pink-700"
+                : "border-slate-200 bg-white text-slate-500 hover:bg-slate-50"
+            }`}
+          >
+            {preset.label}
+          </button>
+        ))}
       </div>
     </div>
   );
@@ -432,7 +358,8 @@ export default function RelativisticKinematicsSimulation() {
         />
       }
       controlsTitle="แผงพารามิเตอร์จลนศาสตร์สัมพัทธภาพ"
-      controls={simControls}
+      controls={advancedControls}
+      compactControls={compactControls}
       metrics={[
         { label: "Lorentz Factor (γ)", value: gamma.toFixed(3), tone: "pink" },
         { label: "ความยาวสัญญาจ้าง L", value: `${contractedLength.toFixed(1)} m`, tone: "violet" },

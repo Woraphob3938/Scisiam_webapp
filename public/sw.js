@@ -1,4 +1,4 @@
-const STATIC_CACHE = "scisiam-static-v3";
+const STATIC_CACHE = "scisiam-static-v4";
 const STATIC_PATH_PREFIXES = ["/_next/static/", "/icons/"];
 const STATIC_FILES = [
   "/ai-oon-logo.png",
@@ -17,6 +17,56 @@ self.addEventListener("message", (event) => {
   if (event.data?.type === "SCISIAM_SKIP_WAITING") {
     self.skipWaiting();
   }
+});
+
+self.addEventListener("push", (event) => {
+  const fallback = {
+    title: "Scisiam",
+    body: "คุณมีการแจ้งเตือนใหม่",
+    url: "/classrooms",
+    tag: "scisiam-notification",
+  };
+  let payload = fallback;
+
+  try {
+    payload = { ...fallback, ...event.data?.json() };
+  } catch {
+    payload.body = event.data?.text() || fallback.body;
+  }
+
+  event.waitUntil(
+    self.registration.showNotification(payload.title, {
+      body: payload.body,
+      icon: "/icons/scisiam-full-192.png",
+      badge: "/icons/scisiam-full-192.png",
+      tag: payload.tag,
+      renotify: true,
+      data: { url: payload.url },
+    }),
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const targetUrl = new URL(
+    event.notification.data?.url || "/classrooms",
+    self.location.origin,
+  ).href;
+
+  event.waitUntil(
+    self.clients
+      .matchAll({ type: "window", includeUncontrolled: true })
+      .then((clients) => {
+        const existingClient = clients.find(
+          (client) => new URL(client.url).origin === self.location.origin,
+        );
+
+        if (existingClient) {
+          return existingClient.navigate(targetUrl).then(() => existingClient.focus());
+        }
+        return self.clients.openWindow(targetUrl);
+      }),
+  );
 });
 
 self.addEventListener("activate", (event) => {

@@ -138,7 +138,6 @@ export default function BernoullisPrincipleSimulation() {
           if (nextProg >= 5.0 && !questSuccessRef.current) {
             setQuestSuccess(true);
             questSuccessRef.current = true;
-            alert("🎉 ภารกิจสำเร็จ! รักษาความดันที่คอคอดให้ต่ำกว่า 100 kPa ต่อเนื่องครบ 5 วินาที บันทึกผลเพื่อเก็บความคืบหน้า");
           }
         } else {
           setQuestProgress(0);
@@ -295,7 +294,10 @@ export default function BernoullisPrincipleSimulation() {
 
 
   const scene = (
-    <div className="relative flex h-full min-h-[258px] items-center justify-center overflow-hidden rounded-2xl border border-emerald-100 bg-[linear-gradient(135deg,#f0fdf4_0%,#e8fcf4_48%,#f6fff6_100%)]">
+    <div
+      data-testid="bernoulli-venturi-rig"
+      className="relative flex h-full min-h-[320px] items-center justify-center overflow-hidden bg-[linear-gradient(145deg,#ecfdf5_0%,#eff6ff_55%,#f8fafc_100%)]"
+    >
       <div className="absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:18px_18px] opacity-35" />
       
       {/* Alert badge if cavitation is happening */}
@@ -306,7 +308,7 @@ export default function BernoullisPrincipleSimulation() {
         </div>
       )}
 
-      <svg className="relative z-10 w-full max-w-[500px] h-48 select-none" viewBox="0 0 500 200">
+      <svg className="relative z-10 h-full min-h-[320px] w-full select-none" viewBox="0 0 720 320" role="img" aria-label="ท่อเวนจูรีแสดงความเร็วและความดันของของไหลที่ปากท่อ คอคอด และทางออก">
         {/* Dynamic colored background representing local pressure inside pipe */}
         {/* Blue represents high pressure, cyan is lower, magenta/purple is extremely low */}
         <defs>
@@ -319,6 +321,10 @@ export default function BernoullisPrincipleSimulation() {
           </linearGradient>
         </defs>
 
+        <rect x="42" y="26" width="188" height="54" rx="16" fill="#ffffff" fillOpacity=".9" stroke="#a7f3d0" />
+        <text x="58" y="48" fill="#059669" fontSize="10" fontWeight="900">VENTURI FLOW BENCH</text>
+        <text x="58" y="67" fill="#334155" fontSize="13" fontWeight="800">น้ำไหลผ่านคอคอด · Q {flowRate.toFixed(1)} L/s</text>
+        <g transform="translate(110 68)">
         {/* Manometers vertical columns glass tubes */}
         {/* Manometer 1 (x = 120) */}
         <rect x="116" y="25" width="8" height="70" fill="none" stroke="#64748b" strokeWidth="1.5" />
@@ -367,6 +373,16 @@ export default function BernoullisPrincipleSimulation() {
         {/* Flowing direction arrows */}
         <path d="M 40 100 L 50 100 m -4 -3 l 4 3 l -4 3" stroke="#ffffff" strokeWidth="1.5" fill="none" />
         <path d="M 450 100 L 460 100 m -4 -3 l 4 3 l -4 3" stroke="#ffffff" strokeWidth="1.5" fill="none" />
+        <text x="120" y="188" fill="#1e3a8a" fontSize="10" fontWeight="900" textAnchor="middle">ปากท่อ</text>
+        <text x="250" y="188" fill={isCavitation ? "#6d28d9" : "#0891b2"} fontSize="10" fontWeight="900" textAnchor="middle">คอคอด</text>
+        <text x="380" y="188" fill="#1e3a8a" fontSize="10" fontWeight="900" textAnchor="middle">ทางออก</text>
+        </g>
+        <g transform="translate(52 266)">
+          <rect width="616" height="34" rx="17" fill="#ffffff" fillOpacity=".88" stroke="#a7f3d0" />
+          <text x="18" y="22" fill="#1e3a8a" fontSize="9.5" fontWeight="900">P₁ {p1.toFixed(0)} kPa · v₁ {v1.toFixed(1)} m/s</text>
+          <text x="308" y="22" fill="#0891b2" fontSize="9.5" fontWeight="900" textAnchor="middle">คอคอดแคบลง → ความเร็วสูงขึ้น → ความดันลดลง</text>
+          <text x="598" y="22" fill="#1e3a8a" fontSize="9.5" fontWeight="900" textAnchor="end">P₂ {p2.toFixed(0)} kPa</text>
+        </g>
       </svg>
     </div>
   );

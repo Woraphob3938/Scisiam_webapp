@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import { ArrowDown, ArrowUp, Check, ChevronLeft, Sparkles } from "lucide-react";
 
 import { usePathname } from "next/navigation";
@@ -32,6 +32,99 @@ type TargetRect = {
   width: number;
   height: number;
 };
+
+type PanelPosition = Pick<CSSProperties, "top" | "left" | "maxHeight">;
+
+const TOUR_PANEL_MARGIN = 16;
+const TOUR_TARGET_GAP = 14;
+
+function getTourPanelPosition(
+  targetRect: TargetRect | null,
+  panelWidth: number,
+  panelHeight: number,
+): PanelPosition {
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+  const safeWidth = Math.min(panelWidth, viewportWidth - TOUR_PANEL_MARGIN * 2);
+  const safeHeight = Math.min(panelHeight, viewportHeight - TOUR_PANEL_MARGIN * 2);
+  const centeredLeft = Math.max(
+    TOUR_PANEL_MARGIN,
+    Math.min(
+      viewportWidth - safeWidth - TOUR_PANEL_MARGIN,
+      (viewportWidth - safeWidth) / 2,
+    ),
+  );
+
+  if (!targetRect) {
+    return {
+      top: viewportHeight - safeHeight - TOUR_PANEL_MARGIN,
+      left: centeredLeft,
+      maxHeight: viewportHeight - TOUR_PANEL_MARGIN * 2,
+    };
+  }
+
+  const targetBottom = targetRect.top + targetRect.height;
+  const spaceAbove = targetRect.top - TOUR_TARGET_GAP - TOUR_PANEL_MARGIN;
+  const spaceBelow =
+    viewportHeight - targetBottom - TOUR_TARGET_GAP - TOUR_PANEL_MARGIN;
+  const spaceLeft = targetRect.left - TOUR_TARGET_GAP - TOUR_PANEL_MARGIN;
+  const spaceRight =
+    viewportWidth -
+    (targetRect.left + targetRect.width) -
+    TOUR_TARGET_GAP -
+    TOUR_PANEL_MARGIN;
+
+  if (spaceBelow >= safeHeight) {
+    return {
+      top: targetBottom + TOUR_TARGET_GAP,
+      left: centeredLeft,
+      maxHeight: spaceBelow,
+    };
+  }
+
+  if (spaceAbove >= safeHeight) {
+    return {
+      top: TOUR_PANEL_MARGIN,
+      left: centeredLeft,
+      maxHeight: spaceAbove,
+    };
+  }
+
+  if (viewportWidth >= 768 && spaceRight >= safeWidth) {
+    return {
+      top: Math.max(
+        TOUR_PANEL_MARGIN,
+        Math.min(
+          viewportHeight - safeHeight - TOUR_PANEL_MARGIN,
+          targetRect.top + targetRect.height / 2 - safeHeight / 2,
+        ),
+      ),
+      left: targetRect.left + targetRect.width + TOUR_TARGET_GAP,
+      maxHeight: viewportHeight - TOUR_PANEL_MARGIN * 2,
+    };
+  }
+
+  if (viewportWidth >= 768 && spaceLeft >= safeWidth) {
+    return {
+      top: Math.max(
+        TOUR_PANEL_MARGIN,
+        Math.min(
+          viewportHeight - safeHeight - TOUR_PANEL_MARGIN,
+          targetRect.top + targetRect.height / 2 - safeHeight / 2,
+        ),
+      ),
+      left: targetRect.left - safeWidth - TOUR_TARGET_GAP,
+      maxHeight: viewportHeight - TOUR_PANEL_MARGIN * 2,
+    };
+  }
+
+  const useTopEdge = spaceAbove >= spaceBelow;
+  return {
+    top: useTopEdge ? TOUR_PANEL_MARGIN : targetBottom + TOUR_TARGET_GAP,
+    left: centeredLeft,
+    maxHeight: Math.max(96, useTopEdge ? spaceAbove : spaceBelow),
+  };
+}
 
 const studentSteps: TourStep[] = [
   {
@@ -170,9 +263,15 @@ function getTargetRect(target: HTMLElement | null): TargetRect | null {
 
 export default function FirstLoginTour({ role }: { role: ScisiamUserRole }) {
   const pathname = usePathname();
+  const panelRef = useRef<HTMLElement>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
   const [targetRect, setTargetRect] = useState<TargetRect | null>(null);
+  const [panelPosition, setPanelPosition] = useState<PanelPosition>({
+    top: 16,
+    left: 16,
+    maxHeight: "calc(100vh - 2rem)",
+  });
 
   const isTeacherTour = role === "teacher";
   const isSupportedRoute = pathname === getTutorialStartPath(role);
@@ -258,6 +357,43 @@ export default function FirstLoginTour({ role }: { role: ScisiamUserRole }) {
     };
   }, [isOpen, step.selector]);
 
+  useEffect(() => {
+    const root = document.documentElement;
+
+    if (isOpen) {
+      root.dataset.scisiamTourOpen = "true";
+      root.dataset.mobileChrome = "visible";
+    } else {
+      delete root.dataset.scisiamTourOpen;
+    }
+
+    return () => {
+      delete root.dataset.scisiamTourOpen;
+    };
+  }, [isOpen]);
+
+  useLayoutEffect(() => {
+    if (!isOpen || !panelRef.current) return;
+
+    const panel = panelRef.current;
+    const updatePanelPosition = () => {
+      const panelRect = panel.getBoundingClientRect();
+      setPanelPosition(
+        getTourPanelPosition(targetRect, panelRect.width, panel.scrollHeight),
+      );
+    };
+
+    updatePanelPosition();
+    const resizeObserver = new ResizeObserver(updatePanelPosition);
+    resizeObserver.observe(panel);
+    window.addEventListener("resize", updatePanelPosition);
+
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener("resize", updatePanelPosition);
+    };
+  }, [isOpen, stepIndex, targetRect]);
+
   const finishTour = async () => {
     setIsOpen(false);
 
@@ -330,7 +466,11 @@ export default function FirstLoginTour({ role }: { role: ScisiamUserRole }) {
           </>
         ) : null}
 
-        <section className="fixed inset-x-4 bottom-4 z-[70] mx-auto max-w-md rounded-2xl border border-blue-100 bg-white p-5 shadow-2xl shadow-slate-900/20 sm:bottom-8">
+        <section
+          ref={panelRef}
+          className="fixed z-[70] w-[calc(100vw-2rem)] max-w-md overflow-y-auto rounded-2xl border border-blue-100 bg-white p-5 shadow-2xl shadow-slate-900/20 transition-[top,left] duration-200 motion-reduce:transition-none"
+          style={panelPosition}
+        >
           <div className="flex items-start gap-3">
             <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
               <Sparkles className="size-5" aria-hidden="true" />

@@ -2,9 +2,6 @@
 
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import {
-  Play,
-  Pause,
-  RotateCcw,
   Sliders,
   ClipboardList,
   Trash,
@@ -420,8 +417,8 @@ export default function KeplersLawsSimulation() {
   // Primary controls
   const [semiMajorAxis, setSemiMajorAxis] = useState(1.0); // a (0.5 to 6.0 AU)
   const [eccentricity, setEccentricity] = useState(0.1); // e (0.0 to 0.7)
-  const [speedMultiplier, setSpeedMultiplier] = useState(1.0); // 0.1 to 5.0
   const [showSectors, setShowSectors] = useState(true);
+  const speedMultiplier = 1;
 
   // Simulation parameters
   const [isRunning, setIsRunning] = useState(false);
@@ -448,7 +445,6 @@ export default function KeplersLawsSimulation() {
     if (Math.abs(semiMajorAxis - 4.0) < 0.01 && !questSuccess) {
       const timer = setTimeout(() => {
         setQuestSuccess(true);
-        alert("🎉 ภารกิจสำเร็จ! คุณตั้งระยะกึ่งแกนเอกเป็น 4.00 AU ทำให้คาบการโคจรเท่ากับ 8.00 ปี และยืนยันกฎข้อที่ 3 ของเคปเลอร์ บันทึกผลเพื่อเก็บความคืบหน้า");
       }, 0);
       return () => clearTimeout(timer);
     }
@@ -462,23 +458,19 @@ export default function KeplersLawsSimulation() {
     setIsRunning(false);
     setSemiMajorAxis(1.0);
     setEccentricity(0.1);
-    setSpeedMultiplier(1.0);
     setMeanAnomaly(0.0);
     setDataPoints([]);
   };
 
-  const handleAddPoint = () => {
-    const newPoint: KeplerDataPoint = {
-      index: dataPoints.length + 1,
+  const createCurrentPoint = (index: number): KeplerDataPoint => ({
+      index,
       semiMajorAxis,
       eccentricity,
       orbitalPeriod,
       aCubed,
       tSquared,
       ratio
-    };
-    setDataPoints(prev => [...prev, newPoint]);
-  };
+  });
 
   const handleClearPoint = (idx: number) => {
     setDataPoints(prev => prev.filter(p => p.index !== idx).map((p, i) => ({ ...p, index: i + 1 })));
@@ -515,15 +507,13 @@ export default function KeplersLawsSimulation() {
   };
 
   const handleSaveResults = async () => {
-    if (dataPoints.length === 0) {
-      alert("ไม่พบข้อมูลการทดลองสำหรับบันทึกผล! กรุณากดเริ่มทดลองและเก็บบันทึกข้อมูลก่อน");
-      return;
-    }
+    const nextDataPoints = [...dataPoints, createCurrentPoint(dataPoints.length + 1)];
+    setDataPoints(nextDataPoints);
 
     const experimentData = {
       labId: "keplers-laws",
       timestamp: new Date().toLocaleString("th-TH"),
-      dataPoints
+      dataPoints: nextDataPoints
     };
 
     await saveExperimentAndSync({
@@ -540,16 +530,15 @@ export default function KeplersLawsSimulation() {
     alert("บันทึกผลการทดลองกฎเคปเลอร์สำเร็จ! 🎉");
   };
 
-  const controls = (
-    <div className="space-y-4">
-      {/* Semi-major Axis control */}
-      <div className="group bg-slate-50/50 p-2.5 rounded-2xl border border-slate-100 hover:border-slate-200/50 transition-all select-none">
-        <div className="flex justify-between items-center text-xs font-bold mb-1">
-          <span className="text-slate-600 flex items-center gap-1.5">
+  const compactControls = (
+    <div className="grid gap-3 sm:grid-cols-2">
+      <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-3">
+        <div className="mb-2 flex items-center justify-between gap-3 text-xs font-bold">
+          <span className="flex items-center gap-1.5 text-slate-600">
             <Globe className="w-3.5 h-3.5 text-blue-500" />
-            กึ่งแกนเอกกึ่งกลาง (Semi-major Axis a)
+            กึ่งแกนเอก a
           </span>
-          <span className="text-blue-600 font-extrabold text-xs bg-blue-50 px-2 py-0.5 rounded border border-blue-100">
+          <span className="rounded-lg border border-blue-100 bg-blue-50 px-2 py-1 font-extrabold text-blue-700">
             {semiMajorAxis.toFixed(2)} AU
           </span>
         </div>
@@ -562,21 +551,19 @@ export default function KeplersLawsSimulation() {
           onChange={(e) => setSemiMajorAxis(Number(e.target.value))}
           className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-500"
         />
-        <div className="flex justify-between text-[8px] font-bold text-slate-400 mt-1">
+        <div className="mt-1 flex justify-between text-[10px] font-bold text-slate-400">
           <span>0.5 AU</span>
-          <span>Earth (1.0 AU)</span>
           <span>6.0 AU</span>
         </div>
       </div>
 
-      {/* Eccentricity control */}
-      <div className="group bg-slate-50/50 p-2.5 rounded-2xl border border-slate-100 hover:border-slate-200/50 transition-all select-none">
-        <div className="flex justify-between items-center text-xs font-bold mb-1">
-          <span className="text-slate-600 flex items-center gap-1.5">
+      <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-3">
+        <div className="mb-2 flex items-center justify-between gap-3 text-xs font-bold">
+          <span className="flex items-center gap-1.5 text-slate-600">
             <Sliders className="w-3.5 h-3.5 text-amber-500" />
-            ความรีทางโคจร (Eccentricity e)
+            ความรีวงโคจร e
           </span>
-          <span className="text-amber-600 font-extrabold text-xs bg-amber-50 px-2 py-0.5 rounded border border-amber-100">
+          <span className="rounded-lg border border-amber-100 bg-amber-50 px-2 py-1 font-extrabold text-amber-700">
             {eccentricity.toFixed(2)}
           </span>
         </div>
@@ -589,56 +576,24 @@ export default function KeplersLawsSimulation() {
           onChange={(e) => setEccentricity(Number(e.target.value))}
           className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-amber-500"
         />
-        <div className="flex justify-between text-[8px] font-bold text-slate-400 mt-1">
-          <span>กลมสมบูรณ์ (e=0.0)</span>
-          <span>วงรีปานกลาง</span>
-          <span>รีสูงมาก (e=0.7)</span>
+        <div className="mt-1 flex justify-between text-[10px] font-bold text-slate-400">
+          <span>วงกลม</span>
+          <span>วงรีมาก</span>
         </div>
       </div>
 
-      {/* Speed multiplier & Sector toggle */}
-      <div className="grid grid-cols-2 gap-3">
-        <label className="block">
-          <span className="mb-1 block text-[11px] font-bold text-slate-500">ความเร็วจำลอง</span>
-          <select
-            value={speedMultiplier}
-            onChange={(e) => setSpeedMultiplier(Number(e.target.value))}
-            className="w-full appearance-none rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700"
-          >
-            <option value={0.2}>0.2x ช้ามาก</option>
-            <option value={0.5}>0.5x ช้า</option>
-            <option value={1.0}>1.0x (ปกติ)</option>
-            <option value={2.0}>2.0x เร็ว</option>
-            <option value={4.0}>4.0x เร็วมาก</option>
-          </select>
-        </label>
-        
-        <label className="block">
-          <span className="mb-1 block text-[11px] font-bold text-slate-500">แสดงเซกเตอร์กวาดพื้นที่</span>
-          <button
-            onClick={() => setShowSectors(!showSectors)}
-            className={`w-full py-2 rounded-xl text-xs font-bold border transition cursor-pointer ${
-              showSectors 
-                ? "bg-indigo-50 border-indigo-200 text-indigo-700" 
-                : "bg-white border-slate-200 text-slate-500"
-            }`}
-          >
-            {showSectors ? "เปิดกวาดพื้นที่" : "ปิดกวาดพื้นที่"}
-          </button>
-        </label>
-      </div>
-
-      {/* Control buttons */}
-      <div className="grid grid-cols-4 gap-2 pt-1">
-        <button onClick={handleStartStop} className={`col-span-2 inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-xs font-black text-white shadow-sm transition active:scale-95 cursor-pointer ${isRunning ? "bg-slate-700" : "bg-blue-600 hover:bg-blue-700"}`}>
-          {isRunning ? <Pause className="h-4 w-4 fill-white stroke-none" /> : <Play className="h-4 w-4 fill-white stroke-none" />}
-          {isRunning ? "หยุดโครจร" : "เริ่มโคจร"}
-        </button>
-        <button onClick={handleAddPoint} className="inline-flex items-center justify-center rounded-xl border border-blue-100 bg-blue-50 text-xs font-black text-blue-700 hover:bg-blue-100 cursor-pointer active:scale-95 transition">บันทึกจุด</button>
-        <button onClick={handleReset} className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 cursor-pointer active:scale-95 transition" aria-label="รีเซ็ต">
-          <RotateCcw className="h-4 w-4" />
-        </button>
-      </div>
+      <button
+        type="button"
+        onClick={() => setShowSectors((current) => !current)}
+        aria-pressed={showSectors}
+        className={`rounded-2xl border px-4 py-3 text-sm font-bold transition sm:col-span-2 ${
+          showSectors
+            ? "border-indigo-200 bg-indigo-50 text-indigo-700"
+            : "border-slate-200 bg-white text-slate-600"
+        }`}
+      >
+        {showSectors ? "แสดงพื้นที่ที่ดาวกวาดอยู่" : "แสดงพื้นที่ที่ดาวกวาด"}
+      </button>
     </div>
   );
 
@@ -664,7 +619,8 @@ export default function KeplersLawsSimulation() {
         />
       }
       controlsTitle="แผงกำหนดมิติทางโคจร"
-      controls={controls}
+      controls={compactControls}
+      compactControls={compactControls}
       metrics={[
         { label: "คาบโคจร T", value: `${orbitalPeriod.toFixed(2)} ปี`, tone: "emerald" },
         { label: "กำลังสาม a³", value: `${aCubed.toFixed(2)}`, tone: "blue" },

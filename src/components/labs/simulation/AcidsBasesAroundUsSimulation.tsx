@@ -5,7 +5,6 @@ import SharedSimulationShell from "./SharedSimulationShell";
 import {
   Beaker,
   Droplets,
-  RotateCcw,
   PlusCircle,
   CheckCircle2,
 } from "lucide-react";
@@ -235,6 +234,26 @@ export default function AcidsBasesAroundUsSimulation() {
     { label: "ความเป็นกรด-เบส", value: classification },
   ];
 
+  const compactControls = (
+    <div className="flex min-h-[5.5rem] items-center justify-between gap-4 rounded-2xl border border-cyan-100 bg-cyan-50/70 px-5 py-3">
+      <div>
+        <p className="text-sm font-extrabold text-slate-800">อินดิเคเตอร์ในตัวอย่าง</p>
+        <p className="mt-1 text-xs font-semibold text-slate-500">
+          {selectedIndicator.name} · {drops} / 10 หยด
+        </p>
+      </div>
+      <button
+        type="button"
+        onClick={handleAddDrop}
+        disabled={isDropping || drops >= 10}
+        className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-cyan-600 px-5 text-sm font-extrabold text-white transition-colors hover:bg-cyan-700 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        <PlusCircle className="h-4 w-4" aria-hidden="true" />
+        หยดอินดิเคเตอร์
+      </button>
+    </div>
+  );
+
   return (
     <SharedSimulationShell
       accent="cyan"
@@ -295,6 +314,7 @@ export default function AcidsBasesAroundUsSimulation() {
         </div>
       }
       controlsTitle="การควบคุมสารและอินดิเคเตอร์"
+      compactControls={compactControls}
       controls={
         <div className="flex flex-col gap-4 w-full">
           <div>
@@ -346,32 +366,6 @@ export default function AcidsBasesAroundUsSimulation() {
             </div>
           </div>
 
-          <div className="flex gap-2 mt-2">
-            <button
-              onClick={handleAddDrop}
-              disabled={isDropping || drops >= 10}
-              className="flex-1 py-2 px-4 bg-cyan-600 hover:bg-cyan-700 disabled:opacity-50 text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
-            >
-              <PlusCircle className="w-4 h-4" />
-              หยดสาร (+1 หยด)
-            </button>
-            <button
-              onClick={handleReset}
-              className="py-2 px-3 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg text-xs font-semibold flex items-center justify-center transition-colors"
-              title="ล้างสารทดลอง"
-            >
-              <RotateCcw className="w-4 h-4 text-slate-500" />
-            </button>
-          </div>
-
-          <button
-            onClick={handleLogObservation}
-            disabled={drops === 0}
-            className="w-full py-2 border border-dashed border-cyan-300 dark:border-cyan-800 text-cyan-600 hover:bg-cyan-50 dark:text-cyan-400 dark:hover:bg-cyan-950/20 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1"
-          >
-            <CheckCircle2 className="w-4 h-4" />
-            บันทึกการสังเกตนี้
-          </button>
         </div>
       }
       metrics={getMetricDisplay()}
@@ -460,6 +454,9 @@ export default function AcidsBasesAroundUsSimulation() {
       showLiveMetrics={true}
       showInfoTabs={true}
       showSaveButton={true}
+      onRun={handleLogObservation}
+      runLabel="บันทึกการสังเกต"
+      runDisabled={drops === 0}
       onReset={handleReset}
       onSave={handleSave}
     />

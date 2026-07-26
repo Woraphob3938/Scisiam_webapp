@@ -93,7 +93,6 @@ export default function TrigonometryWavesSimulation() {
   useEffect(() => {
     if (resonanceScore >= 98 && !announcedQuestRef.current) {
       announcedQuestRef.current = true;
-      alert("🎉 ยินดีด้วย! คุณสามารถปรับแต่งคลื่น Sine ให้กำทอน (Resonance) ได้ตรงกับคลื่นเป้าหมายสำเร็จ!");
     }
 
     if (resonanceScore < 98) {

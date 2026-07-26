@@ -3,10 +3,8 @@
 import React, { useState, useMemo, useEffect } from "react";
 import {
   Sliders,
-  RotateCcw,
   ClipboardList,
   Activity,
-  Play,
   Zap,
   Sparkles,
   Clipboard,
@@ -114,18 +112,15 @@ export default function PushPullForcesSimulation() {
     setIsPlaying(true);
   };
 
-  const handleAddLog = () => {
-    const run: LoggedForceRun = {
-      index: loggedRuns.length + 1,
+  const createCurrentRun = (index: number): LoggedForceRun => ({
+      index,
       actionType: actionType === "push" ? "ผลัก (Push)" : "ดึง (Pull)",
       forceNewton: forceVal,
       weightLoad: loadWeight === "none" ? "กล่องเปล่า (10kg)" : loadWeight === "box" ? "กล่องไม้หนัก (30kg)" : "ตุ๊กตาหมี (15kg)",
       surfaceType: surface === "ice" ? "น้ำแข็งลื่น (Ice)" : surface === "grass" ? "สนามหญ้า (Grass)" : "ทางกรวดหยาบ (Gravel)",
       maxSpeed: Math.abs(parseFloat(velocity.toFixed(2))),
       duration: timeElapsed
-    };
-    setLoggedRuns((prev) => [...prev, run]);
-  };
+  });
 
   const handleClearLog = (idx: number) => {
     setLoggedRuns((prev) => prev.filter((r) => r.index !== idx));
@@ -162,27 +157,90 @@ export default function PushPullForcesSimulation() {
   };
 
   const handleSaveResults = async () => {
-    if (loggedRuns.length === 0) {
-      alert("กรุณากดบันทึกค่าพารามิเตอร์จำลองอย่างน้อย 1 ครั้งก่อนส่งออกรายงาน");
-      return;
-    }
+    const nextRuns = [...loggedRuns, createCurrentRun(loggedRuns.length + 1)];
+    setLoggedRuns(nextRuns);
+
     await saveExperimentAndSync({
       localStorageKey: "scisiam_saved_push_pull_experiment",
-      localPayload: { labId, timestamp: new Date().toLocaleString("th-TH"), loggedRuns },
+      localPayload: { labId, timestamp: new Date().toLocaleString("th-TH"), loggedRuns: nextRuns },
       labId,
       title: "Push & Pull Forces",
       variables: { actionType, forceVal, loadWeight, surface },
       liveValues: { velocity, cartPos, timeElapsed },
-      graphPoints: loggedRuns.map((r) => ({ index: r.index, x: r.forceNewton, y: r.maxSpeed })),
-      tableRows: loggedRuns,
-      summary: { runsCount: loggedRuns.length, maxSpeed: Math.max(...loggedRuns.map((r) => r.maxSpeed)) },
-      score: Math.min(100, Math.max(40, 40 + loggedRuns.length * 15)),
+      graphPoints: nextRuns.map((r) => ({ index: r.index, x: r.forceNewton, y: r.maxSpeed })),
+      tableRows: nextRuns,
+      summary: { runsCount: nextRuns.length, maxSpeed: Math.max(...nextRuns.map((r) => r.maxSpeed)) },
+      score: Math.min(100, Math.max(40, 40 + nextRuns.length * 15)),
       durationSeconds: null
     });
     alert("บันทึกรายงานผลการทดลองการเคลื่อนที่สำเร็จ");
   };
 
   const questProgress = Math.min(100, Math.round((loggedRuns.length / 3) * 100));
+  const compactControls = (
+    <div className="grid gap-3 lg:grid-cols-4">
+      <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-3">
+        <span className="mb-2 block text-xs font-bold text-slate-600">ทิศทางแรง</span>
+        <div className="grid grid-cols-2 gap-2">
+          {(["push", "pull"] as const).map((type) => (
+            <button
+              key={type}
+              type="button"
+              onClick={() => setActionType(type)}
+              aria-pressed={actionType === type}
+              className={`rounded-xl border px-2 py-2 text-xs font-bold transition ${
+                actionType === type ? "border-blue-500 bg-blue-600 text-white" : "border-slate-200 bg-white text-slate-600"
+              }`}
+            >
+              {type === "push" ? "ผลัก" : "ดึง"}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-3">
+        <ManualNumberInput label="แรงกระทำ" ariaLabel="แรงกระทำนิวตัน" value={forceVal} min={10} max={100} step={10} onChange={setForceVal} tone="blue" />
+      </div>
+
+      <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-3">
+        <span className="mb-2 block text-xs font-bold text-slate-600">น้ำหนักบรรทุก</span>
+        <div className="grid grid-cols-3 gap-1">
+          {(["none", "teddy", "box"] as const).map((weight) => (
+            <button
+              key={weight}
+              type="button"
+              onClick={() => setLoadWeight(weight)}
+              aria-pressed={loadWeight === weight}
+              className={`rounded-lg border px-1 py-2 text-[11px] font-bold ${
+                loadWeight === weight ? "border-amber-400 bg-amber-50 text-amber-800" : "border-slate-200 bg-white text-slate-600"
+              }`}
+            >
+              {weight === "none" ? "ว่าง" : weight === "teddy" ? "หมี" : "กล่อง"}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-3">
+        <span className="mb-2 block text-xs font-bold text-slate-600">พื้นผิว</span>
+        <div className="grid grid-cols-3 gap-1">
+          {(["ice", "grass", "gravel"] as const).map((surfaceType) => (
+            <button
+              key={surfaceType}
+              type="button"
+              onClick={() => setSurface(surfaceType)}
+              aria-pressed={surface === surfaceType}
+              className={`rounded-lg border px-1 py-2 text-[11px] font-bold ${
+                surface === surfaceType ? "border-emerald-400 bg-emerald-50 text-emerald-800" : "border-slate-200 bg-white text-slate-600"
+              }`}
+            >
+              {surfaceType === "ice" ? "น้ำแข็ง" : surfaceType === "grass" ? "หญ้า" : "กรวด"}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <SharedSimulationShell
@@ -195,7 +253,10 @@ export default function PushPullForcesSimulation() {
       icon={Activity}
       sceneTitle="วิชวลจำลองรถลากของเล่น (Forces Play Stage)"
       scene={
-        <div className="relative flex h-full min-h-[300px] flex-col overflow-hidden rounded-2xl border border-blue-100 bg-[linear-gradient(135deg,#eff6ff_0%,#dbeafe_48%,#f8fafc_100%)] p-4 select-none">
+        <div
+          data-testid="push-pull-experiment-scene"
+          className="relative flex h-full min-h-[300px] flex-col overflow-hidden bg-[linear-gradient(180deg,#eff6ff_0%,#dbeafe_58%,#f8fafc_100%)] p-4 select-none"
+        >
           <div className="absolute inset-0 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:20px_20px] opacity-25" />
 
           {/* Surface Indicator label */}
@@ -225,6 +286,15 @@ export default function PushPullForcesSimulation() {
               <text x="100" y="30" fill="#1d4ed8" fontSize="6.5" fontWeight="900" textAnchor="middle">
                 แรงลัพธ์ = {Math.max(0, forceVal - frictionForce).toFixed(0)} N
               </text>
+              <g transform="translate(16 44)">
+                <rect width="54" height="30" rx="8" fill="#ffffff" stroke="#bfdbfe" />
+                <text x="27" y="11" fill="#64748b" fontSize="5.5" fontWeight="800" textAnchor="middle">แรงที่ออก</text>
+                <text x="27" y="23" fill="#dc2626" fontSize="8" fontWeight="900" textAnchor="middle">{forceVal} N</text>
+              </g>
+              <g transform="translate(16 78)">
+                <rect width="54" height="18" rx="7" fill="#fff7ed" stroke="#fed7aa" />
+                <text x="27" y="12" fill="#c2410c" fontSize="5.5" fontWeight="900" textAnchor="middle">แรงเสียดทาน {frictionForce} N</text>
+              </g>
               {/* Floor Surface line */}
               <line x1="10" y1="100" x2="190" y2="100" stroke={surface === "ice" ? "#93c5fd" : surface === "grass" ? "#22c55e" : "#78716c"} strokeWidth="5" />
               {surface === "grass" && [18, 36, 54, 72, 132, 150, 168, 186].map((x) => (
@@ -308,86 +378,8 @@ export default function PushPullForcesSimulation() {
         </div>
       }
       controlsTitle="ควบคุมแรงของเด็กๆ"
-      controls={
-        <div className="flex flex-col gap-4 font-sans">
-          <section className="flex flex-col gap-4 rounded-2xl border border-slate-200/70 bg-white p-5 shadow-sm">
-            <h3 className="flex items-center gap-2 text-sm font-black text-slate-800 border-b border-slate-100 pb-2">
-              <Sliders className="h-4.5 w-4.5 text-blue-500" />
-              1. เลือกชนิดและขนาดของแรง
-            </h3>
-
-            <div className="grid grid-cols-2 gap-2">
-              <button type="button" onClick={() => setActionType("push")} className={`rounded-xl border px-3 py-2.5 text-xs font-black transition-all cursor-pointer ${actionType === "push" ? "border-blue-600 bg-blue-50 text-blue-700 font-extrabold" : "border-slate-200 bg-white text-slate-500 hover:bg-slate-50"}`}>
-                ผลักออก (Push 🔴)
-              </button>
-              <button type="button" onClick={() => setActionType("pull")} className={`rounded-xl border px-3 py-2.5 text-xs font-black transition-all cursor-pointer ${actionType === "pull" ? "border-blue-600 bg-blue-50 text-blue-700 font-extrabold" : "border-slate-200 bg-white text-slate-500 hover:bg-slate-50"}`}>
-                ดึงเข้าหา (Pull 🔵)
-              </button>
-            </div>
-
-            <ManualNumberInput label="ขนาดของแรงกระทำ (นิวตัน N)" ariaLabel="แรงกระทำนิวตัน" value={forceVal} min={10} max={100} step={10} onChange={setForceVal} tone="blue" />
-          </section>
-
-          <section className="flex flex-col gap-4 rounded-2xl border border-slate-200/70 bg-white p-5 shadow-sm">
-            <h3 className="flex items-center gap-2 text-sm font-black text-slate-800 border-b border-slate-100 pb-2">
-              <Activity className="h-4.5 w-4.5 text-blue-500" />
-              2. โหลดของบรรทุก & พื้นผิวตัวแปร
-            </h3>
-
-            <div className="flex flex-col gap-1.5">
-              <label className="text-[11px] font-bold text-slate-500">เลือกของบรรทุกเพิ่มมวล</label>
-              <div className="grid grid-cols-3 gap-1.5">
-                {(["none", "box", "teddy"] as const).map((wt) => (
-                  <button key={wt} type="button" onClick={() => setLoadWeight(wt)} className={`rounded-lg border py-1.5 text-xs font-bold transition-all cursor-pointer ${loadWeight === wt ? "border-blue-600 bg-blue-50 text-blue-700" : "border-slate-200 bg-white text-slate-500"}`}>
-                    {wt === "none" ? "ว่างเปล่า" : wt === "box" ? "กล่องหนัก" : "น้องหมี"}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              <label className="text-[11px] font-bold text-slate-500">เลือกพื้นผิวถนน</label>
-              <div className="grid grid-cols-3 gap-1.5">
-                {(["ice", "grass", "gravel"] as const).map((surf) => (
-                  <button key={surf} type="button" onClick={() => setSurface(surf)} className={`rounded-lg border py-1.5 text-xs font-bold transition-all cursor-pointer ${surface === surf ? "border-blue-600 bg-blue-50 text-blue-700" : "border-slate-200 bg-white text-slate-500"}`}>
-                    {surf === "ice" ? "น้ำแข็งลื่น" : surf === "grass" ? "สนามหญ้า" : "ทางกรวด"}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <button onClick={handleStartSim} className="mt-2 flex items-center justify-center gap-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 py-2.5 text-xs font-bold text-white shadow-md cursor-pointer">
-              <Play className="h-3.5 w-3.5" />
-              ปล่อยตัวรันวิ่ง (Start)
-            </button>
-          </section>
-
-          {/* Action buttons */}
-          <div className="grid grid-cols-2 gap-3">
-            <button onClick={handleAddLog} className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs font-bold text-slate-700 shadow-sm transition-all hover:bg-slate-50 active:scale-97 cursor-pointer">
-              <ClipboardList className="h-3.5 w-3.5 text-blue-500" />
-              จดบันทึกผล
-            </button>
-            <button onClick={handleReset} className="flex items-center justify-center gap-2 rounded-xl border border-blue-100 bg-blue-50/50 px-3 py-2.5 text-xs font-bold text-blue-700 shadow-sm transition-all hover:bg-blue-50 active:scale-97 cursor-pointer">
-              <RotateCcw className="h-3.5 w-3.5" />
-              ตั้งใหม่ (Reset)
-            </button>
-          </div>
-        </div>
-      }
-      compactControls={
-        <div className="flex items-center gap-2 font-sans flex-wrap">
-          <button onClick={() => setForceVal((f) => Math.max(10, f - 10))} className="px-2 py-1 text-xs font-bold rounded bg-slate-100">
-            Force -10N
-          </button>
-          <button onClick={() => setForceVal((f) => Math.min(100, f + 10))} className="px-2 py-1 text-xs font-bold rounded bg-slate-100">
-            Force +10N
-          </button>
-          <button onClick={handleReset} className="px-2 py-1 text-xs font-bold rounded bg-blue-500 text-white">
-            Reset
-          </button>
-        </div>
-      }
+      controls={compactControls}
+      compactControls={compactControls}
       metrics={[
         { label: "ความเร็วรถของเล่น", value: `${Math.abs(parseFloat(velocity.toFixed(1)))} m/s`, tone: "blue" },
         { label: "แรงสุทธิหลังหักลบ", value: `${Math.abs(netForce)} นิวตัน`, tone: "blue" },

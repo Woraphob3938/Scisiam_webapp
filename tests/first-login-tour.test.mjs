@@ -12,6 +12,11 @@ test("first-login tour is gated by the persisted onboarding state", () => {
   assert.match(source, /data-tour=\"lab-search\"/);
   assert.match(source, /querySelectorAll/);
   assert.match(source, /scrollIntoView/);
+  assert.match(source, /getTourPanelPosition/);
+  assert.match(source, /spaceAbove/);
+  assert.match(source, /spaceBelow/);
+  assert.match(source, /ResizeObserver/);
+  assert.match(source, /scisiamTourOpen/);
   assert.match(source, /motion-reduce:animate-none/);
   assert.match(source, /ข้ามคู่มือ/);
   assert.match(source, /ย้อนกลับ/);

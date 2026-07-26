@@ -3,11 +3,8 @@
 import React, { useId, useMemo, useState } from "react";
 import {
   Anchor,
-  CheckCircle2,
   ClipboardList,
   Droplets,
-  FlaskConical,
-  RotateCcw,
   Scale,
   Waves,
 } from "lucide-react";
@@ -97,9 +94,6 @@ export default function FloatingSinkingSimulation() {
   const [prediction, setPrediction] = useState<Prediction | null>(null);
   const [tested, setTested] = useState(false);
   const [loggedRuns, setLoggedRuns] = useState<BuoyancyRun[]>([]);
-  const [correctFloatingTest, setCorrectFloatingTest] = useState(false);
-  const [correctSinkingTest, setCorrectSinkingTest] = useState(false);
-  const [clayOutcomes, setClayOutcomes] = useState<Partial<Record<ClayShape, Prediction>>>({});
 
   const selectedMaterial = useMemo(
     () => (material === "clay" ? CLAY[clayShape] : MATERIALS[material]),
@@ -114,15 +108,6 @@ export default function FloatingSinkingSimulation() {
     [selectedMaterial],
   );
 
-  const clayCompared =
-    clayOutcomes.ball === "sink" && clayOutcomes.boat === "float";
-  const missionEvidence = [
-    correctFloatingTest,
-    correctSinkingTest,
-    clayCompared,
-  ];
-  const completedMissions = missionEvidence.filter(Boolean).length;
-  const progressPercent = (completedMissions / missionEvidence.length) * 100;
   const outcomeText =
     result.outcome === "float" ? "วัตถุลอยน้ำ" : "วัตถุจมน้ำ";
 
@@ -145,24 +130,22 @@ export default function FloatingSinkingSimulation() {
     }
 
     setTested(true);
-    const correct = prediction === result.outcome;
-    if (correct && result.outcome === "float") setCorrectFloatingTest(true);
-    if (correct && result.outcome === "sink") setCorrectSinkingTest(true);
-    if (material === "clay") {
-      setClayOutcomes((previous) => ({
-        ...previous,
-        [clayShape]: result.outcome,
-      }));
-    }
   };
 
-  const handleLog = () => {
+  const handleReset = () => {
+    setMaterial("wood");
+    setClayShape("ball");
+    setPrediction(null);
+    setTested(false);
+    setLoggedRuns([]);
+  };
+
+  const handleSave = async () => {
     if (!tested || !prediction) {
-      window.alert("กรุณาทำนายและกดทดลองก่อนจดบันทึก");
+      window.alert("กรุณาเลือกคำทำนายและทดลองก่อนบันทึกผล");
       return;
     }
-
-    const run: BuoyancyRun = {
+    const currentRun: BuoyancyRun = {
       index: loggedRuns.length + 1,
       material: selectedMaterial.label,
       shape: material === "clay" ? (clayShape === "ball" ? "ก้อนกลม" : "รูปเรือ") : "-",
@@ -175,34 +158,15 @@ export default function FloatingSinkingSimulation() {
       buoyantForceNewton: result.buoyantForceNewton,
       predictionCorrect: prediction === result.outcome,
     };
-
-    setLoggedRuns((previous) => [...previous, run].slice(-12));
-  };
-
-  const handleReset = () => {
-    setMaterial("wood");
-    setClayShape("ball");
-    setPrediction(null);
-    setTested(false);
-    setLoggedRuns([]);
-    setCorrectFloatingTest(false);
-    setCorrectSinkingTest(false);
-    setClayOutcomes({});
-  };
-
-  const handleSave = async () => {
-    if (loggedRuns.length === 0) {
-      window.alert("กรุณาจดบันทึกผลอย่างน้อย 1 ครั้งก่อนบันทึกการทดลอง");
-      return;
-    }
+    const runsToSave = [...loggedRuns, currentRun].slice(-12);
+    setLoggedRuns(runsToSave);
 
     await saveExperimentAndSync({
       localStorageKey: "scisiam_saved_floating_sinking_experiment",
       localPayload: {
         labId,
         savedAt: new Date().toISOString(),
-        loggedRuns,
-        completedMissions,
+        loggedRuns: runsToSave,
       },
       labId,
       title: "การลอยและการจม",
@@ -213,16 +177,15 @@ export default function FloatingSinkingSimulation() {
         displacedVolumeM3: selectedMaterial.displacedVolumeM3,
       },
       liveValues: result,
-      graphPoints: loggedRuns.map((run) => ({
+      graphPoints: runsToSave.map((run) => ({
         index: run.index,
         density: run.averageDensityKgM3,
         waterDensity: 1000,
       })),
-      tableRows: loggedRuns,
+      tableRows: runsToSave,
       prediction,
       summary: {
-        completedMissions,
-        runsCount: loggedRuns.length,
+        runsCount: runsToSave.length,
         latestOutcome: result.outcome,
       },
       durationSeconds: null,
@@ -231,37 +194,47 @@ export default function FloatingSinkingSimulation() {
     window.alert("บันทึกผลการทดลองการลอยและการจมแล้ว");
   };
 
-  const missionPanel = (
-    <section className="rounded-xl border border-cyan-200 bg-cyan-50 p-3">
-      <p className="mb-2 text-xs font-black text-cyan-950">ภารกิจสั้น 3 ขั้น</p>
-      <ol className="space-y-2">
-        {[
-          "ทำนายและทดลองวัตถุที่ลอยให้ถูกต้อง",
-          "ทำนายและทดลองวัตถุที่จมให้ถูกต้อง",
-          "เปลี่ยนดินน้ำมันจากก้อนกลมเป็นรูปเรือ",
-        ].map((mission, index) => (
-          <li key={mission} className="flex items-start gap-2 text-xs font-bold leading-relaxed text-slate-700">
-            <CheckCircle2
-              className={`mt-0.5 h-4 w-4 shrink-0 ${
-                missionEvidence[index] ? "text-emerald-600" : "text-slate-300"
-              }`}
-            />
-            <span>{mission}</span>
-          </li>
-        ))}
-      </ol>
-      {completedMissions === 3 && (
-        <p className="mt-3 rounded-lg bg-white px-3 py-2 text-xs font-black text-emerald-700">
-          ปลดล็อกทดลองอิสระแล้ว ลองเปรียบเทียบวัสดุทุกชนิด
-        </p>
-      )}
-    </section>
-  );
-
   const objectY = !tested ? 82 : result.outcome === "float" ? 145 : 267;
   const arrowScale = Math.min(
     70,
     Math.max(result.weightNewton, result.buoyantForceNewton) * 45,
+  );
+
+  const compactControls = (
+    <div className="space-y-3">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+        {(["wood", "plastic", "steel", "clay"] as const).map((id) => (
+          <button
+            key={id}
+            type="button"
+            onClick={() => chooseMaterial(id)}
+            aria-pressed={material === id}
+            className={`${buttonBase} ${
+              material === id ? "border-cyan-500 bg-cyan-50 text-cyan-900" : "border-slate-200 bg-white text-slate-600"
+            }`}
+          >
+            {id === "wood" ? "ไม้" : id === "plastic" ? "พลาสติก" : id === "steel" ? "เหล็ก" : "ดินน้ำมัน"}
+          </button>
+        ))}
+      </div>
+      {material === "clay" && (
+        <div className="grid grid-cols-2 gap-2">
+          {(["ball", "boat"] as const).map((shape) => (
+            <button key={shape} type="button" onClick={() => chooseClayShape(shape)} aria-pressed={clayShape === shape} className={`${buttonBase} ${clayShape === shape ? "border-violet-500 bg-violet-50 text-violet-900" : "border-slate-200 bg-white text-slate-600"}`}>
+              {shape === "ball" ? "ก้อนกลม" : "รูปเรือ"}
+            </button>
+          ))}
+        </div>
+      )}
+      <div className="grid grid-cols-2 gap-2">
+        {(["float", "sink"] as const).map((choice) => (
+          <button key={choice} type="button" onClick={() => { setPrediction(choice); setTested(false); }} aria-pressed={prediction === choice} className={`${buttonBase} ${prediction === choice ? "border-cyan-600 bg-cyan-600 text-white" : "border-slate-200 bg-white text-slate-600"}`}>
+            {choice === "float" ? <Waves className="h-4 w-4" /> : <Anchor className="h-4 w-4" />}
+            ทำนายว่า{choice === "float" ? "ลอย" : "จม"}
+          </button>
+        ))}
+      </div>
+    </div>
   );
 
   return (
@@ -393,143 +366,7 @@ export default function FloatingSinkingSimulation() {
         </div>
       }
       controlsTitle="แผงทดลองลอยหรือจม"
-      controls={
-        <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
-          <section className="space-y-4 rounded-xl border border-slate-200 bg-white p-4">
-            <div>
-              <p className="mb-2 text-xs font-black text-slate-500">เลือกวัตถุ</p>
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-                {(["wood", "plastic", "steel", "clay"] as const).map((id) => {
-                  const label = id === "wood" ? "ไม้" : id === "plastic" ? "พลาสติก" : id === "steel" ? "เหล็ก" : "ดินน้ำมัน";
-                  return (
-                    <button
-                      key={id}
-                      type="button"
-                      onClick={() => chooseMaterial(id)}
-                      aria-pressed={material === id}
-                      className={`${buttonBase} ${
-                        material === id
-                          ? "border-cyan-500 bg-cyan-50 text-cyan-900"
-                          : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
-                      }`}
-                    >
-                      {label}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {material === "clay" && (
-              <div>
-                <p className="mb-2 text-xs font-black text-slate-500">ปั้นดินน้ำมัน</p>
-                <div className="grid grid-cols-2 gap-2">
-                  {(["ball", "boat"] as const).map((shape) => (
-                    <button
-                      key={shape}
-                      type="button"
-                      onClick={() => chooseClayShape(shape)}
-                      aria-pressed={clayShape === shape}
-                      className={`${buttonBase} ${
-                        clayShape === shape
-                          ? "border-violet-500 bg-violet-50 text-violet-900"
-                          : "border-slate-200 bg-white text-slate-600"
-                      }`}
-                    >
-                      {shape === "ball" ? "ก้อนกลม" : "รูปเรือ"}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <div>
-              <p className="mb-2 text-xs font-black text-slate-500">ทำนายก่อนทดลอง</p>
-              <div className="grid grid-cols-2 gap-2">
-                {(["float", "sink"] as const).map((choice) => (
-                  <button
-                    key={choice}
-                    type="button"
-                    onClick={() => {
-                      setPrediction(choice);
-                      setTested(false);
-                    }}
-                    aria-pressed={prediction === choice}
-                    className={`${buttonBase} ${
-                      prediction === choice
-                        ? "border-cyan-600 bg-cyan-600 text-white"
-                        : "border-slate-200 bg-white text-slate-600"
-                    }`}
-                  >
-                    {choice === "float" ? <Waves className="h-4 w-4" /> : <Anchor className="h-4 w-4" />}
-                    {choice === "float" ? "ลอย" : "จม"}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={handleTest}
-              className={`${buttonBase} w-full border-cyan-600 bg-cyan-600 text-white hover:bg-cyan-700`}
-            >
-              <FlaskConical className="h-4 w-4" />
-              เริ่มทดลอง
-            </button>
-          </section>
-
-          <div className="space-y-4">
-            {missionPanel}
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={handleLog}
-                className={`${buttonBase} border-cyan-600 bg-cyan-600 text-white`}
-              >
-                <ClipboardList className="h-4 w-4" />
-                จดผล
-              </button>
-              <button
-                type="button"
-                onClick={handleReset}
-                className={`${buttonBase} border-slate-200 bg-white text-slate-700`}
-              >
-                <RotateCcw className="h-4 w-4" />
-                เริ่มใหม่
-              </button>
-            </div>
-          </div>
-        </div>
-      }
-      compactControls={
-        <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={handleTest}
-            className={`${buttonBase} border-cyan-600 bg-cyan-600 text-white`}
-          >
-            <FlaskConical className="h-4 w-4" />
-            ทดลอง
-          </button>
-          <button
-            type="button"
-            onClick={handleLog}
-            className={`${buttonBase} border-cyan-200 bg-cyan-50 text-cyan-900`}
-          >
-            <ClipboardList className="h-4 w-4" />
-            จดผล
-          </button>
-          <button
-            type="button"
-            onClick={handleReset}
-            className={`${buttonBase} border-slate-200 bg-white text-slate-700`}
-          >
-            <RotateCcw className="h-4 w-4" />
-            เริ่มใหม่
-          </button>
-        </div>
-      }
-      drawerSummary={missionPanel}
+      compactControls={compactControls}
       metrics={[
         {
           label: "ความหนาแน่นวัตถุ",
@@ -627,13 +464,10 @@ export default function FloatingSinkingSimulation() {
         { label: "เลือกวัตถุหรือปั้นดินน้ำมัน", icon: Anchor },
         { label: "ทำนายว่าจะลอยหรือจม", icon: Droplets },
         { label: "ทดลองและดูแรงทั้งสองทิศ", icon: Scale },
-        { label: "จดผลเพื่อผ่านภารกิจ", icon: ClipboardList },
+        { label: "บันทึกผลการทดลอง", icon: ClipboardList },
       ]}
-      progressLabel="ความคืบหน้าภารกิจ"
-      progressValue={`${completedMissions}/3 ภารกิจ`}
-      progressPercent={progressPercent}
       tips={[
-        "ต้องเลือกคำทำนายก่อนกดทดลอง เพื่อฝึกคิดจากข้อมูลมวลและปริมาตร",
+        "เลือกคำทำนายก่อนกดทดลอง แล้วเปรียบเทียบกับผลที่เกิดขึ้น",
         "ดินน้ำมันรูปเรือมีมวลเท่าเดิม แต่แทนที่น้ำได้มากขึ้น จึงเกิดแรงลอยตัวมากขึ้น",
         "แบบจำลองใช้น้ำสะอาดที่ความหนาแน่น 1000 กิโลกรัมต่อลูกบาศก์เมตร",
       ]}

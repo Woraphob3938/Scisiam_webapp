@@ -2,6 +2,7 @@
 
 import React, { useId, useState } from "react";
 import SharedSimulationShell from "./SharedSimulationShell";
+import CompactRangeControl from "./CompactRangeControl";
 import { Info, Activity, Disc } from "lucide-react";
 import { labsById } from "@/data/labs";
 import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";
@@ -109,6 +110,13 @@ export default function QuantumChemistryOrbitalsSimulation() {
     setLogs([]);
   };
 
+  const handleReset = () => {
+    const defaultMolecule = molecules[0];
+    setSelectedMolecule(defaultMolecule);
+    setSelectedOrbital(defaultMolecule.orbitals[0]);
+    setBondDistance(defaultMolecule.idealDistance);
+  };
+
   const handleSave = async () => {
     if (logs.length === 0) {
       window.alert("กรุณาบันทึกข้อมูลตารางอย่างน้อย 1 รายการก่อนส่งผล");
@@ -148,6 +156,21 @@ export default function QuantumChemistryOrbitalsSimulation() {
       setIsSaving(false);
     }
   };
+
+  const compactControls = (
+    <CompactRangeControl
+      label="ระยะพันธะระหว่างนิวเคลียส"
+      symbol="r"
+      value={bondDistance}
+      min={0.4}
+      max={2.5}
+      step={0.05}
+      precision={2}
+      unit="Å"
+      tone="cyan"
+      onChange={setBondDistance}
+    />
+  );
 
   const getMetricDisplay = () => [
     { label: "ระยะห่างระหว่างนิวเคลียส", value: `${bondDistance.toFixed(2)} Å` },
@@ -321,6 +344,7 @@ export default function QuantumChemistryOrbitalsSimulation() {
           </div>
         </div>
       }
+      compactControls={compactControls}
       controlsTitle="ควบคุมพารามิเตอร์โมเลกุล"
       controls={
         <div className="flex flex-col gap-4 w-full">
@@ -371,32 +395,6 @@ export default function QuantumChemistryOrbitalsSimulation() {
             </div>
           </div>
 
-          <div>
-            <div className="flex justify-between text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">
-              <span>ระยะห่างบอนด์ระหว่างนิวเคลียส (r)</span>
-              <span className="text-cyan-600 dark:text-cyan-400 font-bold">{bondDistance.toFixed(2)} Å</span>
-            </div>
-            <input
-              type="range"
-              min="0.40"
-              max="2.50"
-              step="0.05"
-              value={bondDistance}
-              onChange={(e) => setBondDistance(parseFloat(e.target.value))}
-              className="w-full accent-cyan-600"
-            />
-            <div className="flex justify-between text-[10px] text-slate-400 mt-1">
-              <span>0.40 Å (ทับซ้อนสูง)</span>
-              <span>2.50 Å (สลายพันธะ)</span>
-            </div>
-          </div>
-
-          <button
-            onClick={handleLogResult}
-            className="w-full py-2 border border-dashed border-cyan-300 dark:border-cyan-800 text-cyan-600 hover:bg-cyan-50 dark:text-cyan-400 dark:hover:bg-cyan-950/20 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1"
-          >
-            บันทึกค่าระยะนี้ลงตาราง
-          </button>
         </div>
       }
       metrics={getMetricDisplay()}
@@ -476,6 +474,9 @@ export default function QuantumChemistryOrbitalsSimulation() {
       showLiveMetrics={true}
       showInfoTabs={true}
       showSaveButton={true}
+      onRun={handleLogResult}
+      runLabel="คำนวณออร์บิทัล"
+      onReset={handleReset}
       onSave={handleSave}
     />
   );

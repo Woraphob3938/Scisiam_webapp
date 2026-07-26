@@ -3,7 +3,6 @@
 import React, { useState, useMemo } from "react";
 import {
   Sliders,
-  RotateCcw,
   ClipboardList,
   Play,
   Scissors,
@@ -16,6 +15,7 @@ import {
   Thermometer,
 } from "lucide-react";
 import SharedSimulationShell from "@/components/labs/simulation/SharedSimulationShell";
+import CompactRangeControl from "@/components/labs/simulation/CompactRangeControl";
 import ManualNumberInput from "@/components/labs/simulation/ManualNumberInput";
 import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";
 
@@ -84,9 +84,8 @@ export default function RecombinantDnaTransformationSimulation() {
     }, 1500);
   };
 
-  const handleAddLog = () => {
-    const run: LoggedTransformationRun = {
-      index: loggedRuns.length + 1,
+  const createCurrentRun = (index: number): LoggedTransformationRun => ({
+      index,
       restrictionEnzyme,
       heatShockTime,
       heatShockTemp,
@@ -94,9 +93,7 @@ export default function RecombinantDnaTransformationSimulation() {
       efficiency: transformationEfficiency,
       coloniesCount,
       glowsUnderUv: isLigationSuccess && transformationEfficiency > 200
-    };
-    setLoggedRuns((prev) => [...prev, run]);
-  };
+    });
 
   const handleClearLog = (idx: number) => {
     setLoggedRuns((prev) => prev.filter((r) => r.index !== idx));
@@ -133,21 +130,19 @@ export default function RecombinantDnaTransformationSimulation() {
   };
 
   const handleSaveResults = async () => {
-    if (loggedRuns.length === 0) {
-      alert("กรุณากดบันทึกค่าพารามิเตอร์จำลองอย่างน้อย 1 ครั้งก่อนส่งออกรายงาน");
-      return;
-    }
+    const runs = [...loggedRuns, createCurrentRun(loggedRuns.length + 1)];
+    setLoggedRuns(runs);
     await saveExperimentAndSync({
       localStorageKey: "scisiam_saved_recombinant_dna_experiment",
-      localPayload: { labId, timestamp: new Date().toLocaleString("th-TH"), loggedRuns },
+      localPayload: { labId, timestamp: new Date().toLocaleString("th-TH"), loggedRuns: runs },
       labId,
       title: "Recombinant DNA & Transformation",
       variables: { restrictionEnzyme, heatShockTime, heatShockTemp },
       liveValues: { transformationEfficiency, coloniesCount },
-      graphPoints: loggedRuns.map((r) => ({ index: r.index, x: r.heatShockTime, y: r.efficiency })),
-      tableRows: loggedRuns,
-      summary: { runsCount: loggedRuns.length, maxEfficiency: Math.max(...loggedRuns.map((r) => r.efficiency)) },
-      score: Math.min(100, Math.max(40, 40 + loggedRuns.length * 15)),
+      graphPoints: runs.map((r) => ({ index: r.index, x: r.heatShockTime, y: r.efficiency })),
+      tableRows: runs,
+      summary: { runsCount: runs.length, maxEfficiency: Math.max(...runs.map((r) => r.efficiency)) },
+      score: Math.min(100, Math.max(40, 40 + runs.length * 15)),
       durationSeconds: null
     });
     alert("บันทึกรายงานพันธุวิศวกรรมดีเอ็นเอลูกผสมสำเร็จ");
@@ -346,36 +341,25 @@ export default function RecombinantDnaTransformationSimulation() {
             <section className="flex flex-col gap-4 rounded-2xl border border-slate-200/70 bg-white p-5 shadow-sm">
               <h3 className="flex items-center gap-2 text-sm font-black text-slate-800 border-b border-slate-100 pb-2">
                 <CheckCircle2 className="h-4.5 w-4.5 text-emerald-500" />
-                ขั้นที่ 3: ตรวจสอบและบันทึกจดบันทึก
+                ขั้นที่ 3: ตรวจสอบผลบนจานเพาะเชื้อ
               </h3>
-              <p className="text-xs text-slate-500 leading-relaxed">กรุณาตรวจสอบจำนวนโคโลนีแบคทีเรียบนจานเพาะเชื้อ LB + Amp + Ara ที่เรืองแสงสีเขียวภายใต้รังสี UV แล้วบันทึกจุดวัดลงในสมุดผล</p>
+              <p className="text-xs text-slate-500 leading-relaxed">ตรวจสอบจำนวนโคโลนีแบคทีเรียบนจานเพาะเชื้อ LB + Amp + Ara และสังเกตการเรืองแสงสีเขียวภายใต้รังสี UV</p>
             </section>
           )}
-
-          {/* Action buttons */}
-          <div className="grid grid-cols-2 gap-3">
-            <button onClick={handleAddLog} className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs font-bold text-slate-700 shadow-sm transition-all hover:bg-slate-50 active:scale-97 cursor-pointer">
-              <ClipboardList className="h-3.5 w-3.5 text-emerald-500" />
-              บันทึกจุดวัด
-            </button>
-            <button onClick={handleReset} className="flex items-center justify-center gap-2 rounded-xl border border-emerald-100 bg-emerald-50/50 px-3 py-2.5 text-xs font-bold text-emerald-700 shadow-sm transition-all hover:bg-emerald-50 active:scale-97 cursor-pointer">
-              <RotateCcw className="h-3.5 w-3.5" />
-              รีเซ็ตจำลอง
-            </button>
-          </div>
         </div>
       }
       compactControls={
-        <div className="flex items-center gap-2 font-sans flex-wrap">
-          <button onClick={() => setHeatShockTime((t) => Math.max(20, t - 5))} className="px-2 py-1 text-xs font-bold rounded bg-slate-100">
-            Time -5s
-          </button>
-          <button onClick={() => setHeatShockTime((t) => Math.min(80, t + 5))} className="px-2 py-1 text-xs font-bold rounded bg-slate-100">
-            Time +5s
-          </button>
-          <button onClick={handleReset} className="px-2 py-1 text-xs font-bold rounded bg-emerald-500 text-white">
-            Reset
-          </button>
+        <div className="grid min-w-0 grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          <CompactRangeControl label="เวลาช็อกความร้อน" symbol="t" value={heatShockTime} min={20} max={80} step={5} unit="s" tone="emerald" onChange={setHeatShockTime} />
+          <CompactRangeControl label="อุณหภูมิช็อก" symbol="T" value={heatShockTemp} min={30} max={50} step={1} unit="°C" tone="orange" onChange={setHeatShockTemp} />
+          <fieldset className="min-w-0 rounded-2xl border border-slate-200 bg-slate-50/80 p-3">
+            <legend className="px-1 text-xs font-bold text-slate-600">เอนไซม์ตัดจำเพาะ</legend>
+            <div className="mt-1 grid grid-cols-2 gap-1.5">
+              {(["EcoRI", "HindIII"] as const).map((enzyme) => (
+                <button key={enzyme} type="button" onClick={() => setRestrictionEnzyme(enzyme)} className={`min-h-9 rounded-xl border px-2 text-xs font-black ${restrictionEnzyme === enzyme ? "border-emerald-300 bg-emerald-50 text-emerald-700" : "border-slate-200 bg-white text-slate-500"}`}>{enzyme}</button>
+              ))}
+            </div>
+          </fieldset>
         </div>
       }
       metrics={[
@@ -385,7 +369,7 @@ export default function RecombinantDnaTransformationSimulation() {
         { label: "ระบบควบคุมอุณหภูมิช็อกความร้อน", value: `${heatShockTemp}°C สำหรับ ${heatShockTime} วินาที`, tone: undefined }
       ]}
       graph={
-        <section className="flex min-h-[300px] flex-col rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40 font-sans">
+        <section className="flex min-h-[220px] flex-col rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40 font-sans">
           <div className="mb-2 flex items-center justify-between border-b border-slate-100 pb-2">
             <h3 className="flex items-center gap-2 text-sm font-black text-slate-800">
               <Sparkles className="h-4.5 w-4.5 text-emerald-600" />
@@ -415,7 +399,7 @@ export default function RecombinantDnaTransformationSimulation() {
         </section>
       }
       table={
-        <section className="flex min-h-[300px] flex-col rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40 font-sans">
+        <section className="flex min-h-[220px] flex-col rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm shadow-slate-200/40 font-sans">
           <div className="flex items-center justify-between border-b border-slate-100 pb-2 mb-2">
             <h3 className="flex items-center gap-2 text-sm font-black text-slate-800">
               <ClipboardList className="h-4.5 w-4.5 text-emerald-500" />
@@ -508,8 +492,8 @@ export default function RecombinantDnaTransformationSimulation() {
           </ul>
         </div>
       }
-      onRun={handleRunLigation}
-      runLabel="ทดลองเชื่อม DNA"
+      onRun={activeStage === "ligation" ? handleRunLigation : activeStage === "transformation" ? handleRunHeatShock : undefined}
+      runLabel={activeStage === "ligation" ? "ทดลองเชื่อม DNA" : "ทดลอง Heat Shock"}
       onReset={handleReset}
       onSave={handleSaveResults}
     />

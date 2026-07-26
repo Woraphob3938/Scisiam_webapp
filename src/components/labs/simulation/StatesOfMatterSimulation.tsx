@@ -2,16 +2,14 @@
 
 import React, { useEffect, useId, useMemo, useRef, useState } from "react";
 import {
-  CirclePause,
   CirclePlay,
   ClipboardPlus,
   Droplets,
   Eraser,
-  RotateCcw,
-  Save,
   Thermometer,
 } from "lucide-react";
 import SharedSimulationShell from "@/components/labs/simulation/SharedSimulationShell";
+import CompactRangeControl from "@/components/labs/simulation/CompactRangeControl";
 import { getMatterPhase } from "@/lib/simulations/elementaryChemistry";
 import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";
 
@@ -30,9 +28,6 @@ const PARTICLES = Array.from({ length: 36 }, (_, index) => ({
   row: Math.floor(index / 9),
   phaseOffset: ((index * 37) % 360) * (Math.PI / 180),
 }));
-
-const buttonBase =
-  "inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border px-3 py-2 text-sm font-black transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50";
 
 const phaseColors = {
   solid: "#6366f1",
@@ -54,7 +49,6 @@ export default function StatesOfMatterSimulation() {
   const [isRunning, setIsRunning] = useState(false);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [observations, setObservations] = useState<MatterObservation[]>([]);
-  const [isSaving, setIsSaving] = useState(false);
   const animationRef = useRef<number | null>(null);
   const lastTimestampRef = useRef(0);
   const elapsedRef = useRef(0);
@@ -130,20 +124,6 @@ export default function StatesOfMatterSimulation() {
     setIsRunning((running) => !running);
   };
 
-  const handleObserve = () => {
-    setObservations((previous) => [
-      ...previous,
-      {
-        index: previous.length + 1,
-        elapsedSeconds: Number(elapsedSeconds.toFixed(1)),
-        temperatureC,
-        phaseId: phase.id,
-        phaseLabel: phase.thaiLabel,
-        spacing: phase.spacing,
-      },
-    ].slice(-12).map((item, index) => ({ ...item, index: index + 1 })));
-  };
-
   const handleReset = () => {
     setIsRunning(false);
     setTemperatureC(-20);
@@ -155,19 +135,24 @@ export default function StatesOfMatterSimulation() {
   };
 
   const handleSave = async () => {
-    if (observations.length === 0) {
-      window.alert("กรุณาบันทึกการสังเกตอย่างน้อย 1 ครั้งก่อนบันทึกผล");
-      return;
-    }
+    const savedObservations = observations.length > 0
+      ? observations
+      : [{
+          index: 1,
+          elapsedSeconds: Number(elapsedSeconds.toFixed(1)),
+          temperatureC,
+          phaseId: phase.id,
+          phaseLabel: phase.thaiLabel,
+          spacing: phase.spacing,
+        }];
+    if (observations.length === 0) setObservations(savedObservations);
 
-    setIsSaving(true);
-    try {
-      await saveExperimentAndSync({
+    await saveExperimentAndSync({
         localStorageKey: "scisiam_saved_states_of_matter_experiment",
         localPayload: {
           labId,
           timestamp: new Date().toISOString(),
-          observations,
+          observations: savedObservations,
         },
         labId,
         title: "สถานะของสสาร",
@@ -177,22 +162,19 @@ export default function StatesOfMatterSimulation() {
           phase: phase.id,
           motionLevel: phase.motionLevel,
         },
-        graphPoints: observations.map(({ index, temperatureC: value, phaseId }) => ({
+        graphPoints: savedObservations.map(({ index, temperatureC: value, phaseId }) => ({
           index,
           temperatureC: value,
           phase: phaseId,
         })),
-        tableRows: observations,
+        tableRows: savedObservations,
         summary: {
-          observationsCount: observations.length,
+          observationsCount: savedObservations.length,
           latestPhase: phase.thaiLabel,
         },
         durationSeconds: Math.round(elapsedSeconds),
-      });
-      window.alert("บันทึกผลการทดลองสถานะของสสารแล้ว");
-    } finally {
-      setIsSaving(false);
-    }
+    });
+    window.alert("บันทึกผลการทดลองสถานะของสสารแล้ว");
   };
 
   const graph = (
@@ -269,25 +251,8 @@ export default function StatesOfMatterSimulation() {
     </section>
   );
 
-  const controls = (
-    <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
-      <label className="block rounded-xl border border-blue-100 bg-blue-50/60 p-4">
-        <span className="flex items-center justify-between gap-3 text-sm font-black text-slate-800">
-          <span className="inline-flex items-center gap-2"><Thermometer className="h-4 w-4 text-blue-600" /> อุณหภูมิ</span>
-          <output className="rounded-lg bg-white px-3 py-1 text-blue-700">{temperatureC} °C</output>
-        </span>
-        <input aria-label="อุณหภูมิของสาร" type="range" min="-20" max="120" step="1" value={temperatureC} onChange={(event) => setTemperatureC(Number(event.target.value))} className="mt-4 w-full accent-blue-600" />
-        <span className="mt-1 flex justify-between text-[11px] font-bold text-slate-400"><span>-20 °C</span><span>0 °C</span><span>100 °C</span><span>120 °C</span></span>
-      </label>
-      <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
-        <button type="button" onClick={handleToggle} className={`${buttonBase} border-blue-600 bg-blue-600 text-white hover:bg-blue-700`}>
-          {isRunning ? <CirclePause className="h-4 w-4" /> : <CirclePlay className="h-4 w-4" />}{isRunning ? "หยุดชั่วคราว" : "เริ่มเคลื่อนที่"}
-        </button>
-        <button type="button" onClick={handleObserve} className={`${buttonBase} border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100`}><ClipboardPlus className="h-4 w-4" />บันทึกการสังเกต</button>
-        <button type="button" onClick={handleReset} className={`${buttonBase} border-slate-200 bg-white text-slate-600 hover:bg-slate-50`}><RotateCcw className="h-4 w-4" />รีเซ็ต</button>
-        <button type="button" onClick={handleSave} disabled={isSaving || observations.length === 0} className={`${buttonBase} border-violet-600 bg-violet-600 text-white hover:bg-violet-700`}><Save className="h-4 w-4" />{isSaving ? "กำลังบันทึก..." : "บันทึกผล"}</button>
-      </div>
-    </div>
+  const compactControls = (
+    <CompactRangeControl label="อุณหภูมิของสาร" symbol="T" value={temperatureC} min={-20} max={120} step={1} precision={0} unit="°C" tone="blue" onChange={setTemperatureC} />
   );
 
   return (
@@ -318,8 +283,7 @@ export default function StatesOfMatterSimulation() {
         </div>
       }
       controlsTitle="แผงควบคุมอุณหภูมิ"
-      controls={controls}
-      compactControls={controls}
+      compactControls={compactControls}
       metrics={[
         { label: "อุณหภูมิ", value: `${temperatureC} °C`, tone: "blue" },
         { label: "สถานะ", value: phase.thaiLabel, tone: phase.id === "gas" ? "emerald" : "violet" },

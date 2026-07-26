@@ -9,13 +9,13 @@ import {
   Gauge,
   LineChart,
   LucideIcon,
-  RotateCcw,
   Sliders,
   Thermometer,
   Timer,
   Zap,
 } from "lucide-react";
 import SharedSimulationShell, { SimulationMetric, SimulationStep } from "@/components/labs/simulation/SharedSimulationShell";
+import CompactRangeControl from "@/components/labs/simulation/CompactRangeControl";
 import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";
 
 export type ChemistryConceptLabId =
@@ -654,36 +654,6 @@ function ChemistryScene({ labId, result }: { labId: ChemistryConceptLabId; resul
   );
 }
 
-function SliderControl({
-  config,
-  value,
-  onChange,
-}: {
-  config: SliderConfig;
-  value: number;
-  onChange: (value: number) => void;
-}) {
-  return (
-    <label className="block rounded-xl border border-slate-100 bg-slate-50/70 p-3">
-      <span className="mb-2 flex items-center justify-between gap-3 text-xs font-black text-slate-700">
-        <span>{config.label}</span>
-        <span className="rounded-lg bg-white px-2 py-1 font-mono text-blue-600 shadow-sm">
-          {value.toFixed(config.step < 1 ? 2 : 0)} {config.unit}
-        </span>
-      </span>
-      <input
-        type="range"
-        min={config.min}
-        max={config.max}
-        step={config.step}
-        value={value}
-        onChange={(event) => onChange(Number(event.target.value))}
-        className="w-full accent-blue-600"
-      />
-    </label>
-  );
-}
-
 function ResultGraph({ result, accent }: { result: ChemistryResult; accent: Accent }) {
   const color = accent === "orange" ? "#f97316" : accent === "violet" ? "#7c3aed" : accent === "emerald" ? "#10b981" : accent === "rose" ? "#e11d48" : accent === "cyan" ? "#06b6d4" : "#2563eb";
   const xCoord = (x: number) => 30 + (Math.min(result.xMax, Math.max(0, x)) / result.xMax) * 150;
@@ -788,12 +758,14 @@ export default function ChemistryConceptSimulation({ labId }: { labId: Chemistry
   const config = labConfigs[labId];
   const [primary, setPrimary] = useState(config.primary.defaultValue);
   const [secondary, setSecondary] = useState(config.secondary.defaultValue);
+  const [hasRun, setHasRun] = useState(false);
 
   const result = useMemo(() => calculateLab(labId, primary, secondary), [labId, primary, secondary]);
 
   const handleReset = () => {
     setPrimary(config.primary.defaultValue);
     setSecondary(config.secondary.defaultValue);
+    setHasRun(false);
   };
 
   const handleSave = async () => {
@@ -832,22 +804,11 @@ export default function ChemistryConceptSimulation({ labId }: { labId: Chemistry
     });
   };
 
-  const controls = (
-    <div className="space-y-3">
-      <SliderControl config={config.primary} value={primary} onChange={setPrimary} />
-      <SliderControl config={config.secondary} value={secondary} onChange={setSecondary} />
-      <button
-        type="button"
-        onClick={handleReset}
-        className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs font-black text-slate-600 shadow-sm transition hover:bg-slate-50"
-      >
-        <RotateCcw className="h-4 w-4" />
-        รีเซ็ตค่าทดลอง
-      </button>
-      <div className="rounded-xl bg-slate-50 p-3 text-xs font-semibold leading-relaxed text-slate-500">
-        {result.summary}
-      </div>
-    </div>
+  const compactControls = (
+    <>
+      <CompactRangeControl label={config.primary.label} symbol="A" value={primary} min={config.primary.min} max={config.primary.max} step={config.primary.step} unit={config.primary.unit} tone={config.accent === "rose" ? "pink" : config.accent} onChange={setPrimary} />
+      <CompactRangeControl label={config.secondary.label} symbol="B" value={secondary} min={config.secondary.min} max={config.secondary.max} step={config.secondary.step} unit={config.secondary.unit} tone={config.accent === "rose" ? "pink" : config.accent} onChange={setSecondary} />
+    </>
   );
 
   return (
@@ -857,12 +818,12 @@ export default function ChemistryConceptSimulation({ labId }: { labId: Chemistry
       category="Chemistry"
       title={config.title}
       subtitle={config.subtitle}
-      statusLabel="พร้อมจำลอง"
+      statusLabel={hasRun ? "คำนวณผลแล้ว" : "พร้อมจำลอง"}
       icon={config.icon}
       sceneTitle={config.sceneTitle}
       scene={<ChemistryScene labId={labId} result={result} />}
       controlsTitle={config.controlsTitle}
-      controls={controls}
+      compactControls={compactControls}
       metrics={result.metrics}
       graph={<ResultGraph result={result} accent={config.accent} />}
       table={<ResultTable result={result} />}
@@ -873,6 +834,8 @@ export default function ChemistryConceptSimulation({ labId }: { labId: Chemistry
       progressValue={result.progressValue}
       progressPercent={result.progressPercent}
       tips={config.tips}
+      onRun={() => setHasRun(true)}
+      runLabel="คำนวณผล"
       onReset={handleReset}
       onSave={handleSave}
     />

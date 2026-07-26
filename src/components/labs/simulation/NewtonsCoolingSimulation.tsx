@@ -600,7 +600,6 @@ export default function NewtonsCoolingSimulation() {
           if (nextQuestProg >= 20 && !questSuccessRef.current) {
             setQuestSuccess(true);
             questSuccessRef.current = true;
-            alert("🎉 ยินดีด้วย! คุณควบคุมอุณหภูมิน้ำให้อยู่ในช่วง 50°C - 60°C ต่อเนื่องเป็นเวลา 20 วินาทีสำเร็จ บันทึกผลเพื่อเก็บความคืบหน้า");
           }
         } else {
           setQuestProgress(0);

@@ -297,7 +297,6 @@ export default function OhmsLawSimulation() {
           if (nextProg >= 20 && !questSuccessRef.current) {
             setQuestSuccess(true);
             questSuccessRef.current = true;
-            alert("🎉 ยินดีด้วย! คุณรักษากระแสไฟฟ้าให้อยู่ระหว่าง 0.1A - 0.2A ต่อเนื่องเป็นเวลา 20 วินาทีสำเร็จ บันทึกผลเพื่อเก็บความคืบหน้า");
           }
         } else {
           setQuestProgress(0);
@@ -324,18 +323,6 @@ export default function OhmsLawSimulation() {
     setSwitchStatus(true);
     setQuestProgress(0);
     setDataPoints([]);
-  };
-
-  const handleAddPoint = () => {
-    setDataPoints((prev) => [
-      ...prev,
-      {
-        index: prev.length + 1,
-        voltage,
-        resistance,
-        current: switchStatus ? current : 0.0,
-      },
-    ]);
   };
 
   const handleClearPoint = (idx: number) => {
@@ -371,17 +358,21 @@ export default function OhmsLawSimulation() {
   };
 
   const handleSaveResults = async () => {
-    if (dataPoints.length === 0) {
-      alert("ไม่พบข้อมูลการทดลองสำหรับบันทึกผล! กรุณากดเริ่มทดลองและเก็บบันทึกข้อมูลก่อน");
-      return;
-    }
+    const currentPoint: OhmsDataPoint = {
+      index: dataPoints.length + 1,
+      voltage,
+      resistance,
+      current: switchStatus ? current : 0,
+    };
+    const pointsToSave = [...dataPoints, currentPoint].slice(-20);
+    setDataPoints(pointsToSave);
 
     const experimentData = {
       labId: "ohms-law",
       timestamp: new Date().toLocaleString("th-TH"),
-      voltage: Math.max(...dataPoints.map((p) => p.voltage)),
-      resistance: dataPoints[0].resistance,
-      dataPoints,
+      voltage: Math.max(...pointsToSave.map((p) => p.voltage)),
+      resistance: pointsToSave[0].resistance,
+      dataPoints: pointsToSave,
     };
 
     await saveExperimentAndSync({
@@ -391,14 +382,14 @@ export default function OhmsLawSimulation() {
       title: "Ohm's Law & DC Circuits",
       variables: { voltage, resistance, switchStatus },
       liveValues: { current, elapsedSeconds, questProgress, questSuccess },
-      graphPoints: dataPoints,
-      tableRows: dataPoints,
+      graphPoints: pointsToSave,
+      tableRows: pointsToSave,
       summary: {
         maxVoltage: experimentData.voltage,
         resistance: experimentData.resistance,
-        dataPointCount: dataPoints.length,
+        dataPointCount: pointsToSave.length,
       },
-      score: questSuccess ? 100 : Math.min(100, dataPoints.length * 20),
+      score: questSuccess ? 100 : Math.min(100, pointsToSave.length * 20),
       durationSeconds: Math.round(elapsedSeconds),
     });
 
@@ -594,9 +585,6 @@ export default function OhmsLawSimulation() {
             <span className="mb-1 flex justify-between"><span>ความต้านทาน</span><span>{resistance.toFixed(0)} Ω</span></span>
             <input aria-label="ความต้านทาน" type="range" min="10" max="500" step="10" value={resistance} onChange={(event) => setResistance(Number(event.target.value))} className="w-full accent-amber-500" />
           </label>
-          <button type="button" onClick={handleAddPoint} className="min-h-11 rounded-xl border border-blue-100 bg-blue-50 px-3 text-xs font-black text-blue-700 transition hover:bg-blue-100 lg:col-span-3">
-            จดค่าลงตาราง
-          </button>
         </div>
       }
       metrics={[
@@ -633,7 +621,7 @@ export default function OhmsLawSimulation() {
         { label: "ตั้งค่าโหลด", icon: Sliders },
         { label: "สับสวิตช์ลง", icon: Play },
         { label: "ปรับแรงดัน", icon: Zap },
-        { label: "บันทึกจุด", icon: ClipboardList },
+        { label: "บันทึกผลการทดลอง", icon: ClipboardList },
         { label: "หาความชัน", icon: Target },
       ]}
       learningGoals={[

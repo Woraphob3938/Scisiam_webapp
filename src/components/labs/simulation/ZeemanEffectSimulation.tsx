@@ -4,8 +4,6 @@ import React, { useState, useEffect, useRef, useId } from "react";
 import {
   Sliders,
   Play,
-  Pause,
-  RotateCcw,
   LineChart,
   ClipboardList,
   Target,
@@ -18,6 +16,7 @@ import {
   ToggleRight,
 } from "lucide-react";
 import SharedSimulationShell from "@/components/labs/simulation/SharedSimulationShell";
+import CompactRangeControl from "@/components/labs/simulation/CompactRangeControl";
 import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";
 
 // --- TYPES ---
@@ -469,7 +468,6 @@ export default function ZeemanEffectSimulation() {
           if (nextQuestProg >= 5 && !questSuccessRef.current) {
             setQuestSuccess(true);
             questSuccessRef.current = true;
-            alert("🎉 ยินดีด้วย! คุณปรับระดับสนามแม่เหล็กเพื่อเหนี่ยวนำให้เกิดระยะแยกสเปกตรัมอยู่ในช่วง 0.05 nm - 0.06 nm ได้ต่อเนื่องเป็นเวลา 5 วินาทีสำเร็จ บันทึกรายงานเพื่อบันทึกผลการทดลอง");
           }
         } else {
           setQuestProgress(0);
@@ -533,22 +531,6 @@ export default function ZeemanEffectSimulation() {
     lastLoggedTimeRef.current = 0;
     setQuestProgress(0);
     setQuestSuccess(false);
-  };
-
-  // Manual Log
-  const handleAddPoint = () => {
-    setDataPoints((prev) =>
-      [
-        ...prev,
-        {
-          time: elapsedSeconds,
-          magneticField,
-          sourceWavelength,
-          mode: zeemanMode,
-          splittingNm,
-        },
-      ].slice(-MAX_DATA_POINTS),
-    );
   };
 
   // Clear point
@@ -661,108 +643,49 @@ export default function ZeemanEffectSimulation() {
     alert("บันทึกข้อมูลการทดลอง (การแยกเส้นสเปกตรัมและตารางบันทึกผล) สำเร็จ! 🎉");
   };
 
-  const simControls = (
-    <div className="space-y-5">
-      {/* Slider: Magnetic Field */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between text-xs sm:text-sm font-bold">
-          <span className="text-slate-600 font-bold">สนามแม่เหล็กไฟฟ้า (B)</span>
-          <span className="text-blue-650 font-mono">{magneticField.toFixed(2)} Tesla</span>
-        </div>
-        <input
-          type="range"
-          min="0.0"
-          max="3.0"
-          step="0.05"
-          value={magneticField}
-          onChange={(e) => setMagneticField(parseFloat(e.target.value))}
-          className="w-full accent-blue-600"
-        />
-        <div className="flex justify-between text-[10px] text-slate-400 font-bold">
-          <span>0.0 T (ปิดแม่เหล็ก)</span>
-          <span>3.0 T (สูงสุด)</span>
-        </div>
-      </div>
+  const compactControls = (
+    <div className="grid grid-cols-2 gap-3">
+      <CompactRangeControl
+        label="สนามแม่เหล็ก"
+        symbol="B"
+        value={magneticField}
+        min={0}
+        max={3}
+        step={0.05}
+        precision={2}
+        unit="T"
+        tone="blue"
+        onChange={setMagneticField}
+      />
+      <CompactRangeControl
+        label="ความยาวคลื่นตั้งต้น"
+        symbol="λ₀"
+        value={sourceWavelength}
+        min={450}
+        max={680}
+        step={1}
+        unit="nm"
+        tone="violet"
+        onChange={setSourceWavelength}
+      />
+    </div>
+  );
 
-      {/* Slider: Base Wavelength */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between text-xs sm:text-sm font-bold">
-          <span className="text-slate-600 font-bold">ความยาวคลื่นเป้าหมาย (λ₀)</span>
-          <span className="text-blue-650 font-mono">{sourceWavelength.toFixed(1)} nm</span>
-        </div>
-        <input
-          type="range"
-          min="450"
-          max="680"
-          step="1"
-          value={sourceWavelength}
-          onChange={(e) => setSourceWavelength(parseInt(e.target.value))}
-          className="w-full accent-blue-600"
-        />
-        <div className="flex justify-between text-[10px] text-slate-400 font-bold">
-          <span>450 nm</span>
-          <span>680 nm</span>
-        </div>
-      </div>
-
-      {/* Mode Toggle: Normal vs Anomalous */}
-      <div className="flex items-center justify-between text-xs sm:text-sm font-bold border-t border-slate-100 pt-3">
-        <span className="text-slate-600 font-bold">เลือกผลแยกรูปแบบอะตอม</span>
-        <button
-          onClick={() => setZeemanMode(prev => prev === "normal" ? "anomalous" : "normal")}
-          className="flex items-center gap-1 text-blue-600 font-extrabold transition-all active:scale-95"
-        >
-          {zeemanMode === "normal" ? (
-            <>
-              <ToggleLeft className="w-6 h-6 text-slate-400" />
-              <span>Normal Triplet</span>
-            </>
-          ) : (
-            <>
-              <ToggleRight className="w-6 h-6 text-blue-600" />
-              <span>Anomalous Zeeman</span>
-            </>
-          )}
-        </button>
-      </div>
-
-      {/* Button Controls */}
-      <div className="flex items-center gap-2 border-t border-slate-100 pt-4">
-        <button
-          onClick={handleStartStop}
-          className={`flex-grow flex min-h-10 items-center justify-center gap-2 rounded-xl px-4 text-sm font-bold text-white transition-all active:scale-95 ${
-            isRunning
-              ? "bg-slate-700 shadow-lg shadow-slate-500/10"
-              : "bg-blue-600 shadow-lg shadow-blue-500/20 hover:bg-blue-700"
-          }`}
-        >
-          {isRunning ? (
-            <>
-              <Pause className="h-4 w-4" />
-              <span>หยุดจำลอง</span>
-            </>
-          ) : (
-            <>
-              <Play className="h-4 w-4 fill-white" />
-              <span>เริ่มจำลอง</span>
-            </>
-          )}
-        </button>
-        <button
-          onClick={handleReset}
-          className="flex min-h-10 items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 text-sm font-bold text-slate-600 transition-all hover:bg-slate-50 active:scale-95"
-          title="รีเซ็ต"
-        >
-          <RotateCcw className="h-4 w-4" />
-        </button>
-        <button
-          onClick={handleAddPoint}
-          className="flex min-h-10 items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 text-sm font-bold text-slate-700 transition-all hover:bg-slate-50 active:scale-95"
-          title="บันทึกจุดนี้"
-        >
-          <ClipboardList className="h-4 w-4 text-blue-500" />
-        </button>
-      </div>
+  const advancedControls = (
+    <div className="flex items-center justify-between gap-4">
+      <span className="text-sm font-bold text-slate-600">รูปแบบการแยกเส้นสเปกตรัม</span>
+      <button
+        type="button"
+        onClick={() => setZeemanMode((mode) => mode === "normal" ? "anomalous" : "normal")}
+        className="flex min-h-10 items-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-3 text-sm font-bold text-blue-700"
+      >
+        {zeemanMode === "normal" ? (
+          <ToggleLeft className="h-5 w-5" />
+        ) : (
+          <ToggleRight className="h-5 w-5" />
+        )}
+        {zeemanMode === "normal" ? "Normal triplet" : "Anomalous Zeeman"}
+      </button>
     </div>
   );
 
@@ -850,7 +773,8 @@ export default function ZeemanEffectSimulation() {
         />
       }
       controlsTitle="แผงพารามิเตอร์สนามแม่เหล็กและสเปกตรัม"
-      controls={simControls}
+      controls={advancedControls}
+      compactControls={compactControls}
       metrics={[
         { label: "ความยาวคลื่นหลัก λ₀", value: `${sourceWavelength.toFixed(0)} nm`, tone: "blue" },
         { label: "สนามแม่เหล็ก B", value: `${magneticField.toFixed(2)} T`, tone: "cyan" },

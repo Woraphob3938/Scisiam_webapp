@@ -2,7 +2,6 @@
 
 import React, { useId, useMemo, useState } from "react";
 import {
-  CheckCircle2,
   ClipboardList,
   Compass,
   Gauge,
@@ -55,10 +54,6 @@ export default function MagnetExplorationSimulation() {
   const [material, setMaterial] = useState<TestMaterial>("iron");
   const [tested, setTested] = useState(false);
   const [loggedRuns, setLoggedRuns] = useState<MagnetRun[]>([]);
-  const [observedAttraction, setObservedAttraction] = useState(false);
-  const [observedRepulsion, setObservedRepulsion] = useState(false);
-  const [testedIron, setTestedIron] = useState(false);
-  const [testedNonMagnetic, setTestedNonMagnetic] = useState(false);
 
   const poleInteraction = useMemo(
     () => calculateMagneticInteraction("N", facingPole, distanceCm),
@@ -84,14 +79,6 @@ export default function MagnetExplorationSimulation() {
         ? "เกิดแรงผลัก"
         : "ไม่พบแรงดึงดูดชัดเจน";
 
-  const materialMission = testedIron && testedNonMagnetic;
-  const missionEvidence = [
-    observedAttraction,
-    observedRepulsion,
-    materialMission,
-  ];
-  const completedMissions = missionEvidence.filter(Boolean).length;
-  const progressPercent = (completedMissions / missionEvidence.length) * 100;
   const graphPoints = useMemo(
     () =>
       [4, 8, 12, 16, 20, 24, 28].map((distance) => ({
@@ -103,33 +90,6 @@ export default function MagnetExplorationSimulation() {
 
   const handleTest = () => {
     setTested(true);
-    if (testMode === "poles") {
-      if (poleInteraction.relation === "attract") setObservedAttraction(true);
-      if (poleInteraction.relation === "repel") setObservedRepulsion(true);
-      return;
-    }
-
-    if (material === "iron") setTestedIron(true);
-    else setTestedNonMagnetic(true);
-  };
-
-  const handleLog = () => {
-    if (!tested) {
-      window.alert("กรุณากดทดลองก่อนจดบันทึก");
-      return;
-    }
-
-    const run: MagnetRun = {
-      index: loggedRuns.length + 1,
-      mode: testMode,
-      facingPole,
-      distanceCm,
-      material,
-      relation,
-      strength: displayedStrength,
-      resultText,
-    };
-    setLoggedRuns((previous) => [...previous, run].slice(-12));
   };
 
   const handleReset = () => {
@@ -139,35 +99,41 @@ export default function MagnetExplorationSimulation() {
     setMaterial("iron");
     setTested(false);
     setLoggedRuns([]);
-    setObservedAttraction(false);
-    setObservedRepulsion(false);
-    setTestedIron(false);
-    setTestedNonMagnetic(false);
   };
 
   const handleSave = async () => {
-    if (loggedRuns.length === 0) {
-      window.alert("กรุณาจดบันทึกผลอย่างน้อย 1 ครั้งก่อนบันทึกการทดลอง");
+    if (!tested) {
+      window.alert("กรุณากดทดลองก่อนบันทึกผล");
       return;
     }
+    const currentRun: MagnetRun = {
+      index: loggedRuns.length + 1,
+      mode: testMode,
+      facingPole,
+      distanceCm,
+      material,
+      relation,
+      strength: displayedStrength,
+      resultText,
+    };
+    const runsToSave = [...loggedRuns, currentRun].slice(-12);
+    setLoggedRuns(runsToSave);
 
     await saveExperimentAndSync({
       localStorageKey: "scisiam_saved_magnet_exploration_experiment",
       localPayload: {
         labId,
         savedAt: new Date().toISOString(),
-        loggedRuns,
-        completedMissions,
+        loggedRuns: runsToSave,
       },
       labId,
       title: "สำรวจแม่เหล็ก",
       variables: { facingPole, distanceCm, testMode, material },
       liveValues: { relation, strength: displayedStrength, resultText },
       graphPoints,
-      tableRows: loggedRuns,
+      tableRows: runsToSave,
       summary: {
-        completedMissions,
-        runsCount: loggedRuns.length,
+        runsCount: runsToSave.length,
         latestResult: resultText,
       },
       durationSeconds: null,
@@ -176,31 +142,84 @@ export default function MagnetExplorationSimulation() {
     window.alert("บันทึกผลการสำรวจแม่เหล็กแล้ว");
   };
 
-  const missionPanel = (
-    <section className="rounded-xl border border-violet-200 bg-violet-50 p-3">
-      <p className="mb-2 text-xs font-black text-violet-950">ภารกิจสั้น 3 ขั้น</p>
-      <ol className="space-y-2">
-        {[
-          "จัดขั้วต่างกันเพื่อสังเกตแรงดึงดูด",
-          "จัดขั้วเหมือนกันเพื่อสังเกตแรงผลัก",
-          "ทดสอบเหล็กและวัสดุที่ไม่ถูกดูด",
-        ].map((mission, index) => (
-          <li key={mission} className="flex items-start gap-2 text-xs font-bold leading-relaxed text-slate-700">
-            <CheckCircle2
-              className={`mt-0.5 h-4 w-4 shrink-0 ${
-                missionEvidence[index] ? "text-emerald-600" : "text-slate-300"
-              }`}
-            />
-            <span>{mission}</span>
-          </li>
+  const compactControls = (
+    <div className="space-y-3">
+      <div className="grid grid-cols-2 gap-2">
+        {(["poles", "materials"] as const).map((mode) => (
+          <button
+            key={mode}
+            type="button"
+            onClick={() => {
+              setTestMode(mode);
+              setTested(false);
+            }}
+            aria-pressed={testMode === mode}
+            className={`${buttonBase} ${
+              testMode === mode
+                ? "border-violet-600 bg-violet-600 text-white"
+                : "border-slate-200 bg-white text-slate-600"
+            }`}
+          >
+            {mode === "poles" ? <Magnet className="h-4 w-4" /> : <TestTube2 className="h-4 w-4" />}
+            {mode === "poles" ? "ขั้วแม่เหล็ก" : "ทดสอบวัสดุ"}
+          </button>
         ))}
-      </ol>
-      {completedMissions === 3 && (
-        <p className="mt-3 rounded-lg bg-white px-3 py-2 text-xs font-black text-emerald-700">
-          ปลดล็อกทดลองอิสระแล้ว ลองเปลี่ยนระยะและวัสดุเพิ่มเติม
-        </p>
-      )}
-    </section>
+      </div>
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+        {testMode === "poles"
+          ? (["N", "S"] as const).map((pole) => (
+              <button
+                key={pole}
+                type="button"
+                onClick={() => {
+                  setFacingPole(pole);
+                  setTested(false);
+                }}
+                aria-pressed={facingPole === pole}
+                className={`${buttonBase} ${
+                  facingPole === pole
+                    ? "border-violet-500 bg-violet-50 text-violet-900"
+                    : "border-slate-200 bg-white text-slate-600"
+                }`}
+              >
+                หันขั้ว {pole} เข้าหา
+              </button>
+            ))
+          : (Object.keys(MATERIAL_LABELS) as TestMaterial[]).map((id) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => {
+                  setMaterial(id);
+                  setTested(false);
+                }}
+                aria-pressed={material === id}
+                className={`${buttonBase} ${
+                  material === id
+                    ? "border-violet-500 bg-violet-50 text-violet-900"
+                    : "border-slate-200 bg-white text-slate-600"
+                }`}
+              >
+                {MATERIAL_LABELS[id]}
+              </button>
+            ))}
+      </div>
+      <label className="block text-xs font-black text-slate-600" htmlFor="magnet-distance">
+        ระยะห่าง {distanceCm} เซนติเมตร
+      </label>
+      <input
+        id="magnet-distance"
+        type="range"
+        min={4}
+        max={30}
+        value={distanceCm}
+        onChange={(event) => {
+          setDistanceCm(Number(event.target.value));
+          setTested(false);
+        }}
+        className="h-11 w-full accent-violet-600"
+      />
+    </div>
   );
 
   const gap = 72 + distanceCm * 5;
@@ -349,147 +368,7 @@ export default function MagnetExplorationSimulation() {
         </div>
       }
       controlsTitle="แผงสำรวจแม่เหล็ก"
-      controls={
-        <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
-          <section className="space-y-4 rounded-xl border border-slate-200 bg-white p-4">
-            <div>
-              <p className="mb-2 text-xs font-black text-slate-500">โหมดทดลอง</p>
-              <div className="grid grid-cols-2 gap-2">
-                {(["poles", "materials"] as const).map((mode) => (
-                  <button
-                    key={mode}
-                    type="button"
-                    onClick={() => {
-                      setTestMode(mode);
-                      setTested(false);
-                    }}
-                    aria-pressed={testMode === mode}
-                    className={`${buttonBase} ${
-                      testMode === mode
-                        ? "border-violet-600 bg-violet-600 text-white"
-                        : "border-slate-200 bg-white text-slate-600"
-                    }`}
-                  >
-                    {mode === "poles" ? <Magnet className="h-4 w-4" /> : <TestTube2 className="h-4 w-4" />}
-                    {mode === "poles" ? "ขั้วแม่เหล็ก" : "ทดสอบวัสดุ"}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {testMode === "poles" ? (
-              <div>
-                <p className="mb-2 text-xs font-black text-slate-500">ขั้วที่หันเข้าหา N ด้านซ้าย</p>
-                <div className="grid grid-cols-2 gap-2">
-                  {(["N", "S"] as const).map((pole) => (
-                    <button
-                      key={pole}
-                      type="button"
-                      onClick={() => {
-                        setFacingPole(pole);
-                        setTested(false);
-                      }}
-                      aria-pressed={facingPole === pole}
-                      className={`${buttonBase} ${
-                        facingPole === pole
-                          ? "border-violet-500 bg-violet-50 text-violet-900"
-                          : "border-slate-200 bg-white text-slate-600"
-                      }`}
-                    >
-                      ขั้ว {pole}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <div>
-                <p className="mb-2 text-xs font-black text-slate-500">เลือกวัสดุ</p>
-                <div className="grid grid-cols-2 gap-2">
-                  {(Object.keys(MATERIAL_LABELS) as TestMaterial[]).map((id) => (
-                    <button
-                      key={id}
-                      type="button"
-                      onClick={() => {
-                        setMaterial(id);
-                        setTested(false);
-                      }}
-                      aria-pressed={material === id}
-                      className={`${buttonBase} ${
-                        material === id
-                          ? "border-violet-500 bg-violet-50 text-violet-900"
-                          : "border-slate-200 bg-white text-slate-600"
-                      }`}
-                    >
-                      {MATERIAL_LABELS[id]}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <div>
-              <div className="mb-2 flex items-center justify-between gap-3">
-                <label htmlFor="magnet-distance" className="text-xs font-black text-slate-500">
-                  ระยะห่าง
-                </label>
-                <input
-                  type="number"
-                  min={4}
-                  max={30}
-                  value={distanceCm}
-                  onChange={(event) =>
-                    setDistanceCm(
-                      Math.min(30, Math.max(4, Number(event.target.value) || 4)),
-                    )
-                  }
-                  className="h-11 w-24 rounded-xl border border-slate-200 px-3 text-center text-sm font-black text-slate-800"
-                  aria-label="ระยะห่างแม่เหล็กเป็นเซนติเมตร"
-                />
-              </div>
-              <input
-                id="magnet-distance"
-                type="range"
-                min={4}
-                max={30}
-                value={distanceCm}
-                onChange={(event) => {
-                  setDistanceCm(Number(event.target.value));
-                  setTested(false);
-                }}
-                className="h-11 w-full accent-violet-600"
-              />
-            </div>
-
-          </section>
-
-          <div className="space-y-4">
-            {missionPanel}
-            <div>
-              <button
-                type="button"
-                onClick={handleLog}
-                className={`${buttonBase} w-full border-violet-600 bg-violet-600 text-white`}
-              >
-                <ClipboardList className="h-4 w-4" />
-                จดผล
-              </button>
-            </div>
-          </div>
-        </div>
-      }
-      compactControls={
-        <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={handleLog}
-            className={`${buttonBase} border-violet-200 bg-violet-50 text-violet-900`}
-          >
-            <ClipboardList className="h-4 w-4" />
-            จดผล
-          </button>
-        </div>
-      }
-      drawerSummary={missionPanel}
+      compactControls={compactControls}
       metrics={[
         {
           label: "ผลการทดลอง",
@@ -587,11 +466,8 @@ export default function MagnetExplorationSimulation() {
         { label: "เลือกโหมดขั้วแม่เหล็กหรือวัสดุ", icon: Compass },
         { label: "ตั้งขั้ว วัสดุ และระยะ", icon: Ruler },
         { label: "ทดลองและสังเกตทิศแรง", icon: Magnet },
-        { label: "จดผลเพื่อผ่านภารกิจ", icon: ClipboardList },
+        { label: "บันทึกผลการทดลอง", icon: ClipboardList },
       ]}
-      progressLabel="ความคืบหน้าภารกิจ"
-      progressValue={`${completedMissions}/3 ภารกิจ`}
-      progressPercent={progressPercent}
       tips={[
         "ขั้วเหมือนกันผลักกัน ส่วนขั้วต่างกันดึงดูดกัน",
         "ตัวชี้วัดแรงเป็นค่าเปรียบเทียบในชั้นเรียน ไม่ใช่หน่วยแรงนิวตัน",

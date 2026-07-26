@@ -15,6 +15,33 @@ export default function PwaServiceWorker() {
   const reloadingRef = useRef(false);
 
   useEffect(() => {
+    const isMobileTouchDevice = window.matchMedia(
+      "(max-width: 767px) and (pointer: coarse)",
+    ).matches;
+    const isInstalledApp =
+      window.matchMedia("(display-mode: standalone)").matches ||
+      ("standalone" in navigator &&
+        (navigator as Navigator & { standalone?: boolean }).standalone === true);
+    const orientation = screen.orientation as ScreenOrientation & {
+      lock?: (orientation: "portrait-primary") => Promise<void>;
+    };
+
+    if (!isMobileTouchDevice || !isInstalledApp || !orientation.lock) return;
+
+    const lockPortrait = () => {
+      if (document.visibilityState === "visible") {
+        void orientation.lock?.("portrait-primary").catch(() => {
+          // The manifest remains the fallback on browsers that reject runtime locking.
+        });
+      }
+    };
+
+    lockPortrait();
+    document.addEventListener("visibilitychange", lockPortrait);
+    return () => document.removeEventListener("visibilitychange", lockPortrait);
+  }, []);
+
+  useEffect(() => {
     if (
       process.env.NODE_ENV !== "production" ||
       !("serviceWorker" in navigator)
