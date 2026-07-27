@@ -93,7 +93,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
         cacheScisiamAuth(
           {
-            email: user.email,
             role: profile?.role || "student",
             displayName: userName,
             avatarUrl: profile?.avatar_url ?? null,

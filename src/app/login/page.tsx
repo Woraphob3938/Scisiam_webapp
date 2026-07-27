@@ -1,12 +1,7 @@
 import AuthForm from "@/components/auth/AuthForm";
+import { getSafeSameOriginPath } from "@/lib/safe-redirect";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-
-function getSafeNextPath(next: string | undefined) {
-  return next?.startsWith("/") && !next.startsWith("//") && !next.startsWith("/login")
-    ? next
-    : "/labs";
-}
 
 export default async function LoginPage({
   searchParams,
@@ -31,7 +26,9 @@ export default async function LoginPage({
     } catch {
       // Keep the login form available during a temporary auth/network outage.
     }
-    if (hasSession) redirect(getSafeNextPath(next));
+    if (hasSession) {
+      redirect(getSafeSameOriginPath(next, "/labs", ["/login"]));
+    }
   }
 
   const registeredEmail = typeof email === "string" && email.includes("@") ? email : "";

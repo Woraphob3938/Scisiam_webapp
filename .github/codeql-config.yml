@@ -1,0 +1,8 @@
+name: SciSiam CodeQL configuration
+
+paths-ignore:
+  - .agents/**
+  - .claude/**
+  - docs/**
+  - graphify-out/**
+  - tests/**

@@ -81,6 +81,15 @@ export async function syncExperimentRun(input: SyncExperimentInput): Promise<Syn
   }
 
   try {
+    const { data: orphanPaths } = await supabase.rpc(
+      "list_own_orphan_experiment_snapshots",
+    );
+    if (orphanPaths?.length) {
+      await supabase.storage
+        .from("experiment-snapshots")
+        .remove(orphanPaths.slice(0, 5));
+    }
+
     const snapshot = await captureExperimentSnapshot();
     if (snapshot) {
       const path = await uploadExperimentSnapshot(supabase, user.id, data, snapshot);

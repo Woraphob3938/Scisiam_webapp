@@ -17,7 +17,7 @@ test("uses Noto Sans Thai for UI text and Kanit for the Scisiam wordmark", () =>
   assert.match(rootLayout, /variable:\s*"--font-noto-sans-thai"/);
   assert.match(rootLayout, /variable:\s*"--font-kanit"/);
   assert.match(rootLayout, /\$\{notoSansThai\.variable\} \$\{kanit\.variable\} h-full antialiased/);
-  assert.doesNotMatch(globalsCss, /fonts\.googleapis\.com/);
+  assert.equal(globalsCss.includes("fonts.googleapis.com"), false);
   assert.match(globalsCss, /--font-sans:\s*var\(--font-noto-sans-thai\), sans-serif;/);
   assert.match(globalsCss, /--font-heading:\s*var\(--font-noto-sans-thai\), sans-serif;/);
   assert.match(globalsCss, /--font-looped:\s*var\(--font-noto-sans-thai\), sans-serif;/);

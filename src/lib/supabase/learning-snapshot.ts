@@ -154,7 +154,6 @@ export async function loadSupabaseLearningSnapshot(): Promise<LearningSnapshot |
   if (profile) {
     cacheScisiamAuth(
       {
-        email: user.email,
         role: profile.role,
         displayName: profile.displayName,
       },

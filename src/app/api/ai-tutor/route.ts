@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createHash } from "node:crypto";
 import { labsById } from "@/data/labs";
+import { createAdminClient } from "@/lib/supabase/admin";
 import {
   createClient as createSupabaseServerClient,
   isSupabaseConfigured,
@@ -192,12 +193,11 @@ function isMemoryRateLimited(clientId: string): boolean {
 }
 
 async function isRateLimited(clientKey: string, context: UsageContext): Promise<boolean> {
-  if (context.supabase) {
+  if (context.userId) {
     try {
-      const { data, error } = await context.supabase.rpc("check_ai_rate_limit", {
-        p_client_key: clientKey,
-        p_window_seconds: Math.ceil(RATE_LIMIT_WINDOW_MS / 1000),
-        p_max_requests: RATE_LIMIT_MAX_REQUESTS,
+      const admin = createAdminClient();
+      const { data, error } = await admin.rpc("consume_ai_rate_limit", {
+        p_user_id: context.userId,
       });
       const result = data as RateLimitRpcResult | null;
 
