@@ -2,11 +2,12 @@
 
 import React, { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { HelpCircle, LoaderCircle } from "lucide-react";
+import { HelpCircle } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import CategoryFilter, { Category } from "@/components/CategoryFilter";
 import LabCard, { type GradeLevel } from "@/components/LabCard";
+import LabLoadingAtom from "@/components/labs/LabLoadingAtom";
 import Sidebar from "@/components/Sidebar";
 import { useSidebar } from "@/context/SidebarContext";
 import { labsData } from "@/data/labs";
@@ -270,17 +271,7 @@ function LabsContent() {
           role="status"
           aria-live="polite"
         >
-          <div className="flex w-full max-w-sm flex-col items-center rounded-2xl border border-slate-200 bg-white px-6 py-7 text-center shadow-2xl shadow-slate-950/20">
-            <span className="grid h-14 w-14 place-items-center rounded-full bg-blue-50 text-blue-600">
-              <LoaderCircle className="h-7 w-7 animate-spin" aria-hidden="true" />
-            </span>
-            <p className="mt-4 text-lg font-extrabold leading-[1.5] text-slate-950">
-              กำลังโหลดแล็บทดลอง
-            </p>
-            <p className="mt-1 text-sm font-semibold leading-relaxed text-slate-500">
-              โปรดรอสักครู่
-            </p>
-          </div>
+          <LabLoadingAtom />
         </div>
       )}
     </div>
