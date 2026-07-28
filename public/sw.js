@@ -14,6 +14,11 @@ self.addEventListener("install", (event) => {
 });
 
 self.addEventListener("message", (event) => {
+  if (event.origin !== self.location.origin || !event.source?.url) return;
+
+  const sourceUrl = new URL(event.source.url);
+  if (sourceUrl.origin !== self.location.origin) return;
+
   if (event.data?.type === "SCISIAM_SKIP_WAITING") {
     self.skipWaiting();
   }

@@ -5,7 +5,6 @@ export const SCISIAM_REMEMBER_ME_KEY = "scisiam_remember_login";
 export const SCISIAM_REMEMBER_EMAIL_KEY = "scisiam_remember_email";
 
 type CacheAuthInput = {
-  email?: string | null;
   role?: ScisiamUserRole | null;
   displayName?: string | null;
   avatarUrl?: string | null;
@@ -20,10 +19,6 @@ export function cacheScisiamAuth(
   localStorage.setItem("scisiam_logged_in", "true");
   localStorage.setItem("scisiam_user_role", input.role || "student");
   localStorage.setItem("scisiam_user_name", input.displayName || "นักเรียน");
-
-  if (input.email) {
-    localStorage.setItem("scisiam_user_email", input.email);
-  }
 
   if ("avatarUrl" in input) {
     if (input.avatarUrl) {

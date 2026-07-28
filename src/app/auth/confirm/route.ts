@@ -1,10 +1,18 @@
 import type { EmailOtpType } from "@supabase/supabase-js";
 import { NextResponse, type NextRequest } from "next/server";
 
+import { isTrustedSameOriginPost } from "@/lib/server/request-origin";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 
 export async function POST(request: NextRequest) {
   const url = new URL(request.url);
+  if (!isTrustedSameOriginPost(request)) {
+    return NextResponse.redirect(
+      new URL("/login?confirmed=invalid_link", url.origin),
+      303,
+    );
+  }
+
   const formData = await request.formData();
   const email = formData.get("email");
   const token = formData.get("token");
@@ -36,6 +44,16 @@ export async function POST(request: NextRequest) {
     if (!error) {
       if (isRecovery) {
         return NextResponse.redirect(new URL("/reset-password", url.origin), 303);
+      }
+
+      const { error: signOutError } = await supabase.auth.signOut({
+        scope: "local",
+      });
+      if (signOutError) {
+        return NextResponse.redirect(
+          new URL("/login?confirmed=invalid_link", url.origin),
+          303,
+        );
       }
 
       return NextResponse.redirect(

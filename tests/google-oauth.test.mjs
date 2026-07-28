@@ -19,6 +19,7 @@ test("Google OAuth returns authenticated users to the student profile", () => {
   const authForm = readProjectFile("src/components/auth/AuthForm.tsx");
   const desktopRuntime = readProjectFile("src/lib/desktop-runtime.ts");
   const callbackRoute = readProjectFile(callbackPath);
+  const safeRedirect = readProjectFile("src/lib/safe-redirect.ts");
 
   assert.match(authForm, /signInWithOAuth\(\{/);
   assert.match(authForm, /provider:\s*["']google["']/);
@@ -33,9 +34,9 @@ test("Google OAuth returns authenticated users to the student profile", () => {
   assert.match(callbackRoute, /new URL\("scisiam:\/\/auth\/callback"\)/);
   assert.match(callbackRoute, /headers:\s*\{\s*Location:\s*desktopCallback\.toString\(\)\s*\}/);
   assert.match(callbackRoute, /searchParams\.get\("next"\)\s*\?\?\s*"\/profile"/);
-  assert.match(callbackRoute, /function getSafeRedirectPath/);
-  assert.match(callbackRoute, /requestedNext\.includes\("\\\\"\)/);
-  assert.match(callbackRoute, /destination\.origin === base\.origin/);
+  assert.match(callbackRoute, /getSafeSameOriginPath\(requestedNext,\s*"\/profile"\)/);
+  assert.match(safeRedirect, /RAW_NAVIGATION_CONTROL_PATTERN\.test\(requestedPath\)/);
+  assert.match(safeRedirect, /destination\.origin !== base\.origin/);
   assert.match(callbackRoute, /NextResponse\.redirect\(new URL\(next, url\.origin\)\)/);
   assert.doesNotMatch(callbackRoute, /user_metadata|requested_role|role\s*:/);
 });

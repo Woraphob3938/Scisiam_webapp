@@ -47,10 +47,12 @@ test("classroom client validates supported files and does not hide failed cleanu
 
 test("OAuth callback accepts only same-origin relative destinations", () => {
   const source = read("src/app/auth/oauth-callback/route.ts");
+  const sanitizer = read("src/lib/safe-redirect.ts");
 
-  assert.match(source, /function getSafeRedirectPath/);
-  assert.match(source, /destination\.origin === base\.origin/);
-  assert.match(source, /requestedNext\.includes\("\\\\"\)/);
+  assert.match(source, /getSafeSameOriginPath\(requestedNext,\s*"\/profile"\)/);
+  assert.match(sanitizer, /destination\.origin !== base\.origin/);
+  assert.match(sanitizer, /RAW_NAVIGATION_CONTROL_PATTERN/);
+  assert.match(sanitizer, /ENCODED_NAVIGATION_CONTROL_PATTERN/);
 });
 
 test("AI rate limiting uses the verified account and streams a bounded request body", () => {
@@ -67,5 +69,5 @@ test("production CSP is enforced and excludes direct Gemini browser access", () 
 
   assert.match(source, /key: "Content-Security-Policy"/);
   assert.doesNotMatch(source, /Content-Security-Policy-Report-Only/);
-  assert.doesNotMatch(source, /generativelanguage\.googleapis\.com/);
+  assert.equal(source.includes("generativelanguage.googleapis.com"), false);
 });

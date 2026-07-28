@@ -218,14 +218,25 @@ Users only need Windows 10/11, an internet connection, and the installer. After 
 1. เปลี่ยนเลขเวอร์ชันให้ตรงกันใน `package.json`, `src-tauri/Cargo.toml` และ `src-tauri/tauri.conf.json`
 2. Commit และ push โค้ดที่ผ่านการตรวจสอบเข้า `main`
 3. สร้างและ push tag เช่น `app-v0.1.1`
-4. Workflow `.github/workflows/release-desktop.yml` จะสร้าง NSIS installer, ลายเซ็นอัปเดต และ `latest.json` แล้วเผยแพร่ GitHub Release
+4. Workflow `.github/workflows/release-desktop.yml` จะตรวจ source, สร้าง NSIS installer โดยไม่ใช้ production key แล้วรออนุมัติ Environment ก่อนเซ็น updater
+5. Workflow จะสร้าง **draft release** พร้อม installer, updater archive, signature และ `latest.json`
+6. ตรวจ Authenticode/checksum และเผยแพร่ draft ด้วยบัญชีเจ้าของเท่านั้น
 
 ```powershell
 git tag app-v0.1.1
 git push origin app-v0.1.1
 ```
 
-Repository Secrets `TAURI_SIGNING_PRIVATE_KEY` และ `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` ต้องตั้งเพียงครั้งเดียว ห้ามบันทึก private key หรือรหัสผ่านลง Git เด็ดขาด หาก private key สูญหาย แอปรุ่นเดิมจะไม่สามารถยืนยันแพ็กเกจอัปเดตจากกุญแจใหม่ได้
+ก่อนใช้งาน workflow ต้องตั้ง GitHub ดังนี้:
+
+1. สร้าง Environment ชื่อ `desktop-release`
+2. เพิ่ม required reviewer, เปิด prevent self-review และปิด administrator bypass หากแผน GitHub รองรับ
+3. จำกัด deployment tag เป็น `app-v*`
+4. ย้าย `TAURI_SIGNING_PRIVATE_KEY` และ `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` จาก Repository Secrets ไปเป็น Environment Secrets
+5. เปิด branch protection สำหรับ `main` และป้องกัน tag namespace `app-v*`
+6. หมุนทั้ง updater private/public key ก่อนเผยแพร่ updater-enabled build แรก หากเคยแจก build ที่ใช้ key ปัจจุบันแล้ว ต้องวางแผน staged key migration ก่อน
+
+ห้ามบันทึก private key หรือรหัสผ่านลง Git เด็ดขาด หาก private key สูญหาย แอปรุ่นเดิมจะไม่สามารถยืนยันแพ็กเกจอัปเดตจากกุญแจใหม่ได้
 
 ### Release security / ความปลอดภัยก่อนเผยแพร่
 

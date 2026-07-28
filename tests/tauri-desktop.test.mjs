@@ -4,6 +4,7 @@ import { existsSync, readFileSync, statSync } from "node:fs";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 import { ESLint } from "eslint";
+import { load as loadYaml } from "js-yaml";
 
 const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
 const rootDirectory = fileURLToPath(new URL("../", import.meta.url));
@@ -67,15 +68,38 @@ test("desktop updater uses signed GitHub release metadata and passive Windows in
   assert.match(runtime, /ไว้ทีหลัง/);
 });
 
-test("desktop release workflow builds signed updater artifacts from version tags", () => {
+test("desktop release separates untrusted build work from approved signing", () => {
   const workflow = read(".github/workflows/release-desktop.yml");
+  const parsed = loadYaml(workflow);
+  const signingJob = parsed.jobs["sign-and-release"];
+  const actionRefs = [...workflow.matchAll(/uses:\s*[^@\r\n]+@([^\s#]+)/g)];
 
   assert.match(workflow, /app-v\*/);
-  assert.match(workflow, /TAURI_SIGNING_PRIVATE_KEY/);
-  assert.match(workflow, /TAURI_SIGNING_PRIVATE_KEY_PASSWORD/);
-  assert.match(workflow, /includeUpdaterJson:\s*true/);
-  assert.match(workflow, /tauri-apps\/tauri-action@v0/);
+  assert.match(workflow, /git merge-base --is-ancestor/i);
+  assert.match(workflow, /npm ci --ignore-scripts/);
+  assert.match(workflow, /actions\/upload-artifact@[0-9a-f]{40}/);
+  assert.match(workflow, /actions\/download-artifact@[0-9a-f]{40}/);
+  assert.match(workflow, /gh release create[\s\S]*--draft/);
   assert.match(workflow, /windows-latest/);
+  assert.equal(signingJob.environment, "desktop-release");
+  assert.equal(signingJob.env, undefined);
+  assert.ok(
+    signingJob.steps.some(
+      (step) =>
+        step.env?.TAURI_SIGNING_PRIVATE_KEY ===
+          "${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}" &&
+        step.env?.TAURI_SIGNING_PRIVATE_KEY_PASSWORD ===
+          "${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}",
+    ),
+  );
+  assert.ok(actionRefs.length >= 4);
+  for (const [, ref] of actionRefs) {
+    assert.match(ref, /^[0-9a-f]{40}$/);
+  }
+  assert.doesNotMatch(
+    workflow,
+    /\$\{\{\s*github\.ref_name\s*\}\}\.Replace\("app-v"/,
+  );
 });
 
 test("desktop binary commits its configured icons and dependency lockfile", () => {

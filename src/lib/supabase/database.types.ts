@@ -476,6 +476,36 @@ export type Database = {
         Update: never;
         Relationships: [];
       };
+      assignment_push_deliveries: {
+        Row: {
+          assignment_id: string;
+          requested_by: string;
+          status: "queued" | "completed" | "failed";
+          attempt_count: number;
+          sent_count: number;
+          error_code: string | null;
+          created_at: string;
+          completed_at: string | null;
+        };
+        Insert: {
+          assignment_id: string;
+          requested_by: string;
+          status?: "queued" | "completed" | "failed";
+          attempt_count?: number;
+          sent_count?: number;
+          error_code?: string | null;
+          created_at?: string;
+          completed_at?: string | null;
+        };
+        Update: {
+          status?: "queued" | "completed" | "failed";
+          attempt_count?: number;
+          sent_count?: number;
+          error_code?: string | null;
+          completed_at?: string | null;
+        };
+        Relationships: [];
+      };
       ai_usage_events: {
         Row: {
           id: string;
@@ -554,11 +584,9 @@ export type Database = {
         };
         Returns: Json;
       };
-      check_ai_rate_limit: {
+      consume_ai_rate_limit: {
         Args: {
-          p_client_key: string;
-          p_window_seconds?: number;
-          p_max_requests?: number;
+          p_user_id: string;
         };
         Returns: Json;
       };
@@ -583,6 +611,10 @@ export type Database = {
           p_code: string;
         };
         Returns: Json;
+      };
+      list_own_orphan_experiment_snapshots: {
+        Args: Record<PropertyKey, never>;
+        Returns: string[];
       };
       get_classroom_join_code: {
         Args: {

@@ -269,6 +269,7 @@ function LabsContent() {
         <div
           className="fixed inset-0 z-[100] grid place-items-center bg-slate-950/35 px-4"
           role="status"
+          aria-label="กำลังโหลดแล็บทดลอง"
           aria-live="polite"
         >
           <LabLoadingAtom />

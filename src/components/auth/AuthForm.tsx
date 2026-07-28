@@ -350,7 +350,6 @@ export default function AuthForm({
         });
 
         cacheScisiamAuth({
-          email: normalizedEmail,
           role: profile.role,
           displayName: profile.display_name,
         });
@@ -444,7 +443,6 @@ export default function AuthForm({
     cacheScisiamAuth({
       role: "teacher",
       displayName: "ครูอรทัย",
-      email: "teacher.demo@scisiam.com",
     });
     router.push("/profile");
     router.refresh();
