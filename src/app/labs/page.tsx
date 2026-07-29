@@ -1,6 +1,13 @@
 "use client";
 
-import React, { Suspense, useCallback, useEffect, useMemo, useState } from "react";
+import React, {
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { HelpCircle } from "lucide-react";
 import Navbar from "@/components/Navbar";
@@ -33,21 +40,24 @@ type LabsReturnState = {
   searchQuery: string;
 };
 
+const MOBILE_DISCOVERY_QUERY = "(max-width: 639px)";
+
+function subscribeMobileDiscovery(onStoreChange: () => void) {
+  const mediaQuery = window.matchMedia(MOBILE_DISCOVERY_QUERY);
+  mediaQuery.addEventListener("change", onStoreChange);
+  return () => mediaQuery.removeEventListener("change", onStoreChange);
+}
+
+function getMobileDiscoverySnapshot() {
+  return window.matchMedia(MOBILE_DISCOVERY_QUERY).matches;
+}
+
 function useMobileDiscovery() {
-  const [isMobileDiscovery, setIsMobileDiscovery] = useState(false);
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(max-width: 639px)");
-    const handleChange = (event: MediaQueryListEvent) => {
-      setIsMobileDiscovery(event.matches);
-    };
-
-    setIsMobileDiscovery(mediaQuery.matches);
-    mediaQuery.addEventListener("change", handleChange);
-    return () => mediaQuery.removeEventListener("change", handleChange);
-  }, []);
-
-  return isMobileDiscovery;
+  return useSyncExternalStore(
+    subscribeMobileDiscovery,
+    getMobileDiscoverySnapshot,
+    () => false,
+  );
 }
 
 function readLabsReturnState(): LabsReturnState | null {

@@ -8,9 +8,11 @@ const rootDir = join(dirname(fileURLToPath(import.meta.url)), "..");
 const labsPage = readFileSync(join(rootDir, "src/app/labs/page.tsx"), "utf8");
 
 test("mobile lab discovery hides filters and ignores their hidden state", () => {
-  assert.match(labsPage, /window\.matchMedia\("\(max-width: 639px\)"\)/);
-  assert.match(labsPage, /mediaQuery\.addEventListener\("change", handleChange\)/);
-  assert.match(labsPage, /mediaQuery\.removeEventListener\("change", handleChange\)/);
+  assert.match(labsPage, /const MOBILE_DISCOVERY_QUERY = "\(max-width: 639px\)";/);
+  assert.match(labsPage, /useSyncExternalStore\(/);
+  assert.match(labsPage, /mediaQuery\.addEventListener\("change", onStoreChange\)/);
+  assert.match(labsPage, /mediaQuery\.removeEventListener\("change", onStoreChange\)/);
+  assert.match(labsPage, /\(\) => false/);
   assert.match(
     labsPage,
     /const effectiveCategory = isMobileDiscovery \? "All" : selectedCategory;/,
