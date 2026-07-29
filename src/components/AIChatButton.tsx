@@ -270,8 +270,10 @@ export default function AIChatButton() {
             setIsOpen(true);
           }
         }}
-        className={`relative flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border shadow-xl shadow-blue-500/25 transition-all duration-300 hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-blue-100 cursor-pointer sm:h-14 sm:w-14 ${
-          isOpen ? "border-blue-600 bg-blue-600 text-white" : "border-blue-100 bg-white"
+        className={`relative flex min-h-11 min-w-11 items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 focus:outline-none focus:ring-4 focus:ring-blue-100 cursor-pointer ${
+          isOpen
+            ? "h-12 w-12 rounded-2xl bg-blue-600 text-white shadow-xl shadow-blue-500/25 sm:h-14 sm:w-14"
+            : "h-14 w-14 bg-transparent sm:h-16 sm:w-16"
         }`}
         aria-label="เปิด AI ไออุ่น"
         aria-expanded={isOpen}
@@ -282,12 +284,12 @@ export default function AIChatButton() {
           <X className="h-5.5 w-5.5 sm:h-6.5 sm:w-6.5" />
         ) : (
           <Image
-            src="/ai-oon-avatar.png"
+            src="/ai-oon-logo.png"
             alt=""
-            fill
-            sizes="56px"
+            width={64}
+            height={64}
             loading="eager"
-            className="object-cover"
+            className="object-contain"
           />
         )}
       </button>

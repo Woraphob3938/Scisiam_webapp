@@ -22,12 +22,12 @@ test("global interactive UI is deferred until the authenticated device needs it"
   assert.match(overlays, /window\.matchMedia\("\(max-width: 1023px\)"\)/);
 });
 
-test("the always-visible AI I-Oon avatar is loaded eagerly", () => {
+test("the always-visible AI I-Oon artwork is loaded eagerly at a bounded size", () => {
   const aiChat = readProjectFile("src/components/AIChatButton.tsx");
 
   assert.match(
     aiChat,
-    /<Image[\s\S]*?src="\/ai-oon-avatar\.png"[\s\S]*?alt=""[\s\S]*?fill[\s\S]*?sizes="56px"[\s\S]*?loading="eager"/,
+    /<Image[\s\S]*?src="\/ai-oon-logo\.png"[\s\S]*?alt=""[\s\S]*?width=\{64\}[\s\S]*?height=\{64\}[\s\S]*?loading="eager"[\s\S]*?className="object-contain"/,
   );
 });
 

@@ -33,6 +33,23 @@ type LabsReturnState = {
   searchQuery: string;
 };
 
+function useMobileDiscovery() {
+  const [isMobileDiscovery, setIsMobileDiscovery] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 639px)");
+    const handleChange = (event: MediaQueryListEvent) => {
+      setIsMobileDiscovery(event.matches);
+    };
+
+    setIsMobileDiscovery(mediaQuery.matches);
+    mediaQuery.addEventListener("change", handleChange);
+    return () => mediaQuery.removeEventListener("change", handleChange);
+  }, []);
+
+  return isMobileDiscovery;
+}
+
 function readLabsReturnState(): LabsReturnState | null {
   if (typeof window === "undefined") return null;
 
@@ -73,6 +90,7 @@ function LabsContent() {
   const { isCollapsed } = useSidebar();
   const restoredState = useMemo(() => readLabsReturnState(), []);
   const requestedCategory = getRequestedCategory(searchParams);
+  const isMobileDiscovery = useMobileDiscovery();
 
   const [selectedCategory, setSelectedCategory] = useState<Category>(
     () => requestedCategory ?? restoredState?.selectedCategory ?? "All"
@@ -87,13 +105,15 @@ function LabsContent() {
     () => requestedCategory ? "" : restoredState?.searchQuery ?? ""
   );
   const [isEnteringLab, setIsEnteringLab] = useState(false);
+  const effectiveCategory = isMobileDiscovery ? "All" : selectedCategory;
+  const effectiveGradeLevel = isMobileDiscovery ? "All" : selectedGradeLevel;
 
   const categoryLabs = useMemo(
     () =>
-      selectedCategory === "All"
+      effectiveCategory === "All"
         ? labsData
-        : labsData.filter((lab) => lab.category === selectedCategory),
-    [selectedCategory]
+        : labsData.filter((lab) => lab.category === effectiveCategory),
+    [effectiveCategory]
   );
 
   const filteredLabs = useMemo(() => {
@@ -101,12 +121,12 @@ function LabsContent() {
 
     return searchLabs.filter((lab) => {
       const matchesGrade =
-        selectedGradeLevel === "All" || lab.gradeLevel === selectedGradeLevel;
+        effectiveGradeLevel === "All" || lab.gradeLevel === effectiveGradeLevel;
       const matchesSearch = matchesLabSearch(lab, searchQuery);
 
       return matchesGrade && matchesSearch;
     });
-  }, [categoryLabs, searchQuery, selectedGradeLevel]);
+  }, [categoryLabs, effectiveGradeLevel, searchQuery]);
 
   const visibleLabs = showAllLabs ? filteredLabs : filteredLabs.slice(0, INITIAL_VISIBLE_LABS);
   const hiddenLabCount = filteredLabs.length - visibleLabs.length;
@@ -152,9 +172,11 @@ function LabsContent() {
 
   const handleSearchQueryChange = (query: string) => {
     setSearchQuery(query);
-    if (query.trim()) {
-      setSelectedCategory("All");
-      setSelectedGradeLevel("All");
+    if (!isMobileDiscovery) {
+      if (query.trim()) {
+        setSelectedCategory("All");
+        setSelectedGradeLevel("All");
+      }
     }
     setShowAllLabs(false);
   };
@@ -183,13 +205,15 @@ function LabsContent() {
           onSearchQueryChange={handleSearchQueryChange}
         />
 
-        <CategoryFilter
-          activeCategory={selectedCategory}
-          onCategoryChange={handleCategoryChange}
-        />
+        <div className="hidden sm:block">
+          <CategoryFilter
+            activeCategory={selectedCategory}
+            onCategoryChange={handleCategoryChange}
+          />
+        </div>
 
         <section className="w-full px-4 pb-8 pt-1 lg:px-8">
-          <div className="mb-4 flex flex-wrap justify-center gap-2">
+          <div className="mb-4 hidden flex-wrap justify-center gap-2 sm:flex">
             {GRADE_FILTERS.map((grade) => {
               const isActive = selectedGradeLevel === grade.id;
               return (

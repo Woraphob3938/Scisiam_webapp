@@ -19,13 +19,14 @@ test("AI I-Oon supports natural Scisiam and general conversation", () => {
   assert.doesNotMatch(chat, /ผมคือ AI ไออุ่น/);
 });
 
-test("AI I-Oon uses a full-frame avatar", () => {
+test("AI I-Oon uses the full mascot artwork without cropping", () => {
   const chat = readProjectFile("src/components/AIChatButton.tsx");
-  const avatarPath = "public/ai-oon-avatar.png";
+  const artworkPath = "public/ai-oon-logo.png";
 
-  assert.match(chat, /src="\/ai-oon-avatar\.png"/);
-  assert.match(chat, /className="object-cover"/);
-  assert.equal(existsSync(join(rootDir, avatarPath)), true);
+  assert.match(chat, /src="\/ai-oon-logo\.png"/);
+  assert.match(chat, /className="object-contain"/);
+  assert.doesNotMatch(chat, /src="\/ai-oon-avatar\.png"/);
+  assert.equal(existsSync(join(rootDir, artworkPath)), true);
 });
 
 test("AI I-Oon chat header stays compact and uses the mascot", () => {
