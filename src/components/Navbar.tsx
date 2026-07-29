@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Bell, ChevronDown, Award, Menu, User, X } from "lucide-react";
 import { useSidebar } from "@/context/SidebarContext";
 import SettingsModal from "@/components/SettingsModal";
@@ -25,6 +26,7 @@ type NavbarNotification = {
 };
 
 export default function Navbar() {
+  const pathname = usePathname();
   const { toggleSidebar } = useSidebar();
   const profileMenuTriggerRef = useRef<HTMLButtonElement>(null);
   const [showNotification, setShowNotification] = useState(false);
@@ -189,6 +191,10 @@ export default function Navbar() {
       void markClassroomNotificationsReadByIds([notification.classroomId]);
     }
   };
+
+  if (/^\/labs\/[^/]+\/simulation\/?$/.test(pathname)) {
+    return null;
+  }
 
   return (
     <>

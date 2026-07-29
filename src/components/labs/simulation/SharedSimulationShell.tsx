@@ -263,6 +263,7 @@ export default function SharedSimulationShell({
   const resultsPanelRef = useRef<HTMLElement | null>(null);
   const resultsCloseRef = useRef<HTMLButtonElement | null>(null);
   const resultsTriggerRef = useRef<HTMLButtonElement | null>(null);
+  const nativeFullscreenRef = useRef(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [controlsOpen, setControlsOpen] = useState(false);
   const [resultsOpen, setResultsOpen] = useState(false);
@@ -306,10 +307,41 @@ export default function SharedSimulationShell({
       : "sm:bottom-[300px] lg:bottom-[220px]";
 
   useEffect(() => {
-    const syncFullscreen = () => setIsExpanded(document.fullscreenElement === stageShellRef.current);
+    const fullscreenDocument = document as Document & {
+      webkitFullscreenElement?: Element | null;
+    };
+    const syncFullscreen = () => {
+      const fullscreenElement =
+        document.fullscreenElement ?? fullscreenDocument.webkitFullscreenElement ?? null;
+      if (fullscreenElement) {
+        nativeFullscreenRef.current = true;
+        setIsExpanded(fullscreenElement === stageShellRef.current);
+      } else if (nativeFullscreenRef.current) {
+        nativeFullscreenRef.current = false;
+        setIsExpanded(false);
+      }
+    };
     document.addEventListener("fullscreenchange", syncFullscreen);
-    return () => document.removeEventListener("fullscreenchange", syncFullscreen);
+    document.addEventListener("webkitfullscreenchange", syncFullscreen);
+    return () => {
+      document.removeEventListener("fullscreenchange", syncFullscreen);
+      document.removeEventListener("webkitfullscreenchange", syncFullscreen);
+    };
   }, []);
+
+  useEffect(() => {
+    if (!isExpanded) return;
+
+    const previousOverflow = document.body.style.overflow;
+    const previousOverscrollBehavior = document.body.style.overscrollBehavior;
+    document.body.style.overflow = "hidden";
+    document.body.style.overscrollBehavior = "none";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.body.style.overscrollBehavior = previousOverscrollBehavior;
+    };
+  }, [isExpanded]);
 
   useEffect(() => {
     if (!controlsOpen || !usesPersistentControlDock) return;
@@ -380,13 +412,25 @@ export default function SharedSimulationShell({
   };
 
   const toggleFullscreen = async () => {
-    if (isExpanded && !document.fullscreenElement) {
+    const fullscreenDocument = document as Document & {
+      webkitExitFullscreen?: () => Promise<void> | void;
+      webkitFullscreenElement?: Element | null;
+    };
+    const fullscreenElement =
+      document.fullscreenElement ?? fullscreenDocument.webkitFullscreenElement ?? null;
+
+    if (isExpanded && !fullscreenElement) {
+      nativeFullscreenRef.current = false;
       setIsExpanded(false);
       return;
     }
 
-    if (document.fullscreenElement) {
-      await document.exitFullscreen();
+    if (fullscreenElement) {
+      const exitFullscreen =
+        document.exitFullscreen?.bind(document) ??
+        fullscreenDocument.webkitExitFullscreen?.bind(fullscreenDocument);
+      await exitFullscreen?.();
+      nativeFullscreenRef.current = false;
       setIsExpanded(false);
       return;
     }
@@ -395,7 +439,16 @@ export default function SharedSimulationShell({
     setIsExpanded(true);
 
     try {
-      await stage?.requestFullscreen?.();
+      const fullscreenStage = stage as (HTMLElement & {
+        webkitRequestFullscreen?: () => Promise<void> | void;
+      }) | null;
+      const requestFullscreen =
+        fullscreenStage?.requestFullscreen?.bind(fullscreenStage) ??
+        fullscreenStage?.webkitRequestFullscreen?.bind(fullscreenStage);
+      if (requestFullscreen) {
+        await requestFullscreen();
+        nativeFullscreenRef.current = true;
+      }
     } catch {
       // Keep the fixed-position CSS fallback when browser fullscreen is blocked.
     }
@@ -658,7 +711,7 @@ export default function SharedSimulationShell({
       ref={stageShellRef}
       className={`relative w-full min-w-0 max-w-full overflow-hidden border border-slate-200 bg-slate-900 shadow-2xl shadow-slate-300/60 ${
         isExpanded
-          ? "fixed inset-0 z-[100] h-screen min-h-screen w-screen rounded-none border-0 shadow-none"
+          ? "fixed inset-0 z-[100] h-[100dvh] min-h-0 w-[100dvw] max-w-none overscroll-none rounded-none border-0 shadow-none"
           : "min-h-[760px] rounded-[24px] sm:h-[72vh] sm:min-h-[620px] sm:max-h-[840px]"
       }`}
     >
@@ -710,6 +763,7 @@ export default function SharedSimulationShell({
             onClick={toggleFullscreen}
             className="absolute bottom-4 right-3 z-50 grid h-11 w-11 place-items-center rounded-2xl border border-white/70 bg-white/92 text-slate-700 shadow-lg shadow-slate-900/10 backdrop-blur-md transition hover:text-slate-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 sm:bottom-14"
             aria-label={isExpanded ? "ออกจากโหมดเต็มจอ" : "ขยายห้องทดลอง"}
+            aria-pressed={isExpanded}
           >
             {isExpanded ? <Minimize2 className="h-5 w-5" /> : <Maximize2 className="h-5 w-5" />}
           </button>
