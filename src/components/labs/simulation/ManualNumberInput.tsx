@@ -49,6 +49,14 @@ function clampNumber(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
 }
 
+function normalizeDecimalInput(rawValue: string) {
+  return rawValue.replace(",", ".");
+}
+
+function isEditableNumberDraft(rawValue: string) {
+  return /^-?(?:\d+(?:[.,]\d*)?|[.,]\d*)?$/.test(rawValue);
+}
+
 export function BoundedNumberInput({
   ariaLabel,
   value,
@@ -70,32 +78,41 @@ export function BoundedNumberInput({
     setDraftValue(formattedValue);
   }, [formattedValue]);
 
-  const commitDraft = (rawValue: string) => {
-    setDraftValue(rawValue);
-    if (rawValue === "" || rawValue === "-" || rawValue === "." || rawValue === "-.") return;
-
-    const nextValue = Number(rawValue);
-    if (Number.isFinite(nextValue)) onChange(clampNumber(nextValue, min, max));
+  const updateDraft = (rawValue: string) => {
+    if (isEditableNumberDraft(rawValue)) setDraftValue(rawValue);
   };
 
-  const restoreValidValue = () => {
-    const nextValue = Number(draftValue);
+  const commitDraft = () => {
+    const normalizedDraft = normalizeDecimalInput(draftValue);
+    const nextValue = Number(normalizedDraft);
     const validValue = Number.isFinite(nextValue) ? clampNumber(nextValue, min, max) : value;
+    onChange(validValue);
     setDraftValue(formatNumber(validValue));
   };
 
   return (
     <input
       aria-label={ariaLabel}
-      type="number"
+      type="text"
       inputMode="decimal"
-      min={min}
-      max={max}
-      step={step}
+      data-min={min}
+      data-max={max}
+      data-step={step}
+      pattern="-?[0-9]*[.,]?[0-9]*"
       value={draftValue}
       disabled={disabled}
-      onChange={(event) => commitDraft(event.target.value)}
-      onBlur={restoreValidValue}
+      onChange={(event) => updateDraft(event.target.value)}
+      onBlur={commitDraft}
+      onKeyDown={(event) => {
+        if (event.key === "Enter") {
+          commitDraft();
+          event.currentTarget.blur();
+        }
+        if (event.key === "Escape") {
+          setDraftValue(formattedValue);
+          event.currentTarget.blur();
+        }
+      }}
       className={className}
     />
   );

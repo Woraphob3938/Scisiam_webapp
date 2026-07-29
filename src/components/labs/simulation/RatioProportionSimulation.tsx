@@ -16,6 +16,7 @@ import {
   Trash,
 } from "lucide-react";
 import SharedSimulationShell from "@/components/labs/simulation/SharedSimulationShell";
+import { BoundedNumberInput } from "@/components/labs/simulation/ManualNumberInput";
 import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";
 
 interface RatioLog {
@@ -59,11 +60,6 @@ function gcd(firstValue: number, secondValue: number): number {
 function simplifyRatio(first: number, second: number) {
   const divisor = gcd(first, second);
   return `${first / divisor}:${second / divisor}`;
-}
-
-function clampNumber(value: number, min: number, max: number) {
-  if (!Number.isFinite(value)) return min;
-  return Math.min(max, Math.max(min, value));
 }
 
 function RatioStage({
@@ -517,7 +513,6 @@ export default function RatioProportionSimulation() {
       durationSeconds: null,
     });
 
-    alert("Saved Ratio & Proportion Lab result");
   };
 
   const drawerSummary = (
@@ -742,17 +737,16 @@ function ManualNumberInput({
   return (
     <label className="block rounded-2xl border border-slate-100 bg-white p-2.5 text-[11px] font-black text-slate-500 shadow-sm">
       <span className="mb-1 block">{label}</span>
-      <input
-        aria-label={ariaLabel}
-        type="number"
-        inputMode="numeric"
+      <BoundedNumberInput
+        ariaLabel={ariaLabel}
         min={min}
         max={max}
         step={1}
         value={value}
-        onChange={(event) => onChange(clampNumber(Number(event.target.value), min, max))}
+        onChange={onChange}
         className={`h-10 w-full rounded-xl border px-3 text-center font-mono text-base font-black outline-none transition focus:ring-2 ${toneClasses}`}
       />
     </label>
   );
 }
+

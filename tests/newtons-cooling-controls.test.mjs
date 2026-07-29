@@ -330,8 +330,8 @@ test("shared manual number fields preserve an in-progress negative value", () =>
   );
 
   assert.match(source, /const \[draftValue, setDraftValue\] = useState/);
-  assert.match(source, /rawValue === "-"/);
-  assert.match(source, /onBlur=\{restoreValidValue\}/);
+  assert.match(source, /isEditableNumberDraft/);
+  assert.match(source, /onBlur=\{commitDraft\}/);
 });
 
 test("legacy physics simulations expose compact controls and primary actions", () => {

@@ -13,6 +13,7 @@ import {
   Waves,
 } from "lucide-react";
 import SharedSimulationShell from "@/components/labs/simulation/SharedSimulationShell";
+import { BoundedNumberInput } from "@/components/labs/simulation/ManualNumberInput";
 import { GasChamber3DScene } from "@/components/labs/simulation/IdealGasLawSimulation";
 import { MotionTrackScene } from "@/components/labs/simulation/NewtonsSecondLawSimulation";
 import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";
@@ -397,11 +398,6 @@ export default function UnifiedLegacySimulation({ labId }: { labId: UnifiedLegac
   }, [isRunning]);
 
   const updateValue = (key: ControlKey, value: number) => setValues((current) => ({ ...current, [key]: value }));
-  const commitValue = (control: ControlConfig, raw: string) => {
-    const value = Number(raw);
-    if (!Number.isFinite(value)) return;
-    updateValue(control.key, Math.min(control.max, Math.max(control.min, value)));
-  };
   const progressPercent = labId === "acid-base-titration"
     ? Math.min(100, (getValue(values, "baseVolume") / Math.max(result.secondary, 0.1)) * 100)
     : Math.min(100, (elapsedSeconds / 30) * 100);
@@ -444,15 +440,14 @@ export default function UnifiedLegacySimulation({ labId }: { labId: UnifiedLegac
         <label key={control.key} className="rounded-xl border border-slate-100 bg-slate-50/80 px-3 py-2">
           <div className="mb-2 flex items-center justify-between gap-2">
             <span className="truncate text-xs font-black text-slate-700">{control.label}</span>
-            <input
-              type="number"
+            <BoundedNumberInput
+              ariaLabel={`กรอก${control.label}`}
               min={control.min}
               max={control.max}
               step={control.step}
-              value={toFixedSmart(getValue(values, control.key), control.step)}
-              onChange={(event) => commitValue(control, event.target.value)}
+              value={getValue(values, control.key)}
+              onChange={(value) => updateValue(control.key, value)}
               className="h-7 w-20 rounded-lg border border-slate-200 bg-white px-2 text-right text-xs font-black text-slate-800 outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100"
-              aria-label={`กรอก${control.label}`}
             />
           </div>
           <input
@@ -474,15 +469,14 @@ export default function UnifiedLegacySimulation({ labId }: { labId: UnifiedLegac
       {config.controls.map((control) => (
         <label key={control.key} className="rounded-xl bg-slate-50 px-3 py-2 text-slate-700">
           <span className="block truncate opacity-75">{control.label}</span>
-          <input
-            type="number"
+          <BoundedNumberInput
+            ariaLabel={`กรอก${control.label}`}
             min={control.min}
             max={control.max}
             step={control.step}
-            value={toFixedSmart(getValue(values, control.key), control.step)}
-            onChange={(event) => commitValue(control, event.target.value)}
+            value={getValue(values, control.key)}
+            onChange={(value) => updateValue(control.key, value)}
             className="mt-1 h-8 w-full rounded-lg border border-slate-200 bg-white/80 px-2 text-right text-sm font-black text-slate-800 outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100"
-            aria-label={`กรอก${control.label}`}
           />
         </label>
       ))}
@@ -588,8 +582,8 @@ export default function UnifiedLegacySimulation({ labId }: { labId: UnifiedLegac
           score: Math.round(progressPercent),
           durationSeconds: elapsedSeconds,
         });
-        alert("บันทึกผลการทดลองสำเร็จ");
       }}
     />
   );
 }
+
