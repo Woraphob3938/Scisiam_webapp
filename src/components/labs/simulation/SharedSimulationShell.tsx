@@ -426,10 +426,25 @@ export default function SharedSimulationShell({
     }
 
     if (fullscreenElement) {
-      const exitFullscreen =
-        document.exitFullscreen?.bind(document) ??
-        fullscreenDocument.webkitExitFullscreen?.bind(fullscreenDocument);
-      await exitFullscreen?.();
+      let nativeFullscreenExited = false;
+
+      if (document.exitFullscreen) {
+        try {
+          await document.exitFullscreen();
+          nativeFullscreenExited = true;
+        } catch {
+          // Older Safari may expose the standard method but require its WebKit fallback.
+        }
+      }
+
+      if (!nativeFullscreenExited && fullscreenDocument.webkitExitFullscreen) {
+        try {
+          await fullscreenDocument.webkitExitFullscreen();
+        } catch {
+          // State still exits through the fixed-position fallback below.
+        }
+      }
+
       nativeFullscreenRef.current = false;
       setIsExpanded(false);
       return;
@@ -438,20 +453,30 @@ export default function SharedSimulationShell({
     const stage = stageShellRef.current;
     setIsExpanded(true);
 
-    try {
-      const fullscreenStage = stage as (HTMLElement & {
-        webkitRequestFullscreen?: () => Promise<void> | void;
-      }) | null;
-      const requestFullscreen =
-        fullscreenStage?.requestFullscreen?.bind(fullscreenStage) ??
-        fullscreenStage?.webkitRequestFullscreen?.bind(fullscreenStage);
-      if (requestFullscreen) {
-        await requestFullscreen();
-        nativeFullscreenRef.current = true;
+    const fullscreenStage = stage as (HTMLElement & {
+      webkitRequestFullscreen?: () => Promise<void> | void;
+    }) | null;
+    let nativeFullscreenStarted = false;
+
+    if (fullscreenStage?.requestFullscreen) {
+      try {
+        await fullscreenStage.requestFullscreen({ navigationUI: "hide" });
+        nativeFullscreenStarted = true;
+      } catch {
+        // Try the prefixed API next; CSS fullscreen remains available as a last resort.
       }
-    } catch {
-      // Keep the fixed-position CSS fallback when browser fullscreen is blocked.
     }
+
+    if (!nativeFullscreenStarted && fullscreenStage?.webkitRequestFullscreen) {
+      try {
+        await fullscreenStage.webkitRequestFullscreen();
+        nativeFullscreenStarted = true;
+      } catch {
+        // iPhone Safari may reject element fullscreen outside standalone app mode.
+      }
+    }
+
+    nativeFullscreenRef.current = nativeFullscreenStarted;
   };
 
   const tabs: Array<{ key: InfoTab; label: string; icon: LucideIcon }> = [
@@ -709,10 +734,22 @@ export default function SharedSimulationShell({
   const simulationStage = (
     <section
       ref={stageShellRef}
-      className={`relative w-full min-w-0 max-w-full overflow-hidden border border-slate-200 bg-slate-900 shadow-2xl shadow-slate-300/60 ${
+      style={
+        isExpanded
+          ? {
+              position: "fixed",
+              inset: 0,
+              width: "100dvw",
+              height: "100dvh",
+              maxWidth: "none",
+              maxHeight: "none",
+            }
+          : undefined
+      }
+      className={`w-full min-w-0 max-w-full overflow-hidden border border-slate-200 bg-slate-900 shadow-2xl shadow-slate-300/60 ${
         isExpanded
           ? "fixed inset-0 z-[100] h-[100dvh] min-h-0 w-[100dvw] max-w-none overscroll-none rounded-none border-0 shadow-none"
-          : "min-h-[760px] rounded-[24px] sm:h-[72vh] sm:min-h-[620px] sm:max-h-[840px]"
+          : "relative min-h-[760px] rounded-[24px] sm:h-[72vh] sm:min-h-[620px] sm:max-h-[840px]"
       }`}
     >
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(59,130,246,0.18),transparent_30%),radial-gradient(circle_at_80%_20%,rgba(16,185,129,0.14),transparent_28%)]" />

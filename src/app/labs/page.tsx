@@ -14,8 +14,10 @@ import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import CategoryFilter, { Category } from "@/components/CategoryFilter";
 import LabCard, { type GradeLevel } from "@/components/LabCard";
+import ScisiamSplash from "@/components/ScisiamSplash";
 import LabLoadingAtom from "@/components/labs/LabLoadingAtom";
 import Sidebar from "@/components/Sidebar";
+import { useAuth } from "@/context/AuthContext";
 import { useSidebar } from "@/context/SidebarContext";
 import { labsData } from "@/data/labs";
 import { isLabReady } from "@/data/labReadiness";
@@ -97,6 +99,7 @@ function readLabsReturnState(): LabsReturnState | null {
 function LabsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { isAuthReady, isLoggedIn } = useAuth();
   const { isCollapsed } = useSidebar();
   const restoredState = useMemo(() => readLabsReturnState(), []);
   const requestedCategory = getRequestedCategory(searchParams);
@@ -166,10 +169,18 @@ function LabsContent() {
   }, [searchQuery, selectedCategory, selectedGradeLevel, showAllLabs]);
 
   const handleEnterRoom = (id: string) => {
-    if (!isLabReady(id) || isEnteringLab) return;
-    setIsEnteringLab(true);
+    if (!isLabReady(id) || isEnteringLab || !isAuthReady) return;
+
+    const simulationPath = `/labs/${id}/simulation`;
     saveReturnState();
-    router.push(`/labs/${id}/simulation`);
+
+    if (!isLoggedIn) {
+      router.push(`/register?next=${encodeURIComponent(simulationPath)}`);
+      return;
+    }
+
+    setIsEnteringLab(true);
+    router.push(simulationPath);
   };
 
   const handleCategoryChange = (category: Category) => {
@@ -198,6 +209,10 @@ function LabsContent() {
 
   return (
     <div className="flex min-h-screen flex-col bg-slate-50 font-sans antialiased selection:bg-blue-600 selection:text-white">
+      <ScisiamSplash
+        active={isAuthReady && isLoggedIn}
+        hidden={isEnteringLab}
+      />
       <Navbar />
 
       <div className="hidden lg:block">

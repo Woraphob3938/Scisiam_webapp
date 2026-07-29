@@ -520,7 +520,7 @@ export default function LearningHistoryPage({ embedded = false }: LearningHistor
                   nextLabs.map((lab) => (
                     <Link
                       key={lab.id}
-                      href={`/labs/${lab.id}`}
+                      href={`/labs/${lab.id}/simulation`}
                       className="group rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-3 transition-colors hover:border-blue-200 hover:bg-blue-50"
                     >
                       <div className="flex items-start justify-between gap-3">
@@ -624,7 +624,7 @@ function HistoryItem({ record }: { record: HistoryRecord }) {
 
         <div className="flex lg:shrink-0">
           <Link
-            href={record.isReady ? `/labs/${record.labId}/simulation` : `/labs/${record.labId}`}
+            href={record.isReady ? `/labs/${record.labId}/simulation` : "/labs"}
             className="inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-xs font-extrabold leading-[1.45] text-white shadow-md shadow-blue-500/15 transition-colors hover:bg-blue-700 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100 sm:w-auto"
           >
             <Play className="h-4 w-4" />

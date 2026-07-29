@@ -330,7 +330,8 @@ export default function FirstLoginTour({ role }: { role: ScisiamUserRole }) {
     if (!isOpen) return;
 
     const target = getVisibleTarget(step.selector);
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reduceMotion =
+      document.documentElement.dataset.scisiamReduceMotion === "true";
     const initialRect = target?.getBoundingClientRect();
     const needsScroll =
       initialRect &&

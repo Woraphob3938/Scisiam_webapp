@@ -24,16 +24,27 @@ function readBoolean(value: string | null, fallback: boolean) {
   return fallback;
 }
 
+function getSystemReduceMotionPreference() {
+  if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
+    return false;
+  }
+
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
 export function readDisplayPreferences(): DisplayPreferences {
   if (typeof window === "undefined") return DEFAULT_DISPLAY_PREFERENCES;
 
   try {
     const storedTextSize = window.localStorage.getItem(DISPLAY_PREFERENCE_KEYS.textSize);
+    const storedReduceMotion = window.localStorage.getItem(
+      DISPLAY_PREFERENCE_KEYS.reduceMotion
+    );
     return {
       textSize: storedTextSize === "large" ? "large" : "normal",
       reduceMotion: readBoolean(
-        window.localStorage.getItem(DISPLAY_PREFERENCE_KEYS.reduceMotion),
-        false
+        storedReduceMotion,
+        getSystemReduceMotionPreference()
       ),
       colorBlind: readBoolean(
         window.localStorage.getItem(DISPLAY_PREFERENCE_KEYS.colorBlind),
@@ -41,7 +52,10 @@ export function readDisplayPreferences(): DisplayPreferences {
       ),
     };
   } catch {
-    return DEFAULT_DISPLAY_PREFERENCES;
+    return {
+      ...DEFAULT_DISPLAY_PREFERENCES,
+      reduceMotion: getSystemReduceMotionPreference(),
+    };
   }
 }
 
@@ -88,9 +102,14 @@ export const DISPLAY_PREFERENCES_BOOTSTRAP_SCRIPT = `
     const root = document.documentElement;
     const storage = window.localStorage;
     const textSize = storage.getItem("${DISPLAY_PREFERENCE_KEYS.textSize}");
+    const storedReduceMotion = storage.getItem("${DISPLAY_PREFERENCE_KEYS.reduceMotion}");
+    const systemReduceMotion =
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     root.dataset.scisiamTextSize = textSize === "large" ? "large" : "normal";
     root.dataset.scisiamReduceMotion =
-      storage.getItem("${DISPLAY_PREFERENCE_KEYS.reduceMotion}") === "true" ? "true" : "false";
+      storedReduceMotion === null
+        ? String(systemReduceMotion)
+        : storedReduceMotion === "true" ? "true" : "false";
     root.dataset.scisiamColorblind =
       storage.getItem("${DISPLAY_PREFERENCE_KEYS.colorBlind}") === "true" ? "true" : "false";
   } catch {}

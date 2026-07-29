@@ -21,9 +21,9 @@ test("AI I-Oon supports natural Scisiam and general conversation", () => {
 
 test("AI I-Oon uses the full mascot artwork without cropping", () => {
   const chat = readProjectFile("src/components/AIChatButton.tsx");
-  const artworkPath = "public/ai-oon-logo.png";
+  const artworkPath = "public/ai-oon-mascot-transparent.png";
 
-  assert.match(chat, /src="\/ai-oon-logo\.png"/);
+  assert.match(chat, /src="\/ai-oon-mascot-transparent\.png"/);
   assert.match(chat, /className="object-contain"/);
   assert.doesNotMatch(chat, /src="\/ai-oon-avatar\.png"/);
   assert.equal(existsSync(join(rootDir, artworkPath)), true);

@@ -119,9 +119,6 @@ function CoolingViewport({
           .newton-sample-surface { animation: newton-surface-shimmer 1.8s ease-in-out infinite; }
           [data-running="false"].newton-chamber-fan,
           [data-running="false"] .newton-sample-surface { animation-play-state: paused; }
-          @media (prefers-reduced-motion: reduce) {
-            .newton-chamber-fan, .newton-sample-surface { animation: none !important; }
-          }
         `}</style>
         <title id={`${svgId}-title`}>ชุดทดลองกฎการเย็นตัวของนิวตัน</title>
         <desc id={`${svgId}-description`}>

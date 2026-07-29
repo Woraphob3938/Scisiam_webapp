@@ -100,14 +100,16 @@ test("email signup uses the shared token-hash verification page and returns to l
   const loginPage = readProjectFile("src/app/login/page.tsx");
 
   assert.match(authForm, /emailRedirectTo/);
-  assert.match(authForm, /emailRedirectTo = `\$\{window\.location\.origin\}\/auth\/verify`/);
-  assert.match(authForm, /registered=success&email=/);
+  assert.match(authForm, /new URL\("\/auth\/verify", window\.location\.origin\)/);
+  assert.match(authForm, /emailRedirectUrl\.searchParams\.set\("next", initialNext\)/);
+  assert.match(authForm, /new URLSearchParams\(\{\s*registered: "success",\s*email: normalizedEmail/);
   assert.match(authForm, /setMode\("login"\)/);
   assert.match(authForm, /สมัครสมาชิกสำเร็จแล้ว กรุณาตรวจสอบอีเมล/);
   assert.match(confirmRoute, /type === "email"/);
-  assert.match(confirmRoute, /\/login\?confirmed=success/);
+  assert.match(confirmRoute, /loginUrl\.searchParams\.set\("confirmed", "success"\)/);
+  assert.match(confirmRoute, /loginUrl\.searchParams\.set\("next", safeNext\)/);
   assert.match(loginPage, /confirmed === "success"/);
-  assert.match(authForm, /router\.replace\(`\/login\?registered=success&email=/);
+  assert.match(authForm, /router\.replace\(`\/login\?\$\{loginParams\.toString\(\)\}`\)/);
   assert.match(loginPage, /registered === "success"/);
   assert.match(loginPage, /กรุณาตรวจสอบอีเมล/);
   assert.match(loginPage, /สแปมหรือจดหมายขยะ/);

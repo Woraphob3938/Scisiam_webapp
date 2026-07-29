@@ -15,7 +15,7 @@ test("mobile app chrome hides on downward scroll and returns on upward scroll", 
   assert.match(controller, /requestAnimationFrame/);
   assert.match(controller, /addEventListener\("scroll", handleScroll, \{ passive: true \}\)/);
   assert.match(controller, /data-mobile-chrome="hidden"/);
-  assert.match(controller, /prefers-reduced-motion/);
+  assert.doesNotMatch(controller, /prefers-reduced-motion/);
   assert.match(overlays, /MobileChromeController/);
   assert.match(navbar, /mobile-chrome-top/);
   assert.match(tabBar, /mobile-chrome-bottom/);

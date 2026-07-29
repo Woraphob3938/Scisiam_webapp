@@ -2,6 +2,7 @@ import type { EmailOtpType } from "@supabase/supabase-js";
 import { NextResponse, type NextRequest } from "next/server";
 
 import { isTrustedSameOriginPost } from "@/lib/server/request-origin";
+import { getSafeSameOriginPath } from "@/lib/safe-redirect";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 
 export async function POST(request: NextRequest) {
@@ -18,6 +19,12 @@ export async function POST(request: NextRequest) {
   const token = formData.get("token");
   const tokenHash = formData.get("token_hash");
   const type = formData.get("type");
+  const next = formData.get("next");
+  const safeNext = getSafeSameOriginPath(
+    typeof next === "string" ? next : "",
+    "",
+    ["/login", "/register"],
+  );
   const isRecovery = type === "recovery";
   const isEmailConfirmation = type === "email";
   const cleanEmail = typeof email === "string" ? email.trim().toLowerCase() : "";
@@ -56,10 +63,12 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      return NextResponse.redirect(
-        new URL("/login?confirmed=success", url.origin),
-        303,
-      );
+      const loginUrl = new URL("/login", url.origin);
+      loginUrl.searchParams.set("confirmed", "success");
+      if (safeNext) {
+        loginUrl.searchParams.set("next", safeNext);
+      }
+      return NextResponse.redirect(loginUrl, 303);
     }
   }
 

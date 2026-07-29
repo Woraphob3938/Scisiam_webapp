@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Kanit, Noto_Sans_Thai } from "next/font/google";
 import { Suspense } from "react";
 import { SidebarProvider } from "@/context/SidebarContext";
@@ -28,6 +28,13 @@ const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL?.startsWith("http")
     ? process.env.NEXT_PUBLIC_SITE_URL
     : "https://scisiam-app.vercel.app";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#f8fafc",
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),

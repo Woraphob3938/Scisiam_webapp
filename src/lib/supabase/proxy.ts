@@ -5,6 +5,7 @@ import { getSupabaseConfig, isSupabaseConfigured } from "./config";
 import type { Database } from "./database.types";
 
 const PRIVATE_PATH_PREFIXES = ["/profile", "/classrooms", "/dashboard"];
+const LAB_SIMULATION_PATH = /^\/labs\/[^/]+\/simulation(?:\/|$)/;
 
 function isPrivatePath(pathname: string) {
   return PRIVATE_PATH_PREFIXES.some(
@@ -16,6 +17,14 @@ function buildLoginRedirect(request: NextRequest) {
   const redirectUrl = request.nextUrl.clone();
   const nextPath = `${request.nextUrl.pathname}${request.nextUrl.search}`;
   redirectUrl.pathname = "/login";
+  redirectUrl.search = `?next=${encodeURIComponent(nextPath)}`;
+  return NextResponse.redirect(redirectUrl);
+}
+
+function buildRegisterRedirect(request: NextRequest) {
+  const redirectUrl = request.nextUrl.clone();
+  const nextPath = `${request.nextUrl.pathname}${request.nextUrl.search}`;
+  redirectUrl.pathname = "/register";
   redirectUrl.search = `?next=${encodeURIComponent(nextPath)}`;
   return NextResponse.redirect(redirectUrl);
 }
@@ -45,6 +54,10 @@ export async function updateSession(request: NextRequest) {
 
   const claimsResult = await supabase.auth.getClaims().catch(() => null);
   const claims = claimsResult?.data?.claims;
+
+  if (LAB_SIMULATION_PATH.test(request.nextUrl.pathname) && !claims?.sub) {
+    return buildRegisterRedirect(request);
+  }
 
   if (isPrivatePath(request.nextUrl.pathname) && !claims?.sub) {
     return buildLoginRedirect(request);

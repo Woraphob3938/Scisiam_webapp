@@ -30,7 +30,7 @@ test("closed AI tutor trigger shows the full ไออุ่น artwork without 
     aiChatButton.indexOf("{/* Floating Action Button */}"),
   );
 
-  assert.match(triggerSection, /src="\/ai-oon-logo\.png"/);
+  assert.match(triggerSection, /src="\/ai-oon-mascot-transparent\.png"/);
   assert.match(triggerSection, /className="object-contain"/);
   assert.match(triggerSection, /min-h-11 min-w-11/);
   assert.doesNotMatch(triggerSection, /src="\/ai-oon-avatar\.png"/);

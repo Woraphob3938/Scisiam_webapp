@@ -43,19 +43,12 @@ test("classroom launcher keeps the full lab picker out of the initial navigation
   assert.match(dialog, /<Dialog open=\{open\} onOpenChange=\{handleOpenChange\}>/);
 });
 
-test("lab detail client components receive one lab record instead of importing every lab", () => {
+test("lab detail routes stay out of the simulation flow", () => {
   const detailPage = readProjectFile("src/app/labs/[id]/page.tsx");
-  const detailLayout = readProjectFile("src/components/labs/LabDetailLayout.tsx");
-  const hero = readProjectFile("src/components/labs/LabHero.tsx");
 
-  assert.match(detailPage, /import LabHero from "@\/components\/labs\/LabHero"/);
-  assert.match(detailPage, /<LabHero[\s\S]+simulationHref=\{`\/labs\/\$\{labId\}\/simulation`\}/);
-  assert.match(detailLayout, /hero: React\.ReactNode/);
-  assert.match(detailLayout, /\{hero\}/);
-  assert.doesNotMatch(detailLayout, /import LabHero from "@\/components\/labs\/LabHero"/);
-  assert.doesNotMatch(hero, /^"use client";/);
-  assert.match(hero, /simulationHref: string/);
-  assert.match(hero, /href=\{simulationHref\}/);
+  assert.match(detailPage, /redirect\("\/labs"\)/);
+  assert.doesNotMatch(detailPage, /@\/components\/labs/);
+  assert.doesNotMatch(detailPage, /@\/data\/labs/);
 
   for (const path of [
     "src/components/labs/EquipmentList.tsx",

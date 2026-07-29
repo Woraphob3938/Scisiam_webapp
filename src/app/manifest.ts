@@ -6,7 +6,7 @@ export default function manifest(): MetadataRoute.Manifest {
     short_name: "Scisiam",
     description:
       "ห้องแล็บวิทยาศาสตร์จำลองสำหรับนักเรียนและคุณครู ใช้งานได้ทั้งบนเว็บและหน้าจอโฮม",
-    start_url: "/login",
+    start_url: "/",
     scope: "/",
     display: "standalone",
     background_color: "#f3f7ff",

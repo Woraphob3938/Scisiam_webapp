@@ -16,6 +16,7 @@ export default async function LoginPage({
   }>;
 }) {
   const { confirmed, email, oauth, registered, reset, next } = await searchParams;
+  const safeNext = getSafeSameOriginPath(next, "", ["/login", "/register"]);
 
   if (isSupabaseConfigured()) {
     let hasSession = false;
@@ -27,7 +28,7 @@ export default async function LoginPage({
       // Keep the login form available during a temporary auth/network outage.
     }
     if (hasSession) {
-      redirect(getSafeSameOriginPath(next, "/labs", ["/login"]));
+      redirect(safeNext || "/labs");
     }
   }
 
@@ -51,6 +52,7 @@ export default async function LoginPage({
         initialMode="login"
         initialNotice={initialNotice}
         initialError={initialError}
+        initialNext={safeNext}
       />
     </main>
   );

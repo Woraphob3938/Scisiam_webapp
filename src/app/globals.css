@@ -66,14 +66,14 @@ html[data-scisiam-reduce-motion="true"] *::after {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html,
-  html * {
+  html:not([data-scisiam-reduce-motion="false"]),
+  html:not([data-scisiam-reduce-motion="false"]) * {
     scroll-behavior: auto !important;
   }
 
-  html *,
-  html *::before,
-  html *::after {
+  html:not([data-scisiam-reduce-motion="false"]) *,
+  html:not([data-scisiam-reduce-motion="false"]) *::before,
+  html:not([data-scisiam-reduce-motion="false"]) *::after {
     animation-delay: 0ms !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;

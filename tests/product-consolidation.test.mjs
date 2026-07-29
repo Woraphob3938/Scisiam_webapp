@@ -7,8 +7,12 @@ import { fileURLToPath } from "node:url";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (path) => readFileSync(join(root, path), "utf8");
 
-test("Login is the site entry and legacy History redirects into Profile", () => {
-  assert.match(read("src/app/page.tsx"), /redirect\("\/login"\)/);
+test("The lab catalogue owns the welcome overlay and legacy History redirects into Profile", () => {
+  assert.match(read("src/app/page.tsx"), /redirect\("\/labs"\)/);
+  assert.match(
+    read("src/app/labs/page.tsx"),
+    /<ScisiamSplash\s+active=\{isAuthReady && isLoggedIn\}\s+hidden=\{isEnteringLab\}\s*\/>/,
+  );
   assert.match(read("src/app/history/page.tsx"), /redirect\("\/profile\?tab=history"\)/);
 
   for (const path of ["src/components/Sidebar.tsx", "src/components/MobileTabBar.tsx"]) {

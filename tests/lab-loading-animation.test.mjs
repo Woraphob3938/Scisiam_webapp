@@ -12,7 +12,7 @@ test("lab routes use the playful atom loading indicator", () => {
   assert.match(loader, /lab-atom-bounce/);
   assert.match(loader, /lab-atom-electrons/);
   assert.match(loader, /กำลังเตรียมห้องแล็บ/);
-  assert.match(loader, /prefers-reduced-motion: reduce/);
+  assert.doesNotMatch(loader, /prefers-reduced-motion: reduce/);
   assert.match(loader, /role="status"/);
   assert.match(routeLoading, /LabLoadingAtom/);
   assert.match(labsPage, /<LabLoadingAtom \/>/);

@@ -59,7 +59,7 @@ test("Newton cooling viewport visualizes model-driven thermal flow", () => {
   assert.match(source, /กำลังเย็นลง/);
   assert.match(source, /กำลังอุ่นขึ้น/);
   assert.match(source, /ใกล้สมดุล/);
-  assert.match(source, /prefers-reduced-motion: reduce/);
+  assert.doesNotMatch(source, /prefers-reduced-motion: reduce/);
   assert.match(source, /min-h-\[180px\][^"]*sm:min-h-\[300px\]/);
   assert.match(source, /min-h-\[160px\][^"]*sm:min-h-\[280px\]/);
   assert.match(source, /className="h-auto min-h-\[160px\][^"]*sm:h-full/);

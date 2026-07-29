@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ShieldAlert, ShieldCheck } from "lucide-react";
+import { getSafeSameOriginPath } from "@/lib/safe-redirect";
 
 export default async function VerifyEmailLinkPage({
   searchParams,
@@ -10,9 +11,11 @@ export default async function VerifyEmailLinkPage({
     error?: string;
     token_hash?: string;
     type?: string;
+    next?: string;
   }>;
 }) {
-  const { email, error, token_hash: tokenHash, type } = await searchParams;
+  const { email, error, token_hash: tokenHash, type, next } = await searchParams;
+  const safeNext = getSafeSameOriginPath(next, "", ["/login", "/register"]);
   const isSupportedType = type === "email" || type === "recovery";
   const isValidRequest = Boolean(tokenHash) && isSupportedType && !error;
   const isRecovery = type === "recovery";
@@ -91,6 +94,7 @@ export default async function VerifyEmailLinkPage({
           <form action="/auth/confirm" method="post" className="grid gap-5 text-center">
             <input type="hidden" name="token_hash" value={tokenHash} />
             <input type="hidden" name="type" value={type} />
+            {safeNext ? <input type="hidden" name="next" value={safeNext} /> : null}
             <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl border border-emerald-100 bg-emerald-50 text-emerald-600">
               <ShieldCheck className="h-6 w-6" />
             </span>

@@ -18,7 +18,7 @@ test("desktop Google OAuth uses system-browser PKCE callback", () => {
 
 test("browser Google OAuth keeps the existing HTTPS callback", () => {
   assert.deepEqual(getGoogleOAuthOptions("https://scisiam-app.vercel.app", false), {
-    redirectTo: "https://scisiam-app.vercel.app/auth/oauth-callback?next=/profile",
+    redirectTo: "https://scisiam-app.vercel.app/auth/oauth-callback?next=%2Fprofile",
     skipBrowserRedirect: false,
     queryParams: { prompt: "select_account" },
   });
@@ -53,7 +53,10 @@ test("release desktop OAuth keeps PKCE on the remote SciSiam origin", () => {
     /fn forward_callback_code[\s\S]*build_web_callback\(&app_origin\(\), code\)[\s\S]*navigate_main\(app, &callback/,
   );
   assert.match(navigation, /app_origin\s*\.join\("\/auth\/oauth-callback"\)/);
-  assert.match(authForm, /getGoogleOAuthOptions\(window\.location\.origin, desktop\)/);
+  assert.match(
+    authForm,
+    /getGoogleOAuthOptions\([\s\S]*window\.location\.origin,[\s\S]*desktop,[\s\S]*initialNext/,
+  );
   assert.match(authForm, /window\.location\.assign\(data\.url\)/);
   assert.equal(
     getGoogleOAuthOptions(releaseOrigin, true).redirectTo,

@@ -284,7 +284,7 @@ export default function AIChatButton() {
           <X className="h-5.5 w-5.5 sm:h-6.5 sm:w-6.5" />
         ) : (
           <Image
-            src="/ai-oon-logo.png"
+            src="/ai-oon-mascot-transparent.png"
             alt=""
             width={64}
             height={64}

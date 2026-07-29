@@ -19,15 +19,11 @@ test("lab detail page must not fallback unknown lab ids to Newton content", () =
   );
 });
 
-test("lab detail route delegates rendering to the shared detail layout", () => {
+test("lab detail route redirects to the catalogue because details are removed from the flow", () => {
   const source = readProjectFile("src/app/labs/[id]/page.tsx");
 
-  assert.match(
-    source,
-    /import LabDetailLayout from "@\/components\/labs\/LabDetailLayout"/
-  );
-  assert.match(source, /<LabDetailLayout\s+labId=\{labId\}/);
-  assert.doesNotMatch(source, /const SAVED_EXPERIMENT_KEYS/);
+  assert.match(source, /redirect\("\/labs"\)/);
+  assert.doesNotMatch(source, /LabDetailLayout|LabHero/);
 });
 
 test("lab detail data lookup must not fallback unknown lab ids to cooling details", () => {
@@ -349,7 +345,8 @@ test("labs page keeps the filtered lab count without redundant readiness status"
   const labsPage = readProjectFile("src/app/labs/page.tsx");
 
   assert.match(labsPage, /แล็บในมุมมองนี้ \{filteredLabs\.length\} แล็บ/);
-  assert.match(labsPage, /if \(!isLabReady\(id\) \|\| isEnteringLab\) return;/);
+  assert.match(labsPage, /if \(!isLabReady\(id\) \|\| isEnteringLab \|\| !isAuthReady\) return;/);
+  assert.match(labsPage, /router\.push\(`\/register\?next=\$\{encodeURIComponent\(simulationPath\)\}`\)/);
   assert.doesNotMatch(labsPage, /readyFilteredLabCount/);
   assert.doesNotMatch(labsPage, /unfinishedLabs/);
 });
@@ -1226,8 +1223,16 @@ test("profile authentication cannot leave the page on an infinite loading state"
   );
 });
 
-test("home redirects directly to login", () => {
-  const source = readProjectFile("src/app/page.tsx");
+test("home opens the catalogue before its branded welcome overlay", () => {
+  const home = readProjectFile("src/app/page.tsx");
+  const labs = readProjectFile("src/app/labs/page.tsx");
+  const splash = readProjectFile("src/components/ScisiamSplash.tsx");
 
-  assert.match(source, /redirect\("\/login"\)/);
+  assert.match(home, /redirect\("\/labs"\)/);
+  assert.match(
+    labs,
+    /<ScisiamSplash\s+active=\{isAuthReady && isLoggedIn\}\s+hidden=\{isEnteringLab\}\s*\/>/,
+  );
+  assert.match(splash, /ยินดีต้อนรับเข้าสู่ Scisiam/);
+  assert.doesNotMatch(splash, /useRouter|router\.replace/);
 });

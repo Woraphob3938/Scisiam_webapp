@@ -22,10 +22,8 @@ test("returning users skip login while the mobile navbar hides the wordmark", ()
 
   assert.match(login, /supabase\.auth\.getClaims\(\)/);
   assert.match(login, /getSafeSameOriginPath/);
-  assert.match(
-    login,
-    /redirect\(getSafeSameOriginPath\(next,\s*"\/labs",\s*\["\/login"\]\)\)/,
-  );
+  assert.match(login, /const safeNext = getSafeSameOriginPath\(next,[\s\S]*\)/);
+  assert.match(login, /redirect\(safeNext \|\| "\/labs"\)/);
   assert.match(navbar, /hidden[^"]*sm:inline/);
 });
 

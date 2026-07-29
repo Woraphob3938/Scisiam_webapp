@@ -93,13 +93,6 @@ export default function MobileChromeController() {
           transform: translate3d(0, calc(100% + env(safe-area-inset-bottom)), 0);
         }
       }
-
-      @media (prefers-reduced-motion: reduce) {
-        .mobile-chrome-top,
-        .mobile-chrome-bottom {
-          transition-duration: 0.01ms;
-        }
-      }
     `}</style>
   );
 }

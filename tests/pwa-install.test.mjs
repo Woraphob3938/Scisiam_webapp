@@ -11,7 +11,7 @@ test("web app manifest makes Scisiam installable as a standalone Thai app", () =
   const manifest = readProjectFile("src/app/manifest.ts");
 
   assert.match(manifest, /name:\s*"Scisiam"/);
-  assert.match(manifest, /start_url:\s*"\/login"/);
+  assert.match(manifest, /start_url:\s*"\/"/);
   assert.match(manifest, /display:\s*"standalone"/);
   assert.match(manifest, /lang:\s*"th"/);
   assert.match(manifest, /\/icons\/scisiam-full-192\.png/);

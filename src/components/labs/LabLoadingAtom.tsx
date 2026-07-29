@@ -100,14 +100,6 @@ export default function LabLoadingAtom() {
           }
         }
 
-        @media (prefers-reduced-motion: reduce) {
-          .lab-atom-bounce,
-          .lab-atom-orbits,
-          .lab-atom-electrons,
-          .lab-atom-shadow {
-            animation: none;
-          }
-        }
       `}</style>
     </div>
   );

@@ -7,11 +7,21 @@ import test from "node:test";
 const rootDir = dirname(dirname(fileURLToPath(import.meta.url)));
 const read = (relativePath) => readFileSync(join(rootDir, relativePath), "utf8");
 
-test("site root redirects directly to login", () => {
-  const source = read("src/app/page.tsx");
+test("site root opens labs before the welcome overlay appears", () => {
+  const home = read("src/app/page.tsx");
+  const labs = read("src/app/labs/page.tsx");
+  const splash = read("src/components/ScisiamSplash.tsx");
 
-  assert.match(source, /redirect\("\/login"\)/);
-  assert.doesNotMatch(source, /redirect\("\/labs"\)/);
+  assert.match(home, /redirect\("\/labs"\)/);
+  assert.match(
+    labs,
+    /<ScisiamSplash\s+active=\{isAuthReady && isLoggedIn\}\s+hidden=\{isEnteringLab\}\s*\/>/,
+  );
+  assert.match(splash, /sessionStorage\.getItem\(WELCOME_SEEN_KEY\)/);
+  assert.match(splash, /const FADE_DELAY_MS = 2500/);
+  assert.match(splash, /const REMOVE_DELAY_MS = 3000/);
+  assert.match(splash, /setPhase\("leaving"\)/);
+  assert.doesNotMatch(splash, /router\.replace/);
 });
 
 test("authenticated history excludes device-local runs", () => {

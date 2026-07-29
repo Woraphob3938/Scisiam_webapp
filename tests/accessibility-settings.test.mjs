@@ -18,6 +18,8 @@ test("display preferences are applied before hydration and synchronized globally
   assert.match(preferences, /scisiam_display_color_blind/);
   assert.match(preferences, /root\.dataset\.scisiamReduceMotion/);
   assert.match(preferences, /root\.dataset\.scisiamColorblind/);
+  assert.match(preferences, /matchMedia\("\(prefers-reduced-motion: reduce\)"\)/);
+  assert.match(preferences, /storedReduceMotion === null/);
   assert.match(overlays, /applyDisplayPreferences\(\)/);
   assert.match(overlays, /addEventListener\("storage"/);
 });
@@ -32,6 +34,10 @@ test("accessibility settings cover reduced motion and color-independent cues", (
   assert.match(settings, /label="ลดแอนิเมชัน"/);
   assert.match(settings, /label="เปิดโหมดช่วยสำหรับผู้ตาบอดสี"/);
   assert.match(globals, /prefers-reduced-motion: reduce/);
+  assert.match(
+    globals,
+    /html:not\(\[data-scisiam-reduce-motion="false"\]\)/
+  );
   assert.match(globals, /data-scisiam-reduce-motion="true"/);
   assert.match(globals, /data-scisiam-colorblind="true"/);
   assert.match(globals, /--scisiam-cb-orange/);

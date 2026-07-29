@@ -16,11 +16,20 @@ export function getDesktopOAuthError(search: string) {
   return error === "browser-open-failed" ? DESKTOP_OAUTH_BROWSER_OPEN_ERROR : "";
 }
 
-export function getGoogleOAuthOptions(origin: string, desktop: boolean) {
+export function getGoogleOAuthOptions(
+  origin: string,
+  desktop: boolean,
+  nextPath = "/profile",
+) {
+  const safeNextPath =
+    nextPath.startsWith("/") && !nextPath.startsWith("//")
+      ? nextPath
+      : "/profile";
+
   return {
     redirectTo: desktop
       ? `${origin}/auth/oauth-callback?desktop=1`
-      : `${origin}/auth/oauth-callback?next=/profile`,
+      : `${origin}/auth/oauth-callback?next=${encodeURIComponent(safeNextPath)}`,
     skipBrowserRedirect: desktop,
     queryParams: { prompt: "select_account" },
   };

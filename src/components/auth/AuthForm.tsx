@@ -38,6 +38,7 @@ interface AuthFormProps {
   initialMode: "login" | "register";
   initialNotice?: string;
   initialError?: string;
+  initialNext?: string;
 }
 
 type AuthMode = "login" | "register" | "forgot-password";
@@ -68,6 +69,7 @@ export default function AuthForm({
   initialMode,
   initialNotice = "",
   initialError = "",
+  initialNext = "",
 }: AuthFormProps) {
   const router = useRouter();
   const emailInputRef = useRef<HTMLInputElement>(null);
@@ -284,7 +286,11 @@ export default function AuthForm({
       let nextPath = "/labs";
 
       if (mode === "register") {
-        const emailRedirectTo = `${window.location.origin}/auth/verify`;
+        const emailRedirectUrl = new URL("/auth/verify", window.location.origin);
+        if (initialNext) {
+          emailRedirectUrl.searchParams.set("next", initialNext);
+        }
+        const emailRedirectTo = emailRedirectUrl.toString();
         const { data, error: signUpError } = await supabase.auth.signUp({
           email: normalizedEmail,
           password,
@@ -327,7 +333,14 @@ export default function AuthForm({
         setNotice(
           `สมัครสมาชิกสำเร็จแล้ว กรุณาตรวจสอบอีเมล ${normalizedEmail} เพื่อกดยืนยันบัญชีก่อนเข้าสู่ระบบ หากไม่พบให้ดูในสแปมหรือจดหมายขยะ`,
         );
-        router.replace(`/login?registered=success&email=${encodeURIComponent(normalizedEmail)}`);
+        const loginParams = new URLSearchParams({
+          registered: "success",
+          email: normalizedEmail,
+        });
+        if (initialNext) {
+          loginParams.set("next", initialNext);
+        }
+        router.replace(`/login?${loginParams.toString()}`);
         return;
       } else {
         const { data, error: signInError } = await supabase.auth.signInWithPassword({
@@ -354,7 +367,8 @@ export default function AuthForm({
           displayName: profile.display_name,
         });
         cacheRememberedLogin(normalizedEmail, rememberMe);
-        nextPath = profile.role === "teacher" ? "/dashboard" : "/labs";
+        nextPath =
+          initialNext || (profile.role === "teacher" ? "/dashboard" : "/labs");
       }
 
       setLoading(false);
@@ -413,7 +427,11 @@ export default function AuthForm({
       const desktop = isScisiamDesktop();
       const { data, error: oauthError } = await supabase.auth.signInWithOAuth({
         provider: "google",
-        options: getGoogleOAuthOptions(window.location.origin, desktop),
+        options: getGoogleOAuthOptions(
+          window.location.origin,
+          desktop,
+          initialNext || undefined,
+        ),
       });
 
       if (oauthError) {

@@ -23,8 +23,11 @@ test("Google OAuth returns authenticated users to the student profile", () => {
 
   assert.match(authForm, /signInWithOAuth\(\{/);
   assert.match(authForm, /provider:\s*["']google["']/);
-  assert.match(authForm, /getGoogleOAuthOptions\(window\.location\.origin, desktop\)/);
-  assert.match(desktopRuntime, /auth\/oauth-callback\?next=\/profile/);
+  assert.match(
+    authForm,
+    /getGoogleOAuthOptions\([\s\S]*window\.location\.origin,[\s\S]*desktop,[\s\S]*initialNext/,
+  );
+  assert.match(desktopRuntime, /auth\/oauth-callback\?next=\$\{encodeURIComponent\(safeNextPath\)\}/);
   assert.match(desktopRuntime, /auth\/oauth-callback\?desktop=1/);
   assert.match(authForm, /เข้าสู่ระบบด้วย Google/);
   assert.match(authForm, /สมัครด้วย Google/);
@@ -102,7 +105,10 @@ test("email login sends students to labs and teachers to dashboard", () => {
   const authForm = readProjectFile("src/components/auth/AuthForm.tsx");
 
   assert.match(authForm, /let nextPath = "\/labs"/);
-  assert.match(authForm, /nextPath = profile\.role === "teacher" \? "\/dashboard" : "\/labs"/);
+  assert.match(
+    authForm,
+    /initialNext \|\| \(profile\.role === "teacher" \? "\/dashboard" : "\/labs"\)/,
+  );
   assert.match(authForm, /cacheRememberedLogin\(normalizedEmail, rememberMe\);[\s\S]*router\.replace\(nextPath\)/);
   assert.doesNotMatch(authForm, /router\.push\("\/"\)/);
 });
