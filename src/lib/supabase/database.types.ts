@@ -659,6 +659,12 @@ export type Database = {
         };
         Returns: boolean;
       };
+      leave_classroom: {
+        Args: {
+          p_classroom_id: string;
+        };
+        Returns: boolean;
+      };
       remove_classroom_member: {
         Args: {
           p_classroom_id: string;

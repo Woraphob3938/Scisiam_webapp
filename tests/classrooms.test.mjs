@@ -36,6 +36,12 @@ function classroomOwnerToolsMigration() {
   return fs.readFileSync(path.join(migrations, files[0]), "utf8");
 }
 
+function classroomLeaveMigration() {
+  const files = fs.readdirSync(migrations).filter((name) => name.endsWith("_add_leave_classroom_rpc.sql"));
+  assert.equal(files.length, 1, "expected exactly one classroom leave migration");
+  return fs.readFileSync(path.join(migrations, files[0]), "utf8");
+}
+
 function classroomAssignmentUploadsMigration() {
   const files = fs.readdirSync(migrations).filter((name) => name.endsWith("_classroom_assignment_uploads.sql"));
   assert.equal(files.length, 1, "expected exactly one classroom assignment uploads migration");
@@ -166,6 +172,19 @@ test("classroom owner tools are enforced by guarded RPCs", () => {
   assert.match(sql, /target_user_id\s*<>\s*classrooms\.creator_id/i);
 });
 
+test("classroom members can leave only their own membership while owners are rejected", () => {
+  const sql = classroomLeaveMigration();
+
+  assert.match(sql, /create or replace function public\.leave_classroom\(p_classroom_id uuid\)/i);
+  assert.match(sql, /v_user_id uuid := \(select auth\.uid\(\)\)/i);
+  assert.match(sql, /v_creator_id = v_user_id[\s\S]+raise exception/i);
+  assert.match(sql, /delete from public\.classroom_notifications[\s\S]+recipient_id = v_user_id/i);
+  assert.match(sql, /delete from public\.classroom_members[\s\S]+members\.user_id = v_user_id/i);
+  assert.doesNotMatch(sql, /target_user_id/i);
+  assert.match(sql, /revoke all on function public\.leave_classroom\(uuid\) from public, anon/i);
+  assert.match(sql, /grant execute on function public\.leave_classroom\(uuid\) to authenticated/i);
+});
+
 test("classroom assignment foreign keys have covering indexes", () => {
   const files = fs.readdirSync(migrations).filter((name) => name.endsWith("_add_classroom_assignment_creator_index.sql"));
   assert.equal(files.length, 1, "expected exactly one classroom assignment creator index migration");
@@ -255,6 +274,7 @@ test("classroom database types expose experiment grading fields and RPCs", () =>
   assert.match(source, /grade_classroom_assignment_submission:[\s\S]*p_submission_id: string;[\s\S]*p_score: number;/);
   assert.match(source, /experiment_runs:[\s\S]*snapshot_path: string \| null;/);
   assert.match(source, /attach_experiment_run_snapshot:[\s\S]*p_run_id: string;[\s\S]*p_snapshot_path: string;/);
+  assert.match(source, /leave_classroom:[\s\S]*p_classroom_id: string;[\s\S]*Returns: boolean;/);
 });
 
 test("classroom client wires experiment runs and grading through guarded RPCs", () => {

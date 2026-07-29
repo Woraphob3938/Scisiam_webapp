@@ -363,6 +363,17 @@ export async function disbandClassroom(id: string): Promise<void> {
   if (error) throwClassroomActionError(error.code, error.message);
 }
 
+export async function leaveClassroom(id: string): Promise<void> {
+  const supabase = createClient();
+  await requireCurrentUserId(supabase);
+  const { data, error } = await supabase.rpc("leave_classroom", {
+    p_classroom_id: validateClassroomId(id),
+  });
+
+  if (error) throwClassroomActionError(error.code, error.message);
+  if (!data) throw new Error("คุณไม่ได้เป็นสมาชิกของห้องเรียนนี้");
+}
+
 export async function removeClassroomMember(id: string, userId: string): Promise<void> {
   const supabase = createClient();
   await requireCurrentUserId(supabase);

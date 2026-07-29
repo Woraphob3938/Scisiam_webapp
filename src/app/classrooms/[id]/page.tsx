@@ -65,6 +65,7 @@ import {
   getClassroomNotifications,
   markClassroomNotificationsRead,
   gradeClassroomAssignmentSubmission,
+  leaveClassroom,
   removeClassroomMember,
   renameClassroom,
   submitClassroomAssignment,
@@ -130,8 +131,9 @@ export default function ClassroomWorkspacePage() {
   const [renameOpen, setRenameOpen] = useState(false);
   const [renameName, setRenameName] = useState("");
   const [disbandOpen, setDisbandOpen] = useState(false);
+  const [leaveOpen, setLeaveOpen] = useState(false);
   const [memberToRemove, setMemberToRemove] = useState<ClassroomMember | null>(null);
-  const [pendingAction, setPendingAction] = useState<"rename" | "disband" | "remove" | "assignment" | "labs" | null>(null);
+  const [pendingAction, setPendingAction] = useState<"rename" | "disband" | "leave" | "remove" | "assignment" | "labs" | null>(null);
 
   useEffect(() => {
     const list = document.querySelector<HTMLElement>("[data-testid='classroom-tabs-list']");
@@ -315,6 +317,19 @@ export default function ClassroomWorkspacePage() {
       router.replace("/classrooms");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "ยุบห้องเรียนไม่สำเร็จ");
+      setPendingAction(null);
+    }
+  }
+
+  async function handleLeave() {
+    if (!room || room.isCreator) return;
+    setPendingAction("leave");
+    try {
+      await leaveClassroom(room.id);
+      toast.success("ออกจากชั้นเรียนแล้ว");
+      router.replace("/classrooms");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "ออกจากชั้นเรียนไม่สำเร็จ");
       setPendingAction(null);
     }
   }
@@ -554,7 +569,18 @@ export default function ClassroomWorkspacePage() {
                       ยุบห้องเรียน
                     </button>
                   </div>
-                ) : null}
+                ) : (
+                  <div className="mt-3">
+                    <button
+                      type="button"
+                      onClick={() => setLeaveOpen(true)}
+                      className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-rose-200 bg-white px-3 text-sm font-bold text-rose-700 transition-colors hover:bg-rose-50 focus:outline-none focus-visible:ring-3 focus-visible:ring-rose-100"
+                    >
+                      <DoorOpen className="size-4" aria-hidden="true" />
+                      ออกจากชั้นเรียน
+                    </button>
+                  </div>
+                )}
               </div>
             </section>
 
@@ -639,6 +665,15 @@ export default function ClassroomWorkspacePage() {
               isSubmitting={pendingAction === "disband"}
               onOpenChange={setDisbandOpen}
               onConfirm={() => void handleDisband()}
+            />
+            <ConfirmActionDialog
+              open={leaveOpen}
+              title="ออกจากชั้นเรียน"
+              description="คุณจะไม่เห็นงาน ห้องแล็บ และการแจ้งเตือนของชั้นเรียนนี้อีก จนกว่าจะเข้าร่วมใหม่ด้วยรหัสห้อง"
+              confirmLabel="ออกจากชั้นเรียน"
+              isSubmitting={pendingAction === "leave"}
+              onOpenChange={setLeaveOpen}
+              onConfirm={() => void handleLeave()}
             />
             <ConfirmActionDialog
               open={Boolean(memberToRemove)}

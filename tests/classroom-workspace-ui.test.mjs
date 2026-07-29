@@ -45,6 +45,14 @@ test("classroom owner can manage the room, members, and classwork", () => {
   assert.match(source, /createClassroomAssignment/);
 });
 
+test("ordinary classroom members can confirm leaving the room", () => {
+  assert.match(source, /leaveClassroom/);
+  assert.match(source, /room\.isCreator \? \(/);
+  assert.match(source, /ออกจากชั้นเรียน/);
+  assert.match(source, /pendingAction === "leave"/);
+  assert.match(source, /router\.replace\("\/classrooms"\)/);
+});
+
 test("classroom uses a subject-aware cover and an overview for the next action", () => {
   assert.match(source, /getClassroomPresentation/);
   assert.match(source, /<TabsTrigger value="overview"/);
