@@ -527,7 +527,6 @@ export default function KeplersLawsSimulation() {
       score: Math.min(100, experimentData.dataPoints.length * 20),
     });
 
-    alert("บันทึกผลการทดลองกฎเคปเลอร์สำเร็จ! 🎉");
   };
 
   const compactControls = (
@@ -674,3 +673,4 @@ export default function KeplersLawsSimulation() {
     />
   );
 }
+

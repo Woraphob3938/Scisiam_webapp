@@ -179,7 +179,6 @@ export default function EisElectrochemistrySimulation() {
         },
         durationSeconds: 40,
       });
-      window.alert("บันทึกผลอิมพีแดนซ์ไฟฟ้าเคมีสำเร็จ");
     } finally {
       setIsSaving(false);
     }
@@ -441,3 +440,4 @@ export default function EisElectrochemistrySimulation() {
     />
   );
 }
+

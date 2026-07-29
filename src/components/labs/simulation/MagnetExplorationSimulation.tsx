@@ -139,7 +139,6 @@ export default function MagnetExplorationSimulation() {
       durationSeconds: null,
     });
 
-    window.alert("บันทึกผลการสำรวจแม่เหล็กแล้ว");
   };
 
   const compactControls = (
@@ -493,3 +492,4 @@ export default function MagnetExplorationSimulation() {
     />
   );
 }
+

@@ -259,7 +259,6 @@ export default function RatesOfChangeSimulation() {
       durationSeconds: null,
     });
 
-    alert("บันทึกผลแล็บ Rates of Change สำเร็จ");
   };
 
   return (
@@ -655,3 +654,4 @@ export default function RatesOfChangeSimulation() {
     />
   );
 }
+

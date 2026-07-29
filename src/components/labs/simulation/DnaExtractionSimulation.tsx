@@ -134,7 +134,6 @@ export default function DnaExtractionSimulation() {
       },
       score: 100,
     });
-    alert("บันทึกผลการทดลอง DNA Extraction สำเร็จ");
   };
 
   return (
@@ -423,3 +422,4 @@ export default function DnaExtractionSimulation() {
     />
   );
 }
+

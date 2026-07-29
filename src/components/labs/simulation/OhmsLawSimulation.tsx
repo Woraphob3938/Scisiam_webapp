@@ -393,7 +393,6 @@ export default function OhmsLawSimulation() {
       durationSeconds: Math.round(elapsedSeconds),
     });
 
-    alert("บันทึกข้อมูลการทดลอง (กราฟกระแสไฟฟ้าและตารางผล) สำเร็จ! 🎉");
   };
 
   const bandColors = getResistorColors(resistance);
@@ -689,3 +688,4 @@ const getResistorColors = (r: number) => {
     colorsMap[multiplier] || "#9c4a1b",
   ];
 };
+

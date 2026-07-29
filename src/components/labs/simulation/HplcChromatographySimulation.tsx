@@ -162,7 +162,6 @@ export default function HplcChromatographySimulation() {
         },
         durationSeconds: Math.round(maxSimTime * 60),
       });
-      window.alert("บันทึกโครมาโทแกรม HPLC สำเร็จ");
     } finally {
       setIsSaving(false);
     }
@@ -434,3 +433,4 @@ export default function HplcChromatographySimulation() {
     />
   );
 }
+

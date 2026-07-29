@@ -197,7 +197,6 @@ export default function TrigonometryWavesSimulation() {
       score: questSuccess ? 100 : Math.min(90, dataPoints.length * 20),
       durationSeconds: Math.round(time),
     });
-    alert("บันทึกข้อมูลการทดลองสำเร็จ! 🎉");
   };
 
   // Wave rendering calculations
@@ -626,3 +625,4 @@ export default function TrigonometryWavesSimulation() {
     />
   );
 }
+

@@ -154,7 +154,6 @@ export default function HeatingCoolingMaterialsSimulation() {
         },
         durationSeconds: Math.round(elapsedSeconds),
       });
-      window.alert("บันทึกผลการทดลองการร้อนและเย็นของวัสดุแล้ว");
     } finally {
       setIsSaving(false);
     }
@@ -456,3 +455,4 @@ export default function HeatingCoolingMaterialsSimulation() {
     />
   );
 }
+

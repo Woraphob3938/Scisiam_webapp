@@ -513,7 +513,6 @@ export default function LeChateliersPrincipleSimulation() {
       summary: { dataPointCount: experimentData.dataPoints.length },
       score: Math.min(100, experimentData.dataPoints.length * 20),
     });
-    alert("บันทึกข้อมูลการทดลอง (กราฟสมดุลเคมีและตารางผลล่าสุด) สำเร็จ! 🎉");
   };
 
   const compactControls = (
@@ -605,3 +604,4 @@ export default function LeChateliersPrincipleSimulation() {
     />
   );
 }
+

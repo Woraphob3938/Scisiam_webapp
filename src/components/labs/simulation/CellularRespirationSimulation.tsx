@@ -155,7 +155,6 @@ export default function CellularRespirationSimulation() {
       },
       score: 100,
     });
-    alert("บันทึกผลการทดลอง Cellular Respiration สำเร็จ");
   };
 
   return (
@@ -497,3 +496,4 @@ export default function CellularRespirationSimulation() {
     />
   );
 }
+

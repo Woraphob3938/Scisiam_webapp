@@ -306,7 +306,6 @@ export default function AcidBaseTitrationSimulation() {
       score: Math.round(Math.min(100, Math.max(0, progress))),
       durationSeconds: Math.round(elapsedSeconds),
     });
-    alert("บันทึกผลการไทเทรตสำเร็จ");
   };
 
   const visibleRows = displayPoints.slice(-6);
@@ -550,3 +549,4 @@ export default function AcidBaseTitrationSimulation() {
     </div>
   );
 }
+

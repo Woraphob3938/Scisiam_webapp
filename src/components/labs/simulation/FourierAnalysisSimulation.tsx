@@ -267,7 +267,6 @@ export default function FourierAnalysisSimulation() {
       score: Math.min(100, Math.max(40, 40 + questProgress * 0.6)),
       durationSeconds: null,
     });
-    alert("บันทึกผลการทดลองวิเคราะห์สัญญาณฟูเรียร์สำเร็จ");
   };
 
   return (
@@ -610,3 +609,4 @@ export default function FourierAnalysisSimulation() {
     />
   );
 }
+

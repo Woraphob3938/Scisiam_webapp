@@ -139,7 +139,6 @@ export default function OsmosisPlasmolysisSimulation() {
       },
       score: 100,
     });
-    alert("บันทึกผลการทดลอง Osmosis สำเร็จ");
   };
 
   const cellStateText = useMemo(() => {
@@ -463,3 +462,4 @@ export default function OsmosisPlasmolysisSimulation() {
     />
   );
 }
+

@@ -547,7 +547,6 @@ export default function CurveFittingSimulation() {
       durationSeconds: null,
     });
 
-    alert("Saved Curve Fitting & Trend Lines result");
   };
 
   const controls = (
@@ -736,3 +735,4 @@ function ControlSlider({
     </div>
   );
 }
+

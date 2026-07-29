@@ -232,7 +232,6 @@ export default function BraggDiffractionSimulation() {
       },
     });
 
-    alert("บันทึกรายงานผลการทดลองการเลี้ยวเบนของแบรกก์สำเร็จ! 🎉");
   };
 
   const compactControls = (
@@ -639,3 +638,4 @@ function BraggTheory() {
     </div>
   );
 }
+

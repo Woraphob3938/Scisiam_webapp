@@ -631,7 +631,6 @@ export default function HookesLawSimulation() {
       score: questSuccess ? 100 : Math.min(100, pointsToSave.length * 20),
       durationSeconds: Math.round(elapsedSeconds),
     });
-    alert("บันทึกข้อมูลการทดลอง (กราฟแรง-ระยะยืดและตารางผล) สำเร็จ! 🎉");
   };
 
   // SVG Spring drawing helpers
@@ -812,3 +811,4 @@ export default function HookesLawSimulation() {
     />
   );
 }
+

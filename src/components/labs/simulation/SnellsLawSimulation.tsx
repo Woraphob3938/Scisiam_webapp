@@ -418,7 +418,6 @@ export default function SnellsLawSimulation() {
       summary: { dataPointCount: experimentData.dataPoints.length },
       score: Math.min(100, experimentData.dataPoints.length * 20),
     });
-    alert("บันทึกผลการทดลองกฎของสเนลล์สำเร็จ! 🎉");
   };
 
   const visibleRows = dataPoints.slice(-7);
@@ -724,3 +723,4 @@ export default function SnellsLawSimulation() {
     </div>
   );
 }
+

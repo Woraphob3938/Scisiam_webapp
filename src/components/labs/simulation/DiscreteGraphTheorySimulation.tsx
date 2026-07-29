@@ -277,7 +277,6 @@ export default function DiscreteGraphTheorySimulation() {
       score: Math.min(100, Math.max(40, 40 + loggedRuns.length * 15)),
       durationSeconds: null,
     });
-    alert("บันทึกการจำลองโครงสร้างกราฟและเครือข่ายสำเร็จ");
   };
 
   const questProgress = Math.min(100, Math.round((loggedRuns.length / 3) * 100));
@@ -668,3 +667,4 @@ export default function DiscreteGraphTheorySimulation() {
     />
   );
 }
+

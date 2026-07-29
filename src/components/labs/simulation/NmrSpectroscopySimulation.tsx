@@ -134,7 +134,6 @@ export default function NmrSpectroscopySimulation() {
         },
         durationSeconds: 45,
       });
-      window.alert("บันทึกผลสเปกตรัม NMR สำเร็จ");
     } finally {
       setIsSaving(false);
     }
@@ -415,3 +414,4 @@ export default function NmrSpectroscopySimulation() {
     />
   );
 }
+

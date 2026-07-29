@@ -274,7 +274,6 @@ export default function SystemsEquationsSimulation() {
       durationSeconds: null,
     });
 
-    alert("บันทึกผลแล็บ Systems of Equations สำเร็จ");
   };
 
   // Convert coordinate values to SVG coordinates
@@ -837,3 +836,4 @@ export default function SystemsEquationsSimulation() {
     />
   );
 }
+

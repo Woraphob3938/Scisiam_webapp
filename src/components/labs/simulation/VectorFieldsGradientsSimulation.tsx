@@ -259,7 +259,6 @@ export default function VectorFieldsGradientsSimulation() {
       score: Math.min(100, Math.max(40, 40 + loggedRuns.length * 15)),
       durationSeconds: null,
     });
-    alert("บันทึกการทดลองแคลคูลัสสนามเวกเตอร์สำเร็จ");
   };
 
   const questProgress = Math.min(100, Math.round((loggedRuns.length / 3) * 100));
@@ -639,3 +638,4 @@ export default function VectorFieldsGradientsSimulation() {
     />
   );
 }
+

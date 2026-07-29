@@ -570,7 +570,6 @@ export default function HesssLawSimulation() {
       },
       score: Math.min(100, experimentData.completedRuns.length * 34),
     });
-    alert("บันทึกประวัติการแคลอริมิเตอร์กฎของเฮสส์เรียบร้อย! 🎉");
   };
 
   const controls = (
@@ -687,3 +686,4 @@ export default function HesssLawSimulation() {
     />
   );
 }
+

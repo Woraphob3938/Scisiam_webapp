@@ -284,7 +284,6 @@ export default function DifferentialEquationsSimulation() {
       durationSeconds: null,
     });
 
-    alert("บันทึกผลแล็บสมการเชิงอนุพันธ์สำเร็จ");
   };
 
   // Build spring coiled path zig-zag
@@ -778,3 +777,4 @@ export default function DifferentialEquationsSimulation() {
     />
   );
 }
+

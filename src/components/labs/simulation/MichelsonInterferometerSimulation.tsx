@@ -604,7 +604,6 @@ export default function MichelsonInterferometerSimulation() {
       },
     });
 
-    alert("บันทึกข้อมูลการทดลอง (ความเข้มแสงเชิงแสงและตารางบันทึกผล) สำเร็จ! 🎉");
   };
 
   const compactControls = (
@@ -773,3 +772,4 @@ export default function MichelsonInterferometerSimulation() {
     />
   );
 }
+

@@ -199,7 +199,6 @@ export default function PcrGelElectrophoresisSimulation() {
       score: Math.min(100, Math.max(40, 40 + runs.length * 15)),
       durationSeconds: null
     });
-    alert("บันทึกรายงานการทดลองเทคโนโลยีดีเอ็นเอสำเร็จ");
   };
 
   const questProgress = Math.min(100, Math.round((loggedRuns.length / 3) * 100));
@@ -527,3 +526,4 @@ export default function PcrGelElectrophoresisSimulation() {
     />
   );
 }
+

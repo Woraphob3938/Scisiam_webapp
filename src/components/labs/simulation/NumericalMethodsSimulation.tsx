@@ -219,7 +219,6 @@ export default function NumericalMethodsSimulation() {
       score: Math.min(100, Math.max(40, 40 + questProgress * 0.6)),
       durationSeconds: null,
     });
-    alert("บันทึกผลการทดลอง Numerical Methods สำเร็จ");
   };
 
   // Iteration tangent lines for SVG
@@ -699,3 +698,4 @@ export default function NumericalMethodsSimulation() {
     />
   );
 }
+

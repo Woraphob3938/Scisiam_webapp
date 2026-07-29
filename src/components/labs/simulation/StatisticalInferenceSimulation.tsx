@@ -260,7 +260,6 @@ export default function StatisticalInferenceSimulation() {
       score: Math.min(100, Math.max(40, 40 + questProgress * 0.6)),
       durationSeconds: null,
     });
-    alert("บันทึกผลการทดลอง Statistical Inference สำเร็จ");
   };
 
   return (
@@ -748,3 +747,4 @@ export default function StatisticalInferenceSimulation() {
     />
   );
 }
+

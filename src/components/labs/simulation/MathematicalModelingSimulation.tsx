@@ -354,7 +354,6 @@ export default function MathematicalModelingSimulation() {
       score: Math.min(100, Math.max(40, 40 + loggedRuns.length * 15)),
       durationSeconds: null,
     });
-    alert("บันทึกรายงานแบบจำลองคณิตศาสตร์สำเร็จ");
   };
 
   // Compile graph SVG points path
@@ -744,3 +743,4 @@ export default function MathematicalModelingSimulation() {
     />
   );
 }
+

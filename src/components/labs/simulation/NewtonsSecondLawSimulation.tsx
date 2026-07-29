@@ -328,7 +328,6 @@ export default function NewtonsSecondLawSimulation() {
       summary: { dataPointCount: experimentData.dataPoints.length },
       score: Math.min(100, experimentData.dataPoints.length * 20),
     });
-    alert("บันทึกผลการทดลองกฎข้อสองของนิวตันสำเร็จ! 🎉");
   };
 
   const visibleRows = dataPoints.slice(-7);
@@ -600,3 +599,4 @@ export default function NewtonsSecondLawSimulation() {
     </div>
   );
 }
+

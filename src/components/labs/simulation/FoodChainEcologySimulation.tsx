@@ -182,7 +182,6 @@ export default function FoodChainEcologySimulation() {
       },
       score: 100,
     });
-    alert("บันทึกผลการทดลอง Food Chain & Ecology สำเร็จ");
   };
 
   return (
@@ -457,3 +456,4 @@ export default function FoodChainEcologySimulation() {
     />
   );
 }
+

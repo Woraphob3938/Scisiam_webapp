@@ -366,7 +366,6 @@ export default function MitosisCellCycleSimulation() {
       },
       score: checkpoint,
     });
-    alert("บันทึกผลการทดลอง Mitosis & Cell Cycle สำเร็จ");
   };
 
   const controls = (
@@ -464,3 +463,4 @@ export default function MitosisCellCycleSimulation() {
     />
   );
 }
+

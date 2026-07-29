@@ -585,7 +585,6 @@ export default function BeerLambertLawSimulation() {
       summary: { dataPointCount: experimentData.dataPoints.length },
       score: Math.min(100, experimentData.dataPoints.length * 20),
     });
-    alert("บันทึกข้อมูลการทดลอง (กราฟ Absorbance-Concentration และตารางผลล่าสุด) สำเร็จ! 🎉");
   };
 
   const controls = (
@@ -712,3 +711,4 @@ export default function BeerLambertLawSimulation() {
     />
   );
 }
+

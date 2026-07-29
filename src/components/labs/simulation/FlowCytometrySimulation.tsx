@@ -155,7 +155,6 @@ export default function FlowCytometrySimulation() {
       score: Math.min(100, Math.max(40, 40 + runs.length * 15)),
       durationSeconds: null
     });
-    alert("บันทึกรายงานผลสแกนโฟลว์ไซโตเมทรีสำเร็จ");
   };
 
   const questProgress = Math.min(100, Math.round((loggedRuns.length / 3) * 100));
@@ -400,3 +399,4 @@ export default function FlowCytometrySimulation() {
     />
   );
 }
+

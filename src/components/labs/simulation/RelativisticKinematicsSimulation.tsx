@@ -221,7 +221,6 @@ export default function RelativisticKinematicsSimulation() {
       },
     });
 
-    alert("บันทึกรายงานผลการทดลองจลนศาสตร์สัมพัทธภาพสำเร็จ! 🎉");
   };
 
   const compactControls = (
@@ -591,3 +590,4 @@ function RelativityTheory() {
     </div>
   );
 }
+

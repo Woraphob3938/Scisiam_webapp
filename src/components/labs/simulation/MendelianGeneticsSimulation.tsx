@@ -317,7 +317,6 @@ export default function MendelianGeneticsSimulation() {
       },
       score: Math.round(Math.min(100, Math.max(0, progress))),
     });
-    alert("บันทึกผลการทดลอง Mendelian Genetics สำเร็จ");
   };
 
   const controls = (
@@ -408,3 +407,4 @@ export default function MendelianGeneticsSimulation() {
     />
   );
 }
+

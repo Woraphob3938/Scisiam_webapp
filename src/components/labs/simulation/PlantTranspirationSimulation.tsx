@@ -140,7 +140,6 @@ export default function PlantTranspirationSimulation() {
       },
       score: 100,
     });
-    alert("บันทึกผลการทดลอง Plant Transpiration สำเร็จ");
   };
 
   const stomataStateText = useMemo(() => {
@@ -450,3 +449,4 @@ export default function PlantTranspirationSimulation() {
     />
   );
 }
+

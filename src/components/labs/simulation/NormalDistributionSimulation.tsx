@@ -445,7 +445,6 @@ export default function NormalDistributionSimulation() {
       durationSeconds: null,
     });
 
-    alert("บันทึกผลแล็บ Normal Distribution สำเร็จ");
   };
 
   // Bin bar rendering parameters
@@ -970,3 +969,4 @@ export default function NormalDistributionSimulation() {
     />
   );
 }
+

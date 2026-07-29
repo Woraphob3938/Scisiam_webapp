@@ -159,7 +159,6 @@ export default function NaturalSelectionSimulation() {
       },
       score: 100,
     });
-    alert("บันทึกผลการทดลอง Natural Selection สำเร็จ");
   };
 
   // Convert SootLevel to bark color hex
@@ -435,3 +434,4 @@ export default function NaturalSelectionSimulation() {
     />
   );
 }
+

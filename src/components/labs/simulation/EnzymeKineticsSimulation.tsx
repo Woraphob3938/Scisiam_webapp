@@ -187,7 +187,6 @@ export default function EnzymeKineticsSimulation() {
       },
       score: 100,
     });
-    alert("บันทึกผลการทดลอง Enzyme Catalysis สำเร็จ");
   };
 
   const isDenatured = useMemo(() => {
@@ -474,3 +473,4 @@ export default function EnzymeKineticsSimulation() {
     />
   );
 }
+

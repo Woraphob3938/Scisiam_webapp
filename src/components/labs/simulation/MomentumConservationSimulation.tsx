@@ -585,7 +585,6 @@ export default function MomentumConservationSimulation() {
       score: Math.min(100, experimentData.dataPoints.length * 20),
     });
 
-    alert("บันทึกข้อมูลการทดลอง (การชนและกฎโมเมนตัม) สำเร็จ! 🎉");
   };
 
   // Convert physical X coordinates (0 to 10m) to SVG X (40 to 520px)
@@ -1263,3 +1262,4 @@ export default function MomentumConservationSimulation() {
     />
   );
 }
+

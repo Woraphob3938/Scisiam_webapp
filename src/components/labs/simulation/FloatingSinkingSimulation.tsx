@@ -191,7 +191,6 @@ export default function FloatingSinkingSimulation() {
       durationSeconds: null,
     });
 
-    window.alert("บันทึกผลการทดลองการลอยและการจมแล้ว");
   };
 
   const objectY = !tested ? 82 : result.outcome === "float" ? 145 : 267;
@@ -491,3 +490,4 @@ export default function FloatingSinkingSimulation() {
     />
   );
 }
+

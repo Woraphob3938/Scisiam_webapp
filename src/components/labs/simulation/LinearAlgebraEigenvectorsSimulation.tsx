@@ -271,7 +271,6 @@ export default function LinearAlgebraEigenvectorsSimulation() {
       durationSeconds: null,
     });
 
-    alert("บันทึกรายงานผลแล็บ Linear Algebra & Eigenvectors สำเร็จ");
   };
 
   return (
@@ -719,3 +718,4 @@ export default function LinearAlgebraEigenvectorsSimulation() {
     />
   );
 }
+

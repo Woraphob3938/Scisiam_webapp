@@ -784,7 +784,6 @@ export default function NewtonsCoolingSimulation() {
       durationSeconds: Math.round(elapsedSeconds),
     });
 
-    alert("บันทึกข้อมูลการทดลอง (กราฟอุณหภูมิและตารางบันทึกผล) สำเร็จ! 🎉");
   };
 
   const timeLabel = `${Math.floor(elapsedSeconds / 60).toString().padStart(2, "0")}:${Math.floor(elapsedSeconds % 60).toString().padStart(2, "0")}`;
@@ -1031,3 +1030,4 @@ export default function NewtonsCoolingSimulation() {
     />
   );
 }
+

@@ -155,7 +155,6 @@ export default function MixingAndSeparatingSimulation() {
         },
         durationSeconds: null,
       });
-      window.alert("บันทึกผลการทดลองผสมและแยกสารแล้ว");
     } finally {
       setIsSaving(false);
     }
@@ -306,3 +305,4 @@ export default function MixingAndSeparatingSimulation() {
     />
   );
 }
+

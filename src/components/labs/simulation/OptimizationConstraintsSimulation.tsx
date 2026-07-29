@@ -345,7 +345,6 @@ export default function OptimizationConstraintsSimulation() {
       durationSeconds: null,
     });
 
-    alert("บันทึกผลแล็บ Optimization & Constraints สำเร็จ");
   };
 
   return (
@@ -866,3 +865,4 @@ export default function OptimizationConstraintsSimulation() {
     />
   );
 }
+

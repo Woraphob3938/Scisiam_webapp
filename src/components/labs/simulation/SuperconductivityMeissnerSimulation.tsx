@@ -239,7 +239,6 @@ export default function SuperconductivityMeissnerSimulation() {
       },
     });
 
-    alert("บันทึกรายงานผลการทดลองสภาพนำยิ่งยวดสำเร็จ! 🎉");
   };
 
   const compactControls = (
@@ -664,3 +663,4 @@ function SuperconductivityTheory({ Tc }: { Tc: number }) {
     </div>
   );
 }
+

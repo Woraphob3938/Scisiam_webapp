@@ -618,7 +618,6 @@ export default function QuantumTunnelingSimulation() {
       },
     });
 
-    alert("บันทึกข้อมูลการทดลอง (สัมประสิทธิ์การทะลุผ่านและตารางบันทึกผล) สำเร็จ! 🎉");
   };
 
   const compactControls = (
@@ -812,3 +811,4 @@ export default function QuantumTunnelingSimulation() {
     />
   );
 }
+

@@ -173,7 +173,6 @@ export default function PushPullForcesSimulation() {
       score: Math.min(100, Math.max(40, 40 + nextRuns.length * 15)),
       durationSeconds: null
     });
-    alert("บันทึกรายงานผลการทดลองการเคลื่อนที่สำเร็จ");
   };
 
   const questProgress = Math.min(100, Math.round((loggedRuns.length / 3) * 100));
@@ -509,3 +508,4 @@ export default function PushPullForcesSimulation() {
     />
   );
 }
+

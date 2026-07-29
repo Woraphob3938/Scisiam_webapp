@@ -258,7 +258,6 @@ export default function BernoullisPrincipleSimulation() {
       score: Math.min(100, experimentData.dataPoints.length * 20),
     });
 
-    alert("บันทึกข้อมูลการทดลอง (พลศาสตร์ของไหลและหลักแบร์นูลลี) สำเร็จ! 🎉");
   };
 
   // Generate SVG coordinates for Venturi tube outline dynamically based on throatWidth
@@ -661,3 +660,4 @@ function ResultsTable({
     </section>
   );
 }
+

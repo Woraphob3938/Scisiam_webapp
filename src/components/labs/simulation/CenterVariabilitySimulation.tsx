@@ -455,7 +455,6 @@ export default function CenterVariabilitySimulation() {
       durationSeconds: null,
     });
 
-    alert("Saved Center & Variability result");
   };
 
   const controls = (
@@ -598,3 +597,4 @@ export default function CenterVariabilitySimulation() {
     />
   );
 }
+

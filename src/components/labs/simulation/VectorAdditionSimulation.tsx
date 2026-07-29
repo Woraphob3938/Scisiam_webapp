@@ -450,7 +450,6 @@ export default function VectorAdditionSimulation() {
       durationSeconds: null,
     });
 
-    alert("Saved Vector Addition Lab result");
   };
 
   const controls = (
@@ -614,3 +613,4 @@ function ControlSlider({
     </div>
   );
 }
+

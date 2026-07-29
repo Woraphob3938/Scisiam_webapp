@@ -640,7 +640,6 @@ export default function ZeemanEffectSimulation() {
       },
     });
 
-    alert("บันทึกข้อมูลการทดลอง (การแยกเส้นสเปกตรัมและตารางบันทึกผล) สำเร็จ! 🎉");
   };
 
   const compactControls = (
@@ -818,3 +817,4 @@ export default function ZeemanEffectSimulation() {
     />
   );
 }
+

@@ -137,7 +137,6 @@ export default function BloodTypingAgglutinationSimulation() {
       },
       score: 100,
     });
-    alert("บันทึกผลการทดลอง Blood Typing สำเร็จ");
   };
 
   return (
@@ -348,3 +347,4 @@ export default function BloodTypingAgglutinationSimulation() {
     />
   );
 }
+

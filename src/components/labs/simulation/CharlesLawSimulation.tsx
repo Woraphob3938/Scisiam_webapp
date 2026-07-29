@@ -354,7 +354,6 @@ export default function CharlesLawSimulation() {
       score: Math.round(Math.min(100, Math.max(0, progress))),
       durationSeconds: Math.round(elapsedSeconds),
     });
-    alert("บันทึกผลการทดลองกฎของชาร์ลสำเร็จ");
   };
 
   const visibleRows = displayPoints.slice(-7);
@@ -608,3 +607,4 @@ export default function CharlesLawSimulation() {
     </div>
   );
 }
+

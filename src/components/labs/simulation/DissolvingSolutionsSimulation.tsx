@@ -226,7 +226,6 @@ export default function DissolvingSolutionsSimulation() {
         },
         durationSeconds: Math.round(elapsedSeconds),
       });
-      window.alert("บันทึกผลการทดลองการละลายแล้ว");
     } finally {
       setIsSaving(false);
     }
@@ -310,3 +309,4 @@ export default function DissolvingSolutionsSimulation() {
     />
   );
 }
+

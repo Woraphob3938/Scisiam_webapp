@@ -295,7 +295,6 @@ export default function FaradaysLawSimulation() {
       score: Math.min(100, experimentData.dataPoints.length * 20),
     });
 
-    alert("บันทึกข้อมูลการทดลอง (การเหนี่ยวนำแม่เหล็กไฟฟ้า) สำเร็จ! 🎉");
   };
 
   // SVG Coordinates
@@ -750,3 +749,4 @@ function ResultsTable({
     </section>
   );
 }
+

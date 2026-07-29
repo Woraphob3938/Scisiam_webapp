@@ -132,7 +132,6 @@ export default function XpsSpectroscopySimulation() {
         },
         durationSeconds: 30,
       });
-      window.alert("บันทึกผลสเปกตรัม XPS สำเร็จ");
     } finally {
       setIsSaving(false);
     }
@@ -429,3 +428,4 @@ export default function XpsSpectroscopySimulation() {
     />
   );
 }
+

@@ -146,7 +146,6 @@ export default function CardiovascularSystemSimulation() {
       },
       score: 100,
     });
-    alert("บันทึกผลการทดลอง Cardiovascular System สำเร็จ");
   };
 
   return (
@@ -382,3 +381,4 @@ export default function CardiovascularSystemSimulation() {
     />
   );
 }
+

@@ -217,7 +217,6 @@ export default function AdvancedCalculusOptimizationSimulation() {
       durationSeconds: null,
     });
 
-    alert("บันทึกผลการทดลองวิเคราะห์แคลคูลัสขั้นสูงสำเร็จ");
   };
 
   return (
@@ -686,3 +685,4 @@ export default function AdvancedCalculusOptimizationSimulation() {
     />
   );
 }
+

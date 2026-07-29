@@ -551,7 +551,6 @@ export default function PhotoelectricEffectSimulation() {
       score: Math.min(100, experimentData.dataPoints.length * 20),
     });
 
-    alert("บันทึกผลการทดลองโฟโตอิเล็กทริกสำเร็จ! 🎉");
   };
 
   const timeLabel = `${Math.floor(elapsedSeconds / 60).toString().padStart(2, "0")}:${Math.floor(elapsedSeconds % 60).toString().padStart(2, "0")}`;
@@ -690,3 +689,4 @@ export default function PhotoelectricEffectSimulation() {
     />
   );
 }
+

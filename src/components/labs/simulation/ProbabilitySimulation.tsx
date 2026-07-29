@@ -276,7 +276,6 @@ export default function ProbabilitySimulation() {
       score: questSuccess ? 100 : Math.min(90, dataPoints.length * 20),
       durationSeconds: 15,
     });
-    alert("บันทึกข้อมูลการทดลองสำเร็จ! 🎉");
   };
 
   // SVG Visual Renders
@@ -718,3 +717,4 @@ export default function ProbabilitySimulation() {
     />
   );
 }
+

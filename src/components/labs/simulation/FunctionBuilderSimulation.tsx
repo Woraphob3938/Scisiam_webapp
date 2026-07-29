@@ -498,7 +498,6 @@ export default function FunctionBuilderSimulation() {
       durationSeconds: null,
     });
 
-    alert("Saved Function Builder result");
   };
 
   const controls = (
@@ -677,3 +676,4 @@ function ControlSlider({
     </div>
   );
 }
+

@@ -151,7 +151,6 @@ export default function QuantumChemistryOrbitalsSimulation() {
         },
         durationSeconds: 30,
       });
-      window.alert("บันทึกการกระจายตัวของออร์บิทัลสำเร็จ");
     } finally {
       setIsSaving(false);
     }
@@ -481,3 +480,4 @@ export default function QuantumChemistryOrbitalsSimulation() {
     />
   );
 }
+

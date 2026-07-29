@@ -183,7 +183,6 @@ export default function PhysicalChemicalChangesSimulation() {
         },
         durationSeconds: 45,
       });
-      window.alert("บันทึกผลการเรียนรู้แล้ว");
     } finally {
       setIsSaving(false);
     }
@@ -637,3 +636,4 @@ export default function PhysicalChemicalChangesSimulation() {
     />
   );
 }
+

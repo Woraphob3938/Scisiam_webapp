@@ -286,7 +286,6 @@ export default function MultivariableCalculusSimulation() {
       score: Math.min(100, Math.max(40, 40 + questProgress * 0.6)),
       durationSeconds: null,
     });
-    alert("บันทึกผลการทดลอง Multivariable Calculus สำเร็จ");
   };
 
   return (
@@ -661,3 +660,4 @@ export default function MultivariableCalculusSimulation() {
     />
   );
 }
+

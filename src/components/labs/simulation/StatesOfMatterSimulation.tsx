@@ -174,7 +174,6 @@ export default function StatesOfMatterSimulation() {
         },
         durationSeconds: Math.round(elapsedSeconds),
     });
-    window.alert("บันทึกผลการทดลองสถานะของสสารแล้ว");
   };
 
   const graph = (
@@ -312,3 +311,4 @@ export default function StatesOfMatterSimulation() {
     />
   );
 }
+

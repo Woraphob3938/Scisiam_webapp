@@ -96,7 +96,6 @@ export default function SimpleCircuitsSimulation() {
       durationSeconds: null,
     });
 
-    window.alert("บันทึกผลการทดลองวงจรไฟฟ้าแล้ว");
   };
 
   const compactControls = (
@@ -423,3 +422,4 @@ export default function SimpleCircuitsSimulation() {
     />
   );
 }
+

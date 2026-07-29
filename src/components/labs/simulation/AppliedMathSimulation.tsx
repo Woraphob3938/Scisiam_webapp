@@ -1950,7 +1950,6 @@ export default function AppliedMathSimulation({ labId }: { labId: AppliedMathLab
       durationSeconds: null,
     });
 
-    alert(`บันทึกผลแล็บ ${config.title} สำเร็จ`);
   };
 
   const controls = (
@@ -2087,3 +2086,4 @@ export default function AppliedMathSimulation({ labId }: { labId: AppliedMathLab
     />
   );
 }
+

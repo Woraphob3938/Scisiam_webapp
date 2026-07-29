@@ -409,7 +409,6 @@ export default function PhotosynthesisRateSimulation() {
       score: Math.round(Math.min(100, Math.max(0, oxygen))),
       durationSeconds: Math.round(elapsedMinutes * 60),
     });
-    alert("บันทึกผลการทดลอง Photosynthesis Rate สำเร็จ");
   };
 
   const controls = (
@@ -517,3 +516,4 @@ export default function PhotosynthesisRateSimulation() {
     />
   );
 }
+

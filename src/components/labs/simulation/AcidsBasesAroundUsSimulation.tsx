@@ -219,7 +219,6 @@ export default function AcidsBasesAroundUsSimulation() {
         },
         durationSeconds: 30, // Ponytail: hardcoded estimated duration
       });
-      window.alert("บันทึกผลการทดลองเรียบร้อยแล้ว");
     } finally {
       setIsSaving(false);
     }
@@ -462,3 +461,4 @@ export default function AcidsBasesAroundUsSimulation() {
     />
   );
 }
+

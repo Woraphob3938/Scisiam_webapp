@@ -496,7 +496,6 @@ export default function StefanBoltzmannSimulation() {
       score: Math.min(100, experimentData.dataPoints.length * 20),
     });
 
-    alert("บันทึกผลการทดลอง Stefan-Boltzmann สำเร็จ! 🎉");
   };
 
   // Log Intensity vs T^4 Graph for blackbody verification
@@ -700,3 +699,4 @@ export default function StefanBoltzmannSimulation() {
     />
   );
 }
+

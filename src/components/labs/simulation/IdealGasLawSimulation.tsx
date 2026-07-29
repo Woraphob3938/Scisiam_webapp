@@ -731,7 +731,6 @@ export default function IdealGasLawSimulation() {
       summary: { dataPointCount: experimentData.dataPoints.length },
       score: Math.min(100, experimentData.dataPoints.length * 20),
     });
-    alert("บันทึกผลการทดลองกฎของแก๊สอุดมคติสำเร็จ! 🎉");
   };
 
   const visibleRows = dataPoints.slice(-7);
@@ -1027,3 +1026,4 @@ export default function IdealGasLawSimulation() {
     </div>
   );
 }
+

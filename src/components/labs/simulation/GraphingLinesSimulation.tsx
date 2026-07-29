@@ -422,7 +422,6 @@ export default function GraphingLinesSimulation() {
       durationSeconds: null,
     });
 
-    alert("บันทึกผลแล็บ Graphing Lines & Slope สำเร็จ");
   };
 
   const controls = (
@@ -562,3 +561,4 @@ export default function GraphingLinesSimulation() {
     />
   );
 }
+

@@ -1,6 +1,7 @@
 import { createClient, isSupabaseConfigured } from "./client";
 import type { Json } from "./database.types";
 import { captureExperimentSnapshot, uploadExperimentSnapshot } from "../experiment-snapshot";
+import { showExperimentSaveToast } from "../experiment-save-toast";
 
 export type SyncExperimentInput = {
   labId: string;
@@ -41,7 +42,9 @@ export async function saveExperimentAndSync(input: SaveExperimentInput): Promise
     localPayload: input.localPayload,
   });
 
-  return syncExperimentRun(input);
+  const result = await syncExperimentRun(input);
+  showExperimentSaveToast();
+  return result;
 }
 
 export async function syncExperimentRun(input: SyncExperimentInput): Promise<SyncExperimentResult> {

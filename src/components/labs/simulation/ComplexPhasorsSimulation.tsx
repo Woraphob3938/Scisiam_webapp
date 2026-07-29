@@ -202,7 +202,6 @@ export default function ComplexPhasorsSimulation() {
       score: Math.min(100, Math.max(40, 40 + questProgress * 0.6)),
       durationSeconds: null,
     });
-    alert("บันทึกรายงานผลการทดลอง Phasor สำเร็จ");
   };
 
   return (
@@ -661,3 +660,4 @@ export default function ComplexPhasorsSimulation() {
     />
   );
 }
+
