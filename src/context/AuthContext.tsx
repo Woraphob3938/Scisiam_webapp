@@ -111,7 +111,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const authSubscription = supabase?.auth.onAuthStateChange(() => {
       void loadAuthState();
     }).data.subscription;
-    const handleAuthUpdated = () => void loadAuthState();
+    const handleAuthUpdated = () => {
+      // Update shared chrome immediately, then reconcile against Supabase.
+      loadAuthStateFromCache(false);
+      void loadAuthState();
+    };
 
     window.addEventListener(SCISIAM_AUTH_EVENT, handleAuthUpdated);
     window.addEventListener("storage", handleAuthUpdated);

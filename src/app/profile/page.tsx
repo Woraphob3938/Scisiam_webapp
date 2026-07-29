@@ -30,7 +30,7 @@ import {
   readLocalLearningSnapshot,
   type LearningRunSnapshot,
 } from "@/lib/supabase/learning-snapshot";
-import { SCISIAM_AUTH_EVENT } from "@/lib/supabase/auth-cache";
+import { cacheScisiamAuth, SCISIAM_AUTH_EVENT } from "@/lib/supabase/auth-cache";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import { getProfileAvatarSrc } from "@/lib/supabase/profile-avatar";
 import { readyLabCount } from "@/data/labReadiness";
@@ -273,18 +273,16 @@ export default function ProfilePage() {
 
       setUsername(nextName);
       setDraftName(nextName);
-      localStorage.setItem("scisiam_user_name", nextName);
       setAvatarPath(nextAvatarPath);
       setAvatarVersion(Date.now());
-      if (nextAvatarPath) {
-        localStorage.setItem("scisiam_user_avatar", nextAvatarPath);
-      } else {
-        localStorage.removeItem("scisiam_user_avatar");
-      }
       setDraftAvatarFile(null);
       setDraftAvatarPreview(null);
       setIsEditingProfile(false);
-      window.dispatchEvent(new Event(SCISIAM_AUTH_EVENT));
+      cacheScisiamAuth({
+        role: role === "teacher" ? "teacher" : "student",
+        displayName: nextName,
+        avatarUrl: nextAvatarPath,
+      });
       setProfileNotice({ text: "บันทึกโปรไฟล์แล้ว", error: false });
     } catch (error) {
       console.error("Failed to update profile", error);

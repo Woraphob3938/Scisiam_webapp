@@ -15,7 +15,8 @@ test("Navbar follows profile name and avatar updates", () => {
   assert.match(navbar, /getProfileAvatarSrc/);
   assert.match(navbar, /src=\{profileAvatarSrc\}/);
   assert.match(profile, /saveProfile/);
-  assert.match(profile, /dispatchEvent\(new Event\(SCISIAM_AUTH_EVENT\)\)/);
+  assert.match(profile, /cacheScisiamAuth\(\{/);
+  assert.match(profile, /avatarUrl:\s*nextAvatarPath/);
 });
 
 test("navbar auth state persists across route navigation", () => {
@@ -28,6 +29,10 @@ test("navbar auth state persists across route navigation", () => {
   assert.doesNotMatch(navbar, /auth\.getUser\(\)/);
   assert.doesNotMatch(navbar, /auth\.onAuthStateChange\(/);
   assert.match(authProvider, /auth\.getUser\(\)/);
+  assert.match(
+    authProvider,
+    /const handleAuthUpdated = \(\) => \{[\s\S]*?loadAuthStateFromCache\(false\);[\s\S]*?void loadAuthState\(\);/,
+  );
   assert.match(authProvider, /auth\.onAuthStateChange\(/);
 });
 
