@@ -540,7 +540,10 @@ test("shared simulation shell overlays live metrics without shrinking the stage"
   assert.match(source, /data-testid="simulation-stage-metrics"/);
   assert.doesNotMatch(source, /xl:grid-cols-\[minmax\(0,1fr\)_320px\]/);
   assert.doesNotMatch(source, /xl:mr-\[336px\]/);
-  assert.match(source, /\? "fixed inset-0 z-\[100\] h-screen min-h-screen w-screen rounded-none border-0 shadow-none"/);
+  assert.match(
+    source,
+    /\? "fixed inset-0 z-\[100\] h-\[100dvh\] min-h-0 w-\[100dvw\] max-w-none overscroll-none rounded-none border-0 shadow-none"/,
+  );
   assert.match(source, /data-testid="simulation-stage-content"[\s\S]*className="relative min-h-\[320px\][^"]*sm:h-full/);
   assert.match(source, /data-testid="simulation-stage-scene"[\s\S]*className="min-h-\[320px\][^"]*sm:h-full/);
   assert.match(source, /data-testid="simulation-stage-metrics" className="absolute right-5 top-5 z-20 hidden w-\[320px\] xl:block"/);
@@ -589,6 +592,9 @@ test("ratio and proportion math lab uses its own interactive simulation", () => 
 test("ratio and proportion drawer summary exposes manual numeric inputs", () => {
   const simulationFile = "src/components/labs/simulation/RatioProportionSimulation.tsx";
   const source = readProjectFile(simulationFile);
+  const manualNumberInput = readProjectFile(
+    "src/components/labs/simulation/ManualNumberInput.tsx",
+  );
 
   assert.match(source, /drawerSummary=\{drawerSummary\}/);
   assert.match(source, /Manual number input/);
@@ -598,7 +604,8 @@ test("ratio and proportion drawer summary exposes manual numeric inputs", () => 
   assert.match(source, /label="scale"[\s\S]*?tone="pink"/);
   assert.match(source, /label="Scale factor"[\s\S]*?tone="pink"/);
   assert.match(source, /ariaLabel="Enter given value c"/);
-  assert.match(source, /aria-label=\{ariaLabel\}/);
+  assert.match(source, /<BoundedNumberInput/);
+  assert.match(manualNumberInput, /aria-label=\{ariaLabel\}/);
 });
 
 test("all mathematics simulation drawers expose manual numeric inputs", () => {
@@ -935,6 +942,7 @@ test("local Supabase migrations mirror the deployed migration history", () => {
     "20260727083301",
     "20260727083338",
     "20260727083406",
+    "20260729100000",
   ];
 
   assert.deepEqual(
