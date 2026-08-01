@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useId, useMemo, useState } from "react";
 import {
   Activity,
   ClipboardList,
@@ -515,98 +515,303 @@ function calculateLab(labId: ChemistryConceptLabId, primary: number, secondary: 
   };
 }
 
-function ChemistryScene({ labId, result }: { labId: ChemistryConceptLabId; result: ChemistryResult }) {
+type ExperimentSceneProps = {
+  runToken: number;
+};
+
+function ExperimentMotionStyles() {
+  return (
+    <style>{`
+      .electron-flow {
+        offset-path: path("M 166 91 C 210 31, 408 31, 454 91");
+        offset-rotate: 0deg;
+        animation: electron-flow 1.35s linear 3 both;
+      }
+      .salt-ion-left { animation: salt-ion-left 1.8s ease-in-out 2 both; }
+      .salt-ion-right { animation: salt-ion-right 1.8s ease-in-out 2 both; }
+      .zinc-ion-release { animation: zinc-ion-release 2.2s ease-out both; }
+      .cathode-deposit {
+        transform-box: fill-box;
+        transform-origin: center bottom;
+        animation: cathode-deposit 2.4s cubic-bezier(.16, 1, .3, 1) both;
+      }
+      .reactant-left { animation: reactant-left 1.75s cubic-bezier(.76, 0, .24, 1) both; }
+      .reactant-right { animation: reactant-right 1.75s cubic-bezier(.76, 0, .24, 1) both; }
+      .reaction-collision {
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: reaction-collision 1.75s ease-out both;
+      }
+      .reaction-product { animation: reaction-product 1.75s ease-out both; }
+      .solution-drop { animation: solution-drop 1.5s cubic-bezier(.55, .06, .68, .19) both; }
+      .ion-gather-left { animation: ion-gather-left 1.8s cubic-bezier(.45, 0, .55, 1) both; }
+      .ion-gather-right { animation: ion-gather-right 1.8s cubic-bezier(.45, 0, .55, 1) both; }
+      .precipitate-settle { animation: precipitate-settle 2s cubic-bezier(.16, 1, .3, 1) both; }
+
+      @keyframes electron-flow {
+        0% { offset-distance: 0%; opacity: 0; }
+        12%, 88% { opacity: 1; }
+        100% { offset-distance: 100%; opacity: 0; }
+      }
+      @keyframes salt-ion-left {
+        0%, 100% { transform: translateX(18px); }
+        50% { transform: translateX(-18px); }
+      }
+      @keyframes salt-ion-right {
+        0%, 100% { transform: translateX(-18px); }
+        50% { transform: translateX(18px); }
+      }
+      @keyframes zinc-ion-release {
+        0% { transform: translate(0, 0); opacity: 0; }
+        20% { opacity: 1; }
+        100% { transform: translate(30px, 22px); opacity: .2; }
+      }
+      @keyframes cathode-deposit {
+        from { transform: scaleY(.08); opacity: .2; }
+        to { transform: scaleY(1); opacity: .95; }
+      }
+      @keyframes reactant-left {
+        0%, 8% { transform: translateX(-88px); opacity: 1; }
+        55% { transform: translateX(0); opacity: 1; }
+        65%, 100% { transform: translateX(0); opacity: 0; }
+      }
+      @keyframes reactant-right {
+        0%, 8% { transform: translateX(88px); opacity: 1; }
+        55% { transform: translateX(0); opacity: 1; }
+        65%, 100% { transform: translateX(0); opacity: 0; }
+      }
+      @keyframes reaction-collision {
+        0%, 48% { transform: scale(.2); opacity: 0; }
+        58% { transform: scale(1); opacity: .95; }
+        72%, 100% { transform: scale(1.5); opacity: 0; }
+      }
+      @keyframes reaction-product {
+        0%, 60% { transform: translateY(8px); opacity: 0; }
+        78%, 100% { transform: translateY(0); opacity: 1; }
+      }
+      @keyframes solution-drop {
+        0% { transform: translateY(-35px); opacity: 0; }
+        15% { opacity: 1; }
+        72% { transform: translateY(62px); opacity: 1; }
+        100% { transform: translateY(67px) scale(1.8, .35); opacity: 0; }
+      }
+      @keyframes ion-gather-left {
+        0%, 24% { transform: translate(0, 0); opacity: 1; }
+        76% { transform: translate(40px, 55px); opacity: 1; }
+        100% { transform: translate(42px, 70px); opacity: 0; }
+      }
+      @keyframes ion-gather-right {
+        0%, 24% { transform: translate(0, 0); opacity: 1; }
+        76% { transform: translate(-40px, 55px); opacity: 1; }
+        100% { transform: translate(-42px, 70px); opacity: 0; }
+      }
+      @keyframes precipitate-settle {
+        0%, 58% { transform: translateY(-44px); opacity: 0; }
+        74% { opacity: 1; }
+        100% { transform: translateY(0); opacity: 1; }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .electron-flow, .salt-ion-left, .salt-ion-right, .zinc-ion-release,
+        .cathode-deposit, .reactant-left, .reactant-right, .reaction-collision,
+        .reaction-product, .solution-drop, .ion-gather-left, .ion-gather-right,
+        .precipitate-settle {
+          animation-duration: 0.01ms !important;
+          animation-delay: 0ms !important;
+          animation-iteration-count: 1 !important;
+        }
+      }
+    `}</style>
+  );
+}
+
+function GalvanicExperimentScene({ runToken }: ExperimentSceneProps) {
+  const isRunning = runToken > 0;
+
+  return (
+    <g key={`galvanic-${runToken}`}>
+      <ExperimentMotionStyles />
+      <path d="M166 132V91C166 43 454 43 454 91V132" stroke="#334155" strokeWidth="8" strokeLinecap="round" />
+      <path d="M220 144C238 104 382 104 400 144" stroke="#dcfce7" strokeWidth="22" strokeLinecap="round" />
+      <path d="M220 144C238 104 382 104 400 144" stroke="#22c55e" strokeWidth="4" strokeDasharray="7 8" strokeLinecap="round" />
+
+      <path d="M72 144V274C72 285 81 294 92 294H236C247 294 256 285 256 274V144" fill="#ecfeff" stroke="#0891b2" strokeWidth="6" strokeLinejoin="round" />
+      <path d="M364 144V274C364 285 373 294 384 294H528C539 294 548 285 548 274V144" fill="#faf5ff" stroke="#7c3aed" strokeWidth="6" strokeLinejoin="round" />
+      <path d="M81 203H247V273C247 280 241 285 234 285H94C87 285 81 280 81 273Z" fill="#67e8f9" fillOpacity=".52" />
+      <path d="M373 203H539V273C539 280 533 285 526 285H386C379 285 373 280 373 273Z" fill="#c4b5fd" fillOpacity=".52" />
+
+      <rect x="151" y="113" width="30" height="164" rx="6" fill="#94a3b8" stroke="#475569" strokeWidth="3" />
+      <rect x="439" y="113" width="30" height="164" rx="6" fill="#f59e0b" stroke="#b45309" strokeWidth="3" />
+
+      {isRunning ? (
+        <>
+          {[0, 1, 2].map((index) => (
+            <circle key={index} className="electron-flow" cx="0" cy="0" r="7" fill="#7c3aed" style={{ animationDelay: `${index * 0.3}s` }} />
+          ))}
+          <circle className="salt-ion-left" cx="275" cy="119" r="7" fill="#2563eb" />
+          <circle className="salt-ion-right" cx="345" cy="119" r="7" fill="#f97316" />
+          <circle className="salt-ion-left" cx="295" cy="132" r="6" fill="#2563eb" style={{ animationDelay: ".35s" }} />
+          <circle className="salt-ion-right" cx="325" cy="132" r="6" fill="#f97316" style={{ animationDelay: ".35s" }} />
+          <circle className="zinc-ion-release" cx="184" cy="210" r="7" fill="#64748b" />
+          <circle className="zinc-ion-release" cx="184" cy="242" r="6" fill="#64748b" style={{ animationDelay: ".4s" }} />
+          <rect className="cathode-deposit" x="438" y="174" width="32" height="103" rx="7" fill="#fbbf24" />
+        </>
+      ) : (
+        <>
+          <circle cx="214" cy="69" r="6" fill="#7c3aed" opacity=".35" />
+          <circle cx="310" cy="56" r="6" fill="#7c3aed" opacity=".35" />
+          <circle cx="406" cy="69" r="6" fill="#7c3aed" opacity=".35" />
+        </>
+      )}
+
+      <text x="166" y="322" fill="#334155" fontSize="13" fontWeight="800" textAnchor="middle">แอโนด</text>
+      <text x="454" y="322" fill="#92400e" fontSize="13" fontWeight="800" textAnchor="middle">แคโทด</text>
+      <text x="310" y="102" fill="#047857" fontSize="12" fontWeight="800" textAnchor="middle">สะพานเกลือ</text>
+    </g>
+  );
+}
+
+function ReactionRateExperimentScene({ runToken }: ExperimentSceneProps) {
+  const isRunning = runToken > 0;
+  const rows = [126, 160, 194, 228];
+
+  return (
+    <g key={`reaction-${runToken}`}>
+      <ExperimentMotionStyles />
+      <path d="M246 59H374V91L421 260C425 276 413 292 396 292H224C207 292 195 276 199 260L246 91Z" fill="#fff7ed" stroke="#ea580c" strokeWidth="7" strokeLinejoin="round" />
+      <path d="M215 218H405L417 263C420 273 412 282 401 282H219C208 282 200 273 203 263Z" fill="#fed7aa" fillOpacity=".58" />
+      <path d="M249 75H371" stroke="#fdba74" strokeWidth="10" strokeLinecap="round" />
+
+      {rows.map((y, index) => (
+        <g key={y}>
+          <circle className={isRunning ? "reactant-left" : undefined} cx={290} cy={y} r="12" fill="#22c55e" style={isRunning ? { animationDelay: `${index * 0.08}s` } : { transform: "translateX(-88px)" }} />
+          <circle className={isRunning ? "reactant-right" : undefined} cx={330} cy={y} r="12" fill="#8b5cf6" style={isRunning ? { animationDelay: `${index * 0.08}s` } : { transform: "translateX(88px)" }} />
+          {isRunning ? (
+            <g className="reaction-product" style={{ animationDelay: `${index * 0.08}s` }}>
+              <circle cx="302" cy={y} r="12" fill="#22c55e" />
+              <circle cx="322" cy={y} r="12" fill="#8b5cf6" />
+              <path d={`M310 ${y}H314`} stroke="#ffffff" strokeWidth="5" strokeLinecap="round" />
+            </g>
+          ) : null}
+        </g>
+      ))}
+
+      {isRunning ? (
+        <g className="reaction-collision">
+          <circle cx="310" cy="177" r="46" fill="#fbbf24" fillOpacity=".22" />
+          <path d="M310 133L318 160L345 150L328 174L355 187L326 190L332 220L311 198L291 221L296 190L266 187L294 174L276 150L303 160Z" fill="#f97316" fillOpacity=".8" />
+        </g>
+      ) : null}
+
+      <text x="310" y="322" fill="#9a3412" fontSize="13" fontWeight="800" textAnchor="middle">
+        {isRunning ? "อนุภาคชนกันและเกิดผลิตภัณฑ์" : "พร้อมให้อนุภาคเข้าชนกัน"}
+      </text>
+    </g>
+  );
+}
+
+function SolubilityExperimentScene({ runToken }: ExperimentSceneProps) {
+  const isRunning = runToken > 0;
+  const ionRows = [174, 210, 246];
+  const precipitate = [257, 278, 299, 320, 341, 362, 383];
+
+  return (
+    <g key={`solubility-${runToken}`}>
+      <ExperimentMotionStyles />
+      <path d="M284 35H336V92L325 111H295L284 92Z" fill="#e0f2fe" stroke="#0284c7" strokeWidth="5" strokeLinejoin="round" />
+      <path d="M297 111H323L318 137H302Z" fill="#bae6fd" stroke="#0284c7" strokeWidth="4" strokeLinejoin="round" />
+      <path d="M215 125V278C215 287 222 294 231 294H389C398 294 405 287 405 278V125" fill="#ecfeff" stroke="#0891b2" strokeWidth="7" strokeLinejoin="round" />
+      <path d="M224 177H396V276C396 281 392 285 387 285H233C228 285 224 281 224 276Z" fill="#67e8f9" fillOpacity=".44" />
+      <path d="M215 125H405" stroke="#64748b" strokeWidth="7" strokeLinecap="round" />
+
+      <path className={isRunning ? "solution-drop" : undefined} d="M310 133C300 146 296 153 296 162C296 170 302 176 310 176C318 176 324 170 324 162C324 153 320 146 310 133Z" fill="#0ea5e9" opacity={isRunning ? 1 : 0.35} />
+
+      {ionRows.map((y, index) => (
+        <g key={y}>
+          <circle className={isRunning ? "ion-gather-left" : undefined} cx="258" cy={y} r="10" fill="#8b5cf6" style={isRunning ? { animationDelay: `${index * 0.12}s` } : undefined} />
+          <circle className={isRunning ? "ion-gather-right" : undefined} cx="362" cy={y + 10} r="10" fill="#06b6d4" style={isRunning ? { animationDelay: `${index * 0.12}s` } : undefined} />
+          <circle className={isRunning ? "ion-gather-left" : undefined} cx="279" cy={y + 21} r="7" fill="#8b5cf6" style={isRunning ? { animationDelay: `${0.28 + index * 0.12}s` } : undefined} />
+          <circle className={isRunning ? "ion-gather-right" : undefined} cx="341" cy={y + 29} r="7" fill="#06b6d4" style={isRunning ? { animationDelay: `${0.28 + index * 0.12}s` } : undefined} />
+        </g>
+      ))}
+
+      {isRunning ? precipitate.map((x, index) => (
+        <g key={x} className="precipitate-settle" style={{ animationDelay: `${index * 0.09}s` }}>
+          <circle cx={x} cy={274 - (index % 2) * 7} r="9" fill={index % 2 ? "#8b5cf6" : "#06b6d4"} />
+          <circle cx={x + 9} cy={274 - (index % 2) * 7} r="9" fill={index % 2 ? "#06b6d4" : "#8b5cf6"} />
+        </g>
+      )) : null}
+
+      <text x="310" y="322" fill="#0e7490" fontSize="13" fontWeight="800" textAnchor="middle">
+        {isRunning ? "ไอออนรวมตัวและตกเป็นตะกอน" : "ไอออนยังแยกตัวอยู่ในสารละลาย"}
+      </text>
+    </g>
+  );
+}
+
+function ChemistryScene({ labId, result, runToken }: { labId: ChemistryConceptLabId; result: ChemistryResult; runToken: number }) {
   const isGalvanic = labId === "galvanic-cell";
   const isKinetics = labId === "chemical-kinetics";
   const isKsp = labId === "solubility-product";
   const isAvogadro = labId === "avogadros-law";
   const isElectrolysis = labId === "electrolysis-lab";
+  const usesExperimentAnimation = isGalvanic || isKinetics || isKsp;
   const accent = isGalvanic || isElectrolysis ? "#7c3aed" : isKinetics ? "#f97316" : isKsp ? "#06b6d4" : isAvogadro ? "#2563eb" : "#0891b2";
+  const idPrefix = useId().replaceAll(":", "");
+  const workbenchId = `${idPrefix}-workbench`;
+  const shadowId = `${idPrefix}-apparatus-shadow`;
+  const titleId = `${idPrefix}-title`;
+  const descriptionId = `${idPrefix}-description`;
+  const sceneTitle = isGalvanic
+    ? "เซลล์กัลวานิก"
+    : isKinetics
+      ? "การชนของอนุภาคในปฏิกิริยาเคมี"
+      : isKsp
+        ? "การเกิดตะกอนในสารละลาย"
+        : isAvogadro
+          ? "กระบอกเก็บแก๊ส"
+          : isElectrolysis
+            ? "เซลล์ชุบโลหะ"
+            : "อ่างควบคุมอุณหภูมิ";
+  const sceneDescription = isGalvanic
+    ? "ครึ่งเซลล์สองฝั่งเชื่อมด้วยสะพานเกลือ เมื่อเริ่มทดลองอิเล็กตรอนและไอออนจะเคลื่อนที่"
+    : isKinetics
+      ? "อนุภาคสารตั้งต้นเคลื่อนเข้าชนกัน แล้วจับคู่เป็นผลิตภัณฑ์"
+      : isKsp
+        ? "สารจากหลอดหยดลงในบีกเกอร์ ไอออนรวมตัวและตกเป็นของแข็งที่ก้นภาชนะ"
+        : "อุปกรณ์ทดลองเคมีที่ตอบสนองตามตัวแปรของผู้เรียน";
 
   return (
     <div className="relative flex min-h-[390px] items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-slate-50 via-white to-blue-50/50 p-4">
-      <svg className="h-full min-h-[320px] w-full max-w-[680px]" viewBox="0 0 620 340" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label={isGalvanic ? "เซลล์กัลวานิกสองครึ่งเซลล์ เชื่อมด้วยสะพานเกลือและวงจรอิเล็กตรอน" : isKinetics ? "ภาชนะปฏิกิริยา แสดงการชนของอนุภาคและพลังงานก่อกัมมันต์" : isAvogadro ? "กระบอกสูบแก๊ส แสดงความสัมพันธ์ระหว่างจำนวนโมลกับปริมาตร" : "อุปกรณ์ทดลองเคมี"}>
+      <svg className="h-full min-h-[320px] w-full max-w-[680px]" viewBox="0 0 620 340" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby={`${titleId} ${descriptionId}`}>
+        <title id={titleId}>{sceneTitle}</title>
+        <desc id={descriptionId}>{sceneDescription}</desc>
         <defs>
-          <linearGradient id="chemistry-workbench" x1="0" y1="0" x2="0" y2="1">
+          <linearGradient id={workbenchId} x1="0" y1="0" x2="0" y2="1">
             <stop offset="0" stopColor="#ffffff" />
             <stop offset="1" stopColor="#e2e8f0" />
           </linearGradient>
-          <linearGradient id="galvanic-left-solution" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#67e8f9" stopOpacity="0.55" />
-            <stop offset="1" stopColor="#0891b2" stopOpacity="0.75" />
-          </linearGradient>
-          <linearGradient id="galvanic-right-solution" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#c4b5fd" stopOpacity="0.55" />
-            <stop offset="1" stopColor="#7c3aed" stopOpacity="0.72" />
-          </linearGradient>
-          <marker id="chemistry-electron-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-            <path d="M0 0L10 5L0 10Z" fill="#7c3aed" />
-          </marker>
-          <filter id="chemistry-apparatus-shadow" x="-20%" y="-30%" width="140%" height="180%">
+          <filter id={shadowId} x="-20%" y="-30%" width="140%" height="180%">
             <feDropShadow dx="0" dy="9" stdDeviation="8" floodColor="#334155" floodOpacity="0.16" />
           </filter>
         </defs>
-        <rect x="24" y="40" width="572" height="252" rx="30" fill="#ffffff" opacity="0.62" />
-        <rect x="38" y="247" width="540" height="34" rx="17" fill="url(#chemistry-workbench)" />
-        <circle cx="310" cy="156" r="126" fill={accent} opacity="0.065" />
+        {usesExperimentAnimation ? null : (
+          <>
+            <rect x="24" y="40" width="572" height="252" rx="30" fill="#ffffff" opacity="0.62" />
+            <circle cx="310" cy="156" r="126" fill={accent} opacity="0.065" />
+          </>
+        )}
+        <rect x="38" y={usesExperimentAnimation ? 286 : 247} width="540" height={usesExperimentAnimation ? 18 : 34} rx="9" fill={`url(#${workbenchId})`} />
 
         {isGalvanic ? (
-          <g filter="url(#chemistry-apparatus-shadow)">
-            <rect x="135" y="137" width="108" height="110" rx="20" fill="#ecfeff" stroke="#67e8f9" strokeWidth="5" />
-            <rect x="377" y="137" width="108" height="110" rx="20" fill="#faf5ff" stroke="#c4b5fd" strokeWidth="5" />
-            <path d="M143 188H235V239H143Z" fill="url(#galvanic-left-solution)" />
-            <path d="M385 188H477V239H385Z" fill="url(#galvanic-right-solution)" />
-            <rect x="174" y="112" width="22" height="124" rx="7" fill="#94a3b8" stroke="#475569" strokeWidth="3" />
-            <rect x="420" y="112" width="22" height="124" rx="7" fill="#f59e0b" stroke="#b45309" strokeWidth="3" />
-            <path d="M187 137V91H433V137" stroke="#475569" strokeWidth="9" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M224 91C248 50 372 50 397 91" stroke="#ddd6fe" strokeWidth="19" strokeLinecap="round" />
-            <path d="M224 91C248 50 372 50 397 91" stroke="#7c3aed" strokeWidth="5" strokeLinecap="round" strokeDasharray="7 8" markerEnd="url(#chemistry-electron-arrow)" />
-            <circle cx="310" cy="73" r="42" fill="#ffffff" stroke="#cbd5e1" strokeWidth="6" />
-            <path d="M310 73L335 51" stroke="#ef4444" strokeWidth="7" strokeLinecap="round" />
-            <text x="310" y="105" fill="#7c3aed" fontSize="20" fontWeight="900" textAnchor="middle">{result.metrics[0].value}</text>
-            <path d="M196 163C242 126 378 126 420 163" stroke="#22c55e" strokeWidth="9" strokeLinecap="round" opacity="0.75" />
-            <text x="310" y="146" fill="#047857" fontSize="11" fontWeight="900" textAnchor="middle">สะพานเกลือ</text>
-            <text x="185" y="265" fill="#475569" fontSize="11" fontWeight="900" textAnchor="middle">แอโนด (−)</text>
-            <text x="431" y="265" fill="#92400e" fontSize="11" fontWeight="900" textAnchor="middle">แคโทด (+)</text>
-            <text x="310" y="39" fill="#6d28d9" fontSize="11" fontWeight="900" textAnchor="middle">e⁻ ไหลผ่านวงจรภายนอก</text>
-          </g>
+          <GalvanicExperimentScene runToken={runToken} />
         ) : isKinetics ? (
-          <g>
-            <g filter="url(#chemistry-apparatus-shadow)">
-              <path d="M145 82H337L320 253H162L145 82Z" fill="#fff7ed" stroke="#fb923c" strokeWidth="6" strokeLinejoin="round" />
-              <path d="M159 170H324L316 247H166L159 170Z" fill="#fed7aa" opacity="0.58" />
-              {[182, 220, 258, 296, 194, 236, 278, 306].map((x, index) => (
-                <g key={x} transform={`translate(${x} ${126 + (index % 3) * 31})`}>
-                  <circle cx="-7" cy="0" r="8" fill={index % 2 ? "#a855f7" : "#22c55e"} />
-                  <circle cx="7" cy="0" r="8" fill={index % 2 ? "#22c55e" : "#a855f7"} />
-                </g>
-              ))}
-              <path d="M172 224C214 204 268 204 310 224" stroke="#f97316" strokeWidth="8" strokeLinecap="round" opacity="0.8" />
-            </g>
-            <g transform="translate(365 69)">
-              <rect width="206" height="176" rx="24" fill="#ffffff" stroke="#fed7aa" strokeWidth="4" />
-              <text x="20" y="28" fill="#9a3412" fontSize="11" fontWeight="900">โปรไฟล์พลังงาน</text>
-              <path d="M24 137H182M35 147V48" stroke="#cbd5e1" strokeWidth="2" />
-              <path d="M36 126C68 124 74 62 110 58C140 55 142 112 180 109" stroke="#f97316" strokeWidth="6" strokeLinecap="round" fill="none" />
-              <path d="M36 126C72 123 78 91 109 88C138 85 145 111 180 109" stroke="#22c55e" strokeWidth="4" strokeLinecap="round" fill="none" strokeDasharray="6 5" />
-              <text x="123" y="78" fill="#047857" fontSize="9" fontWeight="900">มีตัวเร่ง</text>
-              <text x="103" y="160" fill="#ea580c" fontSize="13" fontWeight="900" textAnchor="middle">{result.metrics[0].value}</text>
-            </g>
-            <text x="241" y="286" fill="#9a3412" fontSize="11" fontWeight="900" textAnchor="middle">การชนที่มีพลังงานเพียงพอทำให้เกิดผลิตภัณฑ์</text>
-          </g>
+          <ReactionRateExperimentScene runToken={runToken} />
         ) : isKsp ? (
-          <g>
-            <path d="M224 74H396L371 250H249L224 74Z" fill="#ecfeff" stroke="#64748b" strokeWidth="7" strokeLinejoin="round" />
-            <path d="M243 178H376L365 250H254L243 178Z" fill="#67e8f9" opacity="0.5" />
-            {Array.from({ length: 18 }, (_, index) => (
-              <circle key={index} cx={250 + (index % 6) * 24} cy={103 + Math.floor(index / 6) * 23} r="7" fill={index % 2 ? "#a855f7" : "#06b6d4"} />
-            ))}
-            <path d="M260 229C293 207 334 207 363 229" stroke="#f97316" strokeWidth="11" strokeLinecap="round" />
-            <text x="310" y="286" fill={result.progressValue === "เกิดตะกอน" ? "#e11d48" : "#0891b2"} fontSize="20" fontWeight="900" textAnchor="middle">{result.progressValue}</text>
-          </g>
+          <SolubilityExperimentScene runToken={runToken} />
         ) : isAvogadro ? (
           <g>
-            <g filter="url(#chemistry-apparatus-shadow)">
+            <g filter={`url(#${shadowId})`}>
               <rect x="116" y="102" width="360" height="142" rx="34" fill="#eff6ff" stroke="#60a5fa" strokeWidth="7" />
               <rect x="126" y="112" width="254" height="122" rx="27" fill="#bfdbfe" opacity="0.58" />
               <rect x="382" y="110" width="24" height="126" rx="9" fill="#334155" />
@@ -758,14 +963,15 @@ export default function ChemistryConceptSimulation({ labId }: { labId: Chemistry
   const config = labConfigs[labId];
   const [primary, setPrimary] = useState(config.primary.defaultValue);
   const [secondary, setSecondary] = useState(config.secondary.defaultValue);
-  const [hasRun, setHasRun] = useState(false);
+  const [runToken, setRunToken] = useState(0);
+  const usesExperimentAnimation = labId === "galvanic-cell" || labId === "chemical-kinetics" || labId === "solubility-product";
 
   const result = useMemo(() => calculateLab(labId, primary, secondary), [labId, primary, secondary]);
 
   const handleReset = () => {
     setPrimary(config.primary.defaultValue);
     setSecondary(config.secondary.defaultValue);
-    setHasRun(false);
+    setRunToken(0);
   };
 
   const handleSave = async () => {
@@ -818,10 +1024,10 @@ export default function ChemistryConceptSimulation({ labId }: { labId: Chemistry
       category="Chemistry"
       title={config.title}
       subtitle={config.subtitle}
-      statusLabel={hasRun ? "คำนวณผลแล้ว" : "พร้อมจำลอง"}
+      statusLabel={runToken > 0 ? (usesExperimentAnimation ? "กำลังแสดงผลทดลอง" : "คำนวณผลแล้ว") : (usesExperimentAnimation ? "พร้อมทดลอง" : "พร้อมจำลอง")}
       icon={config.icon}
       sceneTitle={config.sceneTitle}
-      scene={<ChemistryScene labId={labId} result={result} />}
+      scene={<ChemistryScene labId={labId} result={result} runToken={runToken} />}
       controlsTitle={config.controlsTitle}
       compactControls={compactControls}
       metrics={result.metrics}
@@ -834,8 +1040,8 @@ export default function ChemistryConceptSimulation({ labId }: { labId: Chemistry
       progressValue={result.progressValue}
       progressPercent={result.progressPercent}
       tips={config.tips}
-      onRun={() => setHasRun(true)}
-      runLabel="คำนวณผล"
+      onRun={() => setRunToken((token) => token + 1)}
+      runLabel={usesExperimentAnimation ? "เริ่มทดลอง" : "คำนวณผล"}
       onReset={handleReset}
       onSave={handleSave}
     />
