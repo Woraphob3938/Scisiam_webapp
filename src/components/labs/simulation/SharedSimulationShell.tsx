@@ -270,7 +270,7 @@ export default function SharedSimulationShell({
   const [activeTab, setActiveTab] = useState<InfoTab>("steps");
   const classroomId = searchParams.get("classroom");
   const exitHref = classroomId
-    ? `/classrooms/${encodeURIComponent(classroomId)}?tab=classwork`
+    ? `/classrooms/${encodeURIComponent(classroomId)}?tab=labs`
     : "/labs";
   const hasDrawerSummary = Boolean(drawerSummary) || showLiveMetrics;
   const labDetails = getLabDetails(labId);

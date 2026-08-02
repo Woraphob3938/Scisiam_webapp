@@ -36,6 +36,7 @@ import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
 import ClassroomLabSubmissionDialog, {
+  ClassroomSubmissionImageGallery,
   ExperimentRunPreview,
 } from "@/components/classrooms/ClassroomLabSubmissionDialog";
 import {
@@ -851,9 +852,10 @@ function LabsPanel({
                 const submission = submissions.find((item) => item.assignmentId === assignment.id);
                 return !submission?.gradedAt;
               }) ?? matchingAssignments[0] ?? null;
+          const classroomLabHref = `/labs/${lab.id}/simulation?classroom=${encodeURIComponent(classroomId)}`;
           const labHref = labAssignment
-            ? `/labs/${lab.id}/simulation?classroom=${encodeURIComponent(classroomId)}&assignment=${encodeURIComponent(labAssignment.id)}`
-            : `/labs/${lab.id}/simulation`;
+            ? `${classroomLabHref}&assignment=${encodeURIComponent(labAssignment.id)}`
+            : classroomLabHref;
 
           return (
             <article key={lab.id} className="relative flex min-h-72 flex-col overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm transition-[border-color,box-shadow] duration-200 hover:border-slate-300 hover:shadow-md">
@@ -1412,7 +1414,7 @@ function SelectedFilesList({
             <button
               type="button"
               onClick={() => onRemove(index)}
-              className="grid size-7 shrink-0 place-items-center rounded-md text-slate-600 hover:bg-rose-50 hover:text-rose-600 focus:outline-none focus-visible:ring-3 focus-visible:ring-rose-100"
+              className="grid size-7 shrink-0 place-items-center rounded-md text-rose-700 hover:bg-rose-50 hover:text-rose-800 focus:outline-none focus-visible:ring-3 focus-visible:ring-rose-100"
               aria-label={`เอาไฟล์ ${file.name} ออก`}
             >
               <X className="size-3.5" aria-hidden="true" />
@@ -1498,7 +1500,7 @@ function SubmissionList({
         </ul>
       )}
       <Dialog open={Boolean(reviewing)} onOpenChange={(nextOpen) => !nextOpen && setReviewing(null)}>
-        <DialogContent className="max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-6xl overflow-y-auto">
+        <DialogContent className="max-h-[calc(100dvh-2rem)] w-[calc(100vw-1rem)] max-w-6xl overflow-y-auto sm:max-w-6xl">
           <DialogHeader>
             <DialogTitle>ตรวจผลการทดลอง</DialogTitle>
             <DialogDescription>
@@ -1507,6 +1509,12 @@ function SubmissionList({
           </DialogHeader>
           {isLoadingRun ? <p role="status" className="py-8 text-center text-sm font-semibold text-slate-600">กำลังโหลดผลการทดลอง...</p> : null}
           {run ? <ExperimentRunPreview run={run} /> : null}
+          {reviewing ? (
+            <ClassroomSubmissionImageGallery
+              attachments={reviewing.attachments}
+              heading="รูปภาพผลการทดลองที่นักเรียนแนบ"
+            />
+          ) : null}
           {reviewing?.note ? (
             <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
               <h3 className="text-sm font-extrabold text-slate-900">สรุปผลการทดลอง</h3>

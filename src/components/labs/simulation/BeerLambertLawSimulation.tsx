@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect, useRef, useMemo, useId } from "react";
 import {
   Sliders,
   Trash,
@@ -318,112 +318,115 @@ function TheoryPanel({
   );
 }
 
-function CuvetteScene({
+function SpectrophotometerScene({
   solute,
   wavelength,
   concentration,
   width,
-  absorbance,
+  measuredAbsorbance,
+  scanProgress,
+  isRunning,
 }: {
   solute: SoluteInfo;
   wavelength: number;
   concentration: number;
   width: number;
-  absorbance: number;
+  measuredAbsorbance: number;
+  scanProgress: number;
+  isRunning: boolean;
 }) {
+  const spectrumGradientId = useId();
+  const sampleGradientId = useId();
   const beamColor = wavelengthToRgb(wavelength);
-  
-  // Solution alpha reflects concentration
   const solutionAlpha = Math.min(0.9, 0.05 + concentration * 1.7);
   const solutionColor = solute.baseColor.replace("rgb", "rgba").replace(")", `, ${solutionAlpha})`);
-  
-  // Cuvette geometry based on width (1.0cm to 2.0cm, maps to 90px to 180px wide)
-  const cuvetteWidthPx = 80 + (width - 1.0) * 100;
-  const cuvetteXPx = 200 - cuvetteWidthPx / 2;
-
-  // Transmittance T = 10^-A
-  const transmittance = Math.pow(10, -absorbance);
+  const transmittance = Math.pow(10, -measuredAbsorbance);
+  const beamOpacity = isRunning || scanProgress >= 1 ? 0.92 : 0.18;
+  const detectorOpacity = Math.max(0.06, transmittance * beamOpacity);
+  const scanX = 60 + scanProgress * 424;
   
   return (
-    <div className="relative flex h-full min-h-[258px] items-center justify-center overflow-hidden rounded-2xl border border-cyan-100 bg-[linear-gradient(135deg,#f8fdff_0%,#f0fbff_48%,#fafdfc_100%)]">
-      <div className="absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:18px_18px] opacity-35" />
-      
-      <div className="absolute left-5 top-5 rounded-2xl border border-white/70 bg-white/75 px-3 py-1.5 text-left shadow-sm backdrop-blur">
-        <p className="text-[9px] font-black uppercase text-cyan-600">spectrophotometry path</p>
-        <p className="mt-0.5 text-xs font-black text-slate-700">จำลองการเคลื่อนที่ช่วงแสง</p>
-      </div>
+    <div
+      className="relative flex h-full min-h-[258px] items-center justify-center overflow-hidden bg-[linear-gradient(180deg,#f4fbff_0%,#e8f8ff_100%)]"
+      data-testid="spectrophotometry-scene"
+    >
+      <svg
+        className="h-full min-h-[258px] w-full"
+        viewBox="0 0 560 270"
+        role="img"
+        aria-labelledby="spectrophotometry-scene-title spectrophotometry-scene-desc"
+      >
+        <title id="spectrophotometry-scene-title">เครื่องสเปกโทรโฟโตมิเตอร์วัดความเข้มข้น</title>
+        <desc id="spectrophotometry-scene-desc">
+          แสงจากหลอดกำเนิดผ่านช่องแคบ ตัวแยกความยาวคลื่น คิวเวตต์สารละลาย และตัวตรวจจับเพื่อคำนวณค่าดูดกลืนแสง
+        </desc>
+        <defs>
+          <linearGradient id={spectrumGradientId} x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#6d28d9" />
+            <stop offset="22%" stopColor="#2563eb" />
+            <stop offset="42%" stopColor="#06b6d4" />
+            <stop offset="58%" stopColor="#22c55e" />
+            <stop offset="74%" stopColor="#facc15" />
+            <stop offset="88%" stopColor="#f97316" />
+            <stop offset="100%" stopColor="#dc2626" />
+          </linearGradient>
+          <linearGradient id={sampleGradientId} x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#ffffff" stopOpacity=".42" />
+            <stop offset="100%" stopColor={solutionColor} />
+          </linearGradient>
+        </defs>
 
-      <svg className="relative z-10 w-full max-w-[440px] h-60" viewBox="0 0 400 240">
-        {/* Light Source Box (Left) */}
-        <g transform="translate(15, 95)">
-          <rect x="0" y="0" width="55" height="50" rx="8" fill="#334155" stroke="#1e293b" strokeWidth="2.5" />
-          <circle cx="55" cy="25" r="8" fill="#facc15" />
-          <text x="27.5" y="30" fill="#ffffff" fontSize="9" fontWeight="900" textAnchor="middle">SOURCE</text>
+        <rect x="36" y="48" width="488" height="172" rx="28" fill="#fff" stroke="#bae6fd" strokeWidth="3" />
+        <path d="M56 190H504" stroke="#cbd5e1" strokeWidth="3" />
+
+        <g transform="translate(54 92)">
+          <rect width="76" height="78" rx="18" fill="#1e293b" />
+          <circle cx="38" cy="30" r="17" fill="#fef08a" stroke="#f59e0b" strokeWidth="4" />
+          <path d="M22 30H54M38 14V46M27 19L49 41M49 19L27 41" stroke="#fff7ed" strokeWidth="3" />
+          <text x="38" y="63" textAnchor="middle" fill="#e2e8f0" fontSize="9" fontWeight="900">หลอดกำเนิดแสง</text>
         </g>
 
-        {/* Detector Box (Right) */}
-        <g transform="translate(325, 95)">
-          <rect x="0" y="0" width="60" height="50" rx="8" fill="#475569" stroke="#334155" strokeWidth="2.5" />
-          <rect x="8" y="10" width="44" height="30" rx="4" fill="#0f172a" />
-          <text x="30" y="29" fill="#22c55e" fontSize="13" fontWeight="900" textAnchor="middle" className="font-mono">
-            {absorbance.toFixed(3)}
+        <rect x="145" y="98" width="10" height="66" rx="5" fill="#475569" />
+        <rect x="148" y="111" width="4" height="40" rx="2" fill={beamColor} opacity={beamOpacity} />
+
+        <g transform="translate(174 85)">
+          <rect width="92" height="92" rx="18" fill="#f8fafc" stroke="#94a3b8" strokeWidth="2" />
+          <path d="M31 66L46 21L62 66Z" fill={`url(#${spectrumGradientId})`} stroke="#64748b" strokeWidth="2" />
+          <text x="46" y="82" textAnchor="middle" fill="#475569" fontSize="9" fontWeight="900">MONOCHROMATOR</text>
+        </g>
+
+        <path d="M130 131H145M155 131H174M266 131H307" stroke={beamColor} strokeWidth="9" strokeLinecap="round" opacity={beamOpacity} />
+
+        <g transform="translate(307 68)">
+          <rect width="90" height="126" rx="10" fill="#fff" fillOpacity=".72" stroke="#0891b2" strokeWidth="3" />
+          <rect x="8" y="18" width="74" height="100" rx="6" fill={`url(#${sampleGradientId})`} />
+          <path d="M18 22V112" stroke="#fff" strokeWidth="3" strokeOpacity=".65" />
+          <circle cx="58" cy="70" r="4" fill="#fff" fillOpacity=".55" />
+          <circle cx="38" cy="96" r="3" fill="#fff" fillOpacity=".5" />
+          <text x="45" y="145" textAnchor="middle" fill="#0e7490" fontSize="10" fontWeight="900">คิวเวตต์ {width.toFixed(1)} cm</text>
+        </g>
+
+        <path d="M397 131H434" stroke={beamColor} strokeWidth="9" strokeLinecap="round" opacity={detectorOpacity} />
+
+        <g transform="translate(434 83)">
+          <rect width="72" height="96" rx="18" fill="#0f172a" stroke="#334155" strokeWidth="3" />
+          <rect x="10" y="14" width="52" height="48" rx="9" fill="#052e16" />
+          <text x="36" y="33" textAnchor="middle" fill="#86efac" fontSize="8" fontWeight="900">ABSORBANCE</text>
+          <text x="36" y="51" textAnchor="middle" fill="#dcfce7" fontSize="15" fontWeight="900">{measuredAbsorbance.toFixed(3)}</text>
+          <text x="36" y="80" textAnchor="middle" fill="#cbd5e1" fontSize="8" fontWeight="800">โฟโตไดโอด</text>
+        </g>
+
+        <rect x="120" y="24" width="320" height="10" rx="5" fill={`url(#${spectrumGradientId})`} />
+        <line x1={120 + ((wavelength - 380) / 400) * 320} y1="18" x2={120 + ((wavelength - 380) / 400) * 320} y2="40" stroke="#0f172a" strokeWidth="3" />
+        <text x="280" y="15" textAnchor="middle" fill="#475569" fontSize="10" fontWeight="900">เลือกความยาวคลื่น {wavelength} nm</text>
+
+        {isRunning && <circle cx={scanX} cy="131" r="7" fill={beamColor} stroke="#fff" strokeWidth="3" />}
+        <g transform="translate(44 232)">
+          <rect width="472" height="24" rx="12" fill="#e0f2fe" />
+          <rect width={472 * scanProgress} height="24" rx="12" fill="#38bdf8" />
+          <text x="236" y="16" textAnchor="middle" fill="#0c4a6e" fontSize="10" fontWeight="900">
+            {isRunning ? `กำลังสแกน ${Math.round(scanProgress * 100)}%` : scanProgress >= 1 ? "วัดค่าดูดกลืนแสงเสร็จแล้ว" : "พร้อมเริ่มสแกนตัวอย่าง"}
           </text>
-          <text x="30" y="8" fill="#cbd5e1" fontSize="7" fontWeight="bold" textAnchor="middle">Absorbance</text>
-        </g>
-
-        {/* Light Beam - Left (Source to Cuvette) */}
-        <line x1="78" y1="120" x2={cuvetteXPx} y2="120" stroke={beamColor} strokeWidth="15" strokeLinecap="round" opacity="0.95" />
-        
-        {/* Cuvette filled with chemical solute */}
-        <g transform={`translate(${cuvetteXPx}, 65)`}>
-          <rect x="0" y="0" width={cuvetteWidthPx} height="110" rx="4" fill="rgba(255,255,255,0.7)" stroke="#0891b2" strokeWidth="3" />
-          {/* Solution layer */}
-          <rect x="3" y="10" width={cuvetteWidthPx - 6} height="97" rx="2" fill={solutionColor} />
-          {/* Reflections */}
-          <line x1="8" y1="5" x2="8" y2="105" stroke="#ffffff" strokeWidth="1.5" opacity="0.3" />
-          <text x={cuvetteWidthPx / 2} y="118" fill="#0891b2" fontSize="9.5" fontWeight="900" textAnchor="middle">
-            b = {width.toFixed(1)} cm
-          </text>
-        </g>
-
-        {/* Light Beam - Right (Cuvette to Detector) - Dimmed based on Transmittance */}
-        <line
-          x1={cuvetteXPx + cuvetteWidthPx}
-          y1="120"
-          x2="322"
-          y2="120"
-          stroke={beamColor}
-          strokeWidth="15"
-          strokeLinecap="round"
-          opacity={Math.max(0.04, transmittance * 0.95)}
-        />
-        
-        {/* Molecular particle floatings */}
-        {concentration > 0 && (
-          <g className="animate-pulse" opacity="0.8">
-            <circle cx={cuvetteXPx + cuvetteWidthPx * 0.25} cy="90" r="3" fill="#ffffff" />
-            <circle cx={cuvetteXPx + cuvetteWidthPx * 0.65} cy="140" r="2.5" fill="#ffffff" />
-            <circle cx={cuvetteXPx + cuvetteWidthPx * 0.45} cy="115" r="2" fill="#ffffff" />
-          </g>
-        )}
-
-        {/* Spectrum line reference at bottom */}
-        <g transform="translate(100, 20)">
-          <text x="100" y="-8" fill="#64748b" fontSize="8" fontWeight="800" textAnchor="middle">ช่วงความยาวคลื่นวิเคราะห์</text>
-          <rect x="0" y="0" width="200" height="8" rx="4" fill="url(#spectrumGrad)" />
-          {/* Indicator slider line */}
-          <line x1={(wavelength - 380) / 400 * 200} y1="-3" x2={(wavelength - 380) / 400 * 200} y2="11" stroke="#334155" strokeWidth="2.5" />
-          <defs>
-            <linearGradient id="spectrumGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor={wavelengthToRgb(380)} />
-              <stop offset="15%" stopColor={wavelengthToRgb(440)} />
-              <stop offset="30%" stopColor={wavelengthToRgb(490)} />
-              <stop offset="45%" stopColor={wavelengthToRgb(510)} />
-              <stop offset="70%" stopColor={wavelengthToRgb(580)} />
-              <stop offset="85%" stopColor={wavelengthToRgb(645)} />
-              <stop offset="100%" stopColor={wavelengthToRgb(780)} />
-            </linearGradient>
-          </defs>
         </g>
       </svg>
     </div>
@@ -442,6 +445,8 @@ export default function BeerLambertLawSimulation() {
   const [isRunning, setIsRunning] = useState(false);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [dataPoints, setDataPoints] = useState<BeerLambertDataPoint[]>([]);
+  const [scanProgress, setScanProgress] = useState(0);
+  const [measuredAbsorbance, setMeasuredAbsorbance] = useState(0);
 
   // Quest tracker: reach Absorbance value of 0.80 - 1.20 with copper-sulfate solute
   const [questProgress, setQuestProgress] = useState(0);
@@ -457,23 +462,19 @@ export default function BeerLambertLawSimulation() {
   }, [epsilon, concentration, cuvetteWidth]);
 
   // Sync refs
-  const isRunningRef = useRef(isRunning);
   const elapsedRef = useRef(elapsedSeconds);
-  const soluteIdRef = useRef(selectedSoluteId);
-  const absRef = useRef(absorbance);
-  const questProgressRef = useRef(questProgress);
-  const questSuccessRef = useRef(questSuccess);
+  const scanProgressRef = useRef(0);
+  const scanSnapshotRef = useRef<BeerLambertDataPoint | null>(null);
 
-  useEffect(() => { isRunningRef.current = isRunning; }, [isRunning]);
   useEffect(() => { elapsedRef.current = elapsedSeconds; }, [elapsedSeconds]);
-  useEffect(() => { soluteIdRef.current = selectedSoluteId; }, [selectedSoluteId]);
-  useEffect(() => { absRef.current = absorbance; }, [absorbance]);
-  useEffect(() => { questProgressRef.current = questProgress; }, [questProgress]);
-  useEffect(() => { questSuccessRef.current = questSuccess; }, [questSuccess]);
 
   // Wavelength auto calibration peak button click handler
   const handleAutoCalibrate = () => {
     setWavelength(solute.peakWavelength);
+    setIsRunning(false);
+    setScanProgress(0);
+    setMeasuredAbsorbance(0);
+    scanProgressRef.current = 0;
   };
 
   // Main tick loop
@@ -481,51 +482,56 @@ export default function BeerLambertLawSimulation() {
     let timer: NodeJS.Timeout | null = null;
     if (isRunning) {
       timer = setInterval(() => {
-        const delta = 0.5;
-        const nextTime = elapsedRef.current + delta;
-        if (nextTime <= 100) {
-          setElapsedSeconds(nextTime);
-          elapsedRef.current = nextTime;
-        } else {
+        const snapshot = scanSnapshotRef.current;
+        if (!snapshot) return;
+
+        const nextProgress = Math.min(1, scanProgressRef.current + 0.04);
+        const easedProgress = 1 - (1 - nextProgress) ** 3;
+        const nextTime = nextProgress * 5;
+        scanProgressRef.current = nextProgress;
+        elapsedRef.current = nextTime;
+        setScanProgress(nextProgress);
+        setElapsedSeconds(nextTime);
+        setMeasuredAbsorbance(snapshot.absorbance * easedProgress);
+
+        if (nextProgress >= 1) {
+          setDataPoints((previous) => [
+            ...previous,
+            { ...snapshot, index: previous.length + 1 },
+          ]);
+          const reachedTarget = snapshot.soluteId === "copper-sulfate"
+            && snapshot.absorbance >= 0.8
+            && snapshot.absorbance <= 1.2;
+          setQuestProgress(reachedTarget ? 12 : 0);
+          setQuestSuccess(reachedTarget);
           setIsRunning(false);
-          isRunningRef.current = false;
         }
-
-        // Quest check: copper-sulfate and Absorbance in [0.80, 1.20] for 12 seconds
-        if (soluteIdRef.current === "copper-sulfate" && absRef.current >= 0.8 && absRef.current <= 1.2) {
-          const nextProg = Math.min(12, questProgressRef.current + delta);
-          setQuestProgress(nextProg);
-          questProgressRef.current = nextProg;
-
-          if (nextProg >= 12 && !questSuccessRef.current) {
-            setQuestSuccess(true);
-            questSuccessRef.current = true;
-          }
-        } else {
-          setQuestProgress(0);
-          questProgressRef.current = 0;
-        }
-      }, 500);
+      }, 100);
     }
     return () => { if (timer) clearInterval(timer); };
   }, [isRunning]);
 
   const handleStartStop = () => {
-    if (!isRunning) {
-      setDataPoints((previous) => [
-        ...previous,
-        {
-          index: previous.length + 1,
-          soluteId: solute.id,
-          soluteName: solute.formula,
-          wavelength,
-          concentration,
-          width: cuvetteWidth,
-          absorbance,
-        },
-      ]);
+    if (isRunning) {
+      setIsRunning(false);
+      return;
     }
-    setIsRunning(!isRunning);
+
+    scanSnapshotRef.current = {
+      index: 0,
+      soluteId: solute.id,
+      soluteName: solute.formula,
+      wavelength,
+      concentration,
+      width: cuvetteWidth,
+      absorbance,
+    };
+    scanProgressRef.current = 0;
+    elapsedRef.current = 0;
+    setScanProgress(0);
+    setMeasuredAbsorbance(0);
+    setElapsedSeconds(0);
+    setIsRunning(true);
   };
 
   const handleReset = () => {
@@ -536,7 +542,12 @@ export default function BeerLambertLawSimulation() {
     setConcentration(0.1);
     setCuvetteWidth(1.0);
     setQuestProgress(0);
+    setQuestSuccess(false);
     setDataPoints([]);
+    setScanProgress(0);
+    setMeasuredAbsorbance(0);
+    scanProgressRef.current = 0;
+    scanSnapshotRef.current = null;
   };
 
   const handleClearPoint = (idx: number) => {
@@ -600,6 +611,10 @@ export default function BeerLambertLawSimulation() {
                 setSelectedSoluteId(s.id);
                 // Auto set to peak wavelength to assist user
                 setWavelength(s.peakWavelength);
+                setIsRunning(false);
+                setScanProgress(0);
+                setMeasuredAbsorbance(0);
+                scanProgressRef.current = 0;
               }}
               className={`py-2 px-2.5 rounded-xl border text-[11px] font-black cursor-pointer text-center leading-[1.3] active:scale-95 transition-all ${
                 selectedSoluteId === s.id
@@ -622,9 +637,9 @@ export default function BeerLambertLawSimulation() {
 
   const compactControls = (
     <>
-      <CompactRangeControl label="ความยาวคลื่น" symbol="λ" value={wavelength} min={380} max={780} step={5} precision={0} unit="nm" tone="cyan" onChange={setWavelength} />
-      <CompactRangeControl label="ความเข้มข้น" symbol="c" value={concentration} min={0.01} max={0.5} step={0.01} precision={3} unit="M" tone="violet" onChange={setConcentration} />
-      <CompactRangeControl label="ความกว้างคิวเวตต์" symbol="b" value={cuvetteWidth} min={1} max={2} step={0.1} precision={1} unit="cm" tone="amber" onChange={setCuvetteWidth} />
+      <CompactRangeControl label="ความยาวคลื่น" symbol="λ" value={wavelength} min={380} max={780} step={5} precision={0} unit="nm" tone="cyan" onChange={(value) => { setWavelength(value); setIsRunning(false); setScanProgress(0); setMeasuredAbsorbance(0); scanProgressRef.current = 0; }} />
+      <CompactRangeControl label="ความเข้มข้น" symbol="c" value={concentration} min={0.01} max={0.5} step={0.01} precision={3} unit="M" tone="violet" onChange={(value) => { setConcentration(value); setIsRunning(false); setScanProgress(0); setMeasuredAbsorbance(0); scanProgressRef.current = 0; }} />
+      <CompactRangeControl label="ความกว้างคิวเวตต์" symbol="b" value={cuvetteWidth} min={1} max={2} step={0.1} precision={1} unit="cm" tone="amber" onChange={(value) => { setCuvetteWidth(value); setIsRunning(false); setScanProgress(0); setMeasuredAbsorbance(0); scanProgressRef.current = 0; }} />
     </>
   );
 
@@ -639,19 +654,21 @@ export default function BeerLambertLawSimulation() {
       icon={Sun}
       sceneTitle="เครื่องสเปกโทรโฟโตมิเตอร์จำลอง"
       scene={
-        <CuvetteScene
+        <SpectrophotometerScene
           solute={solute}
           wavelength={wavelength}
           concentration={concentration}
           width={cuvetteWidth}
-          absorbance={absorbance}
+          measuredAbsorbance={measuredAbsorbance}
+          scanProgress={scanProgress}
+          isRunning={isRunning}
         />
       }
       controlsTitle="แผงควบคุมสเปกโทรโฟโตมิเตอร์"
       controls={controls}
       compactControls={compactControls}
       metrics={[
-        { label: "ค่าดูดกลืนแสง A", value: `${absorbance.toFixed(3)} A`, tone: "rose" },
+        { label: "ค่าดูดกลืนแสง A", value: `${measuredAbsorbance.toFixed(3)} A`, tone: "rose" },
         { label: "ความเข้มข้น c", value: `${concentration.toFixed(3)} M`, tone: "cyan" },
         { label: "ความกว้าง cuvette b", value: `${cuvetteWidth.toFixed(1)} cm`, tone: "emerald" },
         { label: "ความยาวคลื่น λ", value: `${wavelength} nm`, tone: "orange" },
@@ -660,7 +677,7 @@ export default function BeerLambertLawSimulation() {
         <BeerLambertGraph
           dataPoints={dataPoints}
           currentConc={concentration}
-          currentAbs={absorbance}
+          currentAbs={measuredAbsorbance}
           maxAbs={2.0}
         />
       }

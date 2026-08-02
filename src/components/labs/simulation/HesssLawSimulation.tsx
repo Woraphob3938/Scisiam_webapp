@@ -43,6 +43,16 @@ const DH_REF = {
   3: -58.0,  // NaOH(aq) + HCl(aq) -> NaCl(aq) + H2O(l) (kJ/mol)
 };
 
+function computeTempAtTime(t: number, rxId: 1 | 2 | 3, mass: number, vol: number) {
+  const moles = mass / MOLAR_MASS_NAOH;
+  const qJ = moles * (-DH_REF[rxId]) * 1000;
+  const dTMax = qJ / (vol * SPECIFIC_HEAT);
+  const tRise = rxId === 2 ? 14 : 8;
+  const scale = (1 - Math.exp(-t / tRise)) * Math.exp(-t / 500);
+
+  return Number((25 + Math.max(0, dTMax * scale)).toFixed(2));
+}
+
 function EnthalpyGraph({
   livePoints,
   currentTemp,
@@ -264,77 +274,126 @@ function CalorimeterScene({
   tempC,
   elapsed,
   isRunning,
+  naohMass,
+  solutionVol,
 }: {
   reactionId: 1 | 2 | 3;
   tempC: number;
   elapsed: number;
   isRunning: boolean;
+  naohMass: number;
+  solutionVol: number;
 }) {
-  // Animating stirrer loop angle
-  const stirrerAngle = isRunning ? (elapsed * 300) % 360 : 0;
-  
-  // Height of thermometer red liquid (maps 20-60°C to 10-90px)
-  const thermoHeight = Math.min(80, Math.max(10, ((tempC - 20) / 40) * 70));
-
-  // NaOH fall anim
-  const pelletVisible = isRunning && elapsed < 8.0;
-  const pelletY = pelletVisible ? Math.min(105, 30 + elapsed * 20) : 0;
+  const thermometerHeight = Math.min(78, Math.max(12, ((tempC - 20) / 45) * 68));
+  const reactionProgress = Math.min(1, elapsed / 100);
+  const stirOffset = isRunning ? Math.sin(elapsed * 2.4) * 4 : 0;
+  const pelletY = 56 + Math.min(1, elapsed / 12) * 70;
+  const heatOpacity = Math.min(0.85, Math.max(0.08, (tempC - 25) / 28));
+  const equation = reactionId === 1
+    ? "NaOH(s) + HCl(aq) → NaCl(aq) + H₂O(l)"
+    : reactionId === 2
+      ? "NaOH(s) → Na⁺(aq) + OH⁻(aq)"
+      : "NaOH(aq) + HCl(aq) → NaCl(aq) + H₂O(l)";
+  const reactionLabel = reactionId === 1
+    ? "ปฏิกิริยารวม"
+    : reactionId === 2
+      ? "การละลาย NaOH"
+      : "การสะเทินกรด-เบส";
 
   return (
-    <div className="relative flex h-full min-h-[258px] items-center justify-center overflow-hidden rounded-2xl border border-orange-100 bg-[linear-gradient(135deg,#fffbf8_0%,#fff7f0_48%,#fffcfc_100%)]">
-      <div className="absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:18px_18px] opacity-35" />
-      
-      <div className="absolute left-5 top-5 rounded-2xl border border-white/70 bg-white/75 px-3 py-1.5 text-left shadow-sm backdrop-blur">
-        <p className="text-[9px] font-black uppercase text-orange-600">adiabatic calorimeter scene</p>
-        <p className="mt-0.5 text-xs font-black text-slate-700">จำลองถ้วยแคลอริมิเตอร์</p>
-      </div>
+    <div
+      className="relative flex h-full min-h-[258px] items-center justify-center overflow-hidden bg-[linear-gradient(180deg,#fffaf5_0%,#fff4e8_100%)]"
+      data-testid="hess-calorimeter-scene"
+    >
+      <svg
+        className="h-full min-h-[258px] w-full"
+        viewBox="0 0 560 270"
+        role="img"
+        aria-labelledby="hess-calorimeter-scene-title hess-calorimeter-scene-desc"
+      >
+        <title id="hess-calorimeter-scene-title">การวัดความร้อนเพื่อพิสูจน์กฎของเฮสส์</title>
+        <desc id="hess-calorimeter-scene-desc">
+          ถ้วยแคลอริมิเตอร์สองชั้นบรรจุสารละลาย มีการเติมโซเดียมไฮดรอกไซด์ กวนสาร และวัดอุณหภูมิที่เปลี่ยนไปเพื่อนำไปคำนวณเอนทัลปี
+        </desc>
 
-      <svg className="relative z-10 w-full max-w-[280px] h-56" viewBox="0 0 300 220">
-        {/* Outer Styrofoam Cup Calorimeter */}
-        <path d="M100 80 L115 180 C117 190 125 190 130 190 H170 C175 190 183 190 185 180 L200 80 Z" fill="#cbd5e1" stroke="#94a3b8" strokeWidth="3" />
-        {/* Lid */}
-        <rect x="92" y="70" width="116" height="12" rx="4" fill="#64748b" />
-        <rect x="120" y="62" width="60" height="8" rx="2" fill="#475569" />
+        <path d="M38 230H522" stroke="#cbd5e1" strokeWidth="3" />
+        <path d="M46 233H514V250H46Z" fill="#e2e8f0" />
 
-        {/* Liquid level */}
-        <path d="M105 105 L112 165 C113 172 121 172 123 172 H177 C179 172 187 172 188 165 L195 105 Z" fill="#38bdf8" opacity="0.45" />
-
-        {/* Stirrer (moving handle rod) */}
-        <g transform={`translate(${isRunning ? Math.sin(stirrerAngle * Math.PI / 180) * 3 : 0}, 0)`}>
-          <path d="M125 35 V140 H140" stroke="#475569" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+        <g transform="translate(38 34)">
+          <rect width="176" height="84" rx="20" fill="#fff" stroke="#fed7aa" strokeWidth="2" />
+          <text x="16" y="23" fill="#c2410c" fontSize="11" fontWeight="900">ขั้นที่ {reactionId} · {reactionLabel}</text>
+          <text x="16" y="45" fill="#334155" fontSize="10" fontWeight="800">{equation}</text>
+          <text x="16" y="68" fill="#64748b" fontSize="9" fontWeight="800">
+            {naohMass.toFixed(1)} g NaOH · {solutionVol.toFixed(0)} mL
+          </text>
         </g>
 
-        {/* Thermometer scale */}
-        <g transform="translate(165, 20)">
-          <rect x="5" y="0" width="12" height="110" rx="6" fill="#ffffff" stroke="#cbd5e1" strokeWidth="2.5" />
-          <circle cx="11" cy="115" r="14" fill="#ef4444" stroke="#cbd5e1" strokeWidth="2.5" />
-          {/* Active temperature level */}
-          <rect x="9" y={110 - thermoHeight} width="4" height={thermoHeight} rx="2" fill="#ef4444" />
-          <circle cx="11" cy="115" r="10" fill="#ef4444" />
-          {/* T-indicator */}
-          <text x="32" y="118" fill="#ef4444" fontSize="9.5" fontWeight="900">{tempC.toFixed(1)}°C</text>
+        <g transform="translate(55 146)">
+          <rect width="122" height="60" rx="18" fill="#fff" stroke="#fdba74" strokeWidth="2" />
+          <text x="16" y="23" fill="#9a3412" fontSize="10" fontWeight="900">สมการแคลอริมิเตอร์</text>
+          <text x="16" y="43" fill="#0f172a" fontSize="16" fontWeight="900">q = mcΔT</text>
+          <path d="M93 17C105 24 106 37 95 45" fill="none" stroke="#fb923c" strokeWidth="4" strokeLinecap="round" opacity={heatOpacity} />
         </g>
 
-        {/* Dropping reactant pellet */}
-        {pelletVisible && reactionId <= 2 && (
-          <g transform={`translate(112, ${pelletY})`}>
-            <rect x="0" y="0" width="10" height="7" rx="3" fill="#f8fafc" stroke="#cbd5e1" strokeWidth="1" />
-            <rect x="5" y="4" width="9" height="6" rx="2" fill="#e2e8f0" />
-          </g>
-        )}
+        <g transform="translate(238 35)">
+          <rect x="16" y="48" width="134" height="142" rx="24" fill="#e2e8f0" stroke="#64748b" strokeWidth="4" />
+          <rect x="27" y="58" width="112" height="121" rx="18" fill="#fff" stroke="#cbd5e1" strokeWidth="3" />
+          <path d="M30 108H136V167C136 175 130 180 122 180H44C36 180 30 175 30 167Z" fill="#fb923c" opacity=".34" />
+          <path d="M30 108C57 101 109 101 136 108" fill="none" stroke="#f97316" strokeWidth="3" />
+          <rect x="6" y="38" width="154" height="20" rx="8" fill="#475569" />
+          <rect x="48" y="29" width="70" height="10" rx="4" fill="#64748b" />
 
-        {/* Bubbles in liquid indicating reaction */}
-        {isRunning && elapsed > 5.0 && elapsed < 40.0 && (
-          <g className="animate-pulse" opacity="0.8">
-            <circle cx="120" cy="130" r="2" fill="#ffffff" />
-            <circle cx="140" cy="145" r="1.5" fill="#ffffff" />
-            <circle cx="112" cy="150" r="2.5" fill="#ffffff" />
-            <circle cx="150" cy="120" r="1.5" fill="#ffffff" />
+          <g transform={`translate(${stirOffset} 0)`}>
+            <path d="M55 12V145H72" fill="none" stroke="#475569" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+            <circle cx="55" cy="12" r="7" fill="#94a3b8" />
           </g>
-        )}
 
-        <text x="150" y="212" fill="#64748b" fontSize="8" fontWeight="800" textAnchor="middle">
-          {isRunning ? "กำลังวัดปฏิกิริยา..." : "พร้อมเริ่มกดบันทึก"}
+          <g transform="translate(100 8)">
+            <rect x="7" width="14" height="119" rx="7" fill="#fff" stroke="#94a3b8" strokeWidth="2.5" />
+            <rect x="12" y={111 - thermometerHeight} width="4" height={thermometerHeight} rx="2" fill="#ef4444" />
+            <circle cx="14" cy="119" r="13" fill="#ef4444" stroke="#94a3b8" strokeWidth="2.5" />
+            <path d="M22 24H29M22 43H27M22 62H29M22 81H27" stroke="#94a3b8" strokeWidth="2" />
+          </g>
+
+          {isRunning && elapsed < 12 && (
+            <g transform={`translate(74 ${pelletY})`}>
+              <rect width="13" height="8" rx="3" fill="#fff" stroke="#94a3b8" />
+              <rect x="8" y="5" width="11" height="7" rx="3" fill="#e2e8f0" stroke="#94a3b8" />
+            </g>
+          )}
+
+          {isRunning && reactionProgress > 0.08 && (
+            <g fill="#fff" opacity={0.45 + reactionProgress * 0.4}>
+              <circle cx="52" cy={156 - (elapsed * 2) % 40} r="3" />
+              <circle cx="78" cy={151 - (elapsed * 1.7) % 34} r="2.5" />
+              <circle cx="113" cy={159 - (elapsed * 2.3) % 44} r="3.5" />
+            </g>
+          )}
+        </g>
+
+        <g transform="translate(411 57)">
+          <rect width="112" height="90" rx="20" fill="#172033" stroke="#475569" strokeWidth="3" />
+          <text x="56" y="24" textAnchor="middle" fill="#fb923c" fontSize="9" fontWeight="900">TEMPERATURE</text>
+          <rect x="15" y="33" width="82" height="32" rx="9" fill="#052e16" />
+          <text x="56" y="55" textAnchor="middle" fill="#86efac" fontSize="18" fontWeight="900">{tempC.toFixed(1)}°C</text>
+          <circle cx="22" cy="76" r="4" fill={isRunning ? "#22c55e" : "#94a3b8"} />
+          <text x="33" y="80" fill="#cbd5e1" fontSize="9" fontWeight="800">
+            {isRunning ? "กำลังบันทึก" : elapsed >= 100 ? "วัดเสร็จแล้ว" : "พร้อมวัด"}
+          </text>
+        </g>
+
+        <g opacity={heatOpacity}>
+          <path d="M407 169C419 158 419 145 407 134" fill="none" stroke="#f97316" strokeWidth="5" strokeLinecap="round" />
+          <path d="M426 178C442 162 442 142 428 127" fill="none" stroke="#fb923c" strokeWidth="4" strokeLinecap="round" />
+          <path d="M445 184C464 164 463 138 448 119" fill="none" stroke="#fdba74" strokeWidth="3" strokeLinecap="round" />
+        </g>
+
+        <text x="280" y="220" textAnchor="middle" fill="#475569" fontSize="10" fontWeight="900">
+          {isRunning
+            ? `กำลังเก็บกราฟอุณหภูมิ ${Math.round(reactionProgress * 100)}%`
+            : elapsed >= 100
+              ? "วัดอุณหภูมิสูงสุดและคำนวณ ΔH แล้ว"
+              : "เลือกขั้นปฏิกิริยาแล้วเริ่มทดลอง"}
         </text>
       </svg>
     </div>
@@ -362,15 +421,14 @@ export default function HesssLawSimulation() {
   const [questSuccess, setQuestSuccess] = useState(false);
 
   // Refs
-  const isRunningRef = useRef(isRunning);
   const elapsedRef = useRef(elapsedSeconds);
   const rxIdRef = useRef(reactionId);
   const massRef = useRef(naohMass);
   const volRef = useRef(solutionVol);
   const runsRef = useRef(completedRuns);
+  const livePointsRef = useRef<CalorimetryDataPoint[]>([]);
   const questSuccessRef = useRef(questSuccess);
 
-  useEffect(() => { isRunningRef.current = isRunning; }, [isRunning]);
   useEffect(() => { elapsedRef.current = elapsedSeconds; }, [elapsedSeconds]);
   useEffect(() => { rxIdRef.current = reactionId; }, [reactionId]);
   useEffect(() => { massRef.current = naohMass; }, [naohMass]);
@@ -394,26 +452,6 @@ export default function HesssLawSimulation() {
     }
   }, []);
 
-  // Compute temperature rising profile
-  // T(t) = T0 + dT * (1 - exp(-t / trise)) * exp(-t / tfall)
-  const computeTempAtTime = (t: number, rxId: 1 | 2 | 3, mass: number, vol: number) => {
-    const moles = mass / MOLAR_MASS_NAOH;
-    const dh = DH_REF[rxId];
-    const qJ = moles * (-dh) * 1000; // reaction heat in J
-    
-    // dT max = q / (mass_water * c_water)
-    const massWater = vol; // density approx 1g/mL
-    const dTMax = qJ / (massWater * SPECIFIC_HEAT);
-    
-    const tRise = rxId === 2 ? 14.0 : 8.0; // Solid dissolution takes longer than neutralization
-    const tFall = 500.0;
-    
-    const scale = (1 - Math.exp(-t / tRise)) * Math.exp(-t / tFall);
-    const riseVal = dTMax * scale;
-    
-    return parseFloat((25.0 + Math.max(0, riseVal)).toFixed(2));
-  };
-
   // Main tick loop
   useEffect(() => {
     let timer: NodeJS.Timeout | null = null;
@@ -421,76 +459,65 @@ export default function HesssLawSimulation() {
       timer = setInterval(() => {
         const delta = 1.0;
         const nextTime = elapsedRef.current + delta;
-        
-        if (nextTime <= 100) {
-          setElapsedSeconds(nextTime);
-          elapsedRef.current = nextTime;
-          
-          const currentT = computeTempAtTime(nextTime, rxIdRef.current, massRef.current, volRef.current);
-          setTempC(currentT);
-          setLivePoints((prev) => [...prev, { time: nextTime, temperature: currentT }]);
-        } else {
-          // Simulation ended
-          setIsRunning(false);
-          isRunningRef.current = false;
-          
-          // Calculate final enthalpy of the run
-          const rxId = rxIdRef.current;
-          const mass = massRef.current;
-          const vol = volRef.current;
-          
-          const finalT = computeTempAtTime(100, rxId, mass, vol);
-          const maxT = Math.max(...livePoints.map((p) => p.temperature), finalT);
-          const dT = maxT - 25.0;
-          
-          const moles = mass / MOLAR_MASS_NAOH;
-          const qJ = vol * SPECIFIC_HEAT * dT;
-          const dhRun = -(qJ / 1000) / moles; // kJ/mol
+        const rxId = rxIdRef.current;
+        const mass = massRef.current;
+        const vol = volRef.current;
+        const currentT = computeTempAtTime(nextTime, rxId, mass, vol);
+        const nextPoint = { time: nextTime, temperature: currentT };
+        const nextPoints = [...livePointsRef.current, nextPoint].slice(-101);
 
-          const newRun: HessReactionRun = {
-            reactionId: rxId,
-            reactionName: rxId === 1 
-              ? "NaOH(s) + HCl(aq) -> NaCl(aq) + H2O(l)" 
-              : rxId === 2 
-              ? "NaOH(s) + H2O -> NaOH(aq)" 
+        elapsedRef.current = nextTime;
+        livePointsRef.current = nextPoints;
+        setElapsedSeconds(nextTime);
+        setTempC(currentT);
+        setLivePoints(nextPoints);
+
+        if (nextTime < 100) return;
+
+        setIsRunning(false);
+        const maxT = Math.max(...nextPoints.map((point) => point.temperature));
+        const dT = maxT - 25;
+        const moles = mass / MOLAR_MASS_NAOH;
+        const qJ = vol * SPECIFIC_HEAT * dT;
+        const dhRun = -(qJ / 1000) / moles;
+        const newRun: HessReactionRun = {
+          reactionId: rxId,
+          reactionName: rxId === 1
+            ? "NaOH(s) + HCl(aq) -> NaCl(aq) + H2O(l)"
+            : rxId === 2
+              ? "NaOH(s) + H2O -> NaOH(aq)"
               : "NaOH(aq) + HCl(aq) -> NaCl(aq) + H2O(l)",
-            naohMass: mass,
-            naohMoles: moles,
-            solutionVol: vol,
-            tempInitial: 25.0,
-            tempFinal: maxT,
-            deltaTemp: dT,
-            enthalpyKJ: dhRun,
-          };
+          naohMass: mass,
+          naohMoles: moles,
+          solutionVol: vol,
+          tempInitial: 25,
+          tempFinal: maxT,
+          deltaTemp: dT,
+          enthalpyKJ: dhRun,
+        };
+        const nextRuns = [
+          ...runsRef.current.filter((run) => run.reactionId !== rxId),
+          newRun,
+        ].sort((a, b) => a.reactionId - b.reactionId);
 
-          const currentRuns = runsRef.current;
-          const nextRuns = [...currentRuns.filter((r) => r.reactionId !== rxId), newRun].sort((a, b) => a.reactionId - b.reactionId);
+        runsRef.current = nextRuns;
+        setCompletedRuns(nextRuns);
 
-          setCompletedRuns(nextRuns);
-          
-          alert(`การทดลองขั้นที่ ${rxId} เสร็จสมบูรณ์!\nอุณหภูมิขึ้นสูงสุด: ${maxT.toFixed(1)}°C (ΔT = +${dT.toFixed(1)}°C)\nคำนวณ Enthalpy ได้: ${dhRun.toFixed(1)} kJ/mol`);
-
-          // Check Hess's law validation quest
-          const run1 = nextRuns.find((r) => r.reactionId === 1);
-          const run2 = nextRuns.find((r) => r.reactionId === 2);
-          const run3 = nextRuns.find((r) => r.reactionId === 3);
-
-          if (run1 && run2 && run3 && !questSuccessRef.current) {
-            const sum = run2.enthalpyKJ + run3.enthalpyKJ;
-            const error = Math.abs((run1.enthalpyKJ - sum) / run1.enthalpyKJ) * 100;
-            if (error < 5.0) {
-              setQuestSuccess(true);
-              questSuccessRef.current = true;
-              setTimeout(() => {
-                alert("🎉 สุดยอดมาก! คุณพิสูจน์กฎของเฮสส์ได้ถูกต้องโดยมีความคลาดเคลื่อนสะสมไม่ถึง 5.0% บันทึกผลเพื่อเก็บความคืบหน้า");
-              }, 150);
-            }
+        const run1 = nextRuns.find((run) => run.reactionId === 1);
+        const run2 = nextRuns.find((run) => run.reactionId === 2);
+        const run3 = nextRuns.find((run) => run.reactionId === 3);
+        if (run1 && run2 && run3 && !questSuccessRef.current) {
+          const sum = run2.enthalpyKJ + run3.enthalpyKJ;
+          const error = Math.abs((run1.enthalpyKJ - sum) / run1.enthalpyKJ) * 100;
+          if (error < 5) {
+            questSuccessRef.current = true;
+            setQuestSuccess(true);
           }
         }
       }, 100);
     }
     return () => { if (timer) clearInterval(timer); };
-  }, [isRunning, livePoints]);
+  }, [isRunning]);
 
   const handleStartStop = () => {
     if (isRunning) {
@@ -499,7 +526,10 @@ export default function HesssLawSimulation() {
       setIsRunning(true);
       setElapsedSeconds(0);
       setTempC(25.0);
-      setLivePoints([{ time: 0, temperature: 25.0 }]);
+      const initialPoints = [{ time: 0, temperature: 25 }];
+      elapsedRef.current = 0;
+      livePointsRef.current = initialPoints;
+      setLivePoints(initialPoints);
     }
   };
 
@@ -511,10 +541,21 @@ export default function HesssLawSimulation() {
     setNaohMass(2.0);
     setSolutionVol(100.0);
     setLivePoints([]);
+    elapsedRef.current = 0;
+    livePointsRef.current = [];
   };
 
   const handleClearRun = (rId: 1 | 2 | 3) => {
     setCompletedRuns((prev) => prev.filter((r) => r.reactionId !== rId));
+  };
+
+  const resetCurrentMeasurement = () => {
+    setIsRunning(false);
+    setElapsedSeconds(0);
+    setTempC(25);
+    setLivePoints([]);
+    elapsedRef.current = 0;
+    livePointsRef.current = [];
   };
 
   const handleExportCSV = () => {
@@ -581,12 +622,16 @@ export default function HesssLawSimulation() {
           {([1, 2, 3] as const).map((rId) => (
             <button
               key={rId}
-              onClick={() => setReactionId(rId)}
+              onClick={() => {
+                setReactionId(rId);
+                resetCurrentMeasurement();
+              }}
+              disabled={isRunning}
               className={`py-1.5 px-2.5 rounded-xl border text-[11px] font-black cursor-pointer text-left leading-[1.3] active:scale-95 transition-all ${
                 reactionId === rId
                   ? "bg-orange-500 border-orange-500 text-white shadow-sm"
                   : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50"
-              }`}
+              } disabled:cursor-not-allowed disabled:opacity-60`}
             >
               <div>ขั้นที่ {rId} {rId === 1 ? "(โดยตรง)" : rId === 2 ? "(ละลาย)" : "(สะเทิน)"}</div>
               <div className="text-[9px] opacity-75">
@@ -606,8 +651,36 @@ export default function HesssLawSimulation() {
 
   const compactControls = (
     <>
-      <CompactRangeControl label="มวล NaOH" symbol="m" value={naohMass} min={1} max={4} step={0.5} precision={1} unit="g" tone="orange" onChange={setNaohMass} />
-      <CompactRangeControl label="ปริมาตรสารละลาย" symbol="V" value={solutionVol} min={50} max={150} step={10} precision={0} unit="mL" tone="violet" onChange={setSolutionVol} />
+      <CompactRangeControl
+        label="มวล NaOH"
+        symbol="m"
+        value={naohMass}
+        min={1}
+        max={4}
+        step={0.5}
+        precision={1}
+        unit="g"
+        tone="orange"
+        onChange={(value) => {
+          setNaohMass(value);
+          resetCurrentMeasurement();
+        }}
+      />
+      <CompactRangeControl
+        label="ปริมาตรสารละลาย"
+        symbol="V"
+        value={solutionVol}
+        min={50}
+        max={150}
+        step={10}
+        precision={0}
+        unit="mL"
+        tone="violet"
+        onChange={(value) => {
+          setSolutionVol(value);
+          resetCurrentMeasurement();
+        }}
+      />
     </>
   );
 
@@ -627,6 +700,8 @@ export default function HesssLawSimulation() {
           tempC={tempC}
           elapsed={elapsedSeconds}
           isRunning={isRunning}
+          naohMass={naohMass}
+          solutionVol={solutionVol}
         />
       }
       controlsTitle="แผงควบคุมแคลอริมิเตอร์"

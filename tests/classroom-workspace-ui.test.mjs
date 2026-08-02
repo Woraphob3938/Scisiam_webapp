@@ -148,19 +148,34 @@ test("lab assignments require a selected lab, max score, saved run, and conclusi
   assert.match(labSubmissionDialogSource, /minLength=\{5\}/);
   assert.match(labSubmissionDialogSource, /maxLength=\{1000\}/);
   assert.match(labSubmissionDialogSource, /5-1,000 ตัวอักษร/);
-  assert.match(labSubmissionDialogSource, /max-w-6xl/);
+  assert.match(labSubmissionDialogSource, /sm:max-w-6xl/);
   assert.match(labSubmissionDialogSource, /snapshotUrl/);
   assert.match(labSubmissionDialogSource, /ภาพหน้าการทดลอง/);
   assert.match(labSubmissionDialogSource, /lg:grid-cols/);
-  assert.match(source, /max-w-6xl/);
+  assert.match(source, /sm:max-w-6xl/);
+});
+
+test("lab submissions accept real images and show them in teacher review", () => {
+  assert.match(labSubmissionDialogSource, /accept="image\/jpeg,image\/png,image\/webp"/);
+  assert.match(labSubmissionDialogSource, /attachmentFiles: imageFiles/);
+  assert.match(labSubmissionDialogSource, /ClassroomSubmissionImageGallery/);
+  assert.match(labSubmissionDialogSource, /ไม่เกิน 10 MB ต่อรูป/);
+  assert.match(labSubmissionDialogSource, /type="file"[\s\S]*?disabled=\{isSubmitting\}/);
+  assert.match(labSubmissionDialogSource, /โหลดรูปภาพที่แนบไม่สำเร็จ กรุณาปิดแล้วเปิดหน้าตรวจอีกครั้ง/);
+  assert.match(source, /ClassroomSubmissionImageGallery/);
+  assert.match(source, /รูปภาพผลการทดลองที่นักเรียนแนบ/);
+  assert.match(source, /attachments=\{reviewing\.attachments\}/);
 });
 
 test("classroom lab cards keep one clear entry action without redundant readiness badges", () => {
   assert.doesNotMatch(source, /readiness\.label/);
   assert.match(source, /lab\.description/);
   assert.match(source, /\? "ทดลองและส่งงาน" : "ทดลอง"/);
-  assert.match(source, /`\/labs\/\$\{lab\.id\}\/simulation/);
-  assert.match(source, /classroom=\$\{encodeURIComponent\(classroomId\)\}/);
+  assert.match(
+    source,
+    /const classroomLabHref = `\/labs\/\$\{lab\.id\}\/simulation\?classroom=\$\{encodeURIComponent\(classroomId\)\}`/,
+  );
+  assert.match(source, /: classroomLabHref/);
   assert.match(source, /assignment=\$\{encodeURIComponent\(labAssignment\.id\)\}/);
 });
 

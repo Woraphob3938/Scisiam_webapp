@@ -33,7 +33,8 @@ test("lab navigation links have visible button affordances", () => {
 
   assert.match(hero, /href="\/labs"[\s\S]*?border-slate-200[\s\S]*?bg-white[\s\S]*?กลับไปหน้ารายชื่อห้องแล็บ/);
   assert.match(shell, /href=\{exitHref\}[\s\S]*?border[\s\S]*?bg-white[\s\S]*?ออกจากแล็บ/);
-  assert.match(shell, /searchParams\.get\("classroom"\)[\s\S]*?tab=classwork/);
+  assert.match(shell, /searchParams\.get\("classroom"\)[\s\S]*?tab=labs/);
+  assert.doesNotMatch(shell, /tab=classwork/);
   assert.doesNotMatch(shell, /รายละเอียดแล็บ/);
 });
 

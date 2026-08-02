@@ -297,6 +297,16 @@ test("classroom client wires experiment runs and grading through guarded RPCs", 
   assert.match(source, /snapshotUrl/);
 });
 
+test("classroom submission updates preserve stored attachments until replacements succeed", () => {
+  const source = fs.readFileSync(path.join(root, "src", "lib", "supabase", "classrooms.ts"), "utf8");
+
+  assert.match(source, /const existingAttachments = existingSubmission/);
+  assert.match(source, /normalizeStoredAttachments\(existingSubmission\.attachments\)/);
+  assert.match(source, /const nextAttachments = uploaded\.length > 0 \? uploaded : existingAttachments/);
+  assert.match(source, /p_attachments: nextAttachments\.map\(toAttachmentJson\)/);
+  assert.match(source, /if \(existingSubmission && uploaded\.length > 0\)/);
+});
+
 test("classroom client exposes owner actions, assignments, and creator names", () => {
   const source = fs.readFileSync(
     path.join(root, "src", "lib", "supabase", "classrooms.ts"),

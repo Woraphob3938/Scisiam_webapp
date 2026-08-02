@@ -617,7 +617,8 @@ test("shared shell keeps results and exit actions inside the simulation workflow
   assert.match(source, /บันทึกผล/);
   assert.match(source, /ออกจากแล็บ/);
   assert.match(source, /searchParams\.get\("classroom"\)/);
-  assert.match(source, /tab=classwork/);
+  assert.match(source, /tab=labs/);
+  assert.doesNotMatch(source, /tab=classwork/);
   assert.doesNotMatch(source, /\{ key: "results", label: "ผลการทดลอง"/);
 });
 

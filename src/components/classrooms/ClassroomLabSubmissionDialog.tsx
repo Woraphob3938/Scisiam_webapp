@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ClipboardCheck, FlaskConical, Upload } from "lucide-react";
+import { ClipboardCheck, FlaskConical, ImagePlus, Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -20,8 +20,18 @@ import {
   type ClassroomAssignment,
   type ClassroomAssignmentSubmission,
   type ClassroomExperimentRun,
+  type ClassroomFileAttachment,
   type SubmitClassroomAssignmentInput,
 } from "@/lib/supabase/classrooms";
+
+const MAX_LAB_SUBMISSION_IMAGES = 10;
+const MAX_LAB_SUBMISSION_IMAGE_BYTES = 10 * 1024 * 1024;
+const LAB_SUBMISSION_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
+
+type SelectedSubmissionImage = {
+  file: File;
+  previewUrl: string;
+};
 
 type ClassroomLabSubmissionDialogProps = {
   assignment: ClassroomAssignment;
@@ -44,7 +54,12 @@ export default function ClassroomLabSubmissionDialog({
   const [runs, setRuns] = useState<ClassroomExperimentRun[]>([]);
   const [selectedRunId, setSelectedRunId] = useState(existingSubmission?.experimentRunId ?? "");
   const [conclusion, setConclusion] = useState(existingSubmission?.note ?? "");
+  const [selectedImages, setSelectedImages] = useState<SelectedSubmissionImage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const imageInputId = useId();
+  const imageHelpId = `${imageInputId}-help`;
+  const previewUrlsRef = useRef(new Set<string>());
+  const imageFiles = selectedImages.map((image) => image.file);
   const selectedRun = runs.find((run) => run.id === selectedRunId) ?? null;
   const isGraded = Boolean(existingSubmission?.gradedAt);
   const resolvedSimulationHref = simulationHref ?? (assignment.labId
@@ -69,6 +84,61 @@ export default function ClassroomLabSubmissionDialog({
     };
   }, [assignment.labId, open]);
 
+  useEffect(() => () => {
+    previewUrlsRef.current.forEach((previewUrl) => URL.revokeObjectURL(previewUrl));
+    previewUrlsRef.current.clear();
+  }, []);
+
+  function selectSubmissionImages(files: File[]) {
+    const uniqueFiles = files.filter((file, index) => {
+      const key = `${file.name}:${file.size}:${file.lastModified}`;
+      return files.findIndex((candidate) => `${candidate.name}:${candidate.size}:${candidate.lastModified}` === key) === index
+        && !selectedImages.some((image) => `${image.file.name}:${image.file.size}:${image.file.lastModified}` === key);
+    });
+
+    const unsupportedFile = uniqueFiles.find((file) => !LAB_SUBMISSION_IMAGE_TYPES.has(file.type));
+    if (unsupportedFile) {
+      toast.error(`รูป ${unsupportedFile.name || "ที่เลือก"} ไม่ใช่ JPG, PNG หรือ WebP`);
+      return;
+    }
+
+    const emptyFile = uniqueFiles.find((file) => file.size <= 0);
+    if (emptyFile) {
+      toast.error(`รูป ${emptyFile.name || "ที่เลือก"} ไม่มีข้อมูล กรุณาเลือกรูปใหม่`);
+      return;
+    }
+
+    const oversizedFile = uniqueFiles.find((file) => file.size > MAX_LAB_SUBMISSION_IMAGE_BYTES);
+    if (oversizedFile) {
+      toast.error(`รูป ${oversizedFile.name || "ที่เลือก"} มีขนาดเกิน 10 MB กรุณาลดขนาดแล้วเลือกใหม่`);
+      return;
+    }
+
+    if (selectedImages.length + uniqueFiles.length > MAX_LAB_SUBMISSION_IMAGES) {
+      toast.error("แนบรูปได้ไม่เกิน 10 รูปต่อการส่งหนึ่งครั้ง");
+      return;
+    }
+
+    const nextImages = uniqueFiles.map((file) => {
+      const previewUrl = URL.createObjectURL(file);
+      previewUrlsRef.current.add(previewUrl);
+      return { file, previewUrl };
+    });
+    setSelectedImages((current) => [...current, ...nextImages]);
+  }
+
+  function removeSelectedImage(previewUrl: string) {
+    URL.revokeObjectURL(previewUrl);
+    previewUrlsRef.current.delete(previewUrl);
+    setSelectedImages((current) => current.filter((image) => image.previewUrl !== previewUrl));
+  }
+
+  function clearSelectedImages() {
+    previewUrlsRef.current.forEach((previewUrl) => URL.revokeObjectURL(previewUrl));
+    previewUrlsRef.current.clear();
+    setSelectedImages([]);
+  }
+
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const saved = await onSubmit({
@@ -77,9 +147,12 @@ export default function ClassroomLabSubmissionDialog({
       experimentRunId: selectedRunId,
       note: conclusion,
       linkUrls: "",
-      attachmentFiles: [],
+      attachmentFiles: imageFiles,
     });
-    if (saved) setOpen(false);
+    if (saved) {
+      clearSelectedImages();
+      setOpen(false);
+    }
   }
 
   const statusText = isGraded
@@ -127,7 +200,7 @@ export default function ClassroomLabSubmissionDialog({
       </button>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-h-[calc(100dvh-1rem)] w-[calc(100vw-1rem)] max-w-6xl overflow-y-auto p-0">
+        <DialogContent className="max-h-[calc(100dvh-1rem)] w-[calc(100vw-1rem)] max-w-6xl overflow-y-auto p-0 sm:max-w-6xl">
           <DialogHeader className="border-b border-slate-100 px-5 py-4 pr-12 sm:px-6">
             <DialogTitle>ส่งผลการทดลอง</DialogTitle>
             <DialogDescription>{assignment.title} · คะแนนเต็ม {assignment.maxScore}</DialogDescription>
@@ -178,6 +251,78 @@ export default function ClassroomLabSubmissionDialog({
               ))}
             </fieldset>
             {selectedRun ? <ExperimentRunPreview run={selectedRun} simulationHref={resolvedSimulationHref} /> : null}
+            <fieldset className="grid min-w-0 gap-3">
+              <legend className="text-sm font-extrabold text-slate-900">
+                รูปภาพผลการทดลอง <span className="font-semibold text-slate-500">(ไม่บังคับ)</span>
+              </legend>
+              <p id={imageHelpId} className="text-xs font-semibold leading-relaxed text-slate-600">
+                แนบภาพจากการทดลองจริงได้สูงสุด 10 รูป รองรับ JPG, PNG และ WebP ไม่เกิน 10 MB ต่อรูป
+              </p>
+              <label
+                htmlFor={imageInputId}
+                className={`inline-flex min-h-11 w-fit items-center justify-center gap-2 whitespace-nowrap rounded-lg border px-4 text-sm font-extrabold transition-colors focus-within:ring-3 focus-within:ring-blue-100 ${isSubmitting ? "cursor-not-allowed border-blue-100 bg-blue-50 text-blue-700 opacity-50" : "cursor-pointer border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 active:bg-blue-200"}`}
+              >
+                <ImagePlus className="size-4" aria-hidden="true" />
+                {selectedImages.length > 0 ? "เพิ่มรูปอีก" : "เลือกรูปภาพ"}
+                <input
+                  id={imageInputId}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  multiple
+                  disabled={isSubmitting}
+                  aria-describedby={imageHelpId}
+                  onChange={(event) => {
+                    selectSubmissionImages(Array.from(event.currentTarget.files ?? []));
+                    event.currentTarget.value = "";
+                  }}
+                  className="sr-only"
+                />
+              </label>
+              {selectedImages.length > 0 ? (
+                <ul className="grid min-w-0 gap-3 sm:grid-cols-2" aria-label="รูปภาพที่เลือกสำหรับส่ง">
+                  {selectedImages.map(({ file, previewUrl }) => (
+                    <li key={previewUrl} className="min-w-0 overflow-hidden rounded-xl border border-slate-200 bg-white">
+                      <Image
+                        src={previewUrl}
+                        alt={`ตัวอย่างรูป ${file.name}`}
+                        width={640}
+                        height={420}
+                        unoptimized
+                        className="aspect-video h-auto w-full bg-slate-50 object-contain"
+                      />
+                      <div className="flex min-w-0 items-center gap-2 p-3">
+                        <span className="min-w-0 flex-1 truncate text-xs font-bold text-slate-700">{file.name}</span>
+                        <span className="shrink-0 text-xs font-semibold text-slate-500">
+                          {(file.size / (1024 * 1024)).toFixed(1)} MB
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => removeSelectedImage(previewUrl)}
+                          disabled={isSubmitting}
+                          className="grid size-11 shrink-0 place-items-center rounded-lg text-rose-700 hover:bg-rose-50 hover:text-rose-800 active:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus-visible:ring-3 focus-visible:ring-rose-100"
+                          aria-label={`นำรูป ${file.name} ออก`}
+                        >
+                          <Trash2 className="size-4" aria-hidden="true" />
+                        </button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+              {existingSubmission?.attachments.length ? (
+                <>
+                  {selectedImages.length > 0 ? (
+                    <p className="text-xs font-semibold leading-relaxed text-amber-800">
+                      รูปใหม่จะแทนที่รูปที่ส่งไว้เมื่อกดส่งผลการทดลอง
+                    </p>
+                  ) : null}
+                  <ClassroomSubmissionImageGallery
+                    attachments={existingSubmission.attachments}
+                    heading="รูปภาพที่ส่งไว้"
+                  />
+                </>
+              ) : null}
+            </fieldset>
             <label className="grid gap-2 text-sm font-extrabold text-slate-900">
               สรุปผลการทดลอง <span className="text-xs font-semibold text-slate-500">5-1,000 ตัวอักษร</span>
               <textarea
@@ -192,15 +337,15 @@ export default function ClassroomLabSubmissionDialog({
               />
             </label>
             <DialogFooter>
-              <button type="button" onClick={() => setOpen(false)} className="min-h-11 rounded-lg border border-slate-300 px-4 font-extrabold text-slate-700">
-                ยกเลิก
-              </button>
+                  <button type="button" onClick={() => setOpen(false)} className="min-h-11 whitespace-nowrap rounded-lg border border-slate-300 px-4 font-extrabold text-slate-700 focus:outline-none focus-visible:ring-3 focus-visible:ring-slate-200">
+                    ยกเลิก
+                  </button>
               <button
                 type="submit"
                 disabled={isSubmitting || !selectedRunId || conclusion.trim().length < 5}
-                className="min-h-11 rounded-lg bg-blue-600 px-5 font-extrabold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {isSubmitting ? "กำลังส่ง..." : "ส่งงาน"}
+                    className="min-h-11 whitespace-nowrap rounded-lg bg-blue-600 px-5 font-extrabold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
+                  >
+                    {isSubmitting ? "กำลังส่ง…" : "ส่งผลการทดลอง"}
               </button>
             </DialogFooter>
           </form>
@@ -262,6 +407,58 @@ export function ExperimentRunPreview({
         </div>
       </div>
     </div>
+  );
+}
+
+export function ClassroomSubmissionImageGallery({
+  attachments,
+  heading,
+}: {
+  attachments: ClassroomFileAttachment[];
+  heading: string;
+}) {
+  const headingId = useId();
+  const imageAttachments = attachments.filter((attachment) => (
+    attachment.mimeType?.startsWith("image/")
+    || /\.(?:jpe?g|png|webp)$/i.test(attachment.name)
+  ));
+  const images = imageAttachments.filter((attachment) => Boolean(attachment.signedUrl));
+
+  if (imageAttachments.length === 0) return null;
+
+  return (
+    <section className="min-w-0" aria-labelledby={headingId}>
+      <h3 id={headingId} className="text-sm font-extrabold leading-relaxed text-slate-900">{heading}</h3>
+      {images.length === 0 ? (
+        <p role="status" className="mt-2 rounded-lg bg-amber-50 px-3 py-2 text-sm font-semibold leading-relaxed text-amber-900">
+          โหลดรูปภาพที่แนบไม่สำเร็จ กรุณาปิดแล้วเปิดหน้าตรวจอีกครั้ง
+        </p>
+      ) : <div className="mt-3 grid min-w-0 gap-3 sm:grid-cols-2">
+        {images.map((attachment) => (
+          <figure key={attachment.path} className="min-w-0 overflow-hidden rounded-xl border border-slate-200 bg-white">
+            <Image
+              src={attachment.signedUrl!}
+              alt={`รูปผลการทดลอง ${attachment.name}`}
+              width={1280}
+              height={900}
+              unoptimized
+              className="aspect-video h-auto w-full bg-slate-50 object-contain"
+            />
+            <figcaption className="flex min-w-0 flex-wrap items-center justify-between gap-2 p-3">
+              <span className="min-w-0 flex-1 truncate text-xs font-bold text-slate-700">{attachment.name}</span>
+              <a
+                href={attachment.signedUrl!}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-lg px-3 text-xs font-extrabold text-blue-700 hover:bg-blue-50 active:bg-blue-100 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
+              >
+                เปิดภาพขนาดเต็ม
+              </a>
+            </figcaption>
+          </figure>
+        ))}
+      </div>}
+    </section>
   );
 }
 

@@ -508,9 +508,26 @@ export async function submitClassroomAssignment(input: SubmitClassroomAssignment
   if (existingSubmissionError) {
     throwClassroomActionError(existingSubmissionError.code, existingSubmissionError.message);
   }
+  const existingAttachments = existingSubmission
+    ? normalizeStoredAttachments(existingSubmission.attachments)
+    : [];
+  if (
+    existingSubmission
+    && existingAttachments.length === 0
+    && existingSubmission.attachment_path
+    && existingSubmission.attachment_name
+  ) {
+    existingAttachments.push({
+      path: existingSubmission.attachment_path,
+      name: existingSubmission.attachment_name,
+      mimeType: existingSubmission.attachment_mime_type,
+      size: existingSubmission.attachment_size,
+    });
+  }
   const uploaded = await uploadClassroomFiles(supabase, classroomId, userId, input.attachmentFiles);
+  const nextAttachments = uploaded.length > 0 ? uploaded : existingAttachments;
 
-  if (!note && linkUrls.length === 0 && uploaded.length === 0) {
+  if (!note && linkUrls.length === 0 && nextAttachments.length === 0) {
     throw new Error("กรุณาแนบไฟล์ วางลิงก์ หรือเขียนหมายเหตุอย่างน้อยหนึ่งอย่าง");
   }
 
@@ -519,7 +536,7 @@ export async function submitClassroomAssignment(input: SubmitClassroomAssignment
     p_experiment_run_id: input.experimentRunId,
     p_note: note || null,
     p_link_urls: linkUrls,
-    p_attachments: uploaded.map(toAttachmentJson),
+    p_attachments: nextAttachments.map(toAttachmentJson),
   });
 
   if (error) {
@@ -528,7 +545,7 @@ export async function submitClassroomAssignment(input: SubmitClassroomAssignment
   }
   if (!data) throw new Error("ส่งงานไม่สำเร็จ");
 
-  if (existingSubmission) {
+  if (existingSubmission && uploaded.length > 0) {
     await removeClassroomFiles(
       supabase,
       attachmentPaths(existingSubmission.attachments, existingSubmission),
