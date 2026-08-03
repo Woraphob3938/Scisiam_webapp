@@ -83,7 +83,7 @@ test("shared shell keeps experiment actions outside advanced settings", () => {
   );
   const actionStart = source.indexOf('data-testid="simulation-primary-actions"');
   const advancedStart = source.indexOf("const persistentAdvancedPanel");
-  const advancedEnd = source.indexOf("const simulationStage");
+  const advancedEnd = source.indexOf("const resultsDrawer", advancedStart);
   const advancedSource = source.slice(advancedStart, advancedEnd);
 
   assert.ok(actionStart > -1, "the always-visible primary action bar should exist");

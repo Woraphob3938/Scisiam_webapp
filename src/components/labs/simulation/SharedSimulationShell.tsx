@@ -8,6 +8,8 @@ import EquipmentList from "@/components/labs/EquipmentList";
 import DetailExperimentSteps from "@/components/labs/ExperimentSteps";
 import TheoryCard from "@/components/labs/TheoryCard";
 import { getLabDetails } from "@/data/labDetails";
+import type { TutorialId } from "@/lib/tutorials/catalog";
+import { reportTutorialAction } from "@/lib/tutorials/events";
 import {
   ArrowLeft,
   BarChart3,
@@ -41,6 +43,7 @@ export interface SimulationStep {
 interface SharedSimulationShellProps {
   accent: "blue" | "cyan" | "emerald" | "orange" | "pink" | "rose" | "violet";
   labId: string;
+  tutorialId?: TutorialId;
   category: string;
   title: string;
   subtitle: string;
@@ -230,6 +233,7 @@ function stripDuplicatePrimaryActions(
 export default function SharedSimulationShell({
   accent,
   labId,
+  tutorialId,
   category,
   title,
   scene,
@@ -509,10 +513,18 @@ export default function SharedSimulationShell({
       ref={resultsTriggerRef}
       type="button"
       data-testid="simulation-results-trigger"
+      data-tutorial={tutorialId ? `${labId}-results` : undefined}
       onClick={(event) => {
         resultsTriggerRef.current = event.currentTarget;
         setControlsOpen(false);
         setResultsOpen(true);
+        if (tutorialId) {
+          reportTutorialAction({
+            tutorialId,
+            actionId: "simulation.results-opened",
+            labId,
+          });
+        }
       }}
       className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-black text-slate-700 transition hover:bg-slate-50 hover:text-slate-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
       aria-expanded={resultsOpen}
@@ -533,6 +545,7 @@ export default function SharedSimulationShell({
       {onRun && (
         <button
           type="button"
+          data-tutorial={tutorialId ? `${labId}-run` : undefined}
           onClick={onRun}
           disabled={runDisabled}
           aria-pressed={runActive}
@@ -728,12 +741,27 @@ export default function SharedSimulationShell({
         <div className="max-h-[260px] min-w-0 overflow-auto">{graph}</div>
         <div className="max-h-[260px] min-w-0 overflow-auto">{table}</div>
       </div>
+
+      {showSaveButton && onSave ? (
+        <div className="sticky bottom-0 mt-4 border-t border-slate-100 bg-white pt-3">
+          <button
+            type="button"
+            data-tutorial={tutorialId ? `${labId}-results-save` : undefined}
+            onClick={onSave}
+            className={`inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-black shadow-sm transition focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${tone.button}`}
+          >
+            <Save className="h-4 w-4" aria-hidden="true" />
+            บันทึกผลการทดลอง
+          </button>
+        </div>
+      ) : null}
     </section>
   );
 
   const simulationStage = (
     <section
       ref={stageShellRef}
+      data-tutorial-lab={tutorialId ? labId : undefined}
       style={
         isExpanded
           ? {

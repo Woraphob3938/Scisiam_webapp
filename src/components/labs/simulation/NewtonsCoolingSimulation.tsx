@@ -20,6 +20,8 @@ import {
 import SharedSimulationShell from "@/components/labs/simulation/SharedSimulationShell";
 import { BoundedNumberInput } from "@/components/labs/simulation/ManualNumberInput";
 import { saveExperimentAndSync } from "@/lib/supabase/experiment-sync";
+import { TUTORIAL_IDS } from "@/lib/tutorials/catalog";
+import { reportTutorialAction } from "@/lib/tutorials/events";
 
 // --- TYPES ---
 export interface CoolingDataPoint {
@@ -528,7 +530,6 @@ export default function NewtonsCoolingSimulation() {
   const currentTempRef = useRef(currentTemp);
   const lastLoggedTimeRef = useRef(lastLoggedTime);
 
-  const initialTempRef = useRef(initialTemp);
   const ambientTempRef = useRef(ambientTemp);
   const coolingConstantRef = useRef(coolingConstant);
   const logIntervalRef = useRef(logInterval);
@@ -543,12 +544,35 @@ export default function NewtonsCoolingSimulation() {
   useEffect(() => { currentTempRef.current = currentTemp; }, [currentTemp]);
   useEffect(() => { lastLoggedTimeRef.current = lastLoggedTime; }, [lastLoggedTime]);
 
-  useEffect(() => { initialTempRef.current = initialTemp; }, [initialTemp]);
   useEffect(() => { ambientTempRef.current = ambientTemp; }, [ambientTemp]);
   useEffect(() => { coolingConstantRef.current = coolingConstant; }, [coolingConstant]);
   useEffect(() => { isHeaterOnRef.current = isHeaterOn; }, [isHeaterOn]);
   useEffect(() => { questProgressRef.current = questProgress; }, [questProgress]);
   useEffect(() => { questSuccessRef.current = questSuccess; }, [questSuccess]);
+
+  const handleInitialTemperatureChange = (value: number) => {
+    const next = clampNumber(value, MIN_TEMPERATURE_C, MAX_TEMPERATURE_C);
+    if (next === initialTemp) return;
+
+    setInitialTemp(next);
+    reportTutorialAction({
+      tutorialId: TUTORIAL_IDS.newtonsCooling,
+      actionId: "newton.initial-temperature.changed",
+      labId,
+    });
+  };
+
+  const handleAmbientTemperatureChange = (value: number) => {
+    const next = clampNumber(value, MIN_TEMPERATURE_C, 50);
+    if (next === ambientTemp) return;
+
+    setAmbientTemp(next);
+    reportTutorialAction({
+      tutorialId: TUTORIAL_IDS.newtonsCooling,
+      actionId: "newton.ambient-temperature.changed",
+      labId,
+    });
+  };
 
   // Handle setting active currentTemp base on initialTemp before start
   useEffect(() => {
@@ -628,6 +652,11 @@ export default function NewtonsCoolingSimulation() {
     const nextIsRunning = !isRunning;
     setIsRunning(nextIsRunning);
     isRunningRef.current = nextIsRunning;
+    reportTutorialAction({
+      tutorialId: TUTORIAL_IDS.newtonsCooling,
+      actionId: nextIsRunning ? "simulation.started" : "simulation.paused",
+      labId,
+    });
 
     // If starting from absolute zero, add initial log point
     if (nextIsRunning && elapsedSeconds === 0) {
@@ -791,8 +820,7 @@ export default function NewtonsCoolingSimulation() {
     setCurrentTemp(next);
     currentTempRef.current = next;
     if (!isRunning) {
-      setInitialTemp(next);
-      initialTempRef.current = next;
+      handleInitialTemperatureChange(next);
     }
   };
   const environmentPresets = [
@@ -801,9 +829,9 @@ export default function NewtonsCoolingSimulation() {
     { label: "อ่างน้ำแข็ง", helper: "5°C / k 0.260", ambient: 5, k: 0.26, icon: Snowflake },
   ];
   const coolingControls = [
-    { label: "อุณหภูมิเริ่มต้น (T₀)", shortLabel: "T₀", value: initialTemp, set: setInitialTemp, min: MIN_TEMPERATURE_C, max: MAX_TEMPERATURE_C, step: 1, suffix: "°C", color: "accent-rose-500", icon: Thermometer },
-    { label: "อุณหภูมิสิ่งแวดล้อม (Tₛ)", shortLabel: "Tₛ", value: ambientTemp, set: setAmbientTemp, min: MIN_TEMPERATURE_C, max: 50, step: 1, suffix: "°C", color: "accent-blue-500", icon: Thermometer },
-    { label: "ค่าคงที่การเย็นตัว (k)", shortLabel: "k", value: coolingConstant, set: setCoolingConstant, min: 0.001, max: 1.000, step: 0.005, suffix: "/นาที", color: "accent-purple-500", icon: Sliders },
+    { label: "อุณหภูมิเริ่มต้น (T₀)", shortLabel: "T₀", value: initialTemp, set: handleInitialTemperatureChange, tutorialTarget: "newtons-cooling-initial-temperature", min: MIN_TEMPERATURE_C, max: MAX_TEMPERATURE_C, step: 1, suffix: "°C", color: "accent-rose-500", icon: Thermometer },
+    { label: "อุณหภูมิสิ่งแวดล้อม (Tₛ)", shortLabel: "Tₛ", value: ambientTemp, set: handleAmbientTemperatureChange, tutorialTarget: "newtons-cooling-ambient-temperature", min: MIN_TEMPERATURE_C, max: 50, step: 1, suffix: "°C", color: "accent-blue-500", icon: Thermometer },
+    { label: "ค่าคงที่การเย็นตัว (k)", shortLabel: "k", value: coolingConstant, set: setCoolingConstant, tutorialTarget: undefined, min: 0.001, max: 1.000, step: 0.005, suffix: "/นาที", color: "accent-purple-500", icon: Sliders },
   ];
 
   const controls = (
@@ -825,7 +853,7 @@ export default function NewtonsCoolingSimulation() {
                 key={preset.label}
                 type="button"
                 onClick={() => {
-                  setAmbientTemp(preset.ambient);
+                  handleAmbientTemperatureChange(preset.ambient);
                   setCoolingConstant(preset.k);
                 }}
                 className={`rounded-xl border px-3 py-2 text-left transition active:scale-[0.98] ${
@@ -872,7 +900,11 @@ export default function NewtonsCoolingSimulation() {
           const disabled = isRunning && control.shortLabel === "T₀";
 
           return (
-            <label key={control.label} className="rounded-xl border border-slate-100 bg-slate-50/80 px-3 py-2">
+            <label
+              key={control.label}
+              data-tutorial={control.tutorialTarget}
+              className="rounded-xl border border-slate-100 bg-slate-50/80 px-3 py-2"
+            >
               <div className="mb-2 flex items-center justify-between gap-2">
                 <span className="inline-flex min-w-0 items-center gap-1.5 text-xs font-black text-slate-700">
                   <ControlIcon className="h-3.5 w-3.5 shrink-0 text-blue-600" />
@@ -929,7 +961,7 @@ export default function NewtonsCoolingSimulation() {
           max={50}
           step={1}
           value={ambientTemp}
-          onChange={setAmbientTemp}
+          onChange={handleAmbientTemperatureChange}
           className="mt-1 h-8 w-full rounded-lg border border-blue-100 bg-white/80 px-2 text-right text-sm font-black text-blue-700 outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100"
           ariaLabel="กรอกอุณหภูมิสิ่งแวดล้อม"
         />
@@ -961,6 +993,7 @@ export default function NewtonsCoolingSimulation() {
     <SharedSimulationShell
       accent="blue"
       labId={labId}
+      tutorialId={TUTORIAL_IDS.newtonsCooling}
       category="Physics"
       title="Newton's Law of Cooling"
       subtitle="ทดลองศึกษาความร้อนและการเย็นตัวของของเหลวตามกฎการเย็นตัวของนิวตัน ควบคุมฮีตเตอร์สั่งการอุณหภูมิ และอ่านค่าเซ็นเซอร์อุณหภูมิแบบ Real-time"

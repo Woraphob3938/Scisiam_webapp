@@ -17,6 +17,7 @@ import {
   Pencil,
   Save,
   School,
+  Trash2,
   UserCircle,
   Users,
   X,
@@ -30,9 +31,13 @@ import {
   readLocalLearningSnapshot,
   type LearningRunSnapshot,
 } from "@/lib/supabase/learning-snapshot";
-import { cacheScisiamAuth, SCISIAM_AUTH_EVENT } from "@/lib/supabase/auth-cache";
+import {
+  cacheScisiamAuth,
+  SCISIAM_AUTH_AVATAR_VERSION_KEY,
+  SCISIAM_AUTH_EVENT,
+} from "@/lib/supabase/auth-cache";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
-import { getProfileAvatarSrc } from "@/lib/supabase/profile-avatar";
+import { createProfileAvatarPath, getProfileAvatarSrc } from "@/lib/supabase/profile-avatar";
 import { readyLabCount } from "@/data/labReadiness";
 import { labsById } from "@/data/labs";
 
@@ -97,9 +102,10 @@ export default function ProfilePage() {
   const [draftName, setDraftName] = useState("นักเรียน");
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [avatarPath, setAvatarPath] = useState<string | null>(null);
-  const [avatarVersion, setAvatarVersion] = useState(0);
+  const [avatarVersion, setAvatarVersion] = useState<string | number>(0);
   const [draftAvatarFile, setDraftAvatarFile] = useState<File | null>(null);
   const [draftAvatarPreview, setDraftAvatarPreview] = useState<string | null>(null);
+  const [draftAvatarRemoved, setDraftAvatarRemoved] = useState(false);
   const [profileBusy, setProfileBusy] = useState<"profile" | null>(null);
   const [profileNotice, setProfileNotice] = useState<{ text: string; error: boolean } | null>(null);
   const avatarInputRef = useRef<HTMLInputElement>(null);
@@ -123,6 +129,7 @@ export default function ProfilePage() {
         setUsername(snapshot.profile.displayName);
         setDraftName(snapshot.profile.displayName);
         setAvatarPath(snapshot.profile.avatarUrl);
+        setAvatarVersion(snapshot.profile.updatedAt ?? Date.now());
       }
     };
 
@@ -157,6 +164,7 @@ export default function ProfilePage() {
         setUsername(storedName);
         setDraftName(storedName);
         setAvatarPath(storedAvatar);
+        setAvatarVersion(localStorage.getItem(SCISIAM_AUTH_AVATAR_VERSION_KEY) || Date.now());
         if (storedRole !== "teacher") {
           applySnapshot(readLocalLearningSnapshot());
         }
@@ -200,6 +208,7 @@ export default function ProfilePage() {
     setDraftName(username);
     setDraftAvatarFile(null);
     setDraftAvatarPreview(null);
+    setDraftAvatarRemoved(false);
     setProfileNotice(null);
     setIsEditingProfile(true);
   };
@@ -208,6 +217,7 @@ export default function ProfilePage() {
     setDraftName(username);
     setDraftAvatarFile(null);
     setDraftAvatarPreview(null);
+    setDraftAvatarRemoved(false);
     setProfileNotice(null);
     setIsEditingProfile(false);
   };
@@ -225,11 +235,19 @@ export default function ProfilePage() {
     try {
       setDraftAvatarFile(file);
       setDraftAvatarPreview(await readFileAsDataUrl(file));
+      setDraftAvatarRemoved(false);
       setProfileNotice(null);
     } catch (error) {
       console.error("Failed to preview profile avatar", error);
       setProfileNotice({ text: "อ่านไฟล์รูปไม่สำเร็จ กรุณาลองอีกครั้ง", error: true });
     }
+  };
+
+  const removeDraftAvatar = () => {
+    setDraftAvatarFile(null);
+    setDraftAvatarPreview(null);
+    setDraftAvatarRemoved(true);
+    setProfileNotice(null);
   };
 
   const saveProfile = async () => {
@@ -242,7 +260,8 @@ export default function ProfilePage() {
     setProfileBusy("profile");
     setProfileNotice(null);
     try {
-      let nextAvatarPath = avatarPath;
+      let nextAvatarPath = draftAvatarRemoved ? null : avatarPath;
+      const nextAvatarVersion = Date.now();
 
       if (!usesLocalProfile()) {
         const supabase = createClient();
@@ -253,11 +272,10 @@ export default function ProfilePage() {
           } = await supabase.auth.getUser();
           if (userError || !user) throw userError || new Error("Authentication required");
 
-          nextAvatarPath = `${user.id}/avatar`;
+          nextAvatarPath = createProfileAvatarPath(user.id, draftAvatarFile.type);
           const { error: uploadError } = await supabase.storage.from("profile-avatars").upload(nextAvatarPath, draftAvatarFile, {
-            upsert: true,
             contentType: draftAvatarFile.type,
-            cacheControl: "3600",
+            cacheControl: "31536000",
           });
           if (uploadError) throw uploadError;
         }
@@ -267,23 +285,50 @@ export default function ProfilePage() {
           p_avatar_url: draftAvatarFile ? nextAvatarPath : null,
         });
         if (error) throw error;
+
+        if (
+          draftAvatarFile &&
+          avatarPath &&
+          nextAvatarPath !== avatarPath &&
+          !avatarPath.startsWith("data:") &&
+          !avatarPath.startsWith("http")
+        ) {
+          const { error: removePreviousFileError } = await supabase.storage.from("profile-avatars").remove([avatarPath]);
+          if (removePreviousFileError) {
+            console.error("Failed to remove previous profile avatar file", removePreviousFileError);
+          }
+        }
+
+        if (draftAvatarRemoved) {
+          const { error: removeProfileError } = await supabase.rpc("remove_own_profile_avatar");
+          if (removeProfileError) throw removeProfileError;
+
+          if (avatarPath && !avatarPath.startsWith("data:") && !avatarPath.startsWith("http")) {
+            const { error: removeFileError } = await supabase.storage.from("profile-avatars").remove([avatarPath]);
+            if (removeFileError) {
+              console.error("Failed to remove old profile avatar file", removeFileError);
+            }
+          }
+        }
       } else {
-        nextAvatarPath = draftAvatarPreview ?? avatarPath;
+        nextAvatarPath = draftAvatarRemoved ? null : draftAvatarPreview ?? avatarPath;
       }
 
       setUsername(nextName);
       setDraftName(nextName);
       setAvatarPath(nextAvatarPath);
-      setAvatarVersion(Date.now());
+      setAvatarVersion(nextAvatarVersion);
       setDraftAvatarFile(null);
       setDraftAvatarPreview(null);
+      setDraftAvatarRemoved(false);
       setIsEditingProfile(false);
       cacheScisiamAuth({
         role: role === "teacher" ? "teacher" : "student",
         displayName: nextName,
         avatarUrl: nextAvatarPath,
+        avatarVersion: nextAvatarVersion,
       });
-      setProfileNotice({ text: "บันทึกโปรไฟล์แล้ว", error: false });
+      setProfileNotice({ text: draftAvatarRemoved ? "นำรูปโปรไฟล์ออกแล้ว" : "บันทึกโปรไฟล์แล้ว", error: false });
     } catch (error) {
       console.error("Failed to update profile", error);
       setProfileNotice({ text: "บันทึกโปรไฟล์ไม่สำเร็จ กรุณาลองอีกครั้ง", error: true });
@@ -293,7 +338,8 @@ export default function ProfilePage() {
   };
 
   const avatarSrc = useMemo(() => getProfileAvatarSrc(avatarPath, avatarVersion), [avatarPath, avatarVersion]);
-  const visibleAvatarSrc = draftAvatarPreview ?? avatarSrc;
+  const visibleAvatarSrc = draftAvatarRemoved ? null : draftAvatarPreview ?? (avatarPath ? avatarSrc : null);
+  const canRemoveAvatar = !draftAvatarRemoved && Boolean(draftAvatarPreview || avatarPath);
   const latestRun = recentRuns[0];
   const progressPercent = Math.min(
     100,
@@ -350,27 +396,46 @@ export default function ProfilePage() {
               <div className="mx-auto max-w-7xl overflow-hidden rounded-[28px] border border-blue-100 bg-[radial-gradient(circle_at_top_right,_rgba(191,219,254,0.8),_transparent_34%),linear-gradient(135deg,#ffffff_0%,#eff6ff_100%)] shadow-sm shadow-slate-200/50">
                 <div className="flex flex-col gap-6 p-5 sm:p-7 lg:flex-row lg:items-center lg:justify-between">
                   <div className="flex min-w-0 items-start gap-4 sm:items-center sm:gap-5">
-                    <div className="relative h-[84px] w-[84px] shrink-0 sm:h-24 sm:w-24">
-                      <div className="relative h-full w-full overflow-hidden rounded-2xl border-4 border-white bg-blue-50 shadow-lg shadow-blue-200/50">
-                        <Image
-                          src={visibleAvatarSrc}
-                          alt={`รูปโปรไฟล์ของ ${username}`}
-                          fill
-                          sizes="96px"
-                          className="object-cover"
-                          priority
-                          unoptimized={visibleAvatarSrc.startsWith("data:")}
-                        />
+                    <div className="grid shrink-0 justify-items-center gap-2">
+                      <div className="relative h-[84px] w-[84px] sm:h-24 sm:w-24">
+                        <div className="relative grid h-full w-full place-items-center overflow-hidden rounded-2xl border-4 border-white bg-blue-50 text-blue-400 shadow-lg shadow-blue-200/50">
+                          {visibleAvatarSrc ? (
+                            <Image
+                              src={visibleAvatarSrc}
+                              alt={`รูปโปรไฟล์ของ ${username}`}
+                              fill
+                              sizes="96px"
+                              className="object-cover"
+                              priority
+                              unoptimized
+                            />
+                          ) : (
+                            <UserCircle className="h-11 w-11" aria-hidden="true" />
+                          )}
+                          {!visibleAvatarSrc ? <span className="sr-only">ยังไม่มีรูปโปรไฟล์</span> : null}
+                        </div>
+                        {isEditingProfile ? (
+                          <button
+                            type="button"
+                            onClick={() => avatarInputRef.current?.click()}
+                            disabled={profileBusy !== null}
+                            className="absolute -bottom-2 -right-2 grid h-10 w-10 place-items-center rounded-xl border-2 border-white bg-blue-600 text-white shadow-md transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-400 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
+                            aria-label="เปลี่ยนรูปโปรไฟล์"
+                          >
+                            <Camera className="h-4 w-4" />
+                          </button>
+                        ) : null}
                       </div>
-                      {isEditingProfile ? (
+                      {isEditingProfile && canRemoveAvatar ? (
                         <button
                           type="button"
-                          onClick={() => avatarInputRef.current?.click()}
+                          onClick={removeDraftAvatar}
                           disabled={profileBusy !== null}
-                          className="absolute -bottom-2 -right-2 grid h-10 w-10 place-items-center rounded-xl border-2 border-white bg-blue-600 text-white shadow-md transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-400 focus:outline-none focus-visible:ring-3 focus-visible:ring-blue-100"
-                          aria-label="เปลี่ยนรูปโปรไฟล์"
+                          className="inline-flex min-h-9 items-center gap-1.5 rounded-lg px-2 text-xs font-bold text-rose-700 transition-colors hover:bg-rose-50 disabled:cursor-not-allowed disabled:text-rose-300 focus:outline-none focus-visible:ring-3 focus-visible:ring-rose-100"
+                          aria-label="ลบรูปโปรไฟล์"
                         >
-                          <Camera className="h-4 w-4" />
+                          <Trash2 className="h-3.5 w-3.5" />
+                          ลบรูป
                         </button>
                       ) : null}
                       <input

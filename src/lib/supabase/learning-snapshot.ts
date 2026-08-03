@@ -25,6 +25,7 @@ export type LearningSnapshot = {
   profile?: {
     displayName: string;
     avatarUrl: string | null;
+    updatedAt?: string;
     role: ScisiamUserRole;
   };
 };
@@ -112,7 +113,7 @@ export async function loadSupabaseLearningSnapshot(): Promise<LearningSnapshot |
   const [profileResult, progressResult, runsResult] = await Promise.all([
     supabase
       .from("profiles")
-      .select("display_name, role, avatar_url")
+      .select("display_name, role, avatar_url, updated_at")
       .eq("id", user.id)
       .maybeSingle(),
     supabase
@@ -147,6 +148,7 @@ export async function loadSupabaseLearningSnapshot(): Promise<LearningSnapshot |
     ? {
         displayName: profileResult.data.display_name,
         avatarUrl: profileResult.data.avatar_url,
+        updatedAt: profileResult.data.updated_at,
         role: profileResult.data.role,
       }
     : undefined;
@@ -156,6 +158,8 @@ export async function loadSupabaseLearningSnapshot(): Promise<LearningSnapshot |
       {
         role: profile.role,
         displayName: profile.displayName,
+        avatarUrl: profile.avatarUrl,
+        avatarVersion: profile.updatedAt ?? null,
       },
       { emit: false },
     );

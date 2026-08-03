@@ -11,12 +11,28 @@ test("Navbar follows profile name and avatar updates", () => {
   const authProvider = read("src", "context", "AuthContext.tsx");
   const profile = read("src", "app", "profile", "page.tsx");
 
-  assert.match(authProvider, /select\("display_name, role, avatar_url"\)/);
+  assert.match(authProvider, /select\("display_name, role, avatar_url, updated_at"\)/);
   assert.match(navbar, /getProfileAvatarSrc/);
   assert.match(navbar, /src=\{profileAvatarSrc\}/);
   assert.match(profile, /saveProfile/);
   assert.match(profile, /cacheScisiamAuth\(\{/);
   assert.match(profile, /avatarUrl:\s*nextAvatarPath/);
+});
+
+test("profile avatar updates use a new cache identity and refresh after iOS resume", () => {
+  const navbar = read("src", "components", "Navbar.tsx");
+  const authProvider = read("src", "context", "AuthContext.tsx");
+  const authCache = read("src", "lib", "supabase", "auth-cache.ts");
+  const profile = read("src", "app", "profile", "page.tsx");
+
+  assert.match(profile, /createProfileAvatarPath\(user\.id, draftAvatarFile\.type\)/);
+  assert.match(profile, /cacheControl:\s*"31536000"/);
+  assert.match(profile, /avatarVersion:\s*nextAvatarVersion/);
+  assert.match(authCache, /SCISIAM_AUTH_AVATAR_VERSION_KEY/);
+  assert.match(authProvider, /select\("display_name, role, avatar_url, updated_at"\)/);
+  assert.match(authProvider, /window\.addEventListener\("pageshow", handleAppResume\)/);
+  assert.match(authProvider, /document\.addEventListener\("visibilitychange", handleVisibilityChange\)/);
+  assert.match(navbar, /<Image[\s\S]{0,300}src=\{profileAvatarSrc\}[\s\S]{0,300}unoptimized/);
 });
 
 test("navbar auth state persists across route navigation", () => {

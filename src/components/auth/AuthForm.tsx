@@ -13,6 +13,7 @@ import {
   Check,
   Eye,
   EyeOff,
+  GraduationCap,
   Lock,
   Mail,
   School,
@@ -43,12 +44,16 @@ interface AuthFormProps {
 
 type AuthMode = "login" | "register" | "forgot-password";
 type AuthRole = "student" | "teacher";
+type InstitutionType = "school" | "university";
 type SchoolOption = {
   id: string;
   name: string;
+  institution_type: InstitutionType;
   district: string | null;
   province: string | null;
   education_area: string | null;
+  school_type: string | null;
+  region: string | null;
 };
 
 const isDemoModeEnabled =
@@ -64,6 +69,29 @@ const roleOptions: Array<{
   { id: "student", title: "นักเรียน", description: "เริ่มบททดลอง" },
   { id: "teacher", title: "คุณครู", description: "จัดการชั้นเรียน" },
 ];
+
+const institutionCopy = {
+  school: {
+    label: "โรงเรียน",
+    placeholder: "เช่น สตรีวิทยา",
+    loading: "กำลังค้นหาโรงเรียน...",
+    lookupError: "โหลดรายชื่อโรงเรียนไม่ได้ กรุณาลองใหม่อีกครั้ง",
+  },
+  university: {
+    label: "มหาวิทยาลัย",
+    placeholder: "เช่น มหาวิทยาลัยเชียงใหม่",
+    loading: "กำลังค้นหามหาวิทยาลัย...",
+    lookupError: "โหลดรายชื่อมหาวิทยาลัยไม่ได้ กรุณาลองใหม่อีกครั้ง",
+  },
+} satisfies Record<
+  InstitutionType,
+  {
+    label: string;
+    placeholder: string;
+    loading: string;
+    lookupError: string;
+  }
+>;
 
 export default function AuthForm({
   initialMode,
@@ -81,6 +109,8 @@ export default function AuthForm({
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [role, setRole] = useState<AuthRole>("student");
+  const [institutionType, setInstitutionType] =
+    useState<InstitutionType>("school");
   const [schoolSearch, setSchoolSearch] = useState("");
   const [schoolOptions, setSchoolOptions] = useState<SchoolOption[]>([]);
   const [selectedSchool, setSelectedSchool] = useState<SchoolOption | null>(null);
@@ -178,8 +208,11 @@ export default function AuthForm({
       const supabase = createClient();
       const { data, error: catalogError } = await supabase
         .from("school_catalog")
-        .select("id, name, district, province, education_area")
+        .select(
+          "id, name, institution_type, district, province, education_area, school_type, region",
+        )
         .ilike("name", `%${query}%`)
+        .eq("institution_type", institutionType)
         .order("name", { ascending: true })
         .limit(8);
 
@@ -187,7 +220,7 @@ export default function AuthForm({
       setSchoolLoading(false);
       if (catalogError) {
         setSchoolOptions([]);
-        setSchoolLookupError("โหลดรายชื่อโรงเรียนไม่ได้ กรุณาตรวจสอบว่าฐานข้อมูลโรงเรียนถูกติดตั้งแล้ว");
+        setSchoolLookupError(institutionCopy[institutionType].lookupError);
         return;
       }
       setSchoolOptions(data ?? []);
@@ -197,7 +230,7 @@ export default function AuthForm({
       ignore = true;
       window.clearTimeout(timer);
     };
-  }, [isRegister, role, schoolSearch, selectedSchool]);
+  }, [institutionType, isRegister, role, schoolSearch, selectedSchool]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -268,7 +301,9 @@ export default function AuthForm({
         return;
       }
       if (role === "teacher" && !selectedSchool) {
-        setError("กรุณาเลือกโรงเรียนจากรายการที่ค้นหา");
+        setError(
+          `กรุณาเลือก${institutionCopy[institutionType].label}จากรายการที่ค้นหา`,
+        );
         setLoading(false);
         return;
       }
@@ -386,6 +421,7 @@ export default function AuthForm({
     setRecoverySent(false);
     setMode(nextMode);
     if (nextMode !== "register") {
+      setInstitutionType("school");
       resetSchoolPicker();
     }
   };
@@ -401,8 +437,15 @@ export default function AuthForm({
   const handleRoleChange = (nextRole: AuthRole) => {
     setRole(nextRole);
     if (nextRole !== "teacher") {
+      setInstitutionType("school");
       resetSchoolPicker();
     }
+  };
+
+  const handleInstitutionTypeChange = (nextType: InstitutionType) => {
+    if (nextType === institutionType) return;
+    setInstitutionType(nextType);
+    resetSchoolPicker();
   };
 
   const selectSchool = (school: SchoolOption) => {
@@ -719,71 +762,137 @@ export default function AuthForm({
               </div>}
 
               {isRegister && role === "teacher" && (
-                <AuthField
-                  id="auth-school"
-                  label="โรงเรียน"
-                  helper="เลือกโรงเรียนเพื่อส่งคำขอบทบาทคุณครู หลังยืนยันอีเมลแล้วบัญชีต้องได้รับการอนุมัติก่อนใช้งานแดชบอร์ดครู"
-                  icon={School}
-                >
-                  <div className="relative">
-                    <input
-                      id="auth-school"
-                      type="text"
-                      required
-                      autoComplete="organization"
-                      placeholder="เช่น สตรีวิทยา"
-                      value={schoolSearch}
-                      onChange={(e) => {
-                        const nextValue = e.target.value;
-                        setSchoolSearch(nextValue);
-                        setSelectedSchool(null);
-                        setSchoolLookupError("");
-                        if (nextValue.trim().length < 2) {
-                          setSchoolOptions([]);
-                          setSchoolLoading(false);
-                        }
-                      }}
-                      aria-autocomplete="list"
-                      aria-controls="auth-school-results"
-                      className={inputClassName}
-                    />
-                    {(schoolOptions.length > 0 || schoolLoading || schoolLookupError) && (
-                      <div
-                        id="auth-school-results"
-                        role="listbox"
-                        className="absolute left-0 right-0 top-[calc(100%+6px)] z-20 max-h-64 overflow-y-auto rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl shadow-slate-200/70"
+                <div className="grid gap-3">
+                  <fieldset className="grid gap-2">
+                    <legend className="text-sm font-extrabold leading-[1.45] text-slate-900">
+                      ประเภทสถานศึกษา
+                    </legend>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        aria-pressed={institutionType === "school"}
+                        onClick={() => handleInstitutionTypeChange("school")}
+                        className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border px-3 py-2.5 text-sm font-extrabold leading-[1.45] transition-colors focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-100 ${
+                          institutionType === "school"
+                            ? "border-blue-600 bg-blue-50 text-blue-700"
+                            : "border-slate-200 bg-white text-slate-600 hover:border-blue-200 hover:bg-slate-50"
+                        }`}
                       >
-                        {schoolLoading ? (
-                          <div className="px-3 py-2 text-xs font-bold leading-relaxed text-slate-400">
-                            กำลังค้นหาโรงเรียน...
-                          </div>
-                        ) : schoolLookupError ? (
-                          <div className="px-3 py-2 text-xs font-bold leading-relaxed text-rose-600">
-                            {schoolLookupError}
-                          </div>
-                        ) : (
-                          schoolOptions.map((school) => (
-                            <button
-                              key={school.id}
-                              type="button"
-                              role="option"
-                              aria-selected={selectedSchool?.id === school.id}
-                              onClick={() => selectSchool(school)}
-                              className="grid w-full gap-0.5 rounded-lg px-3 py-2 text-left transition-colors hover:bg-blue-50 focus:outline-none focus-visible:bg-blue-50"
+                        <School className="h-4 w-4" aria-hidden="true" />
+                        <span>โรงเรียน</span>
+                      </button>
+                      <button
+                        type="button"
+                        aria-pressed={institutionType === "university"}
+                        onClick={() => handleInstitutionTypeChange("university")}
+                        className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border px-3 py-2.5 text-sm font-extrabold leading-[1.45] transition-colors focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-100 ${
+                          institutionType === "university"
+                            ? "border-blue-600 bg-blue-50 text-blue-700"
+                            : "border-slate-200 bg-white text-slate-600 hover:border-blue-200 hover:bg-slate-50"
+                        }`}
+                      >
+                        <GraduationCap className="h-4 w-4" aria-hidden="true" />
+                        <span>มหาวิทยาลัย</span>
+                      </button>
+                    </div>
+                  </fieldset>
+
+                  <AuthField
+                    id="auth-school"
+                    label={institutionCopy[institutionType].label}
+                    helper={`เลือก${institutionCopy[institutionType].label}ที่สังกัดเพื่อส่งคำขอบทบาทคุณครู บัญชีต้องได้รับการอนุมัติก่อนใช้งานแดชบอร์ดครู`}
+                    icon={institutionType === "school" ? School : GraduationCap}
+                  >
+                    <div className="relative">
+                      <input
+                        id="auth-school"
+                        type="text"
+                        required
+                        autoComplete="organization"
+                        placeholder={institutionCopy[institutionType].placeholder}
+                        value={schoolSearch}
+                        onChange={(e) => {
+                          const nextValue = e.target.value;
+                          setSchoolSearch(nextValue);
+                          setSelectedSchool(null);
+                          setSchoolLookupError("");
+                          if (nextValue.trim().length < 2) {
+                            setSchoolOptions([]);
+                            setSchoolLoading(false);
+                          }
+                        }}
+                        aria-autocomplete="list"
+                        aria-controls="auth-school-results"
+                        role="combobox"
+                        aria-expanded={
+                          schoolOptions.length > 0 ||
+                          schoolLoading ||
+                          Boolean(schoolLookupError)
+                        }
+                        className={inputClassName}
+                      />
+                      {(schoolOptions.length > 0 ||
+                        schoolLoading ||
+                        schoolLookupError) && (
+                        <div
+                          id="auth-school-results"
+                          role="listbox"
+                          className="absolute left-0 right-0 top-[calc(100%+6px)] z-20 max-h-64 overflow-y-auto rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl shadow-slate-200/70"
+                        >
+                          {schoolLoading ? (
+                            <div
+                              role="status"
+                              className="px-3 py-2 text-xs font-bold leading-relaxed text-slate-500"
                             >
-                              <span className="text-sm font-extrabold leading-[1.45] text-slate-900">
-                                {school.name}
-                              </span>
-                              <span className="text-xs font-semibold leading-relaxed text-slate-500">
-                                {[school.district, school.province, school.education_area].filter(Boolean).join(" • ")}
-                              </span>
-                            </button>
-                          ))
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </AuthField>
+                              {institutionCopy[institutionType].loading}
+                            </div>
+                          ) : schoolLookupError ? (
+                            <div
+                              role="status"
+                              className="px-3 py-2 text-xs font-bold leading-relaxed text-rose-600"
+                            >
+                              {schoolLookupError}
+                            </div>
+                          ) : (
+                            schoolOptions.map((school) => {
+                              const metadata = (
+                                school.institution_type === "university"
+                                  ? [school.region, school.school_type]
+                                  : [
+                                      school.district,
+                                      school.province,
+                                      school.education_area,
+                                    ]
+                              )
+                                .filter(Boolean)
+                                .join(" • ");
+
+                              return (
+                                <button
+                                  key={school.id}
+                                  type="button"
+                                  role="option"
+                                  aria-selected={selectedSchool?.id === school.id}
+                                  onClick={() => selectSchool(school)}
+                                  className="grid min-h-11 w-full gap-0.5 rounded-lg px-3 py-2 text-left transition-colors hover:bg-blue-50 focus:outline-none focus-visible:bg-blue-50 focus-visible:ring-2 focus-visible:ring-blue-500"
+                                >
+                                  <span className="text-sm font-extrabold leading-[1.45] text-slate-900">
+                                    {school.name}
+                                  </span>
+                                  {metadata ? (
+                                    <span className="text-xs font-semibold leading-relaxed text-slate-500">
+                                      {metadata}
+                                    </span>
+                                  ) : null}
+                                </button>
+                              );
+                            })
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </AuthField>
+                </div>
               )}
 
               {!isRegister && !isForgotPassword && (

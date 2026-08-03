@@ -4,12 +4,19 @@ import test from "node:test";
 
 const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
 
-test("first-login tour is gated by the persisted onboarding state", () => {
+test("first-login tour is action-aware without blocking the highlighted control", () => {
   const source = read("src/components/FirstLoginTour.tsx");
 
-  assert.match(source, /onboarding_completed/);
-  assert.match(source, /update\(\{ onboarding_completed: true \}\)/);
-  assert.match(source, /data-tour=\"lab-search\"/);
+  assert.match(source, /getAutoTutorialId/);
+  assert.match(source, /loadTutorialStatus/);
+  assert.match(source, /persistTutorialStatus/);
+  assert.match(source, /flushPendingTutorialProgress/);
+  assert.match(source, /createPortal/);
+  assert.doesNotMatch(source, /@\/components\/ui\/dialog/);
+  assert.match(source, /TUTORIAL_ACTION_EVENT/);
+  assert.match(source, /matchesTutorialAction/);
+  assert.match(source, /step\.kind === "action"/);
+  assert.match(source, /completedStepIds/);
   assert.match(source, /querySelectorAll/);
   assert.match(source, /scrollIntoView/);
   assert.match(source, /getTourPanelPosition/);
@@ -17,6 +24,15 @@ test("first-login tour is gated by the persisted onboarding state", () => {
   assert.match(source, /spaceBelow/);
   assert.match(source, /ResizeObserver/);
   assert.match(source, /scisiamTourOpen/);
+  assert.match(source, /pointer-events-none/);
+  assert.match(source, /pointer-events-auto/);
+  assert.match(source, /data-tutorial-scrim/);
+  assert.match(source, /TARGET_LOOKUP_TIMEOUT_MS = 1_600/);
+  assert.match(source, /ลองค้นหาอีกครั้ง/);
+  assert.match(source, /ข้ามขั้นตอนนี้/);
+  assert.match(source, /event\.key === "Tab"/);
+  assert.match(source, /event\.key === "Escape"/);
+  assert.match(source, /aria-modal="false"/);
   assert.match(source, /motion-reduce:animate-none/);
   assert.match(source, /ข้ามคู่มือ/);
   assert.match(source, /ย้อนกลับ/);
@@ -38,15 +54,19 @@ test("tour targets are present in the lab and teacher entry points", () => {
   assert.match(read("src/components/GlobalClientOverlays.tsx"), /FirstLoginTour/);
 });
 
-test("settings can replay the role-aware interactive tutorial", () => {
+test("settings can replay the role guide or Newton tutorial", () => {
   const settings = read("src/components/SettingsModal.tsx");
   const replay = read("src/lib/onboarding-tour.ts");
   const tour = read("src/components/FirstLoginTour.tsx");
 
-  assert.match(settings, /เริ่ม Tutorial แบบโต้ตอบอีกครั้ง/);
-  assert.match(settings, /requestTutorialReplay/);
+  assert.match(settings, /handleReplayTutorial\(tutorialId: TutorialId\)/);
+  assert.match(settings, /getGeneralTutorialId\(role\)/);
+  assert.match(settings, /TUTORIAL_IDS\.newtonsCooling/);
+  assert.match(settings, /คู่มือเริ่มต้น/);
+  assert.match(settings, /คู่มือแล็บ Newton/);
+  assert.match(settings, /requestTutorialReplay\(tutorialId\)/);
+  assert.match(settings, /getTutorialStartPath\(tutorialId\)/);
   assert.match(replay, /scisiam-tutorial-replay/);
-  assert.match(replay, /role === "teacher" \? "\/dashboard" : "\/labs"/);
   assert.match(tour, /consumeTutorialReplay/);
 });
 

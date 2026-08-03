@@ -23,6 +23,11 @@ import {
   getTutorialStartPath,
   requestTutorialReplay,
 } from "@/lib/onboarding-tour";
+import {
+  getGeneralTutorialId,
+  TUTORIAL_IDS,
+  type TutorialId,
+} from "@/lib/tutorials/catalog";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import {
   persistDisplayPreferences,
@@ -171,16 +176,18 @@ export default function SettingsModal({
     () => aiStyles.find((item) => item.id === aiStyle) || aiStyles[0],
     [aiStyle]
   );
+  const generalTutorialId = getGeneralTutorialId(role);
+  const canReplayTutorials = role === "student" || role === "teacher";
 
-  const handleReplayTutorial = () => {
-    const startPath = getTutorialStartPath(role);
-    requestTutorialReplay();
+  function handleReplayTutorial(tutorialId: TutorialId) {
+    const startPath = getTutorialStartPath(tutorialId);
+    requestTutorialReplay(tutorialId);
     onClose();
 
     if (pathname !== startPath) {
       router.push(startPath);
     }
-  };
+  }
 
   const sendPasswordResetEmail = async () => {
     setPasswordResetMessage("");
@@ -526,22 +533,34 @@ export default function SettingsModal({
                   </p>
                 </div>
               </div>
-              <div className="flex w-full shrink-0 flex-col gap-2 sm:w-auto sm:items-end">
+              <div className="flex w-full shrink-0 flex-col gap-2 sm:w-auto sm:min-w-52">
                 <Link
                   href="/guide"
                   onClick={onClose}
-                  className="inline-flex min-h-11 w-full items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-sm font-extrabold text-slate-700 transition-colors hover:bg-slate-50 focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-600 focus-visible:ring-offset-2 sm:w-auto"
+                  className="inline-flex min-h-11 w-full items-center justify-center whitespace-nowrap rounded-xl border border-slate-200 bg-white px-4 text-sm font-extrabold text-slate-700 transition-colors hover:bg-slate-50 active:bg-slate-100 focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-600 focus-visible:ring-offset-2 sm:w-auto"
                 >
                   เปิดคู่มือ
                 </Link>
-                <button
-                  type="button"
-                  onClick={handleReplayTutorial}
-                  className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 text-sm font-extrabold text-white transition-colors hover:bg-blue-700 focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-600 focus-visible:ring-offset-2 sm:w-auto"
-                >
-                  <MousePointerClick className="h-4 w-4" aria-hidden="true" />
-                  เริ่ม Tutorial แบบโต้ตอบอีกครั้ง
-                </button>
+                {generalTutorialId ? (
+                  <button
+                    type="button"
+                    onClick={() => handleReplayTutorial(generalTutorialId)}
+                    className="inline-flex min-h-11 w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-blue-600 px-4 text-sm font-extrabold text-white transition-colors hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
+                  >
+                    <MousePointerClick className="h-4 w-4" aria-hidden="true" />
+                    คู่มือเริ่มต้น{role === "teacher" ? "สำหรับคุณครู" : "สำหรับนักเรียน"}
+                  </button>
+                ) : null}
+                {canReplayTutorials ? (
+                  <button
+                    type="button"
+                    onClick={() => handleReplayTutorial(TUTORIAL_IDS.newtonsCooling)}
+                    className="inline-flex min-h-11 w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-blue-200 bg-blue-50 px-4 text-sm font-extrabold text-blue-800 transition-colors hover:bg-blue-100 active:bg-blue-200 focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
+                  >
+                    <MousePointerClick className="h-4 w-4" aria-hidden="true" />
+                    คู่มือแล็บ Newton
+                  </button>
+                ) : null}
               </div>
             </div>
           </section>

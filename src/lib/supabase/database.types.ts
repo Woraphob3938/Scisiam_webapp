@@ -72,6 +72,33 @@ export type Database = {
         };
         Relationships: [];
       };
+      user_tutorial_progress: {
+        Row: {
+          user_id: string;
+          tutorial_id: string;
+          status: "completed" | "skipped";
+          completed_at: string | null;
+          skipped_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          user_id: string;
+          tutorial_id: string;
+          status: "completed" | "skipped";
+          completed_at?: string | null;
+          skipped_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          status?: "completed" | "skipped";
+          completed_at?: string | null;
+          skipped_at?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       labs: {
         Row: {
           id: string;
@@ -95,6 +122,7 @@ export type Database = {
           id: string;
           school_code: string | null;
           area_code: string | null;
+          institution_type: "school" | "university";
           name: string;
           district: string | null;
           province: string | null;
@@ -112,6 +140,7 @@ export type Database = {
           id: string;
           school_code?: string | null;
           area_code?: string | null;
+          institution_type?: "school" | "university";
           name: string;
           district?: string | null;
           province?: string | null;
@@ -128,6 +157,7 @@ export type Database = {
         Update: {
           school_code?: string | null;
           area_code?: string | null;
+          institution_type?: "school" | "university";
           name?: string;
           district?: string | null;
           province?: string | null;
@@ -553,6 +583,10 @@ export type Database = {
           p_display_name?: string | null;
           p_avatar_url?: string | null;
         };
+        Returns: Json;
+      };
+      remove_own_profile_avatar: {
+        Args: Record<PropertyKey, never>;
         Returns: Json;
       };
       save_experiment_run: {

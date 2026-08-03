@@ -843,6 +843,13 @@ test("teacher registration captures a selected school without granting teacher a
   assert.ok(signUpBlock, "sign-up request should be present");
   assert.match(authForm, /\.from\("school_catalog"\)/);
   assert.match(authForm, /setSelectedSchool\(school\)/);
+  assert.match(authForm, /type InstitutionType = "school" \| "university"/);
+  assert.match(authForm, /ประเภทสถานศึกษา/);
+  assert.match(authForm, />\s*โรงเรียน\s*</);
+  assert.match(authForm, />\s*มหาวิทยาลัย\s*</);
+  assert.match(authForm, /\.eq\("institution_type", institutionType\)/);
+  assert.match(authForm, /handleInstitutionTypeChange/);
+  assert.match(authForm, /resetSchoolPicker\(\)/);
   assert.match(authForm, /role === "teacher"[\s\S]*?auth-school/);
   assert.match(authForm, /คำขอบทบาทคุณครู/);
   assert.match(authForm, /ได้รับการอนุมัติ/);
@@ -885,6 +892,33 @@ test("school catalog migration imports DMC school data with explicit API grants 
   assert.match(migration, /สพม\.กรุงเทพมหานคร เขต 1/);
   assert.match(types, /school_catalog:/);
   assert.match(types, /school_id: string \| null/);
+});
+
+test("university catalog imports active institutions and keeps closed institutions out of registration", () => {
+  const migrationFile = readdirSync(join(rootDir, "supabase/migrations"))
+    .find((file) => file.endsWith("_add_university_catalog.sql"));
+
+  assert.ok(migrationFile, "university catalog migration should exist");
+  const migration = readProjectFile(`supabase/migrations/${migrationFile}`);
+  const types = readProjectFile("src/lib/supabase/database.types.ts");
+
+  assert.match(
+    migration,
+    /institution_type text not null default 'school'/i,
+  );
+  assert.match(
+    migration,
+    /check\s*\(institution_type in \('school', 'university'\)\)/i,
+  );
+  assert.match(migration, /school_catalog_institution_type_name_idx/i);
+  assert.equal((migration.match(/\('uni-[a-f0-9]{16}'/g) ?? []).length, 192);
+  assert.doesNotMatch(migration, /มหาวิทยาลัยเว็บสเตอร์\(ประเทศไทย\)/);
+  assert.doesNotMatch(migration, /วิทยาลัยเฉลิมกาญจนาระยอง/);
+  assert.doesNotMatch(migration, /สถาบันเทคโนโลยียานยนต์มหาชัย/);
+  assert.match(
+    types,
+    /institution_type: "school" \| "university"/,
+  );
 });
 
 test("simulations award local points only through the shared experiment save helper", () => {
@@ -940,6 +974,10 @@ test("local Supabase migrations mirror the deployed migration history", () => {
     "20260727083338",
     "20260727083406",
     "20260729100000",
+    "20260803085241",
+    "20260803092331",
+    "20260803095321",
+    "20260803115040",
   ];
 
   assert.deepEqual(

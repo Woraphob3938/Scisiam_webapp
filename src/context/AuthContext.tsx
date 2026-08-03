@@ -11,6 +11,7 @@ import {
 import {
   cacheScisiamAuth,
   clearScisiamAuthCache,
+  SCISIAM_AUTH_AVATAR_VERSION_KEY,
   SCISIAM_AUTH_EVENT,
 } from "@/lib/supabase/auth-cache";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
@@ -24,7 +25,7 @@ type AuthState = {
   role: ScisiamUserRole;
   userName: string;
   avatarPath: string | null;
-  avatarVersion: number;
+  avatarVersion: string | number;
   localNotificationMode: boolean;
 };
 
@@ -51,7 +52,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         role: (localStorage.getItem("scisiam_user_role") as ScisiamUserRole | null) || "student",
         userName: localStorage.getItem("scisiam_user_name") || "นักเรียน",
         avatarPath: localStorage.getItem("scisiam_user_avatar"),
-        avatarVersion: Date.now(),
+        avatarVersion: localStorage.getItem(SCISIAM_AUTH_AVATAR_VERSION_KEY) || Date.now(),
         localNotificationMode,
       });
     };
@@ -77,7 +78,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         const { data: profile } = await supabase
           .from("profiles")
-          .select("display_name, role, avatar_url")
+          .select("display_name, role, avatar_url, updated_at")
           .eq("id", user.id)
           .maybeSingle();
 
@@ -88,7 +89,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           role: profile?.role || "student",
           userName,
           avatarPath: profile?.avatar_url ?? null,
-          avatarVersion: Date.now(),
+          avatarVersion: profile?.updated_at || Date.now(),
           localNotificationMode: false,
         });
         cacheScisiamAuth(
@@ -96,6 +97,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             role: profile?.role || "student",
             displayName: userName,
             avatarUrl: profile?.avatar_url ?? null,
+            avatarVersion: profile?.updated_at ?? null,
           },
           { emit: false },
         );
@@ -116,15 +118,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       loadAuthStateFromCache(false);
       void loadAuthState();
     };
+    const handleAppResume = () => handleAuthUpdated();
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") handleAuthUpdated();
+    };
 
     window.addEventListener(SCISIAM_AUTH_EVENT, handleAuthUpdated);
     window.addEventListener("storage", handleAuthUpdated);
     window.addEventListener("online", handleAuthUpdated);
+    window.addEventListener("pageshow", handleAppResume);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
       window.removeEventListener(SCISIAM_AUTH_EVENT, handleAuthUpdated);
       window.removeEventListener("storage", handleAuthUpdated);
       window.removeEventListener("online", handleAuthUpdated);
+      window.removeEventListener("pageshow", handleAppResume);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
       authSubscription?.unsubscribe();
     };
   }, []);

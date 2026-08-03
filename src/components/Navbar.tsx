@@ -323,7 +323,7 @@ export default function Navbar() {
                 className="flex items-center gap-2 hover:bg-slate-50 p-1.5 pr-2.5 rounded-xl transition-all duration-200 select-none cursor-pointer"
               >
                 <div className="relative w-9 h-9 rounded-full bg-blue-50 flex items-center justify-center overflow-hidden ring-2 ring-indigo-50/50 border border-white shrink-0">
-                  <Image src={profileAvatarSrc} alt={`รูปโปรไฟล์ของ ${userName}`} fill sizes="36px" className="object-cover" unoptimized={profileAvatarSrc.startsWith("data:")} />
+                  <Image src={profileAvatarSrc} alt={`รูปโปรไฟล์ของ ${userName}`} fill sizes="36px" className="object-cover" unoptimized />
                 </div>
                 <div className="hidden sm:flex flex-col text-left">
                   <span className="text-xs text-slate-400 font-medium">ยินดีต้อนรับ</span>
