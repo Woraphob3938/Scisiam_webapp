@@ -31,6 +31,11 @@ function buildRegisterRedirect(request: NextRequest) {
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
+  const pendingAuthResponseWrites: Array<(response: NextResponse) => void> = [];
+  const applyPendingAuthState = (response: NextResponse) => {
+    pendingAuthResponseWrites.forEach((writeAuthState) => writeAuthState(response));
+    return response;
+  };
 
   if (!isSupabaseConfigured()) {
     return supabaseResponse;
@@ -42,12 +47,17 @@ export async function updateSession(request: NextRequest) {
       getAll() {
         return request.cookies.getAll();
       },
-      setAll(cookiesToSet) {
+      setAll(cookiesToSet, headers) {
         cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
-        supabaseResponse = NextResponse.next({ request });
-        cookiesToSet.forEach(({ name, value, options }) => {
-          supabaseResponse.cookies.set(name, value, options);
+        pendingAuthResponseWrites.push((response) => {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            response.cookies.set(name, value, options);
+          });
+          Object.entries(headers).forEach(([key, value]) => {
+            response.headers.set(key, value);
+          });
         });
+        supabaseResponse = applyPendingAuthState(NextResponse.next({ request }));
       },
     },
   });
@@ -56,11 +66,11 @@ export async function updateSession(request: NextRequest) {
   const claims = claimsResult?.data?.claims;
 
   if (LAB_SIMULATION_PATH.test(request.nextUrl.pathname) && !claims?.sub) {
-    return buildRegisterRedirect(request);
+    return applyPendingAuthState(buildRegisterRedirect(request));
   }
 
   if (isPrivatePath(request.nextUrl.pathname) && !claims?.sub) {
-    return buildLoginRedirect(request);
+    return applyPendingAuthState(buildLoginRedirect(request));
   }
 
   return supabaseResponse;
